@@ -1,0 +1,231 @@
+<http://hpi-web.de/ns/dstore/0.1/Nobody> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://hpi-web.de/ns/dstore/0.1/Role> .
+<http://hpi-web.de/ns/dstore/0.1/Everyone> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://hpi-web.de/ns/dstore/0.1/Role> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Resource> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines who uploaded a Resource to the dstore."@en .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#label> "createdBy"@en .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/deleted_at> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/deleted_at> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<http://hpi-web.de/ns/dstore/0.1/deleted_at> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Resource> .
+<http://hpi-web.de/ns/dstore/0.1/deleted_at> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines when a Resource stopped existing."@en .
+<http://hpi-web.de/ns/dstore/0.1/deleted_at> <http://www.w3.org/2000/01/rdf-schema#label> "deleted_at"@en .
+<http://hpi-web.de/ns/dstore/0.1/deleted_at> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/created_at> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/created_at> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<http://hpi-web.de/ns/dstore/0.1/created_at> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/OntologyResource> .
+<http://hpi-web.de/ns/dstore/0.1/created_at> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines when a Resource was created"@en .
+<http://hpi-web.de/ns/dstore/0.1/created_at> <http://www.w3.org/2000/01/rdf-schema#label> "created_at"@en .
+<http://hpi-web.de/ns/dstore/0.1/created_at> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/password> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/password> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/password> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/password> <http://www.w3.org/2000/01/rdf-schema#label> "password"@en .
+<http://hpi-web.de/ns/dstore/0.1/password> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/password> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/resource_index> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/resource_index> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#nonNegativeInteger> .
+<http://hpi-web.de/ns/dstore/0.1/resource_index> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/resource_index> <http://www.w3.org/2000/01/rdf-schema#comment> "A counter for the unique resource indices."@en .
+<http://hpi-web.de/ns/dstore/0.1/resource_index> <http://www.w3.org/2000/01/rdf-schema#label> "resourceIndex"@en .
+<http://hpi-web.de/ns/dstore/0.1/resource_index> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#positiveInteger> .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Resource> .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/2000/01/rdf-schema#comment> "Resource Index"@en .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/2000/01/rdf-schema#label> "Instance Index"@en .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<http://hpi-web.de/ns/dstore/0.1/instance_id> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/ns_label> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/ns_label> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/ns_label> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.w3.org/2002/07/owl#Ontology> .
+<http://hpi-web.de/ns/dstore/0.1/ns_label> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/ns_label> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/aliasAttribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/aliasAttribute> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/AliasAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/aliasAttribute> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/AliasReferenceAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/aliasAttribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/classlabel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/classlabel> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2000/01/rdf-schema#Literal> .
+<http://hpi-web.de/ns/dstore/0.1/classlabel> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://hpi-web.de/ns/dstore/0.1/classlabel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/importModel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/importModel> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/GraphImportModel> .
+<http://hpi-web.de/ns/dstore/0.1/importModel> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/importModel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/instanceModel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/instanceModel> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/GraphInstanceModel> .
+<http://hpi-web.de/ns/dstore/0.1/instanceModel> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/instanceModel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/project> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/project> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/conceptModel> .
+<http://hpi-web.de/ns/dstore/0.1/project> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/project> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/GraphConceptModel> .
+<http://hpi-web.de/ns/dstore/0.1/project> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/conceptModel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/conceptModel> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/project> .
+<http://hpi-web.de/ns/dstore/0.1/conceptModel> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/GraphConceptModel> .
+<http://hpi-web.de/ns/dstore/0.1/conceptModel> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/conceptModel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/ownerOf> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://hpi-web.de/ns/dstore/0.1/member> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/owner> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/ownerOf> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/ownerOf> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/owner> .
+<http://hpi-web.de/ns/dstore/0.1/ownerOf> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://hpi-web.de/ns/dstore/0.1/memberOf> .
+<http://hpi-web.de/ns/dstore/0.1/ownerOf> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/ownerOf> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/ownerOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/member> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/member> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/memberOf> .
+<http://hpi-web.de/ns/dstore/0.1/member> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/member> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/member> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/member> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/memberOf> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/memberOf> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/member> .
+<http://hpi-web.de/ns/dstore/0.1/memberOf> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/memberOf> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/memberOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/isAssignedTo> .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/Role> .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/2000/01/rdf-schema#comment> "assigns a Role to a Person"@en .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/2000/01/rdf-schema#label> "has Role"@en .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/hasRole> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/2002/07/owl#inverseOf> <http://hpi-web.de/ns/dstore/0.1/hasRole> .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/2000/01/rdf-schema#range> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/2000/01/rdf-schema#domain> <http://hpi-web.de/ns/dstore/0.1/Role> .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/2000/01/rdf-schema#comment> "a person that has this role"@en .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/2000/01/rdf-schema#label> "is assigned to"@en .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/isAssignedTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2002/07/owl#OntologyAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.w3.org/2002/07/owl#OntologyRelation> .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/2000/01/rdf-schema#comment> "an ontologyRelation refers to an Ontology Attribute"@en .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/2000/01/rdf-schema#label> "refersTo"@en .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/refersTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://hpi-web.de/ns/dstore/0.1/UserRelation> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/UserRelation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Relation> .
+<http://hpi-web.de/ns/dstore/0.1/UserRelation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/GraphRelation> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/GraphRelation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Relation> .
+<http://hpi-web.de/ns/dstore/0.1/GraphRelation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyRelation> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyRelation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Relation> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyRelation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Relation> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Relation> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Attribute> .
+<http://hpi-web.de/ns/dstore/0.1/Relation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<http://hpi-web.de/ns/dstore/0.1/Relation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/AliasReferenceAttribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/AliasReferenceAttribute> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Attribute> .
+<http://hpi-web.de/ns/dstore/0.1/AliasReferenceAttribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/AliasAttribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/AliasAttribute> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Attribute> .
+<http://hpi-web.de/ns/dstore/0.1/AliasAttribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/UserAttribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/GraphAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/UserAttribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/UserAttribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/UserAttribute> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Attribute> .
+<http://hpi-web.de/ns/dstore/0.1/UserAttribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/GraphAttribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/UserAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/GraphAttribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/GraphAttribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/GraphAttribute> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Attribute> .
+<http://hpi-web.de/ns/dstore/0.1/GraphAttribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/UserAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/GraphAttribute> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Attribute> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyAttribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Attribute> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Attribute> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Relation> .
+<http://hpi-web.de/ns/dstore/0.1/Attribute> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://hpi-web.de/ns/dstore/0.1/Attribute> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Role> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/User> .
+<http://hpi-web.de/ns/dstore/0.1/Role> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/Role> <http://www.w3.org/2000/01/rdf-schema#comment> "A Role defines a set of privileges and rights"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Role> <http://www.w3.org/2000/01/rdf-schema#label> "A user's role"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Role> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Role> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/User> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Agent> .
+<http://hpi-web.de/ns/dstore/0.1/User> <http://www.w3.org/2000/01/rdf-schema#label> "A d.store user"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/User> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/User> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Agent> <http://www.w3.org/2000/01/rdf-schema#comment> "Agent"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Agent> <http://hpi-web.de/ns/dstore/0.1/classlabel> "Agent"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Agent> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Agent> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/OntologyResource> .
+<http://hpi-web.de/ns/dstore/0.1/Agent> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://xmlns.com/foaf/0.1/Agent> .
+<http://hpi-web.de/ns/dstore/0.1/Agent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Person> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://www.w3.org/2000/01/rdf-schema#comment> "Team"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://hpi-web.de/ns/dstore/0.1/classlabel> "Team"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Agent> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://xmlns.com/foaf/0.1/Group> .
+<http://hpi-web.de/ns/dstore/0.1/Team> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Graph> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Role> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/2000/01/rdf-schema#comment> "People"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://hpi-web.de/ns/dstore/0.1/classlabel> "Person"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Agent> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://xmlns.com/foaf/0.1/Person> .
+<http://hpi-web.de/ns/dstore/0.1/Person> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Person> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/2002/07/owl#disjointWith> <http://hpi-web.de/ns/dstore/0.1/Role> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://usefulinc.com/ns/doap#Project> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/2000/01/rdf-schema#comment> "A graph representing a Team Communication Network"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/2000/01/rdf-schema#label> "Team Communication Network"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Graph> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/UserResource> <http://www.w3.org/2000/01/rdf-schema#comment> "Abstract unclassified resource type defined by a project community. Superclass for all community-defined resource classes."^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/UserResource> <http://www.w3.org/2000/01/rdf-schema#label> "Custom resource type defined by users."^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/UserResource> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/UserResource> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Resource> .
+<http://hpi-web.de/ns/dstore/0.1/UserResource> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/GraphResource> <http://www.w3.org/2000/01/rdf-schema#comment> "Abstract unclassified resource type defined by a graph ontology. Superclass for all graph-defined resource classes."^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/GraphResource> <http://www.w3.org/2000/01/rdf-schema#label> "A resource type defined on graph-level."^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/GraphResource> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/GraphResource> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Resource> .
+<http://hpi-web.de/ns/dstore/0.1/GraphResource> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyResource> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyResource> <http://www.w3.org/2000/01/rdf-schema#comment> "..."^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyResource> <http://www.w3.org/2000/01/rdf-schema#label> "A global resource type defined by d.store"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyResource> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Resource> .
+<http://hpi-web.de/ns/dstore/0.1/OntologyResource> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Resource> <http://www.w3.org/2000/01/rdf-schema#comment> "A resource representing not further classified information in a Graph"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Resource> <http://www.w3.org/2000/01/rdf-schema#label> "Resource"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/Resource> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Resource> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/GraphImportModel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/GraphImportModel> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Model> .
+<http://hpi-web.de/ns/dstore/0.1/GraphImportModel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/GraphInstanceModel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/GraphInstanceModel> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Model> .
+<http://hpi-web.de/ns/dstore/0.1/GraphInstanceModel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/GraphConceptModel> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/GraphConceptModel> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://hpi-web.de/ns/dstore/0.1/Model> .
+<http://hpi-web.de/ns/dstore/0.1/GraphConceptModel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://hpi-web.de/ns/dstore/0.1/Model> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <http://hpi-web.de/ns/dstore/0.1/> .
+<http://hpi-web.de/ns/dstore/0.1/Model> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Ontology> .
+<http://hpi-web.de/ns/dstore/0.1/Model> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.w3.org/2000/01/rdf-schema#Class> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://purl.org/dc/elements/1.1/format> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+<http://hpi-web.de/ns/dstore/0.1/> <http://hpi-web.de/ns/dstore/0.1/classlabel> "dstore"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/> <http://purl.org/dc/elements/1.1/format> "application/rdf+xml"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/> <http://purl.org/dc/elements/1.1/title> "d.store Ontology v0.7"^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://hpi-web.de/ns/dstore/0.1/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .

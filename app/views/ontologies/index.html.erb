@@ -1,0 +1,25 @@
+<h1>Listing ontologies</h1>
+
+<table class="table">
+  <tr>
+    <th>Url</th>
+    <th>Description</th>
+    <th>Actions</th>
+  </tr>
+
+<% @ontologies.each do |ontology| %>
+  <tr>
+    <td><%= link_to(ontology.short_name, ontology.url) %></td>
+    <td><%= ontology.description%></td>
+    <td>
+      <%= link_to 'Destroy', ontology, method: :delete, data: { confirm: 'Are you sure?' } %>
+      <br />
+      
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Ontology', new_ontology_path, :class => "btn btn-success" %>

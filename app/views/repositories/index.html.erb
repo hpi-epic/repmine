@@ -1,0 +1,25 @@
+<table style="width:40%" class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>  
+  <% @repositories.each_with_index do |repository, i| %>
+  <tr>
+    <td><%= link_to(repository.name, repository) %></td>
+    <td>
+      <%= link_to "Show", repository, {:class => "btn btn-success"} %>
+      <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-info"} %>      
+      <%= link_to "Delete", repository, {:method => :delete, :confirm => "Really?", :class => "btn btn-danger"} %>
+    <td>
+  </tr> 
+  <% end %>
+</table>
+
+<hr />
+<p>Create new Repository</p>
+<% Repository::TYPES.each do |repo_type| %>
+  <%= link_to(repo_type.classify, new_repository_path(:type => repo_type), {:class => "btn info"})%>
+<% end %>
+

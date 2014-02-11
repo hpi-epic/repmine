@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding='ISO-8859-1'?>
+
+<!DOCTYPE rdf:RDF [
+  <!ENTITY dstore "http://hpi-web.de/ns/dstore/0.1/" >
+  <!ENTITY vcs   "http://hpi-web.de/ns/dstore/vcs/0.1/" >
+  <!ENTITY web    "http://hpi-web.de/ns/dstore/web/0.1/" >
+  <!ENTITY owl    "http://www.w3.org/2002/07/owl#" > 
+  <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#" > 
+  <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#" > 
+  <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#" > 
+  <!ENTITY dc     "http://purl.org/dc/elements/1.1/" > 
+  <!ENTITY foaf   "http://xmlns.com/foaf/0.1/" >  
+]>
+
+<rdf:RDF
+	xmlns         ="&vcs;"
+    xml:base      ="&vcs;"
+    xmlns:vcs    ="&vcs;"
+    xmlns:dstore  ="&dstore;"
+    xmlns:web     ="&web;"    
+    xmlns:owl     ="&owl;"
+    xmlns:rdf     ="&rdf;"
+    xmlns:rdfs    ="&rdfs;"
+    xmlns:xsd     ="&xsd;"
+    xmlns:dc      ="&dc;"
+	  xmlns:foaf    ="&foaf;"    
+>
+  <!-- About the dstore Vocabulary -->
+  <owl:Ontology rdf:about="&vcs;">
+    <dc:title rdf:datatype="&xsd;string">d.store Vcs Repository Ontology v0.1</dc:title>
+    <dc:creator rdf:datatype="&xsd;string">Thomas Kowark</dc:creator>
+    <dc:format rdf:datatype="&xsd;string">application/rdf+xml</dc:format>
+	  <dstore:classlabel rdf:datatype="&xsd;string">vcs</dstore:classlabel>	        
+  </owl:Ontology>
+
+  <!-- =============== -->
+  <!--  Classes        -->
+  <!-- =============== -->
+  <rdfs:Class rdf:about="&vcs;VcsRevision">
+  	<rdf:type rdf:resource="&owl;Class"/>
+  	<rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  	<dstore:classlabel rdf:datatype="&xsd;string">VcsRevision</dstore:classlabel>
+  	<rdfs:comment rdf:datatype="&xsd;string">Revision of an Vcs - contains many files</rdfs:comment>
+  	<rdfs:subClassOf rdf:resource="&dstore;OntologyResource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:about="&vcs;File">
+  	<rdf:type rdf:resource="&owl;Class"/>
+  	<rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  	<dstore:classlabel rdf:datatype="&xsd;string">File</dstore:classlabel>
+  	<rdfs:comment rdf:datatype="&xsd;string">A File within the repository</rdfs:comment>
+  	<rdfs:subClassOf rdf:resource="&dstore;OntologyResource"/>
+  </rdfs:Class>
+
+  <!-- ================== -->
+  <!-- Person extensions  -->
+  <!-- ================== -->
+
+  <!-- Person > vcsname > string -->
+  <dstore:OntologyAttribute rdf:about="&vcs;vcsname">
+  	<rdf:type rdf:resource="&dstore;AliasAttribute"/>
+  	<rdfs:label xml:lang="en">VCS account</rdfs:label>
+    <rdfs:comment xml:lang="en">A person's VCS account name</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Agent"/>
+    <rdfs:range rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+
+  <!-- ================== -->
+  <!-- VcsRevision        -->
+  <!-- ================== -->
+  
+  <!-- VcsRevision > commit_message > string -->
+  <dstore:OntologyAttribute rdf:about="&vcs;commit_message">
+  <rdfs:label xml:lang="en">commit_message</rdfs:label>
+    <rdfs:comment xml:lang="en">The message entered by the author of a particular revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- VcsRevision > revision_id > string -->
+  <dstore:OntologyAttribute rdf:about="&vcs;revision_id">
+  <rdfs:label xml:lang="en">Revision ID</rdfs:label>
+    <rdfs:comment xml:lang="en">Unique identifier of a revision within a repository.</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- VcsRevision > committedBy > Person -->
+  <dstore:OntologyRelation rdf:about="&vcs;committedBy">
+	<rdfs:label xml:lang="en">committed by</rdfs:label>
+    <rdfs:comment xml:lang="en">The committer of a Vcs revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&dstore;Agent"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;hasCommitted"/>
+    <dstore:refersTo rdf:resource="&vcs;vcsname"/>	      
+  </dstore:OntologyRelation>
+
+  <!-- Person > hasCommitted > VcsRevision -->
+  <dstore:OntologyRelation rdf:about="&vcs;hasCommitted">
+	<rdfs:label xml:lang="en">has committed</rdfs:label>
+    <rdfs:comment xml:lang="en">A VcsRevision created by a person</rdfs:comment>
+	  <rdfs:domain rdf:resource="&dstore;Agent"/>	
+    <rdfs:range rdf:resource="&vcs;VcsRevision"/>
+	  <owl:inverseOf rdf:resource="&vcs;committedBy"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyRelation>
+
+  <!-- VcsRevision > isChildOf > VcsRevision -->
+  <dstore:OntologyRelation rdf:about="&vcs;isChildOf">
+	<rdfs:label xml:lang="en">isChildOf</rdfs:label>
+    <rdfs:comment xml:lang="en">A child revision of a revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyRelation>  
+  
+  <!-- VcsRevision > isParentOf > VcsRevision -->
+  <dstore:OntologyRelation rdf:about="&vcs;isParentOf">
+	<rdfs:label xml:lang="en">isParentOf</rdfs:label>
+    <rdfs:comment xml:lang="en">A parent revision of a revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;isChildOf"/>
+  </dstore:OntologyRelation>  
+  
+  <!-- VcsRevision > modified_files > nonNegativeInteger -->
+  <dstore:OntologyAttribute rdf:about="&vcs;modified_files">	    
+  	<rdfs:label xml:lang="en">Modified Files</rdfs:label>
+    <rdfs:comment xml:lang="en">The number of changed files in that revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&xsd;nonNegativeInteger"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+
+  <!-- VcsRevision > added_files > nonNegativeInteger -->
+  <dstore:OntologyAttribute rdf:about="&vcs;added_files">
+  	<rdfs:label xml:lang="en">the number of added files in that revision</rdfs:label>
+    <rdfs:comment xml:lang="en">The number of added files in that the revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&xsd;nonNegativeInteger"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- VcsRevision > removed_files > nonNegativeInteger -->
+  <dstore:OntologyAttribute rdf:about="&vcs;removed_files">	    
+  	<rdfs:label xml:lang="en">removed_files</rdfs:label>
+    <rdfs:comment xml:lang="en">The number of the removed files in the revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&xsd;nonNegativeInteger"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- VcsRevision > moved_files > nonNegativeInteger -->
+  <dstore:OntologyAttribute rdf:about="&vcs;moved_files">	    
+  	<rdfs:label xml:lang="en">moved_files</rdfs:label>
+    <rdfs:comment xml:lang="en">The number of the moved files in the revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&xsd;nonNegativeInteger"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- VcsRevision > added > File -->
+  <dstore:OntologyRelation rdf:about="&vcs;added">
+	<rdfs:label xml:lang="en">added</rdfs:label>
+    <rdfs:comment xml:lang="en">A file that was added in a certain revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&vcs;File"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;subjectOf"/>    
+  </dstore:OntologyRelation>
+  
+  <!-- VcsRevision > modified > File -->
+  <dstore:OntologyRelation rdf:about="&vcs;modified">
+	<rdfs:label xml:lang="en">modified</rdfs:label>
+    <rdfs:comment xml:lang="en">A file that was modified in a certain revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&vcs;File"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;subjectOf"/>        
+  </dstore:OntologyRelation>
+  
+  <!-- VcsRevision > removed > File -->
+  <dstore:OntologyRelation rdf:about="&vcs;removed">
+	<rdfs:label xml:lang="en">removed</rdfs:label>
+    <rdfs:comment xml:lang="en">A file that was removed in a certain revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&vcs;File"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;subjectOf"/>        
+  </dstore:OntologyRelation>  
+
+  <!-- VcsRevision > moved > File -->
+  <dstore:OntologyRelation rdf:about="&vcs;moved">
+	<rdfs:label xml:lang="en">moved</rdfs:label>
+    <rdfs:comment xml:lang="en">A file that was moved in a certain revision</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:range  rdf:resource="&vcs;File"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;subjectOf"/>    
+  </dstore:OntologyRelation>
+  
+  <!-- ================== -->
+  <!-- File               -->
+  <!-- ================== -->    
+  <dstore:OntologyAttribute rdf:about="&vcs;filename">	    
+  	<rdfs:label xml:lang="en">filename</rdfs:label>
+    <rdfs:comment xml:lang="en">name of a file</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;File"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+  
+  <dstore:OntologyAttribute rdf:about="&vcs;is_source_code">	    
+  	<rdfs:label xml:lang="en">is_source_code</rdfs:label>
+    <rdfs:comment xml:lang="en">separates source code files from binaries (i.e. images n stuff)</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;File"/>
+    <rdfs:range  rdf:resource="&xsd;boolean"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>
+    
+  <dstore:OntologyAttribute rdf:about="&vcs;programming_language">	    
+  	<rdfs:label xml:lang="en">programming_language</rdfs:label>
+    <rdfs:comment xml:lang="en">specifies which language was used for a given file. do not ask about stuff like jruby...</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;File"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+  </dstore:OntologyAttribute>    
+  
+  <!-- File > subjectOf > VcsRevision -->
+  <dstore:OntologyRelation rdf:about="&vcs;subjectOf">
+	<rdfs:label xml:lang="en">subjectOf</rdfs:label>
+    <rdfs:comment xml:lang="en">Denotes that a File has been somehow subject of a revision (either added, removed, modified, or moved)</rdfs:comment>
+    <rdfs:domain rdf:resource="&vcs;File"/>
+    <rdfs:range  rdf:resource="&vcs;VcsRevision"/>
+    <rdfs:isDefinedBy rdf:resource="&vcs;"/>
+	  <owl:inverseOf rdf:resource="&vcs;added"/>    
+	  <owl:inverseOf rdf:resource="&vcs;modified"/>    	  
+	  <owl:inverseOf rdf:resource="&vcs;removed"/>    	  	  
+	  <owl:inverseOf rdf:resource="&vcs;moved"/>    	  	  	  
+  </dstore:OntologyRelation>
+
+</rdf:RDF>

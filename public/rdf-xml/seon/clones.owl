@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#"
+     xml:base="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:seonmain="http://se-on.org/ontologies/general/2012/02/main.owl#"
+>
+     
+    <owl:Ontology rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl">
+        <rdfs:comment>This ontology is part of SEON. It defines concepts to describe code clones.</rdfs:comment>
+        <owl:imports rdf:resource="http://se-on.org/ontologies/general/2012/02/main.owl"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#containsClone -->
+
+    <owl:ObjectProperty rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#containsClone">
+        <rdfs:comment>A clone class consists of similar artifacts.</rdfs:comment>
+        <rdfs:range rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone"/>
+        <rdfs:domain rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#CloneClass"/>
+        <rdfs:subPropertyOf rdf:resource="http://se-on.org/ontologies/general/2012/2/main.owl#hasChild"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#hasClone -->
+
+    <owl:ObjectProperty rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#hasClone">
+        <rdf:type rdf:resource="&owl;SymmetricProperty"/>
+        <rdfs:comment>An artifact can have a duplicate.</rdfs:comment>
+        <rdfs:range rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone"/>
+        <rdfs:domain rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone"/>
+        <rdfs:subPropertyOf rdf:resource="http://se-on.org/ontologies/general/2012/02/main.owl#isSimilar"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#isCloneOccurenceOf -->
+
+    <owl:ObjectProperty rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#isCloneOccurenceOf">
+        <rdfs:comment>Clones belong to a class of similar artifacts.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone"/>
+        <rdfs:range rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#CloneClass"/>
+        <owl:inverseOf rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#isCloneOccurenceOf"/>
+        <rdfs:subPropertyOf rdf:resource="http://se-on.org/ontologies/general/2012/2/main.owl#hasParent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#manifestsInClone -->
+
+    <owl:ObjectProperty rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#manifestsInClone">
+        <rdfs:comment>Cloning an artifact leads to a clone of it.</rdfs:comment>
+        <rdfs:range rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone"/>
+        <rdfs:domain rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Cloning"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#occursInArtifact -->
+
+    <owl:ObjectProperty rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#occursInArtifact">
+        <rdfs:comment>Clones appear in artifacts, such Java classes, requirements documents, etc.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone"/>
+        <rdfs:range rdf:resource="http://se-on.org/ontologies/general/2012/2/main.owl#Artifact"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone -->
+
+    <owl:Class rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Clone">
+        <rdfs:subClassOf rdf:resource="http://se-on.org/ontologies/general/2012/2/main.owl#Artifact"/>
+        <rdfs:comment>A duplicate of another artifact.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#CloneClass -->
+
+    <owl:Class rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#CloneClass">
+        <rdfs:subClassOf rdf:resource="http://se-on.org/ontologies/general/2012/2/main.owl#Artifact"/>
+        <rdfs:comment>A class of artifacts that are duplicates of each other.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Cloning -->
+
+    <owl:Class rdf:about="http://se-on.org/ontologies/domain-spanning/2012/02/clones.owl#Cloning">
+        <rdfs:subClassOf rdf:resource="http://se-on.org/ontologies/general/2012/2/main.owl#Activity"/>
+        <rdfs:comment>The act of producing duplicates.</rdfs:comment>
+    </owl:Class>
+    
+    <base:Cloning rdf:about="aCloning">
+      <seonMain:activityEnd>
+    </base:Cloning>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.5.1912) http://owlapi.sourceforge.net -->
+

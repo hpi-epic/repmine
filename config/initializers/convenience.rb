@@ -1,0 +1,3 @@
+EXTRACTION_CONFIG = {}
+EXTRACTION_CONFIG[:full_paths] = false
+EXTRACTION_CONFIG[:tbox] = true

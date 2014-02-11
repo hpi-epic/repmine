@@ -1,0 +1,17 @@
+<%= javascript_tag do %>
+  var type_hierarchy = <%= raw @types.to_json %>;  
+  var relation_info_url = '<%= query_possible_relations_path(@query) %>';
+  var attribute_info_url = '<%= query_possible_attributes_path(@query) %>'
+<% end %>
+
+<%= form_tag(query_store_pattern_path(@query)) do |f| %>
+  <%= submit_tag("Save!", :class => "btn btn-success") %>
+  <%= hidden_field_tag("graph_relations") %>
+  <%= link_to("Reset", query_editor_path(@query), :confirm => "Really Reset?", :class => "btn btn-danger") %>
+  <%= link_to("New Node", "#", :onclick => "createNode();", :class => "btn")%>
+  <hr />
+
+  <div id="drawing_canvas" class="canvas">
+
+  </div>
+<% end %>

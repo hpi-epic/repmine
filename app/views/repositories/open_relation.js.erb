@@ -1,0 +1,5 @@
+$("#<%= @target %>").html("<%= escape_javascript(render :partial => "node", :locals => {:type_stuff => @type_stuff, :id => @target}) %>");
+$("#<%= @relation %>").html("<%= escape_javascript(render :partial => "relation_selector", :locals => {:relations => (@relations || []), :id => @relation}) %>");
+<% @links_to_open.each do |lto| %>
+  $("#<%= lto[0] %>").html("<%= escape_javascript(render :partial => "relation", :locals => {:relation => lto[0], :target => lto[1]}) %>");
+<% end %>

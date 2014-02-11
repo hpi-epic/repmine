@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding='ISO-8859-1'?>
+
+<!DOCTYPE rdf:RDF [
+  <!ENTITY dstore "http://hpi-web.de/ns/dstore/0.1/" >
+  <!ENTITY team   "http://hpi-web.de/ns/dstore/team/0.1/" >
+  <!ENTITY web    "http://hpi-web.de/ns/dstore/web/0.1/" >
+  <!ENTITY owl    "http://www.w3.org/2002/07/owl#" > 
+  <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#" > 
+  <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#" > 
+  <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#" > 
+  <!ENTITY dc     "http://purl.org/dc/elements/1.1/" > 
+  <!ENTITY foaf   "http://xmlns.com/foaf/0.1/" >  
+]>
+
+<rdf:RDF
+	xmlns         ="&team;"
+    xml:base      ="&team;"
+    xmlns:vcs    ="&team;"
+    xmlns:dstore  ="&dstore;"
+    xmlns:web     ="&web;"    
+    xmlns:owl     ="&owl;"
+    xmlns:rdf     ="&rdf;"
+    xmlns:rdfs    ="&rdfs;"
+    xmlns:xsd     ="&xsd;"
+    xmlns:dc      ="&dc;"
+	  xmlns:foaf    ="&foaf;"    
+>
+
+  <!-- About the dstore Vocabulary -->
+  <owl:Ontology rdf:about="&team;">
+    <dc:title rdf:datatype="&xsd;string">d.store Team Ontology v0.1</dc:title>
+    <dc:creator rdf:datatype="&xsd;string">Thomas Kowark</dc:creator>
+    <dc:format rdf:datatype="&xsd;string">application/rdf+xml</dc:format>
+	  <dstore:classlabel rdf:datatype="&xsd;string">team</dstore:classlabel>	             
+  </owl:Ontology>
+  
+  <!-- Team > subteam > Team -->
+  <dstore:OntologyRelation rdf:about="&team;subteam">
+    <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+	  <rdfs:label xml:lang="en">subteam</rdfs:label>
+    <rdfs:comment xml:lang="en">Denotes that a team is a subteam of another one</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Team"/>
+    <rdfs:range  rdf:resource="&dstore;Team"/>
+    <rdfs:isDefinedBy rdf:resource="&team;"/>
+	  <owl:inverseOf rdf:resource="&team;supergroup"/>    
+  </dstore:OntologyRelation>
+  
+  <!-- Team > superteam > Team -->
+  <dstore:OntologyRelation rdf:about="&team;supergroup">
+    <rdf:type rdf:resource="&owl;TransitiveProperty"/>    
+	  <rdfs:label xml:lang="en">supergroup</rdfs:label>
+    <rdfs:comment xml:lang="en">Denotes that a team is a supergroup of another one</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Team"/>
+    <rdfs:range  rdf:resource="&dstore;Team"/>
+    <rdfs:isDefinedBy rdf:resource="&team;"/>
+	  <owl:inverseOf rdf:resource="&team;subteam"/>    
+  </dstore:OntologyRelation>
+</rdf:RDF>

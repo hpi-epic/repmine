@@ -1,0 +1,24 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <% @node.attributes.keys.sort.each do |key| %>
+  <tr>
+    <td><%= key %></td>
+    <td><%= @node.attributes[key].first %></td>
+  </tr>  
+  <% end %>
+</table>
+
+<div class="form-actions">
+  <%= form_tag(graph_create_related_node_path(@graph)) do %>
+    <%= label_tag("Create Related Node")%>
+    Type: <%= select_tag(:target_type, options_for_select(@types.collect{|key, value| [value[:name], key]})) %><br />
+    Relation: <%= select_tag(:target_relation, options_for_select(@relations.collect{|key| [key, key]}))%><br />
+    <%= hidden_field_tag("linked_node", @node.primary_keys.first)%>
+    <%= submit_tag("Create!")%>
+  <% end %>
+</div>

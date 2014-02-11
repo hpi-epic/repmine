@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding='ISO-8859-1'?>
+
+<!DOCTYPE rdf:RDF [
+  <!ENTITY dstore "http://hpi-web.de/ns/dstore/0.1/" >
+  <!ENTITY email  "http://hpi-web.de/ns/dstore/email/0.1/" >
+  <!ENTITY web    "http://hpi-web.de/ns/dstore/web/0.1/" >  
+  <!ENTITY owl    "http://www.w3.org/2002/07/owl#" > 
+  <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#" > 
+  <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#" > 
+  <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#" > 
+  <!ENTITY dc     "http://purl.org/dc/elements/1.1/" >
+  <!ENTITY foaf   "http://xmlns.com/foaf/0.1/" >  
+]>
+
+<rdf:RDF
+	xmlns         ="&email;"
+    xml:base      ="&email;"
+    xmlns:email   ="&email;"
+    xmlns:web     ="&web;"    
+    xmlns:dstore  ="&dstore;"
+    xmlns:owl     ="&owl;"
+    xmlns:rdf     ="&rdf;"
+    xmlns:rdfs    ="&rdfs;"
+    xmlns:xsd     ="&xsd;"
+    xmlns:dc      ="&dc;"
+	  xmlns:foaf    ="&foaf;"    
+>
+  <!-- About the dstore Vocabulary -->
+  <owl:Ontology rdf:about="&email;">
+    <dc:title rdf:datatype="&xsd;string">d.store Email Ontology v0.1</dc:title>
+    <dc:creator rdf:datatype="&xsd;string">Matthias Uflacker</dc:creator>
+    <dc:format rdf:datatype="&xsd;string">application/rdf+xml</dc:format>
+	  <dstore:classlabel rdf:datatype="&xsd;string">email</dstore:classlabel>	    
+  </owl:Ontology>
+
+  <!-- =============== -->
+  <!--  Classes        -->
+  <!-- =============== -->
+
+  <rdfs:Class rdf:about="&email;Email">
+	  <rdf:type rdf:resource="&owl;Class"/>
+	  <rdfs:subClassOf rdf:resource="&dstore;OntologyResource"/>
+  	<rdfs:subClassOf rdf:resource="&web;WebResource"/>  	  
+	  <rdfs:isDefinedBy rdf:resource="&email;"/>
+	  <dstore:classlabel rdf:datatype="&xsd;string">Email</dstore:classlabel>	
+	  <rdfs:comment rdf:datatype="&xsd;string">Emails</rdfs:comment>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:about="&email;EmailList">
+	<rdf:type rdf:resource="&owl;Class"/>
+	<rdfs:subClassOf rdf:resource="&dstore;OntologyResource"/>
+  <rdfs:subClassOf rdf:resource="&web;WebResource"/>  	  	
+	<rdfs:isDefinedBy rdf:resource="&email;"/>
+	<dstore:classlabel rdf:datatype="&xsd;string">EmailList</dstore:classlabel>	
+	<rdfs:comment rdf:datatype="&xsd;string">Email Lists</rdfs:comment>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:about="&email;EmailAttachment">
+	<rdf:type rdf:resource="&owl;Class"/>
+	<rdfs:subClassOf rdf:resource="&dstore;OntologyResource"/>
+  <rdfs:subClassOf rdf:resource="&web;WebResource"/>  	  	
+	<rdfs:isDefinedBy rdf:resource="&email;"/>
+	<dstore:classlabel rdf:datatype="&xsd;string">EmailAttachment</dstore:classlabel>	
+	<rdfs:comment rdf:datatype="&xsd;string">Email Attachments</rdfs:comment>
+  </rdfs:Class>
+
+  <!-- ================== -->
+  <!-- Properties         -->
+  <!-- ================== -->
+
+  <!-- Person > address > string -->
+  <dstore:OntologyAttribute rdf:about="&email;address">
+	  <rdf:type rdf:resource="&dstore;AliasAttribute"/>	
+	  <rdfs:label xml:lang="en">email address</rdfs:label>
+    <rdfs:comment xml:lang="en">A person's email address</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Agent"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+
+  <!-- Email > message_content > string -->
+  <dstore:OntologyAttribute rdf:about="&email;message_content">	
+	<rdfs:label xml:lang="en">message content</rdfs:label>
+    <rdfs:comment xml:lang="en">message content</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+
+  <!-- Email > subject > string -->
+  <dstore:OntologyAttribute rdf:about="&email;subject"> 
+  <rdfs:label xml:lang="en">subject</rdfs:label>
+    <rdfs:comment xml:lang="en">subject</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- Email > message_id > string -->
+  <dstore:OntologyAttribute rdf:about="&email;message_id">	
+	<rdfs:label xml:lang="en">message id</rdfs:label>
+    <rdfs:comment xml:lang="en">message id</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- Email > priority > integer -->
+  <dstore:OntologyAttribute rdf:about="&email;priority">	
+	<rdfs:label xml:lang="en">priority</rdfs:label>
+    <rdfs:comment xml:lang="en">priority</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&xsd;integer"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>  
+  
+  <!-- Email > reply_to_id > string -->
+  <dstore:OntologyAttribute rdf:about="&email;reply_to_id">
+	<rdfs:label xml:lang="en">replied message id</rdfs:label>
+    <rdfs:comment xml:lang="en">replied message id</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+
+  <!-- Email > inReplyTo > Email -->
+  <dstore:OntologyRelation rdf:about="&email;inReplyTo">
+	<rdfs:label xml:lang="en">in reply to</rdfs:label>
+    <rdfs:comment xml:lang="en">in reply to</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>
+  
+  <!-- Email > reply > Email -->
+  <dstore:OntologyRelation rdf:about="&email;reply">
+	<rdfs:label xml:lang="en">reply</rdfs:label>
+    <rdfs:comment xml:lang="en">reply</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <owl:inverseOf rdf:resource="&email;inReplyTo"/>    
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>  
+    
+  <!-- Email > sender > Person -->
+  <dstore:OntologyRelation rdf:about="&email;sender">
+	<rdfs:label xml:lang="en">sender</rdfs:label>
+    <rdfs:comment xml:lang="en">A sender of an email</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&dstore;Agent"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+    <dstore:refersTo rdf:resource="&email;address"/>    
+  </dstore:OntologyRelation>
+  
+  <!-- Person > sent > Email -->
+  <dstore:OntologyRelation rdf:about="&email;hasSent">
+	<rdfs:label xml:lang="en">sent</rdfs:label>
+    <rdfs:comment xml:lang="en">An email sent by this person</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Agent"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <owl:inverseOf rdf:resource="&email;sender"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>  
+
+  <!-- Email > recipient > Person -->
+  <dstore:OntologyRelation rdf:about="&email;recipient">
+	<rdfs:label xml:lang="en">recipient</rdfs:label>
+    <rdfs:comment xml:lang="en">A recipient of an email</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&dstore;Agent"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+    <dstore:refersTo rdf:resource="&email;address"/>    
+  </dstore:OntologyRelation>
+
+  <!-- Email > ccRecipient > Person -->
+  <dstore:OntologyRelation rdf:about="&email;ccRecipient">
+	  <rdfs:label xml:lang="en">cc Recipient</rdfs:label>
+    <rdfs:comment xml:lang="en">A cc recipient of an email</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&dstore;Agent"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+    <dstore:refersTo rdf:resource="&email;address"/>    
+  </dstore:OntologyRelation>
+
+  <!-- Email > bccRecipient > Person -->
+  <dstore:OntologyRelation rdf:about="&email;bccRecipient">
+    <rdfs:label xml:lang="en">bccRecipient</rdfs:label>
+    <rdfs:comment xml:lang="en">A bcc recipient of an email</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&dstore;Agent"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+    <dstore:refersTo rdf:resource="&email;address"/>    
+  </dstore:OntologyRelation>
+
+  <!-- Person > received > Email -->
+  <dstore:OntologyRelation rdf:about="&email;hasReceived">
+	<rdfs:label xml:lang="en">received</rdfs:label>
+    <rdfs:comment xml:lang="en">An email that this person has received</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Agent"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <owl:inverseOf rdf:resource="&email;recipient"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation> 
+  
+  <!-- Person > hasReceivedInCC > Email -->
+  <dstore:OntologyRelation rdf:about="&email;hasReceivedInCC">
+	  <rdfs:label xml:lang="en">hasReceivedInCC</rdfs:label>
+    <rdfs:comment xml:lang="en">An email that this person has received in cc</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Agent"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <owl:inverseOf rdf:resource="&email;ccRecipient"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>
+  
+  <!-- Person > hasReceivedInBCC > Email -->
+  <dstore:OntologyRelation rdf:about="&email;hasReceivedInBCC">
+	  <rdfs:label xml:lang="en">hasReceivedInBCC</rdfs:label>
+    <rdfs:comment xml:lang="en">An email that this person has received in bcc</rdfs:comment>
+    <rdfs:domain rdf:resource="&dstore;Agent"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <owl:inverseOf rdf:resource="&email;bccRecipient"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>
+  
+  <!-- Email > attachment > Attachment -->
+  <dstore:OntologyRelation rdf:about="&email;attachment">
+	<rdfs:label xml:lang="en">attachment</rdfs:label>
+    <rdfs:comment xml:lang="en">An email attachment</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;Email"/>
+    <rdfs:range  rdf:resource="&email;EmailAttachment"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>
+
+  <!-- Attachment > attached_to > Email -->
+  <dstore:OntologyRelation rdf:about="&email;attachedTo">
+	  <rdfs:label xml:lang="en">attached to</rdfs:label>
+    <rdfs:comment xml:lang="en">The email to which this resource is attached to</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;EmailAttachment"/>
+    <rdfs:range  rdf:resource="&email;Email"/>
+    <owl:inverseOf rdf:resource="&email;attachment"/>    
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyRelation>
+  
+  <!-- EmailAttachment > content_type > string -->
+  <dstore:OntologyAttribute rdf:about="&email;content_type">
+	<rdfs:label xml:lang="en">content type</rdfs:label>
+    <rdfs:comment xml:lang="en">content type of mail attachment</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;EmailAttachment"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- EmailAttachment > filesize > string -->
+  <dstore:OntologyAttribute rdf:about="&email;filesize">
+	<rdfs:label xml:lang="en">filesize</rdfs:label>
+    <rdfs:comment xml:lang="en">size of an attachment in bytes</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;EmailAttachment"/>
+    <rdfs:range  rdf:resource="&xsd;nonNegativeInteger"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+  
+  <!-- EmailAttachment > filename > string -->
+  <dstore:OntologyAttribute rdf:about="&email;filename">
+  <rdfs:label xml:lang="en">filename</rdfs:label>
+    <rdfs:comment xml:lang="en">filename of mail attachment</rdfs:comment>
+    <rdfs:domain rdf:resource="&email;EmailAttachment"/>
+    <rdfs:range  rdf:resource="&xsd;string"/>
+    <rdfs:isDefinedBy rdf:resource="&email;"/>
+  </dstore:OntologyAttribute>
+</rdf:RDF>
