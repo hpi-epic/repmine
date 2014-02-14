@@ -22,7 +22,7 @@ class MongoDbRepository < Repository
   def all_classes
     classes = []
     db.collection_names.each do |c_name|
-      classes << OwlClass.new(c_name.singularize.camelcase)
+      classes << OwlClass.new(uri_for_class_name(c_name.singularize.camelcase))
     end
     return classes
   end

@@ -20,4 +20,11 @@ class Repository < ActiveRecord::Base
     raise "implement this in the subclasses"
   end    
     
+  def ont_url
+    return ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + self.name
+  end
+  
+  def uri_for_class_name(class_name)
+    return ont_url + "/" + class_name
+  end
 end

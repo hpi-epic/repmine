@@ -3,7 +3,7 @@ require 'spec_helper'
 describe MongoDbRepository do
   
   before(:each) do
-    @mdb_repo = MongoDbRepository.new({:database_name => "sample_db"})
+    @mdb_repo = MongoDbRepository.new({:database_name => "sample_db", :name => "sample_db"})
     # make sure that we don't require a mongodb connection
     @mdb_repo.stub("db"){double("mongodb", "collection_names" => ["collection1", "collection2", "fancy_collection"])}
   end
@@ -18,11 +18,12 @@ describe MongoDbRepository do
   it "should singularize collection names before they become class names" do
     @mdb_repo.stub("db"){double("mongodb", "collection_names" => ["items"])}
     classes = @mdb_repo.all_classes
-    classes.first.uri.should == "Item"
+    classes.first.name.should == "Item"
   end
   
   it "should create a fancy url for the class. this needs to be based on configuration" do
+    @mdb_repo.stub("db"){double("mongodb", "collection_names" => ["items"])}
     classes = @mdb_repo.all_classes
-    classes.first.uri.should == "http://example.com/ontologies/repmine/schemas/extracted/sample_db/Issue"
+    classes.first.uri.should == "http://hpi-web.de/ontologies/repmine/schemas/extracted/sample_db/Item"
   end
 end
