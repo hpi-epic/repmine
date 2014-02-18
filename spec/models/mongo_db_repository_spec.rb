@@ -17,7 +17,7 @@ describe MongoDbRepository do
       {"_id" => {"key" => "root_rel1.level1_relation"}, "value" => {"type" => "Object"}},      
       {"_id" => {"key" => "root_rel1.level1_relation.attrib1"}, "value" => {"type" => "String"}},
       {"_id" => {"key" => "root_rel1.level1_relation.level2_relation"}, "value" => {"type" => "Array"}},      
-      {"_id" => {"key" => "root_rel1.level1_relation.level2_relation.XX.attrib2"}, "value" => {"type" => "Array"}}
+      {"_id" => {"key" => "root_rel1.level1_relation.level2_relation.XX.attrib2"}, "value" => {"type" => "String"}}
     ]
   end
   
@@ -47,12 +47,9 @@ describe MongoDbRepository do
   
   it "it should find direct ancestors" do
     # "root" and "root_rel1"
-    @mdb_repo.direct_ancestors(schema_info, "").size.should == 3
     @mdb_repo.all_descendants(schema_info, "").size.should == schema_info.size
     @mdb_repo.all_descendants(schema_info, "root").size.should == 0
-    @mdb_repo.direct_ancestors(schema_info, "root_rel1").size.should == 2
     @mdb_repo.all_descendants(schema_info, "root_rel1").size.should == 5
-    @mdb_repo.direct_ancestors(schema_info, "root_rel1.level1_relation").size.should == 2    
     @mdb_repo.all_descendants(schema_info, "root_rel1.level1_relation").size.should == 3    
   end
   
@@ -61,8 +58,6 @@ describe MongoDbRepository do
       double("mongodb", {"collection_names" => ["collection1"]})
     }
     allow(@mdb_repo).to receive(:get_schema_info){schema_info}
-    
-    schema = @mdb_repo.schema
-    schema.classes.size.should == 4
+    @mdb_repo.schema.classes.size.should == 2
   end
 end

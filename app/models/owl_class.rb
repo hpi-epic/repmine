@@ -10,11 +10,11 @@ class OwlClass
   end
   
   def add_attribute(name, type)
-    attributes << Attribute.new(name, type, ont_uri)
+    attributes << Attribute.new(name, type, self)
   end
   
   def add_relation(name, target_class)
-    relations << Relation.new(name, target_class, ont_uri)
+    relations << Relation.new(name, target_class, self)
   end
   
   def uri

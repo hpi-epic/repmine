@@ -34,29 +34,21 @@ class MongoDbRepository < Repository
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'
-  def class_schema(info, owl_class, schema, key_prefix = "")        
-    direct_ancestors(info, key_prefix).each do |inf|
-      type = inf["value"]["type"]
-      key = inf["_id"]["key"]
-      descendants = all_descendants(info, key)    
-      if not descendants.empty?
-        target_class = add_class_to_schema(key.split(".").last, schema)
-        class_schema(all_descendants(info, key), target_class, schema, key)
-        owl_class.add_relation(key, target_class)
-      else
-        owl_class.add_attribute(key, type)
-      end
+  def class_schema(info, owl_class, schema, key_prefix = "")
+    relations = info.select{|inf| inf["value"]["type"] == "Array"}
+    attributes = info.reject{|inf| 
+      relations.include?(inf) || !relations.find{|rel| inf["_id"]["key"].starts_with?(rel["_id"]["key"])}.nil? 
+    }
+    
+    relations.each do |rel|
+      key = rel["_id"]["key"]
+      target_class = add_class_to_schema(key.split(".").last, schema)
+      class_schema(all_descendants(info, key), target_class, schema, key)
+      owl_class.add_relation(key, target_class)
     end
-  end
-  
-  # select all direct ancestors with our prefix. We do this by counting dots. Not beautiful, but does the job
-  def direct_ancestors(info, key_prefix)
-    if key_prefix.empty?
-      return info.select{|inf| inf["_id"]["key"].scan("\.").size == 0}
-    else
-      return info.select{|inf| 
-        inf["_id"]["key"].starts_with?(key_prefix) && key_prefix.scan("\.").size == inf["_id"]["key"].scan("\.").size - 1
-      }
+    
+    attributes.each do |attrib|
+      owl_class.add_attribute(attrib["_id"]["key"].gsub(".XX", ""), attrib["value"]["type"])
     end
   end
   

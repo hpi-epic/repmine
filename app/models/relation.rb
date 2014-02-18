@@ -1,6 +1,8 @@
 class Relation
-  # attr_accessible :title, :body
-  def initialize(name, type, ont_uri)
-    
+  attr_accessor :domain, :range, :name
+  def initialize(name, range, domain)
+    @domain = domain
+    @range = range
+    @name = name
   end  
 end
