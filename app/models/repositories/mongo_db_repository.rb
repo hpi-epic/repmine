@@ -21,16 +21,10 @@ class MongoDbRepository < Repository
   
   def extract_schema(schema)
     db.collection_names.each do |c_name|
-      owl_class = add_class_to_schema(c_name.singularize.camelcase, schema)
+      owl_class = OwlClass.new(schema, name.singularize.camelcase)
       class_schema(get_schema_info(c_name), owl_class, schema)
     end
     return schema
-  end
-    
-  def add_class_to_schema(name, schema)
-    owl_class = OwlClass.new(ont_url, name.singularize.camelcase)
-    schema.classes << owl_class
-    return owl_class
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'
@@ -42,7 +36,7 @@ class MongoDbRepository < Repository
     
     relations.each do |rel|
       key = rel["_id"]["key"]
-      target_class = add_class_to_schema(key.split(".").last, schema)
+      target_class = OwlClass.new(schema, key.split(".").last)
       class_schema(all_descendants(info, key), target_class, schema, key)
       owl_class.add_relation(key, target_class)
     end

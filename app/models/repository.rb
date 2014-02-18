@@ -14,7 +14,7 @@ class Repository < ActiveRecord::Base
   
   # Schema extraction  
   def schema()
-    schema = Schema.new()
+    schema = Schema.new(ont_url)
     extract_schema(schema)
     return schema
   end
