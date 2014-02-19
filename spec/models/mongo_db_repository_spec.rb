@@ -42,7 +42,7 @@ describe MongoDbRepository do
     @mdb_repo.stub("db"){double("mongodb", "collection_names" => ["items"])}
     allow(@mdb_repo).to receive(:get_schema_info){[]}    
     classes = @mdb_repo.schema.classes
-    classes.first.uri.should == "http://hpi-web.de/ontologies/repmine/schemas/extracted/sample_db/Item"
+    classes.first.uri.should == "http://hpi-web.de/ns/ontologies/repmine/schemas/extracted/sample_db/Item"
   end
   
   it "it should find direct ancestors" do

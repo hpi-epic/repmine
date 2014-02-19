@@ -21,7 +21,7 @@ class MongoDbRepository < Repository
   
   def extract_schema(schema)
     db.collection_names.each do |c_name|
-      owl_class = OwlClass.new(schema, name.singularize.camelcase)
+      owl_class = OwlClass.new(schema, c_name.singularize.camelcase)
       class_schema(get_schema_info(c_name), owl_class, schema)
     end
     return schema

@@ -1,12 +1,12 @@
 class Schema
   
-  attr_accessor :classes, :uri, :name
+  attr_accessor :classes, :uri, :repository
   include RdfSerialization  
   
-  def initialize(ont_url, repo_name)
+  def initialize(repository)
     @classes = Set.new()
-    @uri = ont_url
-    @name = repo_name
+    @uri = repository.ont_url
+    @repository = repository
   end
   
   def add_class(klazz)
@@ -16,7 +16,7 @@ class Schema
   def graph
     graph = RDF::Graph.new()
     graph << [resource, RDF.type, RDF::OWL.Ontology]
-    graph << [resource, RDF::DC.title, self.name]
+    graph << [resource, RDF::DC.title, repository.name]
     classes.each{|klazz| graph.insert(*klazz.statements)}
     return graph
   end
