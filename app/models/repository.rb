@@ -32,4 +32,22 @@ class Repository < ActiveRecord::Base
   def ont_url
     return ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + self.name
   end
+  
+  def database_type
+    "Generic"
+  end
+  
+  def database_version
+    # TODO: get this information from the database itself
+    return "1.0"
+  end
+  
+  def imports
+    return [RDF::SchemaExtraction].concat(custom_imports)
+  end
+  
+  # overwrite this if your repository needs custom information within the ontology
+  def custom_imports
+    return []
+  end
 end

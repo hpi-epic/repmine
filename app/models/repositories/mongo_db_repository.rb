@@ -1,5 +1,9 @@
+require 'vocabularies/mongodb_schema_extraction.rb'
+
 class MongoDbRepository < Repository
   attr_accessible :database_name
+
+  COLLECTION_BLACKLIST = ["system.indexes"]
 
   def self.model_name
     return Repository.model_name
@@ -21,28 +25,34 @@ class MongoDbRepository < Repository
   
   def extract_schema(schema)
     db.collection_names.each do |c_name|
+      next if COLLECTION_BLACKLIST.include?(c_name)
       owl_class = OwlClass.new(schema, c_name.singularize.camelcase)
-      class_schema(get_schema_info(c_name), owl_class, schema)
+      class_schema(get_schema_info(c_name), owl_class, schema, c_name)
     end
     return schema
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'
-  def class_schema(info, owl_class, schema, key_prefix = "")
+  def class_schema(info, owl_class, schema, collection_name)
     relations = info.select{|inf| inf["value"]["type"] == "Array"}
     attributes = info.reject{|inf| 
-      relations.include?(inf) || !relations.find{|rel| inf["_id"]["key"].starts_with?(rel["_id"]["key"])}.nil? 
+      relations.include?(inf) || !relations.find{|rel| inf["_id"]["key"].starts_with?(rel["_id"]["key"])}.nil?
     }
     
     relations.each do |rel|
       key = rel["_id"]["key"]
       target_class = OwlClass.new(schema, key.split(".").last)
+      target_class.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
       class_schema(all_descendants(info, key), target_class, schema, key)
-      owl_class.add_relation(key, target_class)
+      r = owl_class.add_relation(key, target_class)
+      r.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(key))
+      r.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
     end
     
     attributes.each do |attrib|
-      owl_class.add_attribute(attrib["_id"]["key"].gsub(".XX", ""), attrib["value"]["type"])
+      a = owl_class.add_attribute(attrib["_id"]["key"].gsub(".XX", ""), attrib["value"]["type"])
+      a.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(attrib["_id"]["key"]).gsub(".XX", ""))
+      a.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
     end
   end
   
@@ -59,6 +69,19 @@ class MongoDbRepository < Repository
   
   def get_schema_info(collection_name)
     info_js = File.open(Rails.root.join("public","javascripts","variety.js")).read    
-    return db.eval(info_js, collection_name)
+    return db.eval(info_js, collection_name, 20000)
+  end
+  
+  def database_type
+    "MongoDB"
+  end
+  
+  def database_version
+    # TODO: get this information from the database itself
+    return "2.4"
+  end
+  
+  def custom_imports
+    [RDF::MongoDBSchemaExtraction]
   end
 end

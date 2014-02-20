@@ -1,4 +1,5 @@
 class Attribute
+  # domain is an owl_class object...
   attr_accessor :name, :type, :domain
   
   include RdfSerialization  
@@ -10,7 +11,7 @@ class Attribute
   end
   
   def uri
-    return domain.ont_uri + "/" + name
+    return domain.uri + "/" + name
   end
   
   def statements

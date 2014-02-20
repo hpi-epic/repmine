@@ -8,7 +8,7 @@ finding rare keys.
 Please see https://github.com/variety/variety for details.
 
 Released by Maypop Inc, © 2012, under the MIT License. */
-function(collection){
+function(collection, limit){
   print("Variety: A MongoDB Schema Analyzer")
   print("Version 1.2.4, released 05 December 2013")
 
@@ -46,6 +46,7 @@ function(collection){
   } 
 
   if (db[collection].count() == 0) {
+    return [];
     throw "The collection specified (" + collection + ") in the database specified ("+ db +") does not exist or is empty.\n"+ 
           "Possible collection options for database specified: " + collNames + ".";
   }
