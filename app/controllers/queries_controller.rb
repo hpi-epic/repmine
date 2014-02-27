@@ -8,7 +8,7 @@ class QueriesController < ApplicationController
   
   def editor
     @query = Query.find(params[:query_id])
-    @type_stuff = {} #@query.all_types_with_relations_and_attributes()
+    @type_stuff = {}
     @types = @query.ag_connection.type_hierarchy
   end
   

@@ -1,8 +1,6 @@
 class Query < ActiveRecord::Base
   
-  include RdfSerialization
-  
-  #rdf_type()
+  #include RdfSerialization
   
   attr_accessible :name, :description, :ontology_ids, :repository_name, :tag_list
   acts_as_taggable_on :tags

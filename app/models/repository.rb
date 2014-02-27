@@ -1,5 +1,9 @@
 class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port
+  has_one :ontology
+  
+  after_create :build_ontology
+  
   TYPES = ["MongoDbRepository", "Neo4jRepository", "HanaGraphEngineRepository"]
   
   def self.for_type(type, params = {})
@@ -12,14 +16,13 @@ class Repository < ActiveRecord::Base
     return self.class.accessible_attributes.select{|at| !at.blank?}
   end
   
-  # Schema extraction  
-  def schema()
-    schema = Schema.new(self)
-    extract_schema(schema)
-    return schema
+  def build_ontology
+    o = ExtractedOntology.new(:url => self.ont_url)
+    o.repository = self
+    o.save
   end
   
-  def extract_schema(schema)
+  def extract_ontology(schema)
     raise "implement this in the subclasses"
   end
   

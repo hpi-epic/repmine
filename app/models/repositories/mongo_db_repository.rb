@@ -23,17 +23,17 @@ class MongoDbRepository < Repository
     return stats
   end
   
-  def extract_schema(schema)
+  def extract_ontology!
     db.collection_names.each do |c_name|
       next if COLLECTION_BLACKLIST.include?(c_name)
-      owl_class = OwlClass.new(schema, c_name.singularize.camelcase)
-      class_schema(get_schema_info(c_name), owl_class, schema, c_name)
+      owl_class = OwlClass.new(ontology, c_name.singularize.camelcase)
+      class_schema(get_schema_info(c_name), owl_class, c_name)
     end
-    return schema
+    return ontology
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'
-  def class_schema(info, owl_class, schema, collection_name)
+  def class_schema(info, owl_class, collection_name)
     relations = info.select{|inf| inf["value"]["type"] == "Array"}
     attributes = info.reject{|inf| 
       relations.include?(inf) || !relations.find{|rel| inf["_id"]["key"].starts_with?(rel["_id"]["key"])}.nil?
@@ -41,9 +41,9 @@ class MongoDbRepository < Repository
     
     relations.each do |rel|
       key = rel["_id"]["key"]
-      target_class = OwlClass.new(schema, key.split(".").last)
+      target_class = OwlClass.new(ontology, key.split(".").last)
       target_class.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
-      class_schema(all_descendants(info, key), target_class, schema, key)
+      class_schema(all_descendants(info, key), target_class, key)
       r = owl_class.add_relation(key, target_class)
       r.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(key))
       r.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
@@ -51,7 +51,7 @@ class MongoDbRepository < Repository
     
     attributes.each do |attrib|
       a = owl_class.add_attribute(attrib["_id"]["key"].gsub(".XX", ""), attrib["value"]["type"])
-      a.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(attrib["_id"]["key"]).gsub(".XX", ""))
+      a.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(attrib["_id"]["key"].gsub(".XX", "")))
       a.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
     end
   end

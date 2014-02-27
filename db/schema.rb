@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140211154812) do
+ActiveRecord::Schema.define(:version => 20140220144301) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -34,8 +34,10 @@ ActiveRecord::Schema.define(:version => 20140211154812) do
     t.text     "description"
     t.string   "prefix_url"
     t.string   "short_name"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.string   "type"
+    t.integer  "repository_id"
   end
 
   create_table "ontologies_queries", :id => false, :force => true do |t|
@@ -46,8 +48,9 @@ ActiveRecord::Schema.define(:version => 20140211154812) do
   create_table "queries", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.string   "repository_name"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "query_attribute_constraints", :force => true do |t|

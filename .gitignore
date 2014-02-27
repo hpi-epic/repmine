@@ -23,5 +23,5 @@
 *.zip
 
 /public/assets
-
+/coverage
 .DS_Store

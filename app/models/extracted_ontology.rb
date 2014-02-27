@@ -1,18 +1,20 @@
 require 'vocabularies/schema_extraction.rb'
+# TODO: unify this with ontology. This will also help vastly as it makes extracted schemas instantly available...
 
-class Schema
+class ExtractedOntology < Ontology
   
-  attr_accessor :classes, :uri, :repository
+  attr_accessor :classes
+  belongs_to :repository
+
   include RdfSerialization  
   
-  def initialize(repository)
-    @classes = Set.new()
-    @uri = repository.ont_url
-    @repository = repository
+  def add_class(klazz)
+    classes << klazz
   end
   
-  def add_class(klazz)
-    @classes << klazz
+  def classes
+    @classes ||= Set.new()
+    return @classes
   end
   
   def graph
@@ -44,7 +46,7 @@ class Schema
      :rdfs => RDF::RDFS,
      :owl => RDF::OWL,
      :schema_extraction => RDF::SchemaExtraction,
-     uri.split("/").last.underscore => uri
+     url.split("/").last.underscore => url
     }
   end
 end

@@ -14,6 +14,7 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem 'factory_girl_rails'
+  gem 'simplecov', '~> 0.7.1'
 end
 
 gem 'autotest-rails'
@@ -35,6 +36,7 @@ gem 'bson_ext'
 
 # visualization
 gem "googlecharts"
+gem "d3-rails"
 
 # tagging queries
 gem 'acts-as-taggable-on'
@@ -56,6 +58,7 @@ gem "logging"
 
 # ontology work with allegrograph
 gem "rdf-agraph"
+gem "rest-client"
 gem "equivalent-xml"
 gem "rdf-xsd"
 gem "linkeddata"

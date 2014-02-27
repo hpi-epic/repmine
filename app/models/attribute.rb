@@ -10,8 +10,8 @@ class Attribute
     @domain = domain
   end
   
-  def uri
-    return domain.uri + "/" + name
+  def url
+    return domain.url + "/" + name
   end
   
   def statements

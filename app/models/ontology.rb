@@ -53,5 +53,4 @@ class Ontology < ActiveRecord::Base
       RDF::Graph.load(HTTPClient.get(self.url).headers["Location"])
     end
   end
-  
 end

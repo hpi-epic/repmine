@@ -93,9 +93,9 @@ class AgraphConnection
       q.pattern([:clazz, RDF.type, RDF::OWL.Class])      
       q.pattern([:sub_clazz, RDF::RDFS.subClassOf, :clazz], :optional => true)
     end.run do |stmt|
-      clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(stmt.clazz.to_s)
+      clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(nil, stmt.clazz.to_s)
       if stmt.bound?(:sub_clazz)
-        sub_clazz = classes[stmt.sub_clazz.to_s] ||= OwlClass.new(stmt.sub_clazz.to_s)
+        sub_clazz = classes[stmt.sub_clazz.to_s] ||= OwlClass.new(nil, stmt.sub_clazz.to_s)
         clazz.subclasses << sub_clazz
         subclasses << stmt.sub_clazz.to_s
       end
