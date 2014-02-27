@@ -36,7 +36,6 @@ gem 'bson_ext'
 
 # visualization
 gem "googlecharts"
-gem "d3-rails"
 
 # tagging queries
 gem 'acts-as-taggable-on'

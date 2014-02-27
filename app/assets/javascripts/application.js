@@ -16,5 +16,5 @@
 //= require bootstrap
 //= require jquery-ui-1.9.2-min
 //= require autocomplete-rails
-//= require d3
+//= require jquery.jsPlumb-1.4.1-all
 //= require_self

@@ -12,11 +12,11 @@
   </thead>
   <% @queries.each do |query| %>
     <tr>
-      <%= form_tag(query_run_on_graph_path(query)) do |f| %>      
+      <%= form_tag(query_run_on_repository_path(query)) do |f| %>      
       <td><%= link_to(query.name, query_path(query)) %></td>
       <td><%= query.description %></td>
       <td>
-        <%= select_tag(:graph_id, options_from_collection_for_select(@graphs, "id", "name")) %>
+        <%= select_tag(:graph_id, options_from_collection_for_select(@repositories, "id", "name")) %>
         <%= submit_tag ("Run Query on Graph!")%>
       </td>
       <td><%= link_to("Destroy", query_path(query), method: :delete, class: "btn") %></td>
