@@ -1,6 +1,6 @@
-class CreateQueries < ActiveRecord::Migration
+class CreatePatterns < ActiveRecord::Migration
   def change
-    create_table :queries do |t|
+    create_table :patterns do |t|
       t.string :name
       t.text :description
       t.string :repository_name

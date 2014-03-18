@@ -1,4 +1,4 @@
-<h3><%= @results["data"].size %> Results for Query <%= @query.name.blank? ? @query.id : "'#{@query.name}'" %></h3>
+<h3><%= @results["data"].size %> Results for Query <%= @pattern.name.blank? ? @pattern.id : "'#{@pattern.name}'" %></h3>
 <%= link_to("Back to Graph", @graph, {:class => "btn"}) %>
 <table class="table">
   <thead>
@@ -24,8 +24,8 @@
   <% end %>
 </table>
 
-<% if @query.name.nil? %>
-  <%= form_tag(graph_query_store_permanently_path(@graph, @query)) do |f| %>
+<% if @pattern.name.nil? %>
+  <%= form_tag(graph_query_store_permanently_path(@graph, @pattern)) do |f| %>
     <div class="form-actions">
       <h3>Found what you were looking for? Store the query for later use!</h3>
       <%= label_tag("Name") %><%= text_field_tag("query[name]")%><br />

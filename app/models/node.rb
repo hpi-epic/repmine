@@ -1,8 +1,9 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-class QueryNode < ActiveRecord::Base
-  attr_accessible :rdf_type
+class Node < ActiveRecord::Base
+  attr_accessible :rdf_type, :x, :y
+
   belongs_to :query
   has_many :query_relation_constraints
   has_many :query_attribute_constraints, :dependent => :destroy

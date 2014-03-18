@@ -9,8 +9,7 @@ class Ontology < ActiveRecord::Base
   validates :url, :uniqueness => true
   validates :prefix_url, :uniqueness => true
   
-  has_and_belongs_to_many :queries
-  
+  has_and_belongs_to_many :patterns
   before_validation :set_prefix_if_empty, :set_short_name_if_empty
   
   def set_prefix_if_empty

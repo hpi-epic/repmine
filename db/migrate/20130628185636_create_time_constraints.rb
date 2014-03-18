@@ -1,6 +1,6 @@
-class CreateQueryTimeConstraints < ActiveRecord::Migration
+class CreateTimeConstraints < ActiveRecord::Migration
   def change
-    create_table :query_time_constraints do |t|
+    create_table :time_constraints do |t|
       t.integer :from_id
       t.integer :to_id
       t.decimal :min_time

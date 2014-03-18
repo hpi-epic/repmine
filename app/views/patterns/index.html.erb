@@ -1,0 +1,30 @@
+<h3>Existing Graph Patterns</h3>
+<%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Run</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <% @patterns.each do |pattern| %>
+    <tr>
+      <%= form_tag(pattern_run_on_repository_path(pattern)) do |f| %>      
+      <td><%= link_to(pattern.name, pattern_path(pattern)) %></td>
+      <td><%= pattern.description %></td>
+      <td>      
+      <% if @repositories.empty? %>
+        <%= link_to("Add a repository", new_repository_path) %>
+      <% else %>
+        <%= select_tag(:graph_id, options_from_collection_for_select(@repositories, "id", "name")) %>
+        <%= submit_tag ("Detect Pattern on Graph!")%>
+      <% end %>
+      </td>      
+      <td><%= link_to("Destroy", pattern_path(pattern), method: :delete, class: "btn") %></td>
+      <% end %>
+    </tr>    
+  <% end %>
+</table>

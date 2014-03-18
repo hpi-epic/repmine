@@ -1,4 +1,4 @@
-class Query < ActiveRecord::Base
+class Pattern < ActiveRecord::Base
   
   #include RdfSerialization
   
@@ -7,8 +7,8 @@ class Query < ActiveRecord::Base
 
   # relations
   has_and_belongs_to_many :ontologies
-  has_many :query_nodes, :dependent => :destroy
-  has_many :query_relation_constraints, :dependent => :destroy
+  has_many :nodes, :dependent => :destroy
+  has_many :relation_constraints, :dependent => :destroy
 
   # hooks
   before_save :create_repository_name!
@@ -16,10 +16,10 @@ class Query < ActiveRecord::Base
 
   # validations
   validates :name, :presence => true
-  validates :ontologies, :length => { :minimum => 1}
+  validates :ontologies, :length => {:minimum => 1}
   
   def root_node
-    return query_nodes.where(:root_node => true).first
+    return nodes.where(:root_node => true).first
   end
   
   def to_cypher(graph)
@@ -83,8 +83,8 @@ class Query < ActiveRecord::Base
   
   def rdf_statements
     graph = RDF::Graph.new()
-    graph << query_nodes.collect{|qn| qn.rdf_statements}
-    graph << query_relation_constraints.collect{|qn| qrc.rdf_statements}
+    graph << nodes.collect{|qn| qn.rdf_statements}
+    graph << relation_constraints.collect{|qn| qrc.rdf_statements}
     return graph
   end
   

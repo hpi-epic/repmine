@@ -1,0 +1,5 @@
+<div id="<%= node.id %>" class='node' style="top:<%= node.y %>px; left:<%= node.x %>px;">
+  <%= form_for(node) do |f| %>
+    <%= f.select("rdf_type", grouped_options_for_select(type_select(type_hierarchy))) %>
+  <% end %>
+</div>

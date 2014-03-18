@@ -72,7 +72,6 @@ var updateConnectionSelector = function(select, source_type, target_type) {
       var options = optionGroupForRelation(source_type.split("/").pop() + " > " + target_type.split("/").pop(), data["outbound"]);
       options += optionGroupForRelation(target_type.split("/").pop() + " > " + source_type.split("/").pop(), data["inbound"]);
       options += optionGroupForRelation("bidirectional", data["bidirectional"]);
-
       $(select).html(options);    
     }
   );
@@ -102,7 +101,7 @@ var createNode = function() {
     style = " style='top: 300px;left: 300px;'";
   }
   
-  nodes.push(node_html_id);  
+  nodes.push(node_html_id);
   $("#drawing_canvas").append("<div id='" + node_html_id +"' class='node'" + style +"></div>");
   $("#" + node_html_id).append(nodeTypeSelector(node_id));
   
@@ -193,22 +192,6 @@ var attributeFilterSelect = function(node_id, order_number, data){
   var navId = "nodes[" + node_id + "[attributes][" + order_number + "][value]";
   selector += "<input type='text' id='" + navId.replace(/\[|\]/g, '_') + "' name='" + navId + "' class='narrow'></input></div>";
   
-  return selector;
-}
-
-var nodeTypeSelector = function(node_id) {
-  var nId = "nodes[" + node_id + "][rdf_type]";
-  var selector = "<select id='" + nId.replace(/\[|\]/g, '_') + "' name='" + nId + "'>";
-  var sorted_keys = {};
-  Object.keys(type_hierarchy).forEach(function(key){
-    sorted_keys[type_hierarchy[key]["name"]] = key;
-  });
-  
-  Object.keys(sorted_keys).sort().forEach(function(key){
-    selector += "<option value='" + sorted_keys[key] + "'>" + key + "</option>";
-    selector += addSubclassesToNodeSelector(type_hierarchy[sorted_keys[key]], 1);
-  });
-  selector += "</select>";
   return selector;
 };
 

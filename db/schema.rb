@@ -13,6 +13,15 @@
 
 ActiveRecord::Schema.define(:version => 20140220144301) do
 
+  create_table "attribute_constraints", :force => true do |t|
+    t.integer  "query_node_id"
+    t.string   "attribute_name"
+    t.string   "value"
+    t.string   "operator"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
+
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
     t.integer  "attempts",   :default => 0, :null => false
@@ -29,6 +38,16 @@ ActiveRecord::Schema.define(:version => 20140220144301) do
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
+  create_table "nodes", :force => true do |t|
+    t.integer  "pattern_id"
+    t.string   "rdf_type"
+    t.boolean  "root_node"
+    t.integer  "x",          :default => 0
+    t.integer  "y",          :default => 0
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
   create_table "ontologies", :force => true do |t|
     t.string   "url"
     t.text     "description"
@@ -40,12 +59,12 @@ ActiveRecord::Schema.define(:version => 20140220144301) do
     t.integer  "repository_id"
   end
 
-  create_table "ontologies_queries", :id => false, :force => true do |t|
+  create_table "ontologies_patterns", :id => false, :force => true do |t|
     t.integer "ontology_id"
-    t.integer "query_id"
+    t.integer "pattern_id"
   end
 
-  create_table "queries", :force => true do |t|
+  create_table "patterns", :force => true do |t|
     t.string   "name"
     t.text     "description"
     t.string   "repository_name"
@@ -53,24 +72,7 @@ ActiveRecord::Schema.define(:version => 20140220144301) do
     t.datetime "updated_at",      :null => false
   end
 
-  create_table "query_attribute_constraints", :force => true do |t|
-    t.integer  "query_node_id"
-    t.string   "attribute_name"
-    t.string   "value"
-    t.string   "operator"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-  end
-
-  create_table "query_nodes", :force => true do |t|
-    t.integer  "query_id"
-    t.string   "rdf_type"
-    t.boolean  "root_node"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
-  create_table "query_relation_constraints", :force => true do |t|
+  create_table "relation_constraints", :force => true do |t|
     t.integer  "source_id"
     t.integer  "target_id"
     t.string   "min_cardinality"
@@ -78,20 +80,9 @@ ActiveRecord::Schema.define(:version => 20140220144301) do
     t.string   "min_path_length"
     t.string   "max_path_length"
     t.string   "relation_name"
-    t.integer  "query_id"
+    t.integer  "pattern_id"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
-  end
-
-  create_table "query_time_constraints", :force => true do |t|
-    t.integer  "from_id"
-    t.integer  "to_id"
-    t.decimal  "min_time"
-    t.decimal  "max_time"
-    t.boolean  "return_timepspan"
-    t.string   "variable_name"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
   end
 
   create_table "repositories", :force => true do |t|
@@ -128,6 +119,17 @@ ActiveRecord::Schema.define(:version => 20140220144301) do
 
   create_table "tags", :force => true do |t|
     t.string "name"
+  end
+
+  create_table "time_constraints", :force => true do |t|
+    t.integer  "from_id"
+    t.integer  "to_id"
+    t.decimal  "min_time"
+    t.decimal  "max_time"
+    t.boolean  "return_timepspan"
+    t.string   "variable_name"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
 end

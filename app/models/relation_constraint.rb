@@ -1,10 +1,11 @@
-class QueryRelationConstraint < ActiveRecord::Base
-  belongs_to :source, :class_name => "QueryNode", :foreign_key => "source_id"
-  belongs_to :target, :class_name => "QueryNode", :foreign_key => "target_id"
-  belongs_to :query
+class RelationConstraint < ActiveRecord::Base
+  belongs_to :source, :class_name => "Node", :foreign_key => "source_id"
+  belongs_to :target, :class_name => "Node", :foreign_key => "target_id"
+  belongs_to :pattern
   attr_accessible :relation_name, :min_cardinality, :max_cardinality, :min_path_length, :max_path_length
   
-  # TODO -> future work: directed relations
+  include RdfSerialization
+  
   def to_cypher
     return "#{source.query_variable}-[r#{id}:`#{relation_name}`#{length_constraints}]-#{target.query_variable}"
   end

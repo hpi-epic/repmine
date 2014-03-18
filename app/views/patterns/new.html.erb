@@ -1,4 +1,4 @@
-<%= simple_form_for(@query, :html => {:class => 'form-vertical' }) do |f| %>
+<%= simple_form_for(@pattern, :html => {:class => 'form-vertical' }) do |f| %>
   <%= f.label :name %>
   <%= f.text_field(:name) %>
   
@@ -6,14 +6,14 @@
   <%= f.text_area(:description, :class => "form-control", :rows => 5) %>
 
   <%= f.label :categories %>
-  <%= f.autocomplete_field :tag_list, autocomplete_tag_name_queries_path, :"data-delimiter" => ', ' %>
+  <%= f.autocomplete_field :tag_list, autocomplete_tag_name_patterns_path, :"data-delimiter" => ', ' %>
   
   <br />
   
   <legend>Ontologies</legend>
   <div class="control-group">
     <% Ontology.all.each do |ont| %>
-      <%= check_box_tag("query[ontology_ids][]", ont.id, @query.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
+      <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
       <br />
     <% end %>
   </div>
