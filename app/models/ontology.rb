@@ -11,7 +11,7 @@ class Ontology < ActiveRecord::Base
   
   has_and_belongs_to_many :patterns
   before_validation :set_prefix_if_empty, :set_short_name_if_empty
-  
+    
   def set_prefix_if_empty
     if prefix_url.blank?
       self.prefix_url = url

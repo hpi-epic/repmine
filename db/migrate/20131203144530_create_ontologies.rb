@@ -5,6 +5,7 @@ class CreateOntologies < ActiveRecord::Migration
       t.text :description
       t.string :prefix_url
       t.string :short_name
+      t.string :group
       t.timestamps
     end
   end

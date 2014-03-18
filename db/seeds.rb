@@ -22,7 +22,8 @@
   Ontology.where(
     url: ontology_url, 
     prefix_url: ontology_url.gsub("https://seal-team.ifi.uzh.ch/seon/", "http://se-on.org/"),
-    short_name: "Seon##{ontology_url.split("/").last}"
+    short_name: "Seon##{ontology_url.split("/").last}",
+    group: "SEON"
   ).first_or_create  
 end
 
