@@ -1,6 +1,3 @@
-var nodes = [];
-var relations = [];
-
 jsPlumb.ready(function() {
   
   jsPlumb.importDefaults({
@@ -8,17 +5,25 @@ jsPlumb.ready(function() {
 	});
 	
 	jsPlumb.bind("connection", function(info, originalEvent) {
-	  storeConnection(info.connection);
 	  if(info.connection.scope == "relations") {
 		  updateConnection(info.connection);	    
 	  }
 	});
-	
-  if(!(typeof type_hierarchy === "undefined")){
-    createNode();
-  }
 });
 
+$("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
+  $("#drawing_canvas").append(xhr.responseText);
+  var node_id = $(xhr.responseText).attr("id");
+  // make the node draggable
+  jsPlumb.draggable(node_id);
+  // endpoint for relations
+  jsPlumb.addEndpoint(node_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+  // endpoint for attributes
+  // TODO
+  // callback for newly selected node classes
+});
+
+// this has to go!
 var connectionNode = function() {
   var con_id = relations.length;
   var con_html_id = "relations[" + con_id + "]";
