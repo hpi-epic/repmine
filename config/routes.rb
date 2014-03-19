@@ -1,12 +1,11 @@
 RepMine::Application.routes.draw do
 
   resources :patterns do
-    post "run_on_repository"
+    resources :nodes    
     get "editor"
     get "possible_relations"
     get "possible_attributes"
-    # should become post after testing
-    get "add_node"
+    get "run_on_repository"
     get :autocomplete_tag_name, :on => :collection
   end
 
@@ -14,7 +13,7 @@ RepMine::Application.routes.draw do
     get "extract_schema"
   end
   
-  resources :ontologies  
+  resources :ontologies
   
   match "/delayed_job" => DelayedJobWeb, :anchor => false
   root :to => "patterns#index"

@@ -31,8 +31,8 @@ class Pattern < ActiveRecord::Base
     return cypher
   end
   
-  def all_types_with_relations_and_attributes()
-    return ag_connection.all_classes_for_repository(repository_name)
+  def type_hierarchy()
+    return ag_connection.type_hierarchy()
   end
   
   def possible_relations_between(source, target)

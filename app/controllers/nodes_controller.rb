@@ -1,12 +1,21 @@
 class NodesController < ApplicationController
+
+  before_filter :get_pattern
   
-  def show
-    @graph = Graph.find(params[:graph_id])
-    node = graph.get_node(params[:node_url])
+  def get_pattern
+    @pattern = Pattern.find(params[:pattern_id])
   end
   
-  def add_linked_node
-    
+  def create
+    @node = @pattern.nodes.create!
+    @type_hierarchy = @pattern.type_hierarchy
+    render :show, :layout => false
+  end
+  
+  def show
+    @node = Node.find(params[:id])
+    @type_hierarchy = @pattern.type_hierarchy
+    render :layout => false
   end
   
 end

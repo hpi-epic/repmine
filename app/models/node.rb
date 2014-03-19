@@ -4,9 +4,9 @@
 class Node < ActiveRecord::Base
   attr_accessible :rdf_type, :x, :y
 
-  belongs_to :query
-  has_many :query_relation_constraints
-  has_many :query_attribute_constraints, :dependent => :destroy
+  belongs_to :pattern
+  has_many :relation_constraints, :dependent => :destroy
+  has_many :attribute_constraints, :dependent => :destroy
   
   def start_info(uri=nil)
     start = query_variable + "="

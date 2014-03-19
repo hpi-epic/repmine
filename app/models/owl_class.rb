@@ -1,14 +1,15 @@
 class OwlClass
-  attr_accessor :subclasses, :name, :relations, :attributes, :schema
+  attr_accessor :subclasses, :name, :relations, :attributes, :schema, :class_url
   
   include RdfSerialization
   
-  def initialize(schema, name)
+  def initialize(schema, name, url = nil)
     @subclasses = Set.new
     @schema = schema
     @name = name
     @relations = Set.new
     @attributes = Set.new
+    @class_url = url
     schema.add_class(self) unless schema.nil?
   end
   
@@ -25,7 +26,7 @@ class OwlClass
   end
   
   def url
-    return schema.url + "/" + name
+    return class_url || (schema.url + "/" + name)
   end
   
   def statements

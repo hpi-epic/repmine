@@ -1,9 +1,10 @@
 <%= javascript_tag do %>
   var relation_info_url = '<%= pattern_possible_relations_path(@pattern) %>';
-  var attribute_info_url = '<%= pattern_possible_attributes_path(@pattern) %>'
+  var attribute_info_url = '<%= pattern_possible_attributes_path(@pattern) %>';
 <% end %>
 
-<%= link_to("New Node", "#", :onclick => "createNode();", :class => "btn")%>
+<%= link_to 'Create Node', pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_node" %>
+
 <hr />
 
 <div id="drawing_canvas" class="canvas"></div>
