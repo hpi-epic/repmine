@@ -19,5 +19,5 @@ class Relation
       [resource, RDF.domain, domain.resource],
       [resource, RDF.range, range]
     ]
-  end  
+  end
 end

@@ -1,4 +1,7 @@
 class NodesController < ApplicationController
+  
+  # these are always just embedded, no need for a layout
+  layout false
 
   before_filter :get_pattern
   
@@ -9,13 +12,12 @@ class NodesController < ApplicationController
   def create
     @node = @pattern.nodes.create!
     @type_hierarchy = @pattern.type_hierarchy
-    render :show, :layout => false
+    render :show
   end
   
   def show
     @node = Node.find(params[:id])
     @type_hierarchy = @pattern.type_hierarchy
-    render :layout => false
   end
   
 end

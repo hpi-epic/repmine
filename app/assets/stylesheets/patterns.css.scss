@@ -1,31 +1,6 @@
 // Place all the styles related to the queries controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-#drawing_canvas {
-}
-
-table.query_main tr td {
-  height: 120px;
-  text-align: center;  
-}
-
-table.query_main tr td.node {
-  width: 300px;
-  height: 200px;  
-}
-
-div.node {
-  background-image:url(circle.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 10em;
-  width: 10em;
-  line-height: 10em;
-  position: absolute;
-  padding: 5px;
-  text-align: center;
-}
-
 div.attributeFilter {
   position: absolute;
   padding: 5px;
@@ -63,12 +38,6 @@ div.relConstraints {
   font-weight: bold;
 }
 
-div.node select{
-  font-size: 13px;
-  width: 130px;
-  height: 25px;
-}
-
 .veryNarrow {
   width: 50px;
 }
@@ -80,13 +49,6 @@ div.node select{
 .narrow {
   width: 60px;
 }
-
-/*.evilHack{
-  padding: 5px;
-  background-color: white;
-  z-index: 1000;
-  font-size: 13px;
-}*/
 
 .justRight {
   width: 120px;

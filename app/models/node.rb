@@ -33,9 +33,11 @@ class Node < ActiveRecord::Base
     return constraints.concat(query_attribute_constraints.collect{|qac| qac.to_cypher}).join(" AND ")
   end
   
+  def possible_relations_to(target_node)
+    return pattern.possible_relations_between(self.rdf_type, target_node.rdf_type, true)
+  end
+  
   def rdf_statements
-    return [
-      
-    ]
+    return []
   end
 end

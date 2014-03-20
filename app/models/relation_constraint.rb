@@ -1,8 +1,7 @@
 class RelationConstraint < ActiveRecord::Base
-  belongs_to :source, :class_name => "Node", :foreign_key => "source_id"
-  belongs_to :target, :class_name => "Node", :foreign_key => "target_id"
-  belongs_to :pattern
-  attr_accessible :relation_name, :min_cardinality, :max_cardinality, :min_path_length, :max_path_length
+  belongs_to :source, :class_name => "Node"
+  belongs_to :target, :class_name => "Node"
+  attr_accessible :relation_type, :min_cardinality, :max_cardinality, :min_path_length, :max_path_length
   
   include RdfSerialization
   
@@ -20,6 +19,10 @@ class RelationConstraint < ActiveRecord::Base
         return max_path_length.strip == "*" ? "*" : "*#{max_path_length}"
       end
     end
+  end
+  
+  def possible_relations
+    return source.possible_relations_to(target)
   end
   
   def rdf_statements

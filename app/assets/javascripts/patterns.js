@@ -6,7 +6,7 @@ jsPlumb.ready(function() {
 	
 	jsPlumb.bind("connection", function(info, originalEvent) {
 	  if(info.connection.scope == "relations") {
-		  updateConnection(info.connection);	    
+		  createConnection(info.connection);
 	  }
 	});
 });
@@ -24,7 +24,7 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
 });
 
 // this has to go!
-var connectionNode = function() {
+/*var connectionNode = function() {
   var con_id = relations.length;
   var con_html_id = "relations[" + con_id + "]";
   var rel_constraint_id = "relations["+ con_id +"]"
@@ -45,41 +45,25 @@ var connectionNode = function() {
 
   var connection = $(conn);
   return connection;
-};
+};*/
 
-var updateConnection = function(connection) {
-  // get the source and target type
-  var source_type = connection.source.children().val();
-  var target_type = connection.target.children().val();  
+var createConnection = function(connection) {
+  var source_id = $(connection.source).attr("data-node-id");
+  var target_id = $(connection.target).attr("data-node-id");
   
-  // update the select list
-  var select_list = $(connection.overlays[0].canvas);
-  select_list.addClass("relation");
-  updateConnectionSelector(select_list.children()[0], source_type, target_type);
+  // reinstall the endpoints
   jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());  
-  jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());    
-};
-
-var storeConnection = function(connection) {
-  var con_id = relations.length;
-  var con_html_id = "relations_" + con_id + "__";
-  $("#" + con_html_id + "source").val(connection.source.attr("id"));
-  $("#" + con_html_id + "target").val(connection.target.attr("id"));  
-  relations.push(con_id);
-};
-
-var updateConnectionSelector = function(select, source_type, target_type) {  
+  jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+  
   // get the available relations from the server. this highly simplifies the JS...
-  jQuery.get(
-    relation_info_url,
-    {source: source_type, target: target_type},
-    function(data) {
-      var options = optionGroupForRelation(source_type.split("/").pop() + " > " + target_type.split("/").pop(), data["outbound"]);
-      options += optionGroupForRelation(target_type.split("/").pop() + " > " + source_type.split("/").pop(), data["inbound"]);
-      options += optionGroupForRelation("bidirectional", data["bidirectional"]);
-      $(select).html(options);    
+  $.ajax({
+    url: new_relation_constraint_path,
+    type: "POST",
+    data: {source_id: source_id, target_id: target_id},
+    success: function(data) {
+      $(select).html(data);
     }
-  );
+  });
 };
 
 var optionGroupForRelation = function(label, rels) {
@@ -113,10 +97,10 @@ var createNode = function() {
   // an onchange handler that will update all conncetions going in and out of this node
   $("#nodes_" + node_id + "__rdf_type_").change(function(ev) {
     $.each(jsPlumb.getConnections({source: node_html_id, scope: 'relations'}), function(index, connection) {
-      updateConnection(connection);  
+      updateConnectionSelector(connection);  
     });
     $.each(jsPlumb.getConnections({target: node_html_id, scope: 'relations'}), function(index, connection) {
-      updateConnection(connection);  
+      updateConnectionSelector(connection);  
     });
     if($("#nodes_" + node_id + "__attributes_").length != 0) {
       insertAttributeSelectorContent(node_id);
@@ -217,42 +201,14 @@ var addSubclassesToNodeSelector = function(startingPoint, level) {
   return selector;
 };
 
-var connectRelations = function(start, end, text) {
-  jsPlumb.connect({
-    source:start,
-    target:end,
-    anchor: ["BottomLeft", "TopLeft"],
-    overlays: [
-      ["PlainArrow", {location:1, width: 10, length: 10}],
-      ["Label", {label:text, cssClass: "evilHack"}]
-    ],
-    endpoint: ["Dot", {radius:1}],
-    connector: "Straight",
-    paintStyle:{ 
-			lineWidth:2,
-			strokeStyle:"rgb(0,0,0)",
-			dashstyle:"2 2",
-			joinstyle:"miter"
-		}
-  })
-}
-
 var connectionEndpoint = function() {
   return {
 		endpoint:["Dot", {radius:4} ],
 		paintStyle:{ fillStyle:"#ffa500", opacity:0.5 },
 		isSource:true,
-		scope: "relations",		
+		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
-    connectorOverlays: [
-        ["Custom", {
-            create: function(component) {
-              return connectionNode();
-            },
-            location:0.5,
-            id:"customOverlay"
-        }]
-    ],		
+		connectorOverlays:[["Arrow",{ width:10, location:1, length:20, id:"arrow" }]],
 		connector : "Straight",
 		isTarget:true,
 		dropOptions : {

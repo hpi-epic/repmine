@@ -1,3 +1,21 @@
 // Place all the styles related to the nodes controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+div.node {
+  background-image:url(circle.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 10em;
+  width: 10em;
+  line-height: 10em;
+  position: absolute;
+  padding: 5px;
+  text-align: center;
+}
+
+div.node select{
+  font-size: 13px;
+  width: 130px;
+  height: 25px;
+}

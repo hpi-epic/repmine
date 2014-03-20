@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140220144301) do
+ActiveRecord::Schema.define(:version => 20140320141122) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "query_node_id"
@@ -80,10 +80,14 @@ ActiveRecord::Schema.define(:version => 20140220144301) do
     t.string   "max_cardinality"
     t.string   "min_path_length"
     t.string   "max_path_length"
-    t.string   "relation_name"
-    t.integer  "pattern_id"
+    t.string   "relation_type"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
+  end
+
+  create_table "relations", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "repositories", :force => true do |t|

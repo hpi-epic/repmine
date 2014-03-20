@@ -7,8 +7,7 @@ class CreateRelationConstraints < ActiveRecord::Migration
       t.string :max_cardinality
       t.string :min_path_length
       t.string :max_path_length
-      t.string :relation_name
-      t.references :pattern
+      t.string :relation_type
       t.timestamps
     end
   end
