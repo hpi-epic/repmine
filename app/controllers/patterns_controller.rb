@@ -1,5 +1,5 @@
 class PatternsController < ApplicationController
-  
+
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
   
   def new
@@ -62,12 +62,5 @@ class PatternsController < ApplicationController
   def possible_attributes
     @pattern = Pattern.find(params[:pattern_id])
     render :json => @pattern.possible_attributes_for(params[:node_class])
-  end
-
-  def add_node
-    @pattern = Pattern.find(params[:pattern_id])
-    @node = Node.new #@pattern.query_nodes.create
-    @type_hierarchy = @pattern.ag_connection.type_hierarchy
-    render :layout => false
   end
 end

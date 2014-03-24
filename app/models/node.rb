@@ -37,6 +37,10 @@ class Node < ActiveRecord::Base
     return pattern.possible_relations_between(self.rdf_type, target_node.rdf_type, true)
   end
   
+  def create_constraint_with_target!(target)
+    return RelationConstraint.from_source_to_target(self, target)
+  end
+  
   def rdf_statements
     return []
   end

@@ -23,30 +23,6 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   // callback for newly selected node classes
 });
 
-// this has to go!
-/*var connectionNode = function() {
-  var con_id = relations.length;
-  var con_html_id = "relations[" + con_id + "]";
-  var rel_constraint_id = "relations["+ con_id +"]"
-  var conn = "<div><select id='" + (con_html_id + "[relation_name]").replace(/\[|\]/g, '_') + "' name='" + con_html_id + "[relation_name]'></select><br />";
-  var tc = con_html_id.replace(/\[|\]/g, '_') + "toggle_cards";
-  var ce = con_html_id.replace(/\[|\]/g, '_') + "cardinalities";
-  conn += "<div id='" + tc + "'><a href='#' onclick=\"$('#" + tc + "').hide(); $('#"+ ce + "').show();\">+ cardinalities</a></div>";
-  conn += "<div id='" + ce + "' style='display:none;' class='relConstraints'>(<input type='text' class='veryNarrow' name='" + con_html_id + "[min_cardinality]'></input>-";
-  conn += "<input type='text' class='veryNarrow' name='" + con_html_id + "[max_cardinality]'></input>)<br /></div>";  
-  var tl = con_html_id.replace(/\[|\]/g, '_') + "toggle_length";
-  var le = con_html_id.replace(/\[|\]/g, '_') + "path_length";
-  conn += "<div id='" + tl + "'><a href='#' onclick=\"$('#" + tl + "').hide(); $('#"+ le + "').show();\">+ path length</a></div>";  
-  conn += "<div id='" + le + "' style='display:none;' class='relConstraints'>[<input type='text' class='veryNarrow' name='" + con_html_id + "[min_path_length]'></input>..";  
-  conn += "<input type='text' class='veryNarrow' name='" + con_html_id + "[max_path_length]'></input>]</div><br />";    
-  conn += "<input type='hidden' id='relations_" + con_id + "__source' name='" + con_html_id + "[source]" + "'></input>";
-  conn += "<input type='hidden' id='relations_" + con_id + "__target' name='" + con_html_id + "[target]" + "'></input></div>";  
-  conn += "</div>"
-
-  var connection = $(conn);
-  return connection;
-};*/
-
 var createConnection = function(connection) {
   var source_id = $(connection.source).attr("data-node-id");
   var target_id = $(connection.target).attr("data-node-id");
@@ -54,14 +30,15 @@ var createConnection = function(connection) {
   // reinstall the endpoints
   jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());  
   jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
-  
+
   // get the available relations from the server. this highly simplifies the JS...
   $.ajax({
     url: new_relation_constraint_path,
     type: "POST",
     data: {source_id: source_id, target_id: target_id},
     success: function(data) {
-      $(select).html(data);
+      var overlay = $(connection.getOverlay("customOverlay").getElement())
+      overlay.html(data);
     }
   });
 };
@@ -184,23 +161,6 @@ var attributeFilterSelect = function(node_id, order_number, data){
   return selector;
 };
 
-/*
-  This method creates the option list for the node class. It is called recursively in case a class
-  has (a) subclass(es). 
-*/
-var addSubclassesToNodeSelector = function(startingPoint, level) {
-  var selector = "";
-  for(var i = startingPoint["subclasses"].length - 1; i >= 0; i -= 1) {
-    selector += "<option value='" + startingPoint["subclasses"][i]["uri"] + "'>";
-    for(var ii = 0; ii < level; ii += 1){selector += "&nbsp;&nbsp"};
-    selector += startingPoint["subclasses"][i]["name"] + "</option>";
-    if(startingPoint["subclasses"][i]["subclasses"].length > 0){
-      selector += addSubclassesToNodeSelector(startingPoint["subclasses"][i], level + 1);
-    }
-  };
-  return selector;
-};
-
 var connectionEndpoint = function() {
   return {
 		endpoint:["Dot", {radius:4} ],
@@ -208,7 +168,16 @@ var connectionEndpoint = function() {
 		isSource:true,
 		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
-		connectorOverlays:[["Arrow",{ width:10, location:1, length:20, id:"arrow" }]],
+		connectorOverlays:[
+      ["Custom", {
+        create:function(component) {
+          return $("<div class='relation'><select></select></div>");
+        },
+        location:0.5,
+        id:"customOverlay"
+      }],		
+		  ["Arrow",{ width:10, location:1, length:20, id:"arrow" }]
+		],
 		connector : "Straight",
 		isTarget:true,
 		dropOptions : {

@@ -1,8 +1,8 @@
 <%= form_for(@relation_constraint) do |f| %>
-  <%= f.select(:relation_type, options_for_select(@possible_relations)) %>
-  (<%= f.text(:min_cardinality, :class => "veryNarrow") %>,
-  <%= f.text(:max_cardinality, :class => "veryNarrow") %>) 
+  <%= f.select(:relation_type, options_for_select(@possible_relations)) %><br />
+  (<%= f.text_field(:min_cardinality, :class => "veryNarrow") %>,
+  <%= f.text_field(:max_cardinality, :class => "veryNarrow") %>) 
   <br />
-  [<%= f.text(:min_path_length, :class => "veryNarrow") %>,
-  <%= f.text(:max_path_length, :class => "veryNarrow") %>]
+  [<%= f.text_field(:min_path_length, :class => "veryNarrow") %>,
+  <%= f.text_field(:max_path_length, :class => "veryNarrow") %>]
 <% end %>

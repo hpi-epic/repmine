@@ -5,9 +5,7 @@ class RelationConstraintsController < ApplicationController
   def create
     source = Node.find(params[:source_id])
     target = Node.find(params[:target_id])
-    @relation_constraint = source.relation_constraints.build()
-    @relation_constraint.target = target
-    @relation_constraint.save!
+    @relation_constraint = source.create_constraint_with_target!(target)
     @possible_relations = @relation_constraint.possible_relations()
     render :show
   end

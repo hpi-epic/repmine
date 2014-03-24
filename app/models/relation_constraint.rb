@@ -28,4 +28,12 @@ class RelationConstraint < ActiveRecord::Base
   def rdf_statements
     return []
   end
+  
+  def self.from_source_to_target(source, target)
+    rel_constraint = self.new()
+    rel_constraint.source = source
+    rel_constraint.target = target
+    rel_constraint.save!
+    return rel_constraint
+  end
 end
