@@ -21,6 +21,7 @@
 /app/models/vocabularies/*.rb
 *.html
 *.zip
+/public/rdf-xml/extracted/*.rdf
 
 /public/assets
 /coverage

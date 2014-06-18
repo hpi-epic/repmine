@@ -91,6 +91,11 @@ class RepositoriesController < ApplicationController
   end
   
   def extract_schema
-    
+    @repository = Repository.find(params[:repository_id])
+    @repository.extract_and_store_ontology!
+    respond_to do |format|
+      format.html
+      format.rdf{send_file(@repository.ont_file_path, :type => "application/rdf+xml; charset=utf-8; header=present")}
+    end
   end
 end

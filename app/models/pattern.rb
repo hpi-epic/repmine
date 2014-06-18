@@ -2,8 +2,10 @@ class Pattern < ActiveRecord::Base
   
   #include RdfSerialization
   
-  attr_accessible :name, :description, :ontology_ids, :repository_name, :tag_list
+  attr_accessible :name, :description, :ontology_ids, :repository_name, :tag_list, :original_query
   acts_as_taggable_on :tags
+  
+  as_enum :query_language, sql: 0, cypher: 1, sparql: 2, mongo_js: 3, gremlin: 4
 
   # relations
   has_and_belongs_to_many :ontologies
@@ -27,7 +29,6 @@ class Pattern < ActiveRecord::Base
     cypher += "MATCH " + query_relation_constraints.collect{|qrc| qrc.to_cypher}.join("--") + "\n"
     cypher += "WHERE " + query_nodes.collect{|node| node.cypher_constraints(graph)}.reject{|part| part.blank?}.join(" AND ") + "\n"
     cypher += "RETURN DISTINCT " + query_nodes.collect{|node| node.query_variable}.join(", ")
-    puts cypher
     return cypher
   end
   

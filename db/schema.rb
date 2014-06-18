@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140320141122) do
+ActiveRecord::Schema.define(:version => 20140502112943) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "query_node_id"
@@ -69,8 +69,15 @@ ActiveRecord::Schema.define(:version => 20140320141122) do
     t.string   "name"
     t.text     "description"
     t.string   "repository_name"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.text     "original_query"
+    t.integer  "query_language_cd"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
+  create_table "process_patterns", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "relation_constraints", :force => true do |t|

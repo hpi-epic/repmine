@@ -6,6 +6,8 @@ gem 'rails', '~> 3.2.16' # MIT
 gem 'pg'
 gem "therubyracer"
 
+gem 'simple_enum', '~> 1.6'
+
 gem "rdf"
 gem "rdf-raptor"
 gem "rdf-rdfxml"

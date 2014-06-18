@@ -4,7 +4,7 @@ class Repository < ActiveRecord::Base
   
   after_create :build_ontology
   
-  TYPES = ["MongoDbRepository", "Neo4jRepository", "HanaGraphEngineRepository"]
+  TYPES = ["MongoDbRepository", "Neo4jRepository", "HanaGraphEngineRepository", "RdfRepository"]
   
   def self.for_type(type, params = {})
     if TYPES.include?(type)
@@ -22,8 +22,18 @@ class Repository < ActiveRecord::Base
     o.save
   end
   
-  def extract_ontology(schema)
+  def extract_ontology!()
     raise "implement this in the subclasses"
+  end
+  
+  def extract_and_store_ontology!
+    o = extract_ontology!
+    File.open(ont_file_path, "w+"){|f| f.puts o.rdf_xml}
+    return o
+  end
+  
+  def ont_file_path
+    Rails.root.join("public", "rdf-xml", "extracted", self.name + ".rdf")
   end
   
   # fancy statistics  

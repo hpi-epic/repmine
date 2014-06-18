@@ -1,5 +1,8 @@
 RepMine::Application.routes.draw do
 
+  resources :process_patterns
+
+
   resources :attribute_constraints
 
 

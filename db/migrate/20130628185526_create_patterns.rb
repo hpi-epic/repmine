@@ -4,6 +4,8 @@ class CreatePatterns < ActiveRecord::Migration
       t.string :name
       t.text :description
       t.string :repository_name
+      t.text :original_query
+      t.integer :query_language_cd
       t.timestamps
     end
   end

@@ -4,6 +4,9 @@
   
   <%= f.label :description %>
   <%= f.text_area(:description, :class => "form-control", :rows => 5) %>
+  
+  <%= f.label :original_query %>
+  <%= f.text_area(:original_query, :class => "form-control", :rows => 6, :cols => 50) %>
 
   <%= f.label :categories %>
   <%= f.autocomplete_field :tag_list, autocomplete_tag_name_patterns_path, :"data-delimiter" => ', ' %>
