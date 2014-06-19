@@ -9,7 +9,7 @@ class RepositoriesController < ApplicationController
   # GET /repositories.json
   def index
     @repositories = Repository.all
-
+    flash[:notice] = "No repositories present. Please create a new one!" if @repositories.empty?
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json =>  @repositories }
@@ -32,6 +32,11 @@ class RepositoriesController < ApplicationController
   # GET /repositories/new
   # GET /repositories/new.json
   def new
+    if params[:type].nil?
+      redirect_to repositories_path 
+      return
+    end
+    
     @repository = Repository.for_type(params[:type])
 
     respond_to do |format|
@@ -92,10 +97,15 @@ class RepositoriesController < ApplicationController
   
   def extract_schema
     @repository = Repository.find(params[:repository_id])
-    @repository.extract_and_store_ontology!
-    respond_to do |format|
-      format.html
-      format.rdf{send_file(@repository.ont_file_path, :type => "application/rdf+xml; charset=utf-8; header=present")}
+    begin
+      @repository.extract_ontology!
+      respond_to do |format|
+        format.html { redirect_to @repository, :notice => "Successfully extracted ontology from repository!" }
+      end
+    rescue Repository::OntologyExtractionError => oee
+      respond_to do |format|
+        format.html { redirect_to @repository, :error => oee.message}
+      end
     end
   end
 end

@@ -1,3 +1,4 @@
+<% unless @repositories.empty? %>
 <table style="width:40%" class="table">
   <thead>
     <tr>
@@ -16,10 +17,11 @@
   </tr> 
   <% end %>
 </table>
+<% end %>
 
 <hr />
 <p>Create new Repository</p>
-<% Repository::TYPES.each do |repo_type| %>
-  <%= link_to(repo_type.classify, new_repository_path(:type => repo_type), {:class => "btn info"})%>
+<%= form_tag(new_repository_path, :method => :get) do |f| %>
+  <%= select_tag(:type, options_from_collection_for_select(Repository::TYPES, "classify", "classify"))%>
+  <%= submit_tag "Create Repository", :class => "btn success"%>
 <% end %>
-

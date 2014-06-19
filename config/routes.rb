@@ -1,10 +1,7 @@
 RepMine::Application.routes.draw do
 
   resources :attribute_constraints
-
-
   resources :relation_constraints
-
 
   resources :patterns do
     resources :nodes

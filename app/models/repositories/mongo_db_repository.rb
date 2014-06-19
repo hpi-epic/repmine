@@ -1,9 +1,11 @@
 require 'vocabularies/mongodb_schema_extraction.rb'
 
 class MongoDbRepository < Repository
-  attr_accessible :database_name
-
   COLLECTION_BLACKLIST = ["system.indexes"]
+  
+  def self.rdf_format
+    "rdf"
+  end
 
   def self.model_name
     return Repository.model_name
@@ -11,7 +13,7 @@ class MongoDbRepository < Repository
   
   def db
     @mongo_client ||= Mongo::MongoClient.new(self.host) 
-    @db ||= @mongo_client.db(self.database_name)
+    @db ||= @mongo_client.db(self.db_name)
     return @db
   end
   
@@ -24,12 +26,16 @@ class MongoDbRepository < Repository
   end
   
   def extract_ontology!
+    
+    ontology.clear!
     db.collection_names.each do |c_name|
       next if COLLECTION_BLACKLIST.include?(c_name)
+      puts "analyzing collection #{c_name}"
       owl_class = OwlClass.new(ontology, c_name.singularize.camelcase)
       class_schema(get_schema_info(c_name), owl_class, c_name)
     end
-    return ontology
+    ontology.create_graph!
+    File.open(ont_file_path, "w+"){|f| f.puts ontology.rdf_xml}
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'

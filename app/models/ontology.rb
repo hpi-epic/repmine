@@ -1,4 +1,4 @@
-require 'rdf/rdfxml'
+require 'rdf/turtle'
 
 class Ontology < ActiveRecord::Base
   attr_accessible :url, :description, :prefix_url, :short_name
@@ -44,6 +44,7 @@ class Ontology < ActiveRecord::Base
     return short_name.gsub("#", "_").gsub("-", "_").gsub(".owl", "").gsub(".rdf", "").camelcase
   end
   
+  # loads an ontology from a url
   def load_ontology
     begin
       RDF::Graph.load(self.url)
@@ -51,5 +52,14 @@ class Ontology < ActiveRecord::Base
       # for http -> https redirects. will fail for others, so ok...
       RDF::Graph.load(HTTPClient.get(self.url).headers["Location"])
     end
+  end
+  
+  def filename
+    return url
+  end
+  
+  # prefixes for the graph. not needed for imported ontologies
+  def xml_prefixes
+    return []
   end
 end

@@ -6,6 +6,6 @@ describe ExtractedOntology do
     owc = OwlClass.new(s, "MyClass")
     owc.add_attribute("my_attribute", "a type")
     owc.add_relation("my_relation", owc)
-    lambda {s.graph}.should_not raise_error
+    lambda {s.rdf_graph}.should_not raise_error
   end
 end

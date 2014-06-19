@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140502112943) do
+ActiveRecord::Schema.define(:version => 20140619115436) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "query_node_id"
@@ -75,11 +75,6 @@ ActiveRecord::Schema.define(:version => 20140502112943) do
     t.datetime "updated_at",        :null => false
   end
 
-  create_table "process_patterns", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "relation_constraints", :force => true do |t|
     t.integer  "source_id"
     t.integer  "target_id"
@@ -99,11 +94,14 @@ ActiveRecord::Schema.define(:version => 20140502112943) do
 
   create_table "repositories", :force => true do |t|
     t.string  "name"
+    t.string  "db_name"
+    t.string  "db_username"
+    t.string  "db_password"
     t.string  "host"
     t.integer "port"
     t.text    "description"
     t.string  "type"
-    t.string  "database_name"
+    t.integer "rdbms_type_cd"
   end
 
   create_table "sessions", :force => true do |t|

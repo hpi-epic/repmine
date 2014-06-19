@@ -10,6 +10,7 @@ gem 'simple_enum', '~> 1.6'
 
 gem "rdf"
 gem "rdf-raptor"
+gem "rdf-turtle"
 gem "rdf-rdfxml"
 
 group :development, :test do
@@ -17,6 +18,7 @@ group :development, :test do
   gem "rspec-rails"
   gem 'factory_girl_rails'
   gem 'simplecov', '~> 0.7.1'
+  gem 'nokogiri'
 end
 
 gem 'autotest-rails'

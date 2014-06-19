@@ -306,6 +306,7 @@ DEPENDENCIES
   logging
   mongo
   neography
+  nokogiri
   pg
   rails (~> 3.2.16)
   rails3-jquery-autocomplete
@@ -313,6 +314,7 @@ DEPENDENCIES
   rdf-agraph
   rdf-raptor
   rdf-rdfxml
+  rdf-turtle
   rdf-xsd
   rest-client
   rspec
