@@ -157,7 +157,6 @@ class HanaConnection
   end
     
   def execute_wipe(wipe_stmt)
-    #logger.debug("Executing: " + clean_statement)
     return connection.execute("CALL WIPE('#{wipe_stmt}')")    
   end
   

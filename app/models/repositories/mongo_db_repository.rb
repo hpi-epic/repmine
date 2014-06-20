@@ -1,5 +1,3 @@
-require 'vocabularies/mongodb_schema_extraction.rb'
-
 class MongoDbRepository < Repository
   COLLECTION_BLACKLIST = ["system.indexes"]
   
@@ -48,17 +46,17 @@ class MongoDbRepository < Repository
     relations.each do |rel|
       key = rel["_id"]["key"]
       target_class = OwlClass.new(ontology, key.split(".").last)
-      target_class.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
+      target_class.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
       class_schema(all_descendants(info, key), target_class, key)
       r = owl_class.add_relation(key, target_class)
-      r.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(key))
-      r.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
+      r.add_custom_property(RDF::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(key))
+      r.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
     end
     
     attributes.each do |attrib|
       a = owl_class.add_attribute(attrib["_id"]["key"].gsub(".XX", ""), attrib["value"]["type"])
-      a.add_custom_property(RDF::MongoDBSchemaExtraction.navigationPath, RDF::Literal.new(attrib["_id"]["key"].gsub(".XX", "")))
-      a.add_custom_property(RDF::MongoDBSchemaExtraction.collectionName, RDF::Literal.new(collection_name))
+      a.add_custom_property(RDF::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(attrib["_id"]["key"].gsub(".XX", "")))
+      a.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
     end
   end
   
@@ -85,9 +83,5 @@ class MongoDbRepository < Repository
   def database_version
     # TODO: get this information from the database itself
     return "2.4"
-  end
-  
-  def custom_imports
-    [RDF::MongoDBSchemaExtraction]
   end
 end

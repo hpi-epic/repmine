@@ -31,13 +31,12 @@ class ExtractedOntology < Ontology
     repository.imports.each{|vocab| @rdf_graph << [resource, RDF::OWL.imports, vocab]}
     @rdf_graph << [resource, RDF::DC.title, repository.name]
     @rdf_graph << [resource, RDF::DC.creator, RDF::Literal.new("Repmine Schema Extractor")]
-    @rdf_graph << [resource, RDF::SchemaExtraction.repositoryDatabase, RDF::Literal.new(repository.database_type)]
-    @rdf_graph << [resource, RDF::SchemaExtraction.repositoryDatabaseVersion, RDF::Literal.new(repository.database_version)] 
+    @rdf_graph << [resource, RDF::SchemaExtraction.repository_database, RDF::Literal.new(repository.database_type)]
+    @rdf_graph << [resource, RDF::SchemaExtraction.repository_database_version, RDF::Literal.new(repository.database_version)] 
     # it contains the classes themselves
     classes.each{|klazz| @rdf_graph.insert(*klazz.all_statements)}
     # then, their attributes and relations. This should prevent inline classes
     classes.each{|klazz| @rdf_graph.insert(*klazz.schema_statements)}    
-    puts "created graph with a total of #{@rdf_graph.statements.size}"
   end
   
   def load_ontology
