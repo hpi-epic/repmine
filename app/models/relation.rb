@@ -17,7 +17,7 @@ class Relation
     stmts = [
       [resource, RDF.type, RDF::OWL.ObjectProperty],
       [resource, RDF.domain, domain.resource],
-      [resource, RDF.range, range]
+      [resource, RDF.range, range.resource]
     ]
   end
 end
