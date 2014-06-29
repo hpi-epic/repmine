@@ -6,7 +6,9 @@ gem 'rails', '~> 3.2.16' # MIT
 gem 'pg'
 gem "therubyracer"
 
+# little helpers
 gem 'simple_enum', '~> 1.6'
+gem "seedbank"
 
 gem "rdf"
 gem "rdf-raptor"

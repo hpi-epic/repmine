@@ -26,4 +26,3 @@
     group: "SEON"
   ).first_or_create  
 end
-
