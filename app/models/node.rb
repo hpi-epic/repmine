@@ -16,8 +16,8 @@ class Node < ActiveRecord::Base
     return pattern.possible_relations_between(self.rdf_type, target_node.rdf_type, true)
   end
   
-  def possible_attributes()
-    return pattern.possible_attributes_for(self.rdf_type)
+  def possible_attributes(rdf_type = nil)
+    return pattern.possible_attributes_for(rdf_type || self.rdf_type)
   end
   
   def create_relations_constraint_with_target!(target)

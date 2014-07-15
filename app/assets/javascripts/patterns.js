@@ -13,16 +13,18 @@ jsPlumb.ready(function() {
 
 $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   $("#drawing_canvas").append(xhr.responseText);
-  var node_id = $(xhr.responseText).attr("id");
+  var node_id = $(xhr.responseText).attr("data-node-id");
+  var node_html_id = $(xhr.responseText).attr("id");
   // make the node draggable
-  jsPlumb.draggable(node_id);
+  jsPlumb.draggable(node_html_id);
   // endpoint for relations
-  jsPlumb.addEndpoint(node_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+  jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
   // endpoint for attributes
-  var ae = jsPlumb.addEndpoint(node_id, attributeEndpoint());  
+  var ae = jsPlumb.addEndpoint(node_html_id, attributeEndpoint());  
   
   // bind the doubleclick to the attribute filter opening button
   ae.bind("dblclick", function(endpoint) {
+    // only perform actions, when there is no filter present
     if(endpoint.connections.length == 0) {
       createNodeAttributeFilter(endpoint, node_id);
     }
@@ -49,6 +51,7 @@ var createConnection = function(connection) {
   });
 };
 
+// creates the box-nodes for attribute filtering
 var createNodeAttributeFilter = function(endpoint, node_id) {
   // build the div
   var node_html_id = "nodes_" + node_id + "__attributes_";
@@ -57,17 +60,32 @@ var createNodeAttributeFilter = function(endpoint, node_id) {
   
   // make the div draggable and connect it to the node
   $("#drawing_canvas").append(attributeFilter);  
+  
+  var more_link = jQuery('<a/>',{
+    id: "append_attribute_filter" + node_id,
+    href: "#",
+    text: "+ add filter"
+  });
+  more_link.click(function(){addAttributeFilter(node_id, more_link)});
+  more_link.appendTo($("#" + node_html_id));
       
   jsPlumb.draggable(node_html_id);
   var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
   jsPlumb.connect({source: endpoint, target: ae});
-  
-  jQuery.get(
-    new_attribute_constraint_path,
-    {node_id: node_id).val()},
-    function(data) {$("#" + node_html_id).html(data);}
-  );
+  addAttributeFilter(node_id, more_link);
 };
+
+// call the backend and retrieve the next line
+var addAttributeFilter = function(node_id, bottom) {
+  $.ajax({
+    url: new_attribute_constraint_path,
+    type: "POST",
+    data: {node_id: node_id},
+    success: function(data) {
+      $(data).insertBefore(bottom);
+    }
+  });
+}
 
 var connectionEndpoint = function() {
   return {

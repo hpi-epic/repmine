@@ -1,5 +1,5 @@
 class AttributeConstraint < ActiveRecord::Base
-  attr_accessible :attribute_name, :value, :operator
+  attr_accessible :attribute_name, :value, :operator, :node
   belongs_to :node
   
   include RdfSerialization

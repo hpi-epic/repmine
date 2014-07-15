@@ -1,3 +1,5 @@
-<%= select_tag("blob", options_from_collection_for_select(["committer.login", "login"],"to_s","to_s"))%>
-<%= select_tag("blob2", options_from_collection_for_select(["?", "~=", "=", "<", ">", "!"],"to_s","to_s"))%>
-<%= text_field_tag("blob3")%>
+<div>
+  <%= select_tag("blob", options_from_collection_for_select(["committer.login", "login"],"to_s","to_s"), :class => "justRight")%>
+  <%= select_tag("blob2", options_from_collection_for_select(["?", "~=", "=", "<", ">", "!"],"to_s","to_s"), :class => "veryNarrow")%>
+  <%= text_field_tag("blob3", "", :class => "justRight")%>
+</div>
