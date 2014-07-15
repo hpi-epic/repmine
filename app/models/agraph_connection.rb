@@ -58,6 +58,7 @@ class AgraphConnection
     return rels.to_a
   end
   
+  # gets the attribuets whose domain is the given class or any of its top classes
   def attributes_for(node_class)
     attribs = Set.new
     
@@ -84,6 +85,7 @@ class AgraphConnection
     return superclasses.to_a
   end
   
+  # gets the entire type hierarchy from an ontology. ditches anonymous classes (e.g., owl:unions as the users should provide them)
   def type_hierarchy
     classes = {}
     subclasses = Set.new
@@ -93,16 +95,17 @@ class AgraphConnection
       q.pattern([:clazz, RDF.type, RDF::OWL.Class])      
       q.pattern([:sub_clazz, RDF::RDFS.subClassOf, :clazz], :optional => true)
     end.run do |stmt|
-      clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(nil, stmt.clazz.to_s.split("/").last, stmt.clazz.to_s)
+      cname = stmt.clazz.to_s.split("/").last
+      next if cname.starts_with?("_:")
+      clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(nil, cname, stmt.clazz.to_s)
       if stmt.bound?(:sub_clazz)
         sub_clazz = classes[stmt.sub_clazz.to_s] ||= OwlClass.new(nil, stmt.sub_clazz.to_s.split("/").last, stmt.sub_clazz.to_s)
         clazz.subclasses << sub_clazz
-        #subclasses << stmt.sub_clazz.to_s
+        subclasses << stmt.sub_clazz.to_s
       end
     end
     
-    #subclasses.each{|sc| classes.delete(sc)}
-    #puts classes.keys.to_yaml
-    return classes
+    subclasses.each{|sc| classes.delete(sc)}
+    return classes.values
   end
 end

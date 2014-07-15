@@ -286,6 +286,7 @@ GEM
       json (>= 1.8.0)
     validate_url (0.2.0)
       activemodel (>= 3.0.0)
+    wongi-engine (0.0.14)
 
 PLATFORMS
   java
@@ -329,3 +330,4 @@ DEPENDENCIES
   twitter-bootstrap-rails
   uglifier (>= 1.0.3)
   validate_url
+  wongi-engine

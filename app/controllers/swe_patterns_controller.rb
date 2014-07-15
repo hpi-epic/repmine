@@ -1,0 +1,2 @@
+class SwePatternsController < ApplicationController
+end

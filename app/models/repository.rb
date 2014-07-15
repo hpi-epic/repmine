@@ -64,6 +64,10 @@ class Repository < ActiveRecord::Base
     return "1.0"
   end
   
+  def type_hierarchy
+    return ontology.type_hierarchy
+  end
+  
   def imports
     return [RDF::SchemaExtraction].concat(custom_imports)
   end

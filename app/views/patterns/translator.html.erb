@@ -1,0 +1,28 @@
+<%= javascript_tag do %>
+  var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@pattern) %>';
+  var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@pattern) %>';
+<% end %>
+
+<%= link_to 'Save', pattern_path(@pattern), :class => "btn btn-success" %>
+<%= link_to 'Reset', pattern_path(@pattern), :class => "btn btn-danger" %>
+
+
+<hr />
+<table width="100%">
+  <tr width="50%">
+    <td>Source: <%= select_tag(:source_ontology, options_from_collection_for_select(Repository.all, "id", "name")) %>
+<%= link_to 'Create Node', pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_node" %>
+    </td>
+    <td>Target: <%= select_tag(:target_ontology, options_from_collection_for_select(Repository.all, "id", "name")) %>
+<%= link_to 'Create Node', pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_node" %>      
+    </td>
+  </tr>
+<tr>
+  <td colspan="2">
+    <div class="verticalLine">&nbsp;</div>
+    <div id="drawing_canvas" class="canvas"></div>
+  </td>
+</tr>  
+</table>
+
+

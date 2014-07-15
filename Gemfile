@@ -14,6 +14,8 @@ gem "rdf"
 gem "rdf-raptor"
 gem "rdf-turtle"
 gem "rdf-rdfxml"
+# rule engine for translations
+gem 'wongi-engine'
 
 group :development, :test do
   gem "rspec"

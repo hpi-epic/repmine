@@ -1,8 +1,13 @@
 <%= form_for(@relation_constraint) do |f| %>
   <%= f.select(:relation_type, options_for_select(@possible_relations)) %><br />
+  <a href="#" onclick="$('#rel_const_cards_<%= @relation_constraint.id %>').show(); $(this).hide();">+ cardinalities</a><br />
+  <div id="rel_const_cards_<%= @relation_constraint.id %>" style="display:none;">
   (<%= f.text_field(:min_cardinality, :class => "veryNarrow") %>,
-  <%= f.text_field(:max_cardinality, :class => "veryNarrow") %>) 
-  <br />
+  <%= f.text_field(:max_cardinality, :class => "veryNarrow") %>)
+  </div>
+  <a href="#" onclick="$('#rel_const_length_<%= @relation_constraint.id %>').show(); $(this).hide();">+ path length</a>  
+  <div id="rel_const_length_<%= @relation_constraint.id %>" style="display:none;">  
   [<%= f.text_field(:min_path_length, :class => "veryNarrow") %>,
   <%= f.text_field(:max_path_length, :class => "veryNarrow") %>]
+  </div>
 <% end %>

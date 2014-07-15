@@ -1,27 +1,39 @@
 <%= simple_form_for(@pattern, :html => {:class => 'form-vertical' }) do |f| %>
-  <%= f.label :name %>
-  <%= f.text_field(:name) %>
+<table>
+  <tr>
+    <td>
+        <%= f.label :name %>
+        <%= f.text_field(:name) %>
   
-  <%= f.label :description %>
-  <%= f.text_area(:description, :class => "form-control", :rows => 5) %>
+        <%= f.label :description %>
+        <%= f.text_area(:description, :class => "form-control", :rows => 5) %>
   
-  <%= f.label :original_query %>
-  <%= f.text_area(:original_query, :class => "form-control", :rows => 6, :cols => 50) %>
+        <%= f.label :original_query %>
+        <%= f.text_area(:original_query, :class => "form-control", :rows => 6, :cols => 50) %>
 
-  <%= f.label :categories %>
-  <%= f.autocomplete_field :tag_list, autocomplete_tag_name_patterns_path, :"data-delimiter" => ', ' %>
-  
-  <br />
-  
-  <legend>Ontologies</legend>
-  <div class="control-group">
-    <% Ontology.all.each do |ont| %>
-      <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
-      <br />
-    <% end %>
-  </div>
-  
-  <br />
-  <%= f.submit %>
-  
+        <%= f.label :categories %>
+        <%= f.autocomplete_field :tag_list, autocomplete_tag_name_patterns_path, :"data-delimiter" => ', ' %>
+        <br />
+        <%= f.submit(:class => "btn btn-success") %>
+      </td>
+      <td style="padding-left: 50px;">
+        <legend>Ontologies</legend>
+        <div class="control-group">
+          <% Ontology.all.each do |ont| %>
+            <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
+            <br />
+          <% end %>
+        </div>
+      </td> 
+      <td style="padding-left: 50px; vertical-align: top">
+        <legend>Software Engineering Patterns</legend>
+        <div class="control-group">
+        <%= select_tag(
+              "pattern[swe_pattern_ids][]", options_from_collection_for_select(SwePattern.all, "id", "name"), 
+              {:multiple => true, :size =>10 }) 
+        %>
+        </div>
+      </td> 
+    </tr>
+</table>  
 <% end %>

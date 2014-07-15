@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140619115436) do
+ActiveRecord::Schema.define(:version => 20140629140613) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "query_node_id"
@@ -75,6 +75,11 @@ ActiveRecord::Schema.define(:version => 20140619115436) do
     t.datetime "updated_at",        :null => false
   end
 
+  create_table "patterns_swe_patterns", :id => false, :force => true do |t|
+    t.integer "pattern_id"
+    t.integer "swe_pattern_id"
+  end
+
   create_table "relation_constraints", :force => true do |t|
     t.integer  "source_id"
     t.integer  "target_id"
@@ -114,6 +119,13 @@ ActiveRecord::Schema.define(:version => 20140619115436) do
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
+  create_table "swe_patterns", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"
     t.integer  "taggable_id"
@@ -124,12 +136,14 @@ ActiveRecord::Schema.define(:version => 20140619115436) do
     t.datetime "created_at"
   end
 
-  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
-  add_index "taggings", ["taggable_id", "taggable_type", "context"], :name => "index_taggings_on_taggable_id_and_taggable_type_and_context"
+  add_index "taggings", ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], :name => "taggings_idx", :unique => true
 
   create_table "tags", :force => true do |t|
-    t.string "name"
+    t.string  "name"
+    t.integer "taggings_count", :default => 0
   end
+
+  add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
 
   create_table "time_constraints", :force => true do |t|
     t.integer  "from_id"

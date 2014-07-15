@@ -4,10 +4,6 @@ class AttributeConstraint < ActiveRecord::Base
   
   include RdfSerialization
   
-  def to_cypher
-    return "#{query_node.query_variable}.#{attribute_name}! #{operator} #{value}"
-  end
-  
   def rdf_statements
     return []
   end

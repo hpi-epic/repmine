@@ -5,25 +5,28 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Description</th>
-      <th>Run</th>
+      <th style="width: 20%;">Description</th>
+      <th>Concepts Used</th>
+      <th>Transfer to <%= select_tag(:graph_id, options_from_collection_for_select(@repositories, "id", "name")) %>
+      </th>
       <th>Actions</th>
     </tr>
   </thead>
-  <% @patterns.each do |pattern| %>
+  <% @patterns.each_with_index do |pattern, i| %>
     <tr>
       <%= form_tag(pattern_run_on_repository_path(pattern)) do |f| %>      
       <td><%= link_to(pattern.name, pattern_path(pattern)) %></td>
       <td><%= pattern.description %></td>
-      <td>      
+      <td><%= i == 0 ? 7 : 3 %></td>
+      <td>
       <% if @repositories.empty? %>
         <%= link_to("Add a repository", new_repository_path) %>
       <% else %>
-        <%= select_tag(:graph_id, options_from_collection_for_select(@repositories, "id", "name")) %>
-        <%= submit_tag ("Detect Pattern on Graph!")%>
+        <%= submit_tag("Execute (#{ i == 0 ? "7/7" : "3/3"})", :class => "btn btn-success") %> 
+        <!--<%= submit_tag("Translate (#{ i == 0 ? "5" : "2"})", :class => "btn btn-info") %> -->
       <% end %>
       </td>      
-      <td><%= link_to("Destroy", pattern_path(pattern), method: :delete, class: "btn") %></td>
+      <td><%= link_to("Destroy", pattern_path(pattern), method: :delete, class: "btn btn-danger") %></td>
       <% end %>
     </tr>    
   <% end %>

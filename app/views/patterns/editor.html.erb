@@ -3,6 +3,8 @@
   var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@pattern) %>';
 <% end %>
 
+<%= link_to 'Save', pattern_path(@pattern), :class => "btn btn-success" %>
+<%= link_to 'Reset', pattern_path(@pattern), :class => "btn btn-danger" %>
 <%= link_to 'Create Node', pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_node" %>
 
 <hr />

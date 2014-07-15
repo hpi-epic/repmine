@@ -9,6 +9,10 @@ class PatternsController < ApplicationController
   def editor
     @pattern = Pattern.find(params[:pattern_id])
   end
+  
+  def translator
+    @pattern = Pattern.find(params[:pattern_id])
+  end
     
   def create
     @pattern = Pattern.new(params[:pattern])

@@ -51,5 +51,14 @@ div.relConstraints {
 }
 
 .justRight {
-  width: 120px;
+  width: 130px;
+}
+
+.verticalLine {
+  min-height: 700px;
+  width: 1px;
+  position: absolute;
+  left: 650px;
+  top: 130px;
+  border-left: 2px dotted black;
 }

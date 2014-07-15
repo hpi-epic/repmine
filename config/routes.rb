@@ -1,5 +1,8 @@
 RepMine::Application.routes.draw do
 
+  resources :swe_patterns
+
+
   resources :attribute_constraints
   resources :relation_constraints
 
@@ -8,6 +11,7 @@ RepMine::Application.routes.draw do
     resources :relation_constraints
     resources :attribute_constraints
     get "editor"
+    get "translator"
     get "run_on_repository"
     get :autocomplete_tag_name, :on => :collection
   end
