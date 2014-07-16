@@ -5,7 +5,8 @@ class Node < ActiveRecord::Base
   attr_accessible :rdf_type, :x, :y
 
   belongs_to :pattern
-  has_many :relation_constraints, :dependent => :destroy
+  has_many :source_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "source_id", :dependent => :destroy
+  has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy  
   has_many :attribute_constraints, :dependent => :destroy
   
   def query_variable()
@@ -26,5 +27,9 @@ class Node < ActiveRecord::Base
   
   def rdf_statements
     return []
+  end
+  
+  def reset!
+
   end
 end

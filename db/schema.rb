@@ -14,7 +14,7 @@
 ActiveRecord::Schema.define(:version => 20140629140613) do
 
   create_table "attribute_constraints", :force => true do |t|
-    t.integer  "query_node_id"
+    t.integer  "node_id"
     t.string   "attribute_name"
     t.string   "value"
     t.string   "operator"
@@ -144,16 +144,5 @@ ActiveRecord::Schema.define(:version => 20140629140613) do
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
-
-  create_table "time_constraints", :force => true do |t|
-    t.integer  "from_id"
-    t.integer  "to_id"
-    t.decimal  "min_time"
-    t.decimal  "max_time"
-    t.boolean  "return_timepspan"
-    t.string   "variable_name"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-  end
 
 end

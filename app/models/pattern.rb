@@ -1,6 +1,6 @@
 class Pattern < ActiveRecord::Base
   
-  #include RdfSerialization
+  include RdfSerialization
   
   attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :repository_name, :tag_list, :original_query
   acts_as_taggable_on :tags
@@ -11,7 +11,6 @@ class Pattern < ActiveRecord::Base
   has_and_belongs_to_many :ontologies
   has_and_belongs_to_many :swe_patterns
   has_many :nodes, :dependent => :destroy
-  has_many :relation_constraints, :dependent => :destroy
 
   # hooks
   before_save :create_repository_name!
@@ -70,6 +69,13 @@ class Pattern < ActiveRecord::Base
     self.repository_name.gsub!(" ", "_")
     self.repository_name.gsub!("#", "_")    
     self.repository_name += "_" + SecureRandom.urlsafe_base64
+  end
+  
+  def reset!
+    # first remove all newly created nodes...
+    nodes.find(:all, :conditions => ["created_at > ?", self.updated_at]).each{|node| node.destroy}
+    # then we reset the remainder
+    nodes.each{|node| node.reset!}
   end
   
   def rdf_xml

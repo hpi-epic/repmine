@@ -6,9 +6,10 @@ RepMine::Application.routes.draw do
     resources :nodes
     resources :relation_constraints
     resources :attribute_constraints
-    get "editor"
-    get "translator"
-    get "run_on_repository"
+    get :editor
+    get :translator
+    post :run_on_repository
+    post :reset
     get :autocomplete_tag_name, :on => :collection
   end
 

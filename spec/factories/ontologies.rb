@@ -2,5 +2,6 @@
 
 FactoryGirl.define do
   factory :ontology do
+    url "http://example.org/myOntology"
   end
 end

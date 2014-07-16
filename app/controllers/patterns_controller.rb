@@ -50,11 +50,11 @@ class PatternsController < ApplicationController
     flash[:notice] = "Destroyed Pattern '#{qn}'"
     redirect_to queries_path
   end
-  
-  def run_on_graph
-    @pattern = Pattern.find(params[:pattern_id])
-    @graph = Graph.find(params[:graph_id])    
-    @results = @graph.execute_query(@pattern)
+    
+  def reset
+    @pattern = Pattern.find(params[:id])
+    @pattern.reset!
+    redirect_to @pattern
   end
 
   # callbacks from here on

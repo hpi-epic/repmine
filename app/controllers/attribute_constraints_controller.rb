@@ -8,9 +8,9 @@ class AttributeConstraintsController < ApplicationController
   end
 
   def create
-    node = Node.find(params[:node_id])
-    @attribute_constraint = AttributeConstraint.create(:node => node)
-    @possible_attributes = node.possible_attributes(params[:rdf_type])
+    @node = Node.find(params[:node_id])
+    @attribute_constraint = AttributeConstraint.create(:node => @node)
+    @possible_attributes = @node.possible_attributes(params[:rdf_type])
     render :show
   end
   
