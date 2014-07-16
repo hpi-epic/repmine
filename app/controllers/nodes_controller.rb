@@ -20,4 +20,15 @@ class NodesController < ApplicationController
     @type_hierarchy = @pattern.type_hierarchy
   end
   
+  def update
+    @node = Node.find(params[:id])
+    respond_to do |format|
+      if @node.update_attributes(params[:node])
+        format.json { head :ok }
+      else
+        format.json { render json: @node.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
 end

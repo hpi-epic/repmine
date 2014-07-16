@@ -1,3 +1,4 @@
+// jsPlumb initializer - creates the drawing canvas and binds the 'connection' event
 jsPlumb.ready(function() {
   
   jsPlumb.importDefaults({
@@ -5,32 +6,70 @@ jsPlumb.ready(function() {
 	});
 	
 	jsPlumb.bind("connection", function(info, originalEvent) {
-	  if(info.connection.scope == "relations") {
+	  if(info.connection.scope == "relations") {	    
 		  createConnection(info.connection);
 	  }
 	});
 });
 
+// handler for pressing the 'create node' button
 $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
-  $("#drawing_canvas").append(xhr.responseText);
-  var node_id = $(xhr.responseText).attr("data-node-id");
-  var node_html_id = $(xhr.responseText).attr("id");
+  var node = $(xhr.responseText);
+  node.appendTo($("#drawing_canvas"));
+  addNodeToGraph(node);
+});
+
+// makes a node draggable and creates the onclick and 
+var addNodeToGraph = function(node){
+  var node_id = node.attr("data-node-id");
+  var node_html_id = node.attr("id");
+  
   // make the node draggable
   jsPlumb.draggable(node_html_id);
   // endpoint for relations
   jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
   // endpoint for attributes
   var ae = jsPlumb.addEndpoint(node_html_id, attributeEndpoint());  
-  
+
   // bind the doubleclick to the attribute filter opening button
   ae.bind("dblclick", function(endpoint) {
     // only perform actions, when there is no filter present
     if(endpoint.connections.length == 0) {
       createNodeAttributeFilter(endpoint, node_id);
     }
-	});
-});
+  });  
+};
 
+// handler for the 'save' button. basically submits all forms
+var save_pattern = function(){
+  save_nodes();
+  // all forms that edit_*_constraints (you get the hint) are submitted
+  $("form[class*=edit_][class*=_constraint]").each(function(index){
+    submit_and_highlight($(this));
+  });
+};
+
+// sets position variables for each node and submits the form
+var save_nodes = function(){
+  $("form[class=edit_node]").each(function(index){
+    var position = $(this).parent().position()
+    $(this).find("input[id=node_x]").val(position.left);
+    $(this).find("input[id=node_y]").val(position.top);
+    submit_and_highlight($(this));
+  });
+};
+
+// submits the form and highlights possible errors
+var submit_and_highlight = function(form){
+  $.ajax({
+    url : form.attr("action"),
+    type: "POST",
+    data : form.serialize(),
+    success:function(data, textStatus, jqXHR){}
+  });
+};
+
+// creates a connection between two endpoints
 var createConnection = function(connection) {
   var source_id = $(connection.source).attr("data-node-id");
   var target_id = $(connection.target).attr("data-node-id");
@@ -91,6 +130,7 @@ var addAttributeFilter = function(node_id, bottom) {
   });
 }
 
+// encapsulates the enpoint options for the orange connection thingies
 var connectionEndpoint = function() {
   return {
 		endpoint:["Dot", {radius:4} ],
@@ -121,6 +161,7 @@ var connectionEndpoint = function() {
 	};
 };
 
+// same for the attribute endpoints
 var attributeEndpoint = function() {
   return {
 		endpoint:["Rectangle", {width:6, height:6} ],
