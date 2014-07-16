@@ -1,5 +1,7 @@
 <div>
-  <%= select_tag("blob", options_from_collection_for_select(["committer.login", "login"],"to_s","to_s"), :class => "justRight")%>
-  <%= select_tag("blob2", options_from_collection_for_select(["?", "~=", "=", "<", ">", "!"],"to_s","to_s"), :class => "veryNarrow")%>
-  <%= text_field_tag("blob3", "", :class => "justRight")%>
+  <%= form_for([@pattern,@attribute_constraint], :html => {:class => "needsNoSpace"}) do |f| %>
+    <%= f.select(:attribute_name, attrib_selector(@possible_attributes), {}, {:class => "justRight"})%>
+    <%= f.select(:operator, operator_selector(), {}, {:class => "veryNarrow"})%>
+    <%= f.text_field(:value, {:class => "justRight"})%>
+  <% end %>
 </div>

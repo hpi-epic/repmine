@@ -54,33 +54,37 @@ var createConnection = function(connection) {
 // creates the box-nodes for attribute filtering
 var createNodeAttributeFilter = function(endpoint, node_id) {
   // build the div
-  var node_html_id = "nodes_" + node_id + "__attributes_";
+  var node_html_id = "node_" + node_id + "_attributes";
   var attributeFilter = "<div id='" + node_html_id  + "' class='attributeFilter' style='left: ";
   attributeFilter += (endpoint.canvas.offsetLeft + 3) + "px; top: " + (endpoint.canvas.offsetTop - 120) + "px;'></div>";
   
   // make the div draggable and connect it to the node
   $("#drawing_canvas").append(attributeFilter);  
+  jsPlumb.draggable(node_html_id);
+  var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
+  jsPlumb.connect({source: endpoint, target: ae});  
   
+  // create the '+ add filter' link at the bottom of the div
   var more_link = jQuery('<a/>',{
-    id: "append_attribute_filter" + node_id,
+    id: "append_attribute_filter_" + node_id,
     href: "#",
     text: "+ add filter"
   });
+  more_link.appendTo($("#" + node_html_id));  
+  
+  // define onclick function for new filters
   more_link.click(function(){addAttributeFilter(node_id, more_link)});
-  more_link.appendTo($("#" + node_html_id));
-      
-  jsPlumb.draggable(node_html_id);
-  var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
-  jsPlumb.connect({source: endpoint, target: ae});
+  
+  // create an initial attribute filter
   addAttributeFilter(node_id, more_link);
 };
 
-// call the backend and retrieve the next line
+// call the backend and retrieve the next attribute filter line
 var addAttributeFilter = function(node_id, bottom) {
   $.ajax({
     url: new_attribute_constraint_path,
     type: "POST",
-    data: {node_id: node_id},
+    data: {node_id: node_id, rdf_type: $("#node_" + node_id).find("select").val()},
     success: function(data) {
       $(data).insertBefore(bottom);
     }

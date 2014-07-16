@@ -63,12 +63,13 @@ class AgraphConnection
     attribs = Set.new
     
     [node_class].concat(get_all_superclasses(node_class)).each do |clazz|
+      domain = OwlClass.new(nil, nil, clazz)
       repository.build_query(:infer => true) do |qq|
         qq.pattern([:attrib, RDF.type, RDF::OWL.DatatypeProperty])
         qq.pattern([:attrib, RDF::RDFS.domain, RDF::Resource.new(clazz)])
         qq.pattern([:attrib, RDF::RDFS.range, :range], :optional => true)
-      end.run do |res2|
-        attribs << {:uri => res2.attrib.to_s, :range => res2.bound?(:range) ? res2.range.to_s : nil}
+      end.run do |res|
+        attribs << Attribute.from_url(res.attrib.to_s, res.bound?(:range) ? res.range : nil, domain)
       end
     end
     

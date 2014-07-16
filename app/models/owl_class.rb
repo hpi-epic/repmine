@@ -13,8 +13,8 @@ class OwlClass
     schema.add_class(self) unless schema.nil?
   end
   
-  def add_attribute(name, type)
-    a = Attribute.new(name, type, self)
+  def add_attribute(name, range)
+    a = Attribute.new(name, range, self)
     attributes << a
     return a
   end

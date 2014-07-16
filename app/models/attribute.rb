@@ -1,24 +1,31 @@
 class Attribute
-  # domain is an owl_class object...
-  attr_accessor :name, :type, :domain
+  # domain is an owl_class object, range an RDF::Resource
+  attr_accessor :name, :range, :domain, :attribute_url
   
   include RdfSerialization  
   
-  def initialize(name, type, domain)
+  def initialize(name, range, domain)
     @name = name
-    @type = type.is_a?(RDF::Resource) ? type : RDF::Resource.new(type)
+    @range = range.is_a?(RDF::Resource) ? range : RDF::Resource.new(range)
     @domain = domain
   end
   
+  def self.from_url(url, range, domain)
+    name = url.split("/").last.split("#").last
+    attrib = self.new(name, range, domain)
+    attrib.attribute_url = url
+    return attrib
+  end
+  
   def url
-    return domain.url + "/" + name
+    return attribute_url || domain.url + "/" + name
   end
   
   def statements
     stmts = [
       [resource, RDF.type, RDF::OWL.DatatypeProperty],
       [resource, RDF.domain, domain.resource],
-      [resource, RDF.range, type]
+      [resource, RDF.range, range]
     ]
   end
 end

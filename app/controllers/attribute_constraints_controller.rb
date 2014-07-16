@@ -1,7 +1,12 @@
 class AttributeConstraintsController < ApplicationController
   
   layout false
+  before_filter :get_pattern
   
+  def get_pattern
+    @pattern = Pattern.find(params[:pattern_id])
+  end
+
   def create
     node = Node.find(params[:node_id])
     @attribute_constraint = AttributeConstraint.create(:node => node)
