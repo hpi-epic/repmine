@@ -20,7 +20,7 @@ class Node < ActiveRecord::Base
     return pattern.possible_attributes_for(rdf_type || self.rdf_type)
   end
   
-  def create_relations_constraint_with_target!(target)
+  def create_relation_constraint_with_target!(target)
     return RelationConstraint.from_source_to_target(self, target)
   end
   
