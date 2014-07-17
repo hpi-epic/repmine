@@ -76,6 +76,7 @@ class Pattern < ActiveRecord::Base
     nodes.find(:all, :conditions => ["created_at > ?", self.updated_at]).each{|node| node.destroy}
     # then we reset the remainder
     nodes.each{|node| node.reset!}
+    self.reload
   end
   
   def rdf_xml
