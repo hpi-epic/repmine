@@ -22,6 +22,6 @@
 <hr />
 <p>Create new Repository</p>
 <%= form_tag(new_repository_path, :method => :get) do |f| %>
-  <%= select_tag(:type, options_from_collection_for_select(Repository::TYPES, "classify", "classify"))%>
+  <%= select_tag(:type, options_from_collection_for_select(Repository::TYPES, "classify", "classify"), {:class => "needsNoSpace"})%>
   <%= submit_tag "Create Repository", :class => "btn success"%>
 <% end %>

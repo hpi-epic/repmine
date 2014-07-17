@@ -52,9 +52,10 @@ class PatternsController < ApplicationController
   end
     
   def reset
-    @pattern = Pattern.find(params[:id])
+    @pattern = Pattern.find(params[:pattern_id])
     @pattern.reset!
-    redirect_to @pattern
+    flash[:notice] = "Resetted Pattern to state of: #{@pattern.updated_at}"    
+    redirect_to pattern_path(@pattern)
   end
 
   # callbacks from here on
