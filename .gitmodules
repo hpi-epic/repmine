@@ -1,6 +1,8 @@
 [submodule "externals/d2rq"]
 	path = externals/d2rq
 	url = https://github.com/d2rq/d2rq.git
+        ignore = dirty
 [submodule "externals/aml"]
 	path = externals/aml
 	url = https://github.com/AgreementMakerLight/AML-Project.git
+        ignore = dirty
