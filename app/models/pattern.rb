@@ -13,7 +13,7 @@ class Pattern < ActiveRecord::Base
   has_many :nodes, :dependent => :destroy
 
   # hooks
-  before_save :create_repository_name!
+  before_create :create_repository_name!
   before_destroy :delete_repository!
 
   # validations

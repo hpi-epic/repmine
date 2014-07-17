@@ -30,8 +30,12 @@ class Node < ActiveRecord::Base
   end
   
   def reset!
-    source_relation_constraints.find(:all, :conditions => ["updated_at > ?", self.pattern.updated_at]).each{|rc| rc.destroy}
-    attribute_constraints.find(:all, :conditions => ["updated_at > ?", self.pattern.updated_at]).each{|ac| ac.destroy}
+    # remove the newly created ones
+    source_relation_constraints.find(:all, :conditions => ["created_at > ?", self.pattern.updated_at]).each{|rc| rc.destroy}
+    attribute_constraints.find(:all, :conditions => ["created_at > ?", self.pattern.updated_at]).each{|ac| ac.destroy}
+    # and get rid of all the changed attributes n stuff
+    source_relation_constraints.reload    
+    attribute_constraints.reload
     source_relation_constraints.each{|rc| rc.reload}
     attribute_constraints.each{|rc| rc.reload}    
   end

@@ -47,6 +47,7 @@ var save_pattern = function(){
   $("form[class*=edit_][class*=_constraint]").each(function(index){
     submit_and_highlight($(this));
   });
+  submit_and_highlight($("form[class=edit_pattern]"));
 };
 
 // sets position variables for each node and submits the form

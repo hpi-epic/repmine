@@ -43,6 +43,17 @@ class PatternsController < ApplicationController
     end
   end
   
+  def update
+    @pattern = Pattern.find(params[:id])
+    respond_to do |format|
+      if @pattern.update_attributes(params[:pattern])
+        format.json { head :ok }
+      else
+        format.json { render json: @node.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
   def destroy
     @pattern = Pattern.find(params[:id])
     qn = @pattern.name
