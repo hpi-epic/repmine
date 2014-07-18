@@ -1,7 +1,1 @@
-<div class="node" style="top: <%= @node.x %>px;left: <%= @node.y %>px;" id="node_<%=@node.id%>" data-node-id="<%= @node.id %>">
-<%= form_for([@pattern,@node]) do |f| %>
-  <%= f.hidden_field :x %>
-  <%= f.hidden_field :y %>
-  <%= f.select(:rdf_type, type_select(@type_hierarchy)) %>
-<% end %>
-</div>
+<%= render :partial => "show", :locals => {:node => @node, :pattern => @pattern, :type_hierarchy => @type_hierarchy}%>

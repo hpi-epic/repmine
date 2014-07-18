@@ -8,6 +8,8 @@ class PatternsController < ApplicationController
   
   def editor
     @pattern = Pattern.find(params[:pattern_id])
+    # little performance tweak...
+    @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
   end
   
   def translator
@@ -59,7 +61,7 @@ class PatternsController < ApplicationController
     qn = @pattern.name
     @pattern.destroy
     flash[:notice] = "Destroyed Pattern '#{qn}'"
-    redirect_to queries_path
+    redirect_to patterns_path
   end
     
   def reset

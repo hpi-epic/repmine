@@ -1,0 +1,7 @@
+<div class="node" style="top: <%= node.y %>px;left: <%= node.x %>px;" id="node_<%=node.id%>" data-node-id="<%= node.id %>">
+<%= form_for([pattern, node]) do |f| %>
+  <%= f.hidden_field :x %>
+  <%= f.hidden_field :y %>
+  <%= f.select(:rdf_type, type_select(type_hierarchy, node)) %>
+<% end %>
+</div>
