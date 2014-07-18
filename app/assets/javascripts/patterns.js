@@ -10,6 +10,10 @@ jsPlumb.ready(function() {
 		  createConnection(info.connection);
 	  }
 	});
+	
+	$("form[class=edit_node]").each(function(index){
+	  addNodeToGraph($(this).parent());
+	})
 });
 
 // handler for pressing the 'create node' button
