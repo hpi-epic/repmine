@@ -52,7 +52,7 @@ class AgraphConnection
       q.pattern([:rel, RDF::RDFS.domain, RDF::Resource.new(domain)])
       q.pattern([:rel, RDF::RDFS.range, RDF::Resource.new(range)])
     end.run do |res|
-      rels << res.rel.to_s
+      rels << Relation.from_url(res.rel.to_s, domain, range)
     end
     
     return rels.to_a

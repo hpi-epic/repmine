@@ -12,7 +12,7 @@ class RelationConstraintsController < ApplicationController
     source = Node.find(params[:source_id])
     target = Node.find(params[:target_id])
     @relation_constraint = source.create_relation_constraint_with_target!(target)
-    @possible_relations = @relation_constraint.possible_relations()
+    @possible_relations = source.possible_relations_to(target, params[:source_type], params[:target_type])
     render :show
   end
   

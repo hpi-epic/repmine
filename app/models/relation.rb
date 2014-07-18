@@ -1,5 +1,5 @@
 class Relation
-  attr_accessor :domain, :range, :name
+  attr_accessor :domain, :range, :name, :relation_url
   
   include RdfSerialization
     
@@ -9,8 +9,15 @@ class Relation
     @name = name
   end  
   
+  def self.from_url(url, range, domain)
+    name = url.split("/").last.split("#").last
+    relation = self.new(name, range, domain)
+    relation.relation_url = url
+    return relation
+  end
+  
   def url
-    return domain.url + "/" + name
+    return relation_url || (domain.url + "/" + name)
   end
   
   def statements

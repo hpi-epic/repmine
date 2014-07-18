@@ -82,14 +82,15 @@ var createConnection = function(connection) {
   // reinstall the endpoints
   jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());  
   jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+  
+  var overlay = $(connection.getOverlay("customOverlay").getElement())
 
   // get the available relations from the server. this highly simplifies the JS...
   $.ajax({
     url: new_relation_constraint_path,
     type: "POST",
-    data: {source_id: source_id, target_id: target_id},
+    data: {source_id: source_id, target_id: target_id, source_type: rdfTypeForNode(source_id), target_type: rdfTypeForNode(target_id)},
     success: function(data) {
-      var overlay = $(connection.getOverlay("customOverlay").getElement())
       overlay.html(data);
     }
   });
@@ -128,11 +129,15 @@ var addAttributeFilter = function(node_id, bottom) {
   $.ajax({
     url: new_attribute_constraint_path,
     type: "POST",
-    data: {node_id: node_id, rdf_type: $("#node_" + node_id).find("select").val()},
+    data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
     success: function(data) {
       $(data).insertBefore(bottom);
     }
   });
+}
+
+var rdfTypeForNode = function(node_id) {
+  return $("#node_" + node_id).find("select").val();
 }
 
 // encapsulates the enpoint options for the orange connection thingies

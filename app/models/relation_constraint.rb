@@ -5,10 +5,6 @@ class RelationConstraint < ActiveRecord::Base
   
   include RdfSerialization
   
-  def possible_relations
-    return source.possible_relations_to(target)
-  end
-  
   def rdf_statements
     return []
   end
