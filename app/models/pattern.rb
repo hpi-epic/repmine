@@ -18,7 +18,8 @@ class Pattern < ActiveRecord::Base
 
   # validations
   validates :name, :presence => true
-  validates :ontologies, :length => {:minimum => 1}
+  validates :description, :presence => true  
+  validates :ontologies, :length => {:minimum => 1, :too_short => "requires at least one selection"}
   
   def root_node
     return nodes.where(:root_node => true).first
