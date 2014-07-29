@@ -23,8 +23,8 @@ class Relation
   def statements
     stmts = [
       [resource, RDF.type, RDF::OWL.ObjectProperty],
-      [resource, RDF.domain, domain.resource],
-      [resource, RDF.range, range.resource]
+      [resource, RDF::RDFS.domain, domain.resource],
+      [resource, RDF::RDFS.range, range.resource]
     ]
   end
 end

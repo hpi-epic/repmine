@@ -24,8 +24,8 @@ class Attribute
   def statements
     stmts = [
       [resource, RDF.type, RDF::OWL.DatatypeProperty],
-      [resource, RDF.domain, domain.resource],
-      [resource, RDF.range, range]
+      [resource, RDF::RDFS.domain, domain.resource],
+      [resource, RDF::RDFS.range, range]
     ]
   end
 end

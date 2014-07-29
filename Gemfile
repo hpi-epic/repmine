@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.1.2'
 
-gem 'rails', '~> 3.2.16' # MIT
+gem 'rails', '~> 3.2.19' # MIT
 
 gem 'pg'
 gem "therubyracer"
