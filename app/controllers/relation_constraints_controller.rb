@@ -21,9 +21,9 @@ class RelationConstraintsController < ApplicationController
   end
   
   def update
-    @relation_constraint = AttributeConstraint.find(params[:id])
+    @relation_constraint = RelationConstraint.find(params[:id])
     respond_to do |format|
-      if @relation_constraint.update_attributes(params[:node])
+      if @relation_constraint.update_attributes(params[:relation_constraint])
         format.json { head :ok }
       else
         format.json { render json: @relation_constraint.errors, status: :unprocessable_entity }

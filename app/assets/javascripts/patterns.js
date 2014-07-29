@@ -41,7 +41,12 @@ var addNodeToGraph = function(node){
     if(endpoint.connections.length == 0) {
       createNodeAttributeFilter(endpoint, node_id);
     }
-  });  
+  });
+  
+  // insert an onchange handler for each node's type selector
+  node.find("#node_rdf_type").change(function(event){
+    update_connections_and_attributes($(this).closest("div"));
+  })
 };
 
 // handler for the 'save' button. basically submits all forms
@@ -74,22 +79,50 @@ var submit_and_highlight = function(form){
   });
 };
 
+// updates all connections of a node upon change of the node class
+var update_connections_and_attributes = function(node){
+  var node_id = node.attr("id")
+  $(jsPlumb.getConnections("relations")).each(function(index, connection){
+    if(connection.sourceId == node_id || connection.targetId == node_id){
+      /*var form = $(connection.getOverlay("customOverlay").getElement()).find("form");
+      var source_type = rdfTypeForNode($(connection.source).attr("data-node-id"));
+      var target_type = rdfTypeForNode($(connection.target).attr("data-node-id"));
+      var data = form.serialize();
+      data['source_type'] = source_type;
+      data['target_type'] = target_type;
+      $.ajax({
+        url : form.attr("action"),
+        type: "POST",
+        data : form.serialize(),
+        success:function(data, textStatus, jqXHR){
+          
+        }
+      });*/
+    }
+  })
+};
+
 // creates a connection between two endpoints
 var createConnection = function(connection) {
   var source_id = $(connection.source).attr("data-node-id");
   var target_id = $(connection.target).attr("data-node-id");
   
   // reinstall the endpoints
-  jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());  
-  jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+  jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+  jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());    
   
   var overlay = $(connection.getOverlay("customOverlay").getElement())
 
-  // get the available relations from the server. this highly simplifies the JS...
+  // get the available relations from the server
   $.ajax({
     url: new_relation_constraint_path,
     type: "POST",
-    data: {source_id: source_id, target_id: target_id, source_type: rdfTypeForNode(source_id), target_type: rdfTypeForNode(target_id)},
+    data: {
+      source_id: source_id, 
+      target_id: target_id, 
+      source_type: rdfTypeForNode(source_id), 
+      target_type: rdfTypeForNode(target_id)
+    },
     success: function(data) {
       overlay.html(data);
     }
