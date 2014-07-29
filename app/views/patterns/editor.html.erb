@@ -2,6 +2,7 @@
   var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@pattern) %>';
   var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@pattern) %>';
   var connect_these_nodes = <%= @relations.to_json.html_safe %>;
+  var load_their_attribute_constraints = <%= @attributes.to_json.html_safe %>
 <% end %>
 
 <% content_for :javascript_includes do %>
