@@ -7,26 +7,25 @@ class RelationConstraintsController < ApplicationController
   def get_pattern
     @pattern = Pattern.find(params[:pattern_id])
   end
-    
+  
+  # only one relation constraint in one direction allowed between two nodes. This is a UI restriction, though...
   def create
-    source = Node.find(params[:source_id])
-    target = Node.find(params[:target_id])
-    @relation_constraint = source.create_relation_constraint_with_target!(target)
-    @possible_relations = source.possible_relations_to(target, params[:source_type], params[:target_type])
+    @rc = RelationConstraint.find_or_create_by_source_id_and_target_id(params[:source_id], params[:target_id])
+    @possible_relations = @rc.possible_relations(params[:source_type], params[:target_type])
     render :show
   end
   
   def show
-    @relation_constraint = RelationConstraint.find(params[:id])
+    @rc = RelationConstraint.find(params[:id])
   end
   
   def update
-    @relation_constraint = RelationConstraint.find(params[:id])
+    @rc = RelationConstraint.find(params[:id])
     respond_to do |format|
-      if @relation_constraint.update_attributes(params[:relation_constraint])
+      if @rc.update_attributes(params[:relation_constraint])
         format.json { head :ok }
       else
-        format.json { render json: @relation_constraint.errors, status: :unprocessable_entity }
+        format.json { render json: @rc.errors, status: :unprocessable_entity }
       end
     end
   end

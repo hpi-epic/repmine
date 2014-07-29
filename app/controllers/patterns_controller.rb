@@ -10,6 +10,11 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
     # little performance tweak...
     @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
+    @relations = @pattern.nodes.collect{|node|
+      node.source_relation_constraints.collect{|src| 
+        {:source => node.id, :target => src.target_id}
+      }
+    }.flatten
   end
   
   def translator

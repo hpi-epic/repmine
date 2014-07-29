@@ -9,11 +9,7 @@ class RelationConstraint < ActiveRecord::Base
     return []
   end
   
-  def self.from_source_to_target(source, target)
-    rel_constraint = self.new()
-    rel_constraint.source = source
-    rel_constraint.target = target
-    rel_constraint.save!
-    return rel_constraint
+  def possible_relations(source_type, target_type)
+    return source.pattern.possible_relations_between(source_type || source.rdf_type, target_type || target.rdf_type, true)
   end
 end
