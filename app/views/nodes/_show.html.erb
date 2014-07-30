@@ -3,5 +3,15 @@
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>
   <%= f.select(:rdf_type, type_select(type_hierarchy, node)) %>
+  <a href="#" onclick="openComplexDialog('node_<%=node.id%>_modal')">
+    <%= fa_icon("sitemap")%>
+    complex
+  </a>
 <% end %>
+</div>
+
+<div id="node_<%= node.id%>_modal" class="modal hide node-modal">
+  <%= select_tag(:rdf_type, type_select(type_hierarchy, node)) %><br />
+  <%= select_tag(:operator, options_for_select(["&sub;".html_safe, "&sup;".html_safe]), :class => "narrow") %><br />
+  <%= select_tag(:rdf_type, type_select(type_hierarchy, node)) %>  
 </div>

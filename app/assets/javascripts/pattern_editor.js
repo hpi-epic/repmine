@@ -92,7 +92,11 @@ var removeAttributeConstraint = function(url, div_id){
       $("#" + div_id).remove();
     }
   })
-}
+};
+
+var openComplexDialog = function(modal_id){
+  $('#' + modal_id).modal('show');
+};
 
 // submits the form and highlights possible errors
 var submitAndHighlight = function(form){

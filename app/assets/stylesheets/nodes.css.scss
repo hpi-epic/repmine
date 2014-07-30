@@ -8,7 +8,6 @@ div.node {
   background-size: cover;
   height: 10em;
   width: 10em;
-  line-height: 10em;
   position: absolute;
   padding: 5px;
   text-align: center;
@@ -18,4 +17,13 @@ div.node select{
   font-size: 13px;
   width: 130px;
   height: 25px;
+}
+
+div.node form{
+  margin-top: 3.5em;
+}
+
+div.node-modal {
+  text-align:center;
+  padding-top: 10px;
 }
