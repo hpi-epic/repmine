@@ -8,9 +8,8 @@ class RelationConstraintsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
   end
   
-  # only one relation constraint in one direction allowed between two nodes. This is a UI restriction, though...
   def create
-    @rc = RelationConstraint.find_or_create_by_source_id_and_target_id(params[:source_id], params[:target_id])
+    @rc = RelationConstraint.create(:source_id => params[:source_id], :target_id => params[:target_id])
     @possible_relations = @rc.possible_relations(params[:source_type], params[:target_type])    
     render :show
   end

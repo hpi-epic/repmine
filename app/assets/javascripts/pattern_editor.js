@@ -14,24 +14,21 @@ jsPlumb.ready(function() {
 	  var free_target = freeRelationEndpointOn("node_" + el.target);
 	  var connection = jsPlumb.connect({source: free_source, target: free_target});
 	  createConnection(connection, true, el.url);
-	});	
+	});
+	
+	for (var node_id in load_their_attribute_constraints){
+    var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
+    var more_link = createNodeAttributeFilter(endpoint, node_id);
+    for (var i in load_their_attribute_constraints[node_id]){      
+      addAttributeFilter(node_id, more_link, load_their_attribute_constraints[node_id][i]);
+    }
+  }	
 	
 	jsPlumb.bind("connection", function(info, originalEvent) {
 	  if(info.connection.scope == "relations") {  
 		  createConnection(info.connection, true);
 	  }
 	});
-});
-
-$(document).ready(function(){
-
-  for (var node_id in load_their_attribute_constraints){
-    jsPlumb.getEndpoints("node_" + node_id)[1].fire("dblclick", jsPlumb.getEndpoints("node_" + node_id)[1]);
-    /*for (var node_id in load_their_attribute_constraints){
-      
-    }*/
-  }
-  
 });
 
 // handler for pressing the 'create node' button
@@ -57,38 +54,48 @@ var addNodeToGraph = function(node){
   ae.bind("dblclick", function(endpoint) {
     // only perform actions, when there is no filter present
     if(endpoint.connections.length == 0) {
-      createNodeAttributeFilter(endpoint, node_id);
+      addAttributeFilter(node_id, createNodeAttributeFilter(endpoint, node_id));
     }
   });
   
   // insert an onchange handler for each node's type selector
   node.find("#node_rdf_type").change(function(event){
-    update_connections_and_attributes($(this).closest("div"));
+    updateConnectionsAndAttributes($(this).closest("div"));
   })
 };
 
 // handler for the 'save' button. basically submits all forms
-var save_pattern = function(){
-  save_nodes();
+var savePattern = function(){
+  saveNodes();
   // all forms that edit_*_constraints (you get the hint) are submitted
   $("form[class*=edit_][class*=_constraint]").each(function(index){
-    submit_and_highlight($(this));
+    submitAndHighlight($(this));
   });
-  submit_and_highlight($("form[class=edit_pattern]"));
+  submitAndHighlight($("form[class=edit_pattern]"));
 };
 
 // sets position variables for each node and submits the form
-var save_nodes = function(){
+var saveNodes = function(){
   $("form[class=edit_node]").each(function(index){
     var position = $(this).parent().position()
     $(this).find("input[id=node_x]").val(position.left);
     $(this).find("input[id=node_y]").val(position.top);
-    submit_and_highlight($(this));
+    submitAndHighlight($(this));
   });
 };
 
+var removeAttributeConstraint = function(url, div_id){
+  $.ajax({
+    url: url,
+    method: 'DELETE',
+    success: function(data, textStatus, jqXHR){
+      $("#" + div_id).remove();
+    }
+  })
+}
+
 // submits the form and highlights possible errors
-var submit_and_highlight = function(form){
+var submitAndHighlight = function(form){
   $.ajax({
     url : form.attr("action"),
     type: "POST",
@@ -103,7 +110,7 @@ var submit_and_highlight = function(form){
 };
 
 // updates all connections of a node upon change of the node class
-var update_connections_and_attributes = function(node){
+var updateConnectionsAndAttributes = function(node){
   var node_id = node.attr("id")
   $(jsPlumb.getConnections("relations")).each(function(index, connection){
     if(connection.sourceId == node_id || connection.targetId == node_id){
@@ -168,21 +175,23 @@ var createNodeAttributeFilter = function(endpoint, node_id) {
   
   // define onclick function for new filters
   more_link.click(function(){addAttributeFilter(node_id, more_link)});
-  
-  // create an initial attribute filter
-  addAttributeFilter(node_id, more_link);
+  return more_link;
 };
 
 // call the backend and retrieve the next attribute filter line
-var addAttributeFilter = function(node_id, bottom) {
-  $.ajax({
-    url: new_attribute_constraint_path,
-    type: "POST",
-    data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
-    success: function(data) {
-      $(data).insertBefore(bottom);
-    }
-  });
+var addAttributeFilter = function(node_id, bottom, url) {
+  if(url){
+    $.ajax({url: url, success: function(data) {$(data).insertBefore(bottom)}})
+  } else {
+    $.ajax({
+      url: new_attribute_constraint_path,
+      type: "POST",
+      data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
+      success: function(data) {
+        $(data).insertBefore(bottom);
+      }
+    });    
+  }
 }
 
 var rdfTypeForNode = function(node_id) {

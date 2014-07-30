@@ -13,10 +13,6 @@ class Node < ActiveRecord::Base
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
   
-  def possible_attributes(rdf_type = nil)
-    return pattern.possible_attributes_for(rdf_type || self.rdf_type)
-  end
-  
   def rdf_statements
     return []
   end

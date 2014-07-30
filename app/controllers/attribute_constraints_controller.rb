@@ -9,22 +9,34 @@ class AttributeConstraintsController < ApplicationController
 
   def create
     @node = Node.find(params[:node_id])
-    @attribute_constraint = AttributeConstraint.create(:node => @node)
-    @possible_attributes = @node.possible_attributes(params[:rdf_type])
+    @ac = AttributeConstraint.create(:node => @node)
+    @possible_attributes = @ac.possible_attributes(params[:rdf_type])
     render :show
   end
   
   def show
-    @attribute_constraint = AttributeConstraint.find(params[:id])
+    @ac = AttributeConstraint.find(params[:id])
+    @possible_attributes ||= @ac.possible_attributes()
   end
   
   def update
-    @attribute_constraint = AttributeConstraint.find(params[:id])
+    @ac = AttributeConstraint.find(params[:id])
     respond_to do |format|
-      if @attribute_constraint.update_attributes(params[:attribute_constraint])
+      if @ac.update_attributes(params[:attribute_constraint])
         format.json { render json: {}, status => :ok }
       else
-        format.json { render json: @attribute_constraint.errors, status: :unprocessable_entity }
+        format.json { render json: @ac.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  def destroy
+    @ac = AttributeConstraint.find(params[:id])
+    respond_to do |format|
+      if @ac.destroy
+        format.json { render json: {}, status => :ok }
+      else
+        format.json { render json: @ac.errors, status: :unprocessable_entity }
       end
     end
   end
