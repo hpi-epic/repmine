@@ -8,16 +8,25 @@ class PatternsController < ApplicationController
   
   def editor
     @pattern = Pattern.find(params[:pattern_id])
-    # little performance tweak...
+    
+    # little performance tweak, only load the hierarchy, if we have nodes that go with it
     @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
     
-    # load all the existing attribute and relation constraints
-    @relations = @pattern.nodes.collect{|node|
-      node.source_relation_constraints.collect{|src| 
-        {:source => node.id, :target => src.target_id}
-      }
-    }.flatten
-    @attributes = @pattern.nodes.reject{|node| node.attribute_constraints.empty?}.collect{|n| n.id}
+    # load existing relation constraints
+    @relations = @pattern.nodes.collect do |node|
+      node.source_relation_constraints.collect do |src| 
+        {:source => node.id, :target => src.target_id, :url => pattern_relation_constraint_path(@pattern, src)}
+      end
+    end.flatten
+    
+    # and attribute constraints, as well
+    @attributes = {}
+    @pattern.nodes.each do |node|
+      node.attribute_constraints.each do |nac|
+        @attributes[node.id] ||= []
+        @attributes[node.id] << pattern_attribute_constraint_path(@pattern, nac)
+      end
+    end
   end
   
   def translator
@@ -57,7 +66,7 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:id])
     respond_to do |format|
       if @pattern.update_attributes(params[:pattern])
-        format.json { head :ok }
+        format.json { render json: {:message => "Pattern successfully saved!"}, status => :ok}
       else
         format.json { render json: @node.errors, status: :unprocessable_entity }
       end

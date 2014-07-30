@@ -3,30 +3,35 @@ jsPlumb.ready(function() {
   
   jsPlumb.importDefaults({
     Container: "drawing_canvas"
-	});
-	
-	jsPlumb.bind("connection", function(info, originalEvent) {
-	  if(info.connection.scope == "relations") {  
-		  createConnection(info.connection, true);
-	  }
 	});	
 	
 	$("form[class=edit_node]").each(function(index){
 	  addNodeToGraph($(this).parent());
 	});
-});
-
-$(document).ready(function(){
-  
-	$(load_their_attribute_constraints).each(function(index, el){
-	  jsPlumb.getEndpoints("node_" + el)[1].fire("dblclick", jsPlumb.getEndpoints("node_" + el)[1]);
-	});
 	
 	$(connect_these_nodes).each(function(index, el){
 	  var free_source = freeRelationEndpointOn("node_" + el.source);
 	  var free_target = freeRelationEndpointOn("node_" + el.target);
-	  jsPlumb.connect({source: free_source, target: free_target});
+	  var connection = jsPlumb.connect({source: free_source, target: free_target});
+	  createConnection(connection, true, el.url);
+	});	
+	
+	jsPlumb.bind("connection", function(info, originalEvent) {
+	  if(info.connection.scope == "relations") {  
+		  createConnection(info.connection, true);
+	  }
 	});
+});
+
+$(document).ready(function(){
+
+  for (var node_id in load_their_attribute_constraints){
+    jsPlumb.getEndpoints("node_" + node_id)[1].fire("dblclick", jsPlumb.getEndpoints("node_" + node_id)[1]);
+    /*for (var node_id in load_their_attribute_constraints){
+      
+    }*/
+  }
+  
 });
 
 // handler for pressing the 'create node' button
@@ -88,7 +93,12 @@ var submit_and_highlight = function(form){
     url : form.attr("action"),
     type: "POST",
     data : form.serialize(),
-    success:function(data, textStatus, jqXHR){}
+    success: function(data, textStatus, jqXHR){
+      if(data.message){alert(data.message)};
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+      alert(jqXHR);
+    }
   });
 };
 
@@ -103,7 +113,7 @@ var update_connections_and_attributes = function(node){
 };
 
 // creates a connection between two endpoints
-var createConnection = function(connection, reinstall_endpoints) {
+var createConnection = function(connection, reinstall_endpoints, url) {
   var source_id = $(connection.source).attr("data-node-id");
   var target_id = $(connection.target).attr("data-node-id");
   
@@ -115,20 +125,24 @@ var createConnection = function(connection, reinstall_endpoints) {
   
   var overlay = $(connection.getOverlay("customOverlay").getElement())
 
-  // get the available relations from the server
-  $.ajax({
-    url: new_relation_constraint_path,
-    type: "POST",
-    data: {
-      source_id: source_id, 
-      target_id: target_id,
-      source_type: rdfTypeForNode(source_id), 
-      target_type: rdfTypeForNode(target_id)
-    },
-    success: function(data) {
-      overlay.html(data);
-    }
-  });
+  // get the available relations from the server oder simply load the existing one
+  if(url){
+    $.ajax({url: url, success: function(data){overlay.html(data)}})
+  } else {
+    $.ajax({
+      url: new_relation_constraint_path,
+      type: "POST",
+      data: {
+        source_id: source_id, 
+        target_id: target_id,
+        source_type: rdfTypeForNode(source_id), 
+        target_type: rdfTypeForNode(target_id)
+      },
+      success: function(data) {
+        overlay.html(data);
+      }
+    });    
+  }
 };
 
 // creates the box-nodes for attribute filtering

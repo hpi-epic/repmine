@@ -24,7 +24,7 @@ class NodesController < ApplicationController
     @node = Node.find(params[:id])
     respond_to do |format|
       if @node.update_attributes(params[:node])
-        format.json { head :ok }
+        format.json { render json: {}, status => :ok }
       else
         format.json { render json: @node.errors, status: :unprocessable_entity }
       end

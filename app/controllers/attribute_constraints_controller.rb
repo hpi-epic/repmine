@@ -22,7 +22,7 @@ class AttributeConstraintsController < ApplicationController
     @attribute_constraint = AttributeConstraint.find(params[:id])
     respond_to do |format|
       if @attribute_constraint.update_attributes(params[:attribute_constraint])
-        format.json { head :ok }
+        format.json { render json: {}, status => :ok }
       else
         format.json { render json: @attribute_constraint.errors, status: :unprocessable_entity }
       end
