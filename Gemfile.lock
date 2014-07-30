@@ -76,6 +76,8 @@ GEM
       railties (>= 3.0.0)
     ffi (1.9.3)
     ffi (1.9.3-java)
+    font-awesome-rails (4.1.0.0)
+      railties (>= 3.2, < 5.0)
     googlecharts (1.6.8)
     haml (4.0.5)
       tilt
@@ -232,7 +234,7 @@ GEM
       rspec-support (~> 3.0.0)
     rspec-support (3.0.3)
     rubyzip (1.1.6)
-    sass (3.3.11)
+    sass (3.3.12)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -305,6 +307,7 @@ DEPENDENCIES
   delayed_job_web
   equivalent-xml
   factory_girl_rails
+  font-awesome-rails
   googlecharts
   jquery-rails
   linkeddata

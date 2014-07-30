@@ -55,6 +55,7 @@ gem "validate_url"
 
 # fancy ui
 gem "twitter-bootstrap-rails"
+gem "font-awesome-rails"
 
 # background work
 gem 'delayed_job_active_record'
