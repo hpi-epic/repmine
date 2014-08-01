@@ -18,7 +18,6 @@
 /data/*.json
 /data/samples/*.json
 /config/*.yml
-/app/models/vocabularies/*.rb
 *.html
 *.zip
 /public/ontologies/extracted/*.rdf

@@ -48,14 +48,14 @@ class MongoDbRepository < Repository
       target_class.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
       class_schema(all_descendants(info, key), target_class, key)
       r = owl_class.add_relation(key, target_class)
-      r.add_custom_property(RDF::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(key))
-      r.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
+      r.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(key))
+      r.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
     end
     
     attributes.each do |attrib|
       a = owl_class.add_attribute(attrib["_id"]["key"].gsub(".XX", ""), attrib["value"]["type"])
-      a.add_custom_property(RDF::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(attrib["_id"]["key"].gsub(".XX", "")))
-      a.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
+      a.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(attrib["_id"]["key"].gsub(".XX", "")))
+      a.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
     end
   end
   
