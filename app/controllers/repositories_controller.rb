@@ -108,7 +108,7 @@ class RepositoriesController < ApplicationController
       end
     rescue Exception => e
       respond_to do |format|
-        format.html { redirect_to @repository, :error => oee.message}
+        format.html { redirect_to @repository, :error => e.message}
       end
     end
   end
