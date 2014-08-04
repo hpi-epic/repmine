@@ -2,3 +2,6 @@
 	path = externals/d2rq
 	url = https://github.com/d2rq/d2rq.git
         ignore = dirty
+[submodule "externals/aml-jar"]
+	path = externals/aml-jar
+	url = https://github.com/AgreementMakerLight/AML-Jar.git
