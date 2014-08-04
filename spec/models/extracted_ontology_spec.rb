@@ -12,8 +12,8 @@ describe ExtractedOntology do
   it "should create valid rdf/xml..." do 
     ont = MongoDbRepository.create({:db_name => "sample_db", :name => "sample_db"}).ontology
     owc = OwlClass.new(ont, "MyClass")
-    owc.add_custom_property(RDF::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new("hello world"))
-    owc.add_custom_property(RDF::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new("hello world"))
+    owc.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new("hello world"))
+    owc.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new("hello world"))
     ont.create_graph!
     lambda {RDF::RDFXML::Reader.new(ont.rdf_xml)}.should_not raise_error
   end

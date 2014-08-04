@@ -31,9 +31,11 @@ class Ontology < ActiveRecord::Base
   end
   
   def imports()
-    return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).collect do |res|
-      Ontology.where("url = ? OR prefix_url = ?", res.object.to_s, res.object.to_s).first_or_create
-    end)
+    return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).reject{|res| 
+      res.object.to_s == Vocabularies::SchemaExtraction.to_s}.collect do |res|
+        Ontology.where("url = ? OR prefix_url = ?", res.object.to_s, res.object.to_s).first_or_create
+      end
+    )
   end
   
   def rdf_graph
@@ -46,16 +48,19 @@ class Ontology < ActiveRecord::Base
   
   # loads an ontology from a url
   def load_ontology
-    begin
-      RDF::Graph.load(self.url)
-    rescue
-      # for http -> https redirects. will fail for others, so ok...
-      RDF::Graph.load(HTTPClient.get(self.url).headers["Location"])
-    end
+    RDF::Graph.load(self.url)
   end
   
   def filename
     return url
+  end
+  
+  def local_path
+    return Rails.root.join("public", "ontologies", "tmp", url.split("/").last)
+  end
+  
+  def download!
+    File.open(local_path, "w+"){|f| f.puts RestClient.get(self.url).body}
   end
   
   # prefixes for the graph. not needed for imported ontologies

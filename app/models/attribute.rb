@@ -11,7 +11,7 @@ class Attribute
   end
   
   def self.from_url(url, range, domain)
-    name = url.split("/").last.split("#").last
+    name = url.gsub(domain.url.to_s + "/", "").split("#").last
     attrib = self.new(name, range, domain)
     attrib.attribute_url = url
     return attrib

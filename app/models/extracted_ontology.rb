@@ -31,8 +31,8 @@ class ExtractedOntology < Ontology
     repository.imports.each{|vocab| @rdf_graph << [resource, RDF::OWL.imports, vocab]}
     @rdf_graph << [resource, RDF::DC.title, repository.name]
     @rdf_graph << [resource, RDF::DC.creator, RDF::Literal.new("Repmine Schema Extractor")]
-    @rdf_graph << [resource, RDF::SchemaExtraction.repository_database, RDF::Literal.new(repository.database_type)]
-    @rdf_graph << [resource, RDF::SchemaExtraction.repository_database_version, RDF::Literal.new(repository.database_version)] 
+    @rdf_graph << [resource, Vocabularies::SchemaExtraction.repository_database, RDF::Literal.new(repository.database_type)]
+    @rdf_graph << [resource, Vocabularies::SchemaExtraction.repository_database_version, RDF::Literal.new(repository.database_version)] 
     # it contains the classes themselves
     classes.each{|klazz| @rdf_graph.insert(*klazz.all_statements)}
     # then, their attributes and relations. This should prevent inline classes
@@ -51,13 +51,21 @@ class ExtractedOntology < Ontology
     return {
      :rdfs => RDF::RDFS,
      :owl => RDF::OWL,
-     :schema_extraction => RDF::SchemaExtraction,
+     :schema_extraction => Vocabularies::SchemaExtraction,
      url.split("/").last.underscore => url
     }
   end
   
   def filename
     return repository.ont_file_url
+  end
+  
+  def local_path
+    return repository.ont_file_path
+  end
+  
+  def download!
+    return true
   end
   
   # returns an rdf file of the graph

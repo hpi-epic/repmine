@@ -3,6 +3,8 @@ class Pattern < ActiveRecord::Base
   include RdfSerialization
   
   attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :repository_name, :tag_list, :original_query
+  attr_accessor :ag_connection, :ag_alignment
+  
   acts_as_taggable_on :tags
   
   as_enum :query_language, sql: 0, cypher: 1, sparql: 2, mongo_js: 3, gremlin: 4
@@ -61,7 +63,12 @@ class Pattern < ActiveRecord::Base
   end
   
   def ag_connection
-    return AgraphConnection.new(self.repository_name)
+    @ag_connection ||= AgraphConnection.new(self.repository_name)
+    return @ag_connection
+  end
+  
+  def prepare_translation!(target_ontology)
+    target_ontology.load_to_repository!(self.repository_name)
   end
   
   def create_repository_name!

@@ -26,7 +26,7 @@
         <!--<%= submit_tag("Translate (#{ i == 0 ? "5" : "2"})", :class => "btn btn-info") %> -->
       <% end %>
       </td>      
-      <td><%= link_to("Destroy", pattern_path(pattern), method: :delete, class: "btn btn-danger") %></td>
+      <td><%= link_to("Destroy", pattern_path(pattern), :method => :delete, :class => "btn btn-danger", :confirm => "Really delete #{pattern.name}?") %></td>
       <% end %>
     </tr>    
   <% end %>
