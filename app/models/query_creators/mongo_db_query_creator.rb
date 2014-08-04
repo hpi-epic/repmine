@@ -1,0 +1,3 @@
+class MongoDbQueryCreator < QueryCreator
+  
+end
