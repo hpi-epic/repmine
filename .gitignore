@@ -20,8 +20,9 @@
 /config/*.yml
 *.html
 *.zip
-/public/ontologies/extracted/*.rdf
-
+/public/ontologies/extracted
+/public/ontologies/tmp
+/public/ontologies/aligments
 /public/assets
 /coverage
 .DS_Store

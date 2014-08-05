@@ -14,7 +14,7 @@ class OntologyMatcher
     [source_ont, target_ont].each{|ont| ont.download!}
     cmd = "java -jar aml.jar -m -s #{source_ont.local_path} -t #{target_ont.local_path} -o #{alignment_path}"
     puts cmd
-    Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml", "AgreementMakerLight")) do |stdin, stdout, stderr, wait_thr|
+    Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
       puts "+++ err: " + stderr.read
       puts "+++ info: " + stdout.read
     end
