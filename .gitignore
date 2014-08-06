@@ -26,3 +26,4 @@
 /public/assets
 /coverage
 .DS_Store
+/externals/aml/store/error.log
