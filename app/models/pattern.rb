@@ -79,6 +79,24 @@ class Pattern < ActiveRecord::Base
     self.repository_name += "_" + SecureRandom.urlsafe_base64
   end
   
+  def comprehensive_ontology
+    if ontologies.size == 1
+      return ontologies.first
+    else
+      return create_comprehensive_ontology
+    end
+  end
+  
+  def create_comprehensive_ontology
+    g = RDF::Graph.new()
+    ontologies.each{|o| g.load(o.url)}
+    name = "pattern_tmp_#{self.id}"
+    ont = ExtractedOntology.new(:url => name + ".rdf", :prefix_url => "/", :short_name => name)
+    buffer = RDF::RDFXML::Writer.buffer{|writer| writer.write_graph(g)}
+    File.open(ont.local_file_path, "w+"){|f| f.puts buffer}
+    return ont
+  end
+  
   def reset!
     # first remove all newly created nodes...
     nodes.find(:all, :conditions => ["created_at > ?", self.updated_at]).each{|node| node.destroy}

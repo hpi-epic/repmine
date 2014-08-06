@@ -7,7 +7,7 @@ describe Pattern do
     
     @node = @pattern.nodes.create!    
     AttributeConstraint.create!(:node => @node)
-    @node.create_relation_constraint_with_target!(@node)
+    RelationConstraint.create(:source_id => @node.id, :target_id => @node.id)
     
     nodes_before = Node.count
     ac_before = AttributeConstraint.count

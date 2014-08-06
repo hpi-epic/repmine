@@ -4,8 +4,14 @@ class ExtractedOntology < Ontology
   
   attr_accessor :classes
   belongs_to :repository
+  
+  before_validation :set_ontology_url
 
   include RdfSerialization  
+  
+  def set_ontology_url
+    self.url = ont_url
+  end
   
   def self.model_name
     return Ontology.model_name
@@ -40,8 +46,8 @@ class ExtractedOntology < Ontology
   end
   
   def load_ontology
-    if File.exist?(repository.ont_file_path)
-      RDF::Graph.load(repository.ont_file_path) 
+    if File.exist?(local_file_path)
+      RDF::Graph.load(ont_file_path)
     else
       nil
     end
@@ -56,12 +62,24 @@ class ExtractedOntology < Ontology
     }
   end
   
-  def filename
-    return repository.ont_file_url
+  def get_url
+    return "ontologies/extracted/#{name_url_safe}.#{file_format}"
   end
   
-  def local_path
-    return repository.ont_file_path
+  def ont_url
+    return ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
+  end
+  
+  def local_file_path
+    return Rails.root.join("public", "ontologies", "extracted", name_url_safe + ".#{file_format}")
+  end
+  
+  def name_url_safe
+    return short_name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_')
+  end
+  
+  def file_format
+    return repository.nil? ? ".rdf" : repository.class.rdf_format
   end
   
   def download!

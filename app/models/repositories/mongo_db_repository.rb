@@ -24,7 +24,6 @@ class MongoDbRepository < Repository
   end
   
   def extract_ontology!
-    
     ontology.clear!
     db.collection_names.each do |c_name|
       next if COLLECTION_BLACKLIST.include?(c_name)
@@ -32,7 +31,7 @@ class MongoDbRepository < Repository
       class_schema(get_schema_info(c_name), owl_class, c_name)
     end
     ontology.create_graph!
-    File.open(ont_file_path, "w+"){|f| f.puts ontology.rdf_xml}
+    File.open(ontology.local_file_path, "w+"){|f| f.puts ontology.rdf_xml}
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'

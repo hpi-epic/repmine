@@ -44,7 +44,7 @@ describe MongoDbRepository do
     allow(@mdb_repo).to receive(:get_schema_info){[]}    
     @mdb_repo.extract_ontology!    
     classes = @mdb_repo.ontology.classes
-    classes.first.url.should == "http://hpi-web.de/ns/ontologies/repmine/schemas/extracted/sample_db/Item"
+    classes.first.url.should == "http://hpi-web.de/ns/ontologies/repmine/schemas/extracted/sample_db_#{@mdb_repo.id}/Item"
   end
   
   it "it should find direct ancestors" do

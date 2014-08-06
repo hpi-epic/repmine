@@ -2,17 +2,16 @@ require 'open3'
 
 class OntologyMatcher
   
-  attr_accessor :ag_connection, :source_ont, :target_ont
+  attr_accessor :ag_connection, :source_ont, :target_ont, :pattern
   
-  def initialize(pattern, ont_s, ont_t)
+  def initialize(pattern, ont_t)
     @pattern = pattern
-    @source_ont = ont_s
     @target_ont = ont_t
   end
   
   def match!()
-    [source_ont, target_ont].each{|ont| ont.download!}
-    cmd = "java -jar aml.jar -m -s #{source_ont.local_path} -t #{target_ont.local_path} -o #{alignment_path}"
+    prepare_matching!
+    cmd = "java -jar aml.jar -m -s #{source_ont.local_file_path} -t #{target_ont.local_file_path} -o #{alignment_path}"
     puts cmd
     Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
       puts "+++ err: " + stderr.read
@@ -25,6 +24,12 @@ class OntologyMatcher
   # this is where the magic will happen
   def get_substitute_for(element)
     
+  end
+  
+  def prepare_matching!
+    target_ont.download!
+    @source_ont = pattern.comprehensive_ontology
+    @source_ont.download!
   end
   
   def alignment_path

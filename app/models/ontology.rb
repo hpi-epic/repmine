@@ -10,7 +10,7 @@ class Ontology < ActiveRecord::Base
   validates :prefix_url, :uniqueness => true
   
   has_and_belongs_to_many :patterns
-  before_validation :set_prefix_if_empty, :set_short_name_if_empty
+  before_validation :set_prefix_if_empty ,:set_short_name_if_empty
     
   def set_prefix_if_empty
     if prefix_url.blank?
@@ -51,16 +51,16 @@ class Ontology < ActiveRecord::Base
     RDF::Graph.load(self.url)
   end
   
-  def filename
+  def get_url
     return url
   end
   
-  def local_path
+  def local_file_path
     return Rails.root.join("public", "ontologies", "tmp", url.split("/").last)
   end
   
   def download!
-    File.open(local_path, "w+"){|f| f.puts RestClient.get(self.url).body}
+    File.open(local_file_path, "w+"){|f| f.puts RestClient.get(self.url).body}
   end
   
   # prefixes for the graph. not needed for imported ontologies

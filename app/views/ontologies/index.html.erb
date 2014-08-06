@@ -9,7 +9,7 @@
 
 <% @ontologies.each do |ontology| %>
   <tr>
-    <td><%= link_to(ontology.short_name, ontology.is_a?(ExtractedOntology) ? root_path + ontology.filename : ontology.url) %></td>
+    <td><%= link_to(ontology.short_name, ontology.get_url) %></td>
     <td><%= ontology.description%></td>
     <td>
       <%= link_to 'Destroy', ontology, method: :delete, data: { confirm: 'Are you sure?' } %>
