@@ -21,8 +21,9 @@ class AgraphConnection
     return @repository
   end
   
-  def insert_graph!(rdf_graph)
-    repository.insert(rdf_graph.statements)
+  def insert_file!(rdf_file)
+    repository.load(rdf_file)
+    remove_duplicates!
   end
   
   def remove_duplicates!()

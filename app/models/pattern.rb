@@ -91,9 +91,9 @@ class Pattern < ActiveRecord::Base
     g = RDF::Graph.new()
     ontologies.each{|o| g.load(o.url)}
     name = "pattern_tmp_#{self.id}"
-    ont = ExtractedOntology.new(:url => name + ".rdf", :prefix_url => "/", :short_name => name)
-    buffer = RDF::RDFXML::Writer.buffer{|writer| writer.write_graph(g)}
-    File.open(ont.local_file_path, "w+"){|f| f.puts buffer}
+    ont = ExtractedOntology.new(:short_name => name)
+    ont.set_ontology_url!
+    ont.rdf_graph = g
     return ont
   end
   
@@ -127,4 +127,5 @@ class Pattern < ActiveRecord::Base
     ontologies.each{|ont| prefixes[ont.short_prefix] = ont.url}
     return prefixes
   end
+  
 end

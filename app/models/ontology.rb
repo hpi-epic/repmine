@@ -27,6 +27,7 @@ class Ontology < ActiveRecord::Base
   def load_to_repository!(repository_name)
     # store it in a repository and remove all duplicates
     ag_connection = AgraphConnection.new(repository_name)
+    
     ag_connection.insert_graph!(rdf_graph)
   end
   
@@ -59,12 +60,18 @@ class Ontology < ActiveRecord::Base
     return Rails.root.join("public", "ontologies", "tmp", url.split("/").last)
   end
   
-  def download!
-    File.open(local_file_path, "w+"){|f| f.puts RestClient.get(self.url).body}
+  def download!(force = false)
+    if !File.exist?(local_file_path) || force
+      File.open(local_file_path, "w+"){|f| f.puts rdf_xml} 
+    end
   end
   
   # prefixes for the graph. not needed for imported ontologies
   def xml_prefixes
     return []
+  end
+  
+  def rdf_xml
+    RestClient.get(self.url).body
   end
 end
