@@ -6,8 +6,8 @@ class PatternsController < ApplicationController
     @pattern = Pattern.new
   end
   
-  def editor
-    @pattern = Pattern.find(params[:pattern_id])
+  def show
+    @pattern = Pattern.find(params[:id])
     
     # little performance tweak, only load the hierarchy, if we have nodes that go with it
     @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
@@ -45,11 +45,6 @@ class PatternsController < ApplicationController
         format.html {render action: "new"}
       end
     end
-  end
-  
-  def show
-    @pattern = Pattern.find(params[:id])
-    redirect_to pattern_editor_path(@pattern)
   end
   
   def index

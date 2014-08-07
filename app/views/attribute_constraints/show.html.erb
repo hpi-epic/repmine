@@ -4,8 +4,6 @@
     <%= f.select(:attribute_name, attrib_selector(@possible_attributes), {}, {:class => "justRight"})%>
     <%= f.select(:operator, operator_selector(), {}, {:class => "veryNarrow"})%>
     <%= f.text_field(:value, {:class => "justRight"})%>
-    <a href="#" onclick="removeAttributeConstraint('<%= pattern_attribute_constraint_path(@pattern, @ac) %>', '<%= div_id %>');">
-      <%= fa_icon "times-circle" %>
-    </a>
+    <%= link_to(fa_icon("times-circle"), "#", :onclick => "removeAttributeConstraint('#{pattern_attribute_constraint_path(@pattern, @ac)}', '#{div_id}');") %>
   <% end %>
 </div>
