@@ -66,22 +66,26 @@ var addNodeToGraph = function(node){
 
 // handler for the 'save' button. basically submits all forms
 var savePattern = function(){
-  saveNodes();
+  var requests = saveNodes();
   // all forms that edit_*_constraints (you get the hint) are submitted
   $("form[class*=edit_][class*=_constraint]").each(function(index){
-    submitAndHighlight($(this));
+    requests.push(submitAndHighlight($(this)));
   });
-  submitAndHighlight($("form[class=edit_pattern]"));
+  $.when(requests).done(function(){
+    submitAndHighlight($("form[class=edit_pattern]")); 
+  });
 };
 
 // sets position variables for each node and submits the form
 var saveNodes = function(){
+  var requests = []
   $("form[class=edit_node]").each(function(index){
     var position = $(this).parent().position()
     $(this).find("input[id=node_x]").val(position.left);
     $(this).find("input[id=node_y]").val(position.top);
-    submitAndHighlight($(this));
+    requests.push(submitAndHighlight($(this)));
   });
+  return requests
 };
 
 var removeAttributeConstraint = function(url, div_id){
@@ -100,7 +104,7 @@ var openComplexDialog = function(modal_id){
 
 // submits the form and highlights possible errors
 var submitAndHighlight = function(form){
-  $.ajax({
+  return $.ajax({
     url : form.attr("action"),
     type: "POST",
     data : form.serialize(),

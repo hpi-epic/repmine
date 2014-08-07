@@ -66,6 +66,7 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:id])
     respond_to do |format|
       if @pattern.update_attributes(params[:pattern])
+        @pattern.touch
         format.json { render json: {:message => "Pattern successfully saved!"}, status => :ok}
       else
         format.json { render json: @node.errors, status: :unprocessable_entity }
