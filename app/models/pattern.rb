@@ -112,6 +112,13 @@ class Pattern < ActiveRecord::Base
     return buffer
   end
   
+  def count_used_concepts
+    concepts = Set.new()
+    nodes.each do |node|
+      concepts.concat(node.used_concepts)
+    end
+  end
+  
   def rdf_statements
     graph = RDF::Graph.new()
     graph << nodes.collect{|qn| qn.rdf_statements}

@@ -10,7 +10,7 @@ class Ontology < ActiveRecord::Base
   validates :prefix_url, :uniqueness => true
   
   has_and_belongs_to_many :patterns
-  before_validation :set_prefix_if_empty ,:set_short_name_if_empty
+  before_validation :set_ontology_url, :set_prefix_if_empty ,:set_short_name_if_empty
     
   def set_prefix_if_empty
     if prefix_url.blank?
@@ -24,11 +24,17 @@ class Ontology < ActiveRecord::Base
     end
   end
   
+  def set_ontology_url
+    if url.blank?
+      self.url = ont_url
+    end
+  end
+  
   def load_to_repository!(repository_name)
     # store it in a repository and remove all duplicates
     ag_connection = AgraphConnection.new(repository_name)
-    
-    ag_connection.insert_graph!(rdf_graph)
+    download!
+    ag_connection.insert_file!(local_file_path)
   end
   
   def imports()

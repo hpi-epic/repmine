@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140629140613) do
+ActiveRecord::Schema.define(:version => 20140808090037) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "node_id"
@@ -40,7 +40,6 @@ ActiveRecord::Schema.define(:version => 20140629140613) do
 
   create_table "nodes", :force => true do |t|
     t.integer  "pattern_id"
-    t.string   "rdf_type"
     t.boolean  "root_node"
     t.integer  "x",          :default => 0
     t.integer  "y",          :default => 0
@@ -144,5 +143,16 @@ ActiveRecord::Schema.define(:version => 20140629140613) do
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
+
+  create_table "type_expressions", :force => true do |t|
+    t.string   "operator"
+    t.string   "rdf_type"
+    t.integer  "node_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+    t.string   "ancestry"
+  end
+
+  add_index "type_expressions", ["ancestry"], :name => "index_type_expressions_on_ancestry"
 
 end

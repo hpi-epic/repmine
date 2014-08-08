@@ -1,7 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe MongoDbRepository do
-  
+RSpec.describe MongoDbRepository, :type => :model do  
   before(:each) do
     @mdb_repo = MongoDbRepository.create({:db_name => "sample_db", :name => "sample_db"})
     # make sure that we don't require a mongodb connection

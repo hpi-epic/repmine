@@ -1,8 +1,8 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe OwlClass do
+RSpec.describe OwlClass, :type => :model do  
   it "should create valid statements for a class" do
-    s = create(:repository).ontology
+    s = FactoryGirl.create(:repository).ontology
     klazz = OwlClass.new(s, "MyClass")
     klazz.statements.size.should == 4
     # TODO check whether the statements are ok 

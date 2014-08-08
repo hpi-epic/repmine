@@ -1,6 +1,8 @@
 class OwlClass
   attr_accessor :subclasses, :name, :relations, :attributes, :schema, :class_url
   
+  SET_OPS = {:sub => "&sub;", :sup => "&sup;", :not => "&not;"}
+  
   include RdfSerialization
   
   def initialize(schema, name, url = nil)

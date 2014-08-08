@@ -5,15 +5,21 @@ gem 'rails', '~> 3.2.19' # MIT
 
 gem 'pg'
 gem "therubyracer"
+gem 'jquery-rails'
 
 # little helpers
 gem 'simple_enum', '~> 1.6'
 gem "seedbank"
 
+# trees for complex class expressions
+gem 'ancestry'
+
+# rdf related stuff
 gem "rdf"
 gem "rdf-raptor"
 gem "rdf-turtle"
 gem "rdf-rdfxml"
+
 # rule engine for translations
 gem 'wongi-engine'
 
@@ -21,7 +27,7 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem 'factory_girl_rails'
-  gem 'simplecov', '~> 0.7.1'
+  gem 'simplecov'
   gem 'nokogiri'
 end
 
@@ -34,8 +40,6 @@ group :assets do
   gem 'coffee-rails', '~> 3.2.1'
   gem 'uglifier', '>= 1.0.3'
 end
-
-gem 'jquery-rails'
 
 # repository specific stuff
 gem 'neography'

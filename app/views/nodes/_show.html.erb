@@ -2,7 +2,7 @@
 <%= form_for([pattern, node]) do |f| %>
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>
-  <%= f.select(:rdf_type, type_select(type_hierarchy, node)) %>
+  <%= f.select(:rdf_type, type_select(type_hierarchy, node), :class => "classSelector") %>
   <a href="#" onclick="openComplexDialog('node_<%=node.id%>_modal')">
     <%= fa_icon("sitemap")%>
     complex
@@ -11,7 +11,25 @@
 </div>
 
 <div id="node_<%= node.id%>_modal" class="modal hide node-modal">
-  <%= select_tag(:rdf_type, type_select(type_hierarchy, node)) %><br />
-  <%= select_tag(:operator, options_for_select(["&sub;".html_safe, "&sup;".html_safe]), :class => "narrow") %><br />
-  <%= select_tag(:rdf_type, type_select(type_hierarchy, node)) %>  
+  <table>
+    <tr id="complex_node_<%= node.id%>_0">
+      <td id="complex_node_<%= node.id%>_0_0" colspan="2">
+        <%= select_tag("operator_0", options_for_select(["&sub;".html_safe, "&sup;".html_safe, "&not;".html_safe]), :class => "narrow") %>
+      </td>
+    <tr>
+    <tr>
+      <td id>
+        <%= select_tag("rdf_type_1_0", type_select(type_hierarchy, node)) %>
+      </td>
+      <td id>
+        <a href="#" onclick="addLeaf(1)">+ add leaf</a>
+      </td>
+    </tr>
+    <tr>
+      <td id="complex_node_<%= node.id %>_2_0" colspan>
+        <a href="#" onclick="addLevel(2,0)">+ add level</a>
+      </td>
+    </tr>
+  </table>
+  <%= button_tag("save")%>
 </div>

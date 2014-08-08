@@ -1,5 +1,8 @@
 RepMine::Application.routes.draw do
 
+  resources :type_expressions
+
+
   resources :swe_patterns
 
   resources :patterns do

@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe Pattern do
+RSpec.describe Pattern, :type => :model do  
   it "should only remove unsaved elements upon 'reset'" do
     @pattern = FactoryGirl.create(:pattern)
     @pattern.update_attribute(:updated_at,Time.now)
@@ -22,7 +22,6 @@ describe Pattern do
   it "should revert unsaved changes for existing elements" do
     @pattern = FactoryGirl.create(:pattern)
     @pattern.update_attribute(:updated_at,Time.now)
-        
     assert_not_equal "http://example2.org", @pattern.nodes.first.rdf_type
     @pattern.nodes.first.rdf_type = "http://example2.org"
     @pattern.reset!

@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe Ontology do
+RSpec.describe Ontology, :type => :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end

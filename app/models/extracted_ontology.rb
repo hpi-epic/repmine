@@ -4,14 +4,8 @@ class ExtractedOntology < Ontology
   
   attr_accessor :classes
   belongs_to :repository
-  
-  before_validation :set_ontology_url!
 
   include RdfSerialization  
-  
-  def set_ontology_url!
-    self.url = ont_url
-  end
   
   def self.model_name
     return Ontology.model_name
