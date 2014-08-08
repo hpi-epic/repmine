@@ -8,7 +8,9 @@ class TypeExpression < ActiveRecord::Base
       if operator == OwlClass::SET_OPS[:not]
         return str(shorten) + children.first.fancy_string(shorten)
       else
-        return children.sort_by{|a| a.created_at}.collect{|c| c.fancy_string(shorten)}.join(operator)
+        expr = children.sort_by{|a| a.created_at}.collect{|c| c.fancy_string(shorten)}.join(operator)
+        expr = "(#{expr})" if depth > 0
+        return expr
       end
     else
       return str(shorten)
