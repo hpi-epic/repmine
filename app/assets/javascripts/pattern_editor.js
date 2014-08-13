@@ -78,7 +78,7 @@ var savePattern = function(){
 
 // sets position variables for each node and submits the form
 var saveNodes = function(){
-  var requests = []
+  var requests = [];
   $("form[class=edit_node]").each(function(index){
     var position = $(this).parent().position()
     $(this).find("input[id=node_x]").val(position.left);
@@ -202,9 +202,37 @@ var addAttributeFilter = function(node_id, bottom, url) {
   }
 }
 
+// returns the rdf type value for a node
 var rdfTypeForNode = function(node_id) {
   return $("#node_" + node_id).find("select").val();
-}
+};
+
+// highlights a type selector upon click
+var highlightSelector = function(element) {
+  $("li.type_expression").each(function(i, ts){
+    $(ts).removeClass("highlighted");
+  });
+  element.addClass("highlighted");
+};
+
+// adds a type expression above, below, or on the same level as the selected_element (determined by url)
+// for simplicity, we simply redraw the entire tree instead of fiddling with the DOM
+var addTypeExpression = function(url,selected_element, list){
+  var requests = [];  
+  if(selected_element.length == 1){
+    var target_url = url.replace("XXX", selected_element.attr("data-id"));
+    $(".edit_type_expression").each(function(i,form){
+      requests.push(submitAndHighlight($(form)));
+    })
+    $.when(requests).done(function(){
+      $.ajax({url: target_url, type: "POST", success: function(data){
+        $(list).html(data);}
+      });
+    });
+  } else {
+    alert("You have to select an element before altering the tree!");
+  }
+};
 
 var freeRelationEndpointOn = function(node_html_id){
   var endpoints = jsPlumb.getEndpoints(node_html_id);

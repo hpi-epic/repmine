@@ -26,7 +26,7 @@ class TypeExpression < ActiveRecord::Base
   end
   
   def operator?
-    return !operator.nil?
+    return rdf_type.nil?
   end
   
   def reset!

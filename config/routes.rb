@@ -1,12 +1,15 @@
 RepMine::Application.routes.draw do
-
-  resources :type_expressions
-
-
   resources :swe_patterns
 
   resources :patterns do
-    resources :nodes
+    resources :nodes do
+      resources :type_expressions do
+        post "add_below"
+        post "add_same_level"
+        post "delete"        
+      end
+    end
+    
     resources :relation_constraints
     resources :attribute_constraints
     get :editor

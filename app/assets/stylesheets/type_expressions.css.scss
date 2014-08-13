@@ -1,3 +1,24 @@
 // Place all the styles related to the type_expressions controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+ul.type_expression {
+  text-align: left;
+  list-style-type: none;  
+}
+
+ul.type_expression select {
+  margin: 5px;
+}
+
+li.highlighted {
+  background-color: #E4544D;
+}
+
+li.operator {
+  
+}
+
+li.type_selector {
+  
+}
