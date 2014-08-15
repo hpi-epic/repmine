@@ -20,8 +20,8 @@ class Node < ActiveRecord::Base
     return []
   end
   
-  def build_type_expression
-    self.type_expression ||= TypeExpression.new(:node => self, :rdf_type => nil)
+  def build_type_expression()
+    self.type_expression ||= TypeExpression.create(:node => self, :rdf_type => nil)
     type_expression.children.create(:rdf_type => "")
   end
   
@@ -31,9 +31,15 @@ class Node < ActiveRecord::Base
   
   # if only the string is set, everything should work as normal
   def rdf_type=(str)
-    if type_expression.root.operator.nil?
-      type_expression.children.first.rdf_type = str
-      type_expression.children.first.save
+    if type_expression.fancy_string != str
+      if type_expression.children.size == 1 && !type_expression.children.first.operator?
+        type_expression.children.first.update_attributes(:rdf_type => str)
+      else
+        type_expression.destroy
+        type_expression = TypeExpression.create(:node => self, :rdf_type => nil)
+        type_expression.children.create(:rdf_type => str)
+        type_expression.save
+      end
     end
   end
   

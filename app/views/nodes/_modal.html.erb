@@ -1,0 +1,48 @@
+<div id="node_<%= node.id%>_modal" class="modal hide node-modal">
+  <table style="width: 100%;">
+    <tr>
+      <td style="padding-right: 15px;">
+        <div id="node_<%= node.id%>_modal_tree">
+        <%= render(
+          :partial => "type_expressions/show",
+          :locals => {:type_expression => node.type_expression, :type_hierarchy => type_hierarchy, :pattern => pattern, :node => node}) %>
+        </div>
+      </td>
+      <td style="width: 100px; text-align: left">
+        <%= link_to(
+          fa_icon("save", :text => "save"),
+          "#",
+          :onclick => "saveTypeExpressions($('#node_#{node.id}_modal_tree'), '#{pattern_node_type_expression_fancy_string_path(pattern, node, node.type_expression)}', $('#node_#{node.id}').find('select'));"
+        ) %>
+        <hr />        
+        <%= link_to(
+          fa_icon("arrow-circle-o-down", :text => "operator below"),
+          "#",
+          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_below_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
+        ) %><br />
+        <%= link_to(
+          fa_icon("arrow-circle-o-left", :text => "operator same level"),
+          "#",
+          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_same_level_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
+        ) %>
+        <hr />    
+        <%= link_to(
+          fa_icon("arrow-circle-down", :text => "type below"),
+          "#",
+          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_below_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
+        ) %><br />
+        <%= link_to(
+          fa_icon("arrow-circle-left", :text => "type same level"),
+          "#",
+          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_same_level_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
+        ) %>
+        <hr />                    
+        <%= link_to(
+          fa_icon("times-circle", :text => "delete"),
+          "#",
+          :onclick => "addTypeExpression('#{pattern_node_type_expression_delete_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'));"
+        ) %>
+      </td>
+    </tr>
+  </table>
+</div>

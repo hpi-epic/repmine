@@ -3,10 +3,12 @@ RepMine::Application.routes.draw do
 
   resources :patterns do
     resources :nodes do
+      get "modal"
       resources :type_expressions do
         post "add_below"
         post "add_same_level"
         post "delete"        
+        get "fancy_string"
       end
     end
     

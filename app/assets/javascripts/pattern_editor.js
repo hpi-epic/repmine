@@ -98,8 +98,20 @@ var removeAttributeConstraint = function(url, div_id){
   })
 };
 
-var openComplexDialog = function(modal_id){
-  $('#' + modal_id).modal('show');
+var openComplexDialog = function(url){
+  $.ajax({
+    url: url, 
+    success: function(data, textStatus, jqXHR){
+      var modal = $(data);
+      var old_modal = $("#drawing_canvas").find("div[id=" + modal.attr("id") + "]")
+      if(old_modal.length == 1){
+        old_modal.html(modal);
+      } else {
+        $("#drawing_canvas").append(modal);
+      }
+      modal.modal('show');
+    }
+  });
 };
 
 // submits the form and highlights possible errors
@@ -217,21 +229,42 @@ var highlightSelector = function(element) {
 
 // adds a type expression above, below, or on the same level as the selected_element (determined by url)
 // for simplicity, we simply redraw the entire tree instead of fiddling with the DOM
-var addTypeExpression = function(url,selected_element, list){
+var addTypeExpression = function(url,selected_element, list, operator){
   var requests = [];  
   if(selected_element.length == 1){
     var target_url = url.replace("XXX", selected_element.attr("data-id"));
-    $(".edit_type_expression").each(function(i,form){
-      requests.push(submitAndHighlight($(form)));
-    })
-    $.when(requests).done(function(){
-      $.ajax({url: target_url, type: "POST", success: function(data){
+    // save each type expression in this list
+    $.when(saveAllTypeExpressions(list)).done(function(){
+      $.ajax({url: target_url, data: {operator: operator}, type: "POST", success: function(data){
         $(list).html(data);}
       });
     });
   } else {
     alert("You have to select an element before altering the tree!");
   }
+};
+
+var saveAllTypeExpressions = function(list){
+  var requests = []
+  list.find(".edit_type_expression").each(function(i,form){
+    requests.push(submitAndHighlight($(form)));
+  });
+  return requests;
+};
+
+var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selector){
+  $.when(saveAllTypeExpressions(list)).done(function(){
+    $.ajax({url: fancy_string_url, success: function(data){
+      var new_option = $(data);
+      var old_option = node_rdf_type_selector.find("option[id=" + new_option.attr("id") + "]");
+      if(old_option.length == 0){
+        node_rdf_type_selector.append(data);
+      } else {
+        old_option.html(new_option);
+      }
+      }
+    })
+  });
 };
 
 var freeRelationEndpointOn = function(node_html_id){

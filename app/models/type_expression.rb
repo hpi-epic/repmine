@@ -13,7 +13,7 @@ class TypeExpression < ActiveRecord::Base
         return expr
       end
     else
-      return str(shorten)
+      return rdf_type.blank? ? nil : str(shorten)
     end
   end
   

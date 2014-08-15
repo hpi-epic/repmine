@@ -34,4 +34,10 @@ class NodesController < ApplicationController
     end
   end
   
+  def modal
+    @node = Node.find(params[:node_id])
+    @type_hierarchy = @pattern.type_hierarchy
+    render :partial => "nodes/modal", :locals => {:node => @node, :type_hierarchy => @type_hierarchy, :pattern => @pattern}
+  end
+  
 end
