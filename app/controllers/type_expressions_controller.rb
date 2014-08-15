@@ -19,8 +19,13 @@ class TypeExpressionsController < ApplicationController
   
   def fancy_string
     @te = get_type_expression
+    @node_id = params[:node_id]
     render :layout => false
-  end  
+  end
+  
+  def show
+    render :layout => false, :partial => "type_expressions/show", :locals => get_locals    
+  end
   
   def get_locals()
     {:type_expression => @node.type_expression, :type_hierarchy => @pattern.type_hierarchy, :pattern => @pattern, :node => @node}
@@ -40,9 +45,13 @@ class TypeExpressionsController < ApplicationController
   private
   
   def set_inst_vars
-    @te = get_type_expression
     @pattern = Pattern.find(params[:pattern_id])
-    @node = Node.find(params[:node_id])
+    @node = Node.find(params[:node_id])    
+    @te = begin
+      get_type_expression
+    rescue Exception => e
+      @node.type_expression
+    end
   end
   
   def get_type_expression

@@ -12,7 +12,7 @@
         <%= link_to(
           fa_icon("save", :text => "save"),
           "#",
-          :onclick => "saveTypeExpressions($('#node_#{node.id}_modal_tree'), '#{pattern_node_type_expression_fancy_string_path(pattern, node, node.type_expression)}', $('#node_#{node.id}').find('select'));"
+          :onclick => "saveTypeExpressions($('#node_#{node.id}_modal_tree'), '#{pattern_node_type_expression_fancy_string_path(pattern, node, node.type_expression)}', $('#node_#{node.id}').find('select'), $('#node_#{node.id}_modal'));"
         ) %>
         <hr />        
         <%= link_to(

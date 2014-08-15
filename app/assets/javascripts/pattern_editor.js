@@ -98,17 +98,11 @@ var removeAttributeConstraint = function(url, div_id){
   })
 };
 
-var openComplexDialog = function(url){
+var openComplexDialog = function(url, modal_tree, modal){
   $.ajax({
     url: url, 
     success: function(data, textStatus, jqXHR){
-      var modal = $(data);
-      var old_modal = $("#drawing_canvas").find("div[id=" + modal.attr("id") + "]")
-      if(old_modal.length == 1){
-        old_modal.html(modal);
-      } else {
-        $("#drawing_canvas").append(modal);
-      }
+      modal_tree.html(data);
       modal.modal('show');
     }
   });
@@ -252,7 +246,7 @@ var saveAllTypeExpressions = function(list){
   return requests;
 };
 
-var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selector){
+var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selector, modal){
   $.when(saveAllTypeExpressions(list)).done(function(){
     $.ajax({url: fancy_string_url, success: function(data){
       var new_option = $(data);
@@ -262,6 +256,7 @@ var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selecto
       } else {
         old_option.html(new_option);
       }
+      modal.modal("hide");
       }
     })
   });
