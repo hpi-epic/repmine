@@ -12,21 +12,24 @@ class OntologyMatcher
   end
   
   def match!()
-    prepare_matching!
-    cmd = "java -jar aml.jar -m -s #{source_ont.local_file_path} -t #{target_ont.local_file_path} -o #{alignment_path}"
-    errors = nil
-    Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
-      errors = stderr.read
-      if errors.blank? 
-        build_alignment_graph! 
-      else
-        raise MatchingError, errors
+    prepare_matching!  
+    unless already_matched?    
+      cmd = "java -jar aml.jar -m -s #{source_ont.local_file_path} -t #{target_ont.local_file_path} -o #{alignment_path}"
+      errors = nil
+      Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
+        errors = stderr.read
+        raise MatchingError, errors unless errors.blank? 
       end
     end
+    build_alignment_graph!    
   end
   
   def build_alignment_graph!()
     @alignment_graph = RDF::Graph.load(alignment_path)
+  end
+  
+  def already_matched?
+    return File.exist?(alignment_path)
   end
   
   # this is where the magic will happen
