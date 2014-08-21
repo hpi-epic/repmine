@@ -29,6 +29,13 @@ class TypeExpression < ActiveRecord::Base
     return rdf_type.nil?
   end
   
+  def used_concepts
+    concepts = []
+    concepts << rdf_type unless operator?
+    children.each{|child| concepts.concat(child.used_concepts)}
+    return concepts  
+  end
+  
   def reset!
     pattern = node.nil? ? root.node.pattern : node.pattern
     if self.created_at > pattern.updated_at

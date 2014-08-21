@@ -57,10 +57,6 @@ class Node < ActiveRecord::Base
   end
   
   def used_concepts
-    concepts = Set.new()
-    remove_them = OwlClass::SET_OPS.values + ["(",")"]
-    remove_us_regex = Regex.new(remove_them.join("|"))
-    nodes.each{|op| concepts.concat(rdf_type.gsub(remove_us_regex, " "))}
-    attribute_constraints.each{|ac| concepts.concat()}
+    return type_expression.used_concepts + source_relation_constraints.collect{|src| src.used_concepts} + attribute_constraints.collect{|src| src.used_concepts}
   end
 end

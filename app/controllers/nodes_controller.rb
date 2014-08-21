@@ -34,4 +34,9 @@ class NodesController < ApplicationController
     end
   end
   
+  def fancy_rdf_string
+    @node = Node.find(params[:node_id])
+    @te = @node.type_expression
+    render :layout => false
+  end
 end

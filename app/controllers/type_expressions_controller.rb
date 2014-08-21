@@ -17,12 +17,6 @@ class TypeExpressionsController < ApplicationController
     render :layout => false, :partial => "type_expressions/show", :locals => get_locals
   end
   
-  def fancy_string
-    @te = get_type_expression
-    @node_id = params[:node_id]
-    render :layout => false
-  end
-  
   def show
     render :layout => false, :partial => "type_expressions/show", :locals => get_locals    
   end
