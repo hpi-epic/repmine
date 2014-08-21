@@ -13,21 +13,15 @@ class Ontology < ActiveRecord::Base
   before_validation :set_ontology_url, :set_prefix_if_empty ,:set_short_name_if_empty
     
   def set_prefix_if_empty
-    if prefix_url.blank?
-      self.prefix_url = url
-    end
+    self.prefix_url = url if prefix_url.blank?
   end
   
   def set_short_name_if_empty
-    if short_name.blank?
-      self.short_name = url.split("/").last.split("\.").first
-    end
+    self.short_name = url.split("/").last.split("\.").first if short_name.blank?
   end
   
   def set_ontology_url
-    if url.blank?
-      self.url = ont_url
-    end
+    self.url = ont_url if url.blank?
   end
   
   def load_to_repository!(repository_name)
@@ -70,6 +64,10 @@ class Ontology < ActiveRecord::Base
     if !File.exist?(local_file_path) || force
       File.open(local_file_path, "w+"){|f| f.puts rdf_xml} 
     end
+  end
+  
+  def does_exist?
+    true
   end
   
   # prefixes for the graph. not needed for imported ontologies

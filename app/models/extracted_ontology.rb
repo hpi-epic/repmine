@@ -40,11 +40,7 @@ class ExtractedOntology < Ontology
   end
   
   def load_ontology
-    if File.exist?(local_file_path)
-      RDF::Graph.load(ont_file_path)
-    else
-      nil
-    end
+    does_exist? ? RDF::Graph.load(ont_file_path) : nil
   end
   
   def prefixes
@@ -86,6 +82,10 @@ class ExtractedOntology < Ontology
       writer.write_graph(@rdf_graph)
     end
     return buffer
+  end
+  
+  def does_exist?
+    return File.exist?(local_file_path)
   end
   
   private

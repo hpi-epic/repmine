@@ -2,6 +2,7 @@ RepMine::Application.routes.draw do
   resources :swe_patterns
 
   resources :patterns do
+    get 'missing_concepts'
     resources :nodes do
       get "fancy_rdf_string"
       resources :type_expressions do

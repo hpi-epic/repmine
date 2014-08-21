@@ -11,4 +11,8 @@ class AttributeConstraint < ActiveRecord::Base
   def possible_attributes(rdf_type = nil)
     return node.pattern.possible_attributes_for(rdf_type || node.rdf_type)
   end
+  
+  def used_concepts
+    return [attribute_name]
+  end
 end

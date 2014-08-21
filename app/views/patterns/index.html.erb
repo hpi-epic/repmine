@@ -1,3 +1,7 @@
+<% content_for :javascript_includes do %>
+  <%= javascript_include_tag "patterns.js" %>
+<% end %>
+
 <h3>Existing Graph Patterns</h3>
 <%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
 
@@ -7,25 +11,26 @@
       <th>Name</th>
       <th style="width: 20%;">Description</th>
       <th>Concepts Used</th>
-      <th>Transfer to <%= select_tag(:graph_id, options_from_collection_for_select(@repositories, "id", "name"), {:class => "needsNoSpace"}) %>
-      </th>
+      <th>Transfer</th>
       <th>Actions</th>
     </tr>
   </thead>
   <% @patterns.each_with_index do |pattern, i| %>
     <tr>
-      <%= form_tag(pattern_run_on_repository_path(pattern)) do |f| %>      
       <td><%= link_to(pattern.name, pattern_path(pattern)) %></td>
       <td><%= pattern.description %></td>
-      <td><%= i == 0 ? 7 : 3 %></td>
+      <td><%= pattern.concept_count %></td>
       <td>
-      <% if @repositories.empty? %>
-        <%= link_to("Add a repository", new_repository_path) %>
-      <% else %>
-        <%= submit_tag("Execute (#{ i == 0 ? "7/7" : "3/3"})", :class => "btn btn-success") %> 
-        <!--<%= submit_tag("Translate (#{ i == 0 ? "5" : "2"})", :class => "btn btn-info") %> -->
-      <% end %>
-      </td>      
+      <%= form_tag(pattern_run_on_repository_path(pattern), :id => "run_pattern_#{pattern.id}") do |f| %>
+      <%= select_tag(
+        :repository_id, 
+        options_from_collection_for_select(@repositories, "id", "name"), 
+        {:include_blank => true, :class => "needsNoSpace", :onchange => "checkExecutionStatus($('#run_pattern_#{pattern.id}'), '#{pattern_missing_concepts_path(pattern)}', $('#query_button_#{pattern.id}'));".html_safe}
+      ) %>
+      <span id="query_button_<%= pattern.id %>">
+        <%= fa_icon("chevron-circle-left", :text => "choose") %>
+      </span>
+      </td>   
       <td><%= link_to("Destroy", pattern_path(pattern), :method => :delete, :class => "btn btn-danger", :confirm => "Really delete #{pattern.name}?") %></td>
       <% end %>
     </tr>    

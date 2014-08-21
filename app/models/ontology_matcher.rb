@@ -4,6 +4,8 @@ class OntologyMatcher
   
   attr_accessor :ag_connection, :source_ont, :target_ont, :pattern, :alignment_graph
   
+  class MatchingError < StandardError;end
+  
   def initialize(pattern, ont_t)
     @pattern = pattern
     @target_ont = ont_t
@@ -15,9 +17,12 @@ class OntologyMatcher
     errors = nil
     Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
-      build_alignment_graph! if errors.blank?
+      if errors.blank? 
+        build_alignment_graph! 
+      else
+        raise MatchingError, errors
+      end
     end
-    return errors
   end
   
   def build_alignment_graph!()

@@ -58,4 +58,8 @@ class Repository < ActiveRecord::Base
   def custom_imports
     return []
   end
+  
+  def self.all_that_have_an_ontology
+    self.all.select{|repo| repo.ontology.does_exist?}
+  end
 end

@@ -53,7 +53,7 @@ class PatternsController < ApplicationController
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
     else
-      @repositories = Repository.all
+      @repositories = Repository.all_that_have_an_ontology
     end
   end
   
@@ -82,6 +82,20 @@ class PatternsController < ApplicationController
     @pattern.reset!
     flash[:notice] = "Resetted Pattern to state of: #{@pattern.updated_at}"    
     redirect_to pattern_path(@pattern)
+  end
+  
+  def missing_concepts
+    @pattern = Pattern.find(params[:pattern_id])
+    @repository = Repository.find(params[:repository_id])
+    @matching_error = nil
+    @missing_concepts = begin
+      @pattern.unmatched_concepts(@repository)
+    rescue OntologyMatcher::MatchingError => e
+      @matching_error = e.message
+      nil
+    end
+    
+    render :layout => false 
   end
 
   # callbacks from here on

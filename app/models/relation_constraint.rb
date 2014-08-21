@@ -9,6 +9,10 @@ class RelationConstraint < ActiveRecord::Base
     return []
   end
   
+  def used_concepts
+    return [relation_type]
+  end
+  
   def possible_relations(source_type = nil, target_type = nil)
     return source.pattern.possible_relations_between(source_type || source.rdf_type, target_type || target.rdf_type, true)
   end

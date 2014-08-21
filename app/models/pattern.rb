@@ -80,11 +80,7 @@ class Pattern < ActiveRecord::Base
   end
   
   def comprehensive_ontology
-    if ontologies.size == 1
-      return ontologies.first
-    else
-      return create_comprehensive_ontology
-    end
+    return ontologies.size == 1 ? ontologies.first : create_comprehensive_ontology
   end
   
   def create_comprehensive_ontology
@@ -92,9 +88,28 @@ class Pattern < ActiveRecord::Base
     ontologies.each{|o| g.load(o.url)}
     name = "pattern_tmp_#{self.id}"
     ont = ExtractedOntology.new(:short_name => name)
-    ont.set_ontology_url!
+    ont.set_ontology_url
     ont.rdf_graph = g
     return ont
+  end
+  
+  def concept_count
+    concepts_used.size
+  end
+  
+  def concepts_used
+    Set.new(nodes.collect{|n| n.used_concepts}.flatten)
+  end
+  
+  def unmatched_concepts(repository)
+    matched = match_concepts(repository)
+    return concepts_used.select{|concept| matched.find{|match| match[:entity] == concept}.nil?  }
+  end
+  
+  def match_concepts(repository)
+    om = OntologyMatcher.new(self, repository.ontology)
+    om.match!
+    return concepts_used.collect{|concept| om.get_substitutes_for(concept)}.flatten
   end
   
   def reset!
@@ -110,13 +125,6 @@ class Pattern < ActiveRecord::Base
       writer.write_graph(rdf_statements)
     end
     return buffer
-  end
-  
-  def count_used_concepts
-    concepts = Set.new()
-    nodes.each do |node|
-      concepts.concat(node.used_concepts)
-    end
   end
   
   def rdf_statements
