@@ -22,7 +22,7 @@
 *.zip
 /public/ontologies/extracted
 /public/ontologies/tmp
-/public/ontologies/aligments
+/public/ontologies/alignments
 /public/assets
 /coverage
 .DS_Store
