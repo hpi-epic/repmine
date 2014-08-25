@@ -1,68 +1,23 @@
 // Place all the styles related to the queries controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-div.attributeFilter {
-  position: absolute;
-  padding: 5px;
-  border: 1px solid #676767;
-  background-color: #48B7AB;  
-  font-size: 13px;
-}
-
 div.static {
   background-color: #CACACA;    
 }
 
-div.attributeFilter select {
-  font-size: 13px;
-  height: 30px;  
-  font-size: 13px;
-}
-
-div.attributeFilter input {
-  font-size: 13px;  
-}
-
-div.relation {
-  font-size: 13px;
-  background-color: white;  
-  z-index: 1000;  
-}
-
-div.relation select{
-  font-size: 13px;
-}
-
-div.relation input{
-  font-size: 13px;
-}
-
-div.relConstraints {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-form.edit_relation_constraint{
-  padding: 5px;
-}
-
-.veryNarrow {
+.very_narrow {
   width: 50px;
-}
-
-.ultraNarrow {
-  width: 30px;
 }
 
 .narrow {
   width: 60px;
 }
 
-.justRight {
+.just_right {
   width: 130px;
 }
 
-div.translationControls {
+div.translation_controls {
   position: absolute; 
   width: 95%;
   margin-top: 12em;

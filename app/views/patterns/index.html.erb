@@ -25,7 +25,7 @@
       <%= select_tag(
         :repository_id, 
         options_from_collection_for_select(@repositories, "id", "name"), 
-        {:include_blank => true, :class => "needsNoSpace", :onchange => "checkExecutionStatus($('#run_pattern_#{pattern.id}'), '#{pattern_missing_concepts_path(pattern)}', $('#query_button_#{pattern.id}'));".html_safe}
+        {:include_blank => true, :class => "needs_no_space", :onchange => "checkExecutionStatus($('#run_pattern_#{pattern.id}'), '#{pattern_missing_concepts_path(pattern)}', $('#query_button_#{pattern.id}'));".html_safe}
       ) %>
       <span id="query_button_<%= pattern.id %>">
         <%= fa_icon("chevron-circle-left", :text => "choose") %>

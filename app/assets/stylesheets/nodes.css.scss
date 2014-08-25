@@ -15,8 +15,10 @@ div.node {
 
 div.immutable_node {
   background-image:url(circle_grey.png);
-  background-repeat: no-repeat;
-  background-size: cover;  
+}
+
+div.selected_node {
+  background-image:url(circle_red.png);  
 }
 
 div.node select{
@@ -30,7 +32,7 @@ div.node form{
   margin-top: 3.5em;
 }
 
-div.node-modal {
+div.node_modal {
   text-align:center;
   padding-top: 10px;
 }

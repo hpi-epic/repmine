@@ -1,0 +1,21 @@
+// Place all the styles related to the attribute_constraints controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+div.attribute_constraints {
+  position: absolute;
+  padding: 5px;
+  border: 1px solid #676767;
+  background-color: #48B7AB;  
+  font-size: 13px;
+}
+
+div.attributeFilter select {
+  font-size: 13px;
+  height: 30px;  
+  font-size: 13px;
+}
+
+div.attributeFilter input {
+  font-size: 13px;  
+}

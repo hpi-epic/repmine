@@ -1,6 +1,6 @@
 <%= form_for([@pattern, @rc]) do |f| %>
 
-  <%= f.select(:relation_type, options_from_collection_for_select(@possible_relations, "relation_url", "name", @rc.relation_type), {}, {:class => "needsNoSpace"}) %><br /><br />
+  <%= f.select(:relation_type, options_from_collection_for_select(@possible_relations, "relation_url", "name", @rc.relation_type), {}, {:class => "needs_no_space"}) %><br /><br />
   
   <% if @rc.min_cardinality.blank? && @rc.max_cardinality.blank? %>
     <a href="#" onclick="$('#rel_const_cards_<%= @rc.id %>').show(); $(this).hide();">+ cardinalities</a><br />
@@ -9,8 +9,8 @@
     <br /><div id="rel_const_cards_<%= @rc.id %>">
   <% end %>
   
-  (<%= f.text_field(:min_cardinality, :class => "veryNarrow") %>,
-  <%= f.text_field(:max_cardinality, :class => "veryNarrow") %>)
+  (<%= f.text_field(:min_cardinality, :class => "very_narrow") %>,
+  <%= f.text_field(:max_cardinality, :class => "very_narrow") %>)
   </div>
 
   <% if @rc.min_path_length.blank? && @rc.max_path_length.blank? %>
@@ -20,7 +20,7 @@
     <div id="rel_const_length_<%= @rc.id %>">
   <% end %>
   
-  [<%= f.text_field(:min_path_length, :class => "veryNarrow") %>,
-  <%= f.text_field(:max_path_length, :class => "veryNarrow") %>]
+  [<%= f.text_field(:min_path_length, :class => "very_narrow") %>,
+  <%= f.text_field(:max_path_length, :class => "very_narrow") %>]
   </div>
 <% end %>

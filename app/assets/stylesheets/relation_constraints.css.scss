@@ -1,0 +1,25 @@
+// Place all the styles related to the relations controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+div.relation {
+  font-size: 13px;
+  background-color: white;  
+  z-index: 1000;  
+}
+
+div.relation select{
+  font-size: 13px;
+}
+
+div.relation input{
+  font-size: 13px;
+}
+
+div.relation_constraints {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+form.edit_relation_constraint {
+  padding: 5px;
+}

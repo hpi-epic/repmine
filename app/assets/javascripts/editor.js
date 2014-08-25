@@ -29,6 +29,7 @@ var addNodeEndpoints = function(node_html_id){
   return endpoints;
 };
 
+// creates the relations and attribute constraint thingies
 var loadExistingConnections = function(make_static){
   $(connect_these_nodes).each(function(index, el){
 	  var free_source = freeRelationEndpointOn("node_" + el.source);
@@ -44,7 +45,7 @@ var loadExistingConnections = function(make_static){
       addAttributeFilter(node_id, more_link, load_their_attribute_constraints[node_id][i]);
     }
   }
-}
+};
 
 // handler for the 'save' button. basically submits all forms
 var savePattern = function(){
@@ -152,7 +153,7 @@ var createConnection = function(connection, reinstall_endpoints, url) {
 var createNodeAttributeFilter = function(endpoint, node_id, make_static) {
   // build the div
   var node_html_id = "node_" + node_id + "_attributes";
-  var node_class = "attributeFilter";
+  var node_class = "attribute_constraints";
   if(make_static == true){
     node_class += " static";
   }
@@ -198,7 +199,7 @@ var addAttributeFilter = function(node_id, bottom, url) {
       }
     });    
   }
-}
+};
 
 // returns the rdf type value for a node
 var rdfTypeForNode = function(node_id) {
@@ -261,7 +262,7 @@ var freeRelationEndpointOn = function(node_html_id){
     if(e.scope == "relations"){free_endpoint = e}
   });
   return free_endpoint  
-}
+};
 
 // encapsulates the enpoint options for the orange connection thingies
 var connectionEndpoint = function() {

@@ -11,6 +11,8 @@ jsPlumb.ready(function() {
 	
   loadExistingConnections(true);
   removeExcessEndpoints();
+  addOnclickHandler();
+  loadExistingTranslations();
 });
 
 // handler for pressing the 'create node' button
@@ -29,4 +31,22 @@ var removeExcessEndpoints = function(){
       }
     });
   });
+};
+
+// adds an onclick handler to nodes, relations, and attributes
+var addOnclickHandler = function(){
+  $("div.immutable_node").each(function(i, node){
+    $(node).on("click", function(){
+      if($(this).hasClass("selected_node")){
+        $(this).removeClass("selected_node");        
+      } else {
+        $(this).addClass("selected_node");        
+      }
+    })
+  });
+  
+};
+
+var loadExistingTranslations = function(){
+  
 };

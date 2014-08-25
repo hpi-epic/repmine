@@ -16,7 +16,7 @@
   <% end %>
 </div>
 
-<div class="translationControls" style="top: <%= @offset %>px" />
+<div class="translation_controls" style="top: <%= @offset %>px" />
   <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success" %>
   <%= link_to 'Create Node', translation_node_pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_translation_node" %>
 </div>
