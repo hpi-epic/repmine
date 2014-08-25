@@ -6,7 +6,7 @@ module AttributeConstraintsHelper
   # TODO: get a list from some model...
   def operator_selector(list = nil)
     opts = list.nil? ? ["?", "~=", "=", "<", ">", "!"] : list
-    options_for_select(list)
+    options_for_select(opts)
   end
   
   def fixed_select(ac)
