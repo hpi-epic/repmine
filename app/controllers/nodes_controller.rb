@@ -39,4 +39,8 @@ class NodesController < ApplicationController
     @te = @node.type_expression
     render :layout => false
   end
+  
+  def translation_node
+    render :json => {}
+  end
 end

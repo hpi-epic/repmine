@@ -30,4 +30,8 @@ class RelationConstraintsController < ApplicationController
     end
   end
   
+  def static
+    @rc = RelationConstraint.find(params[:relation_constraint_id])    
+  end
+  
 end

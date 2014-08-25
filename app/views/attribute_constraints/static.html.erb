@@ -1,0 +1,8 @@
+<% div_id = "node_#{@ac.node.id}_attributes_#{@ac.id}" %>
+<div id="<%= div_id %>">
+  <%= form_for([@pattern,@ac], :html => {:class => "needsNoSpace edit_attribute_constraint"}) do |f| %>
+    <%= f.select(:attribute_name, fixed_select(@ac), {}, {:class => "justRight"})%>
+    <%= f.select(:operator, operator_selector([@ac.operator]), {}, {:class => "veryNarrow"})%>
+    <%= f.text_field(:value, {:class => "justRight", :disabled => true})%>
+  <% end %>
+</div>

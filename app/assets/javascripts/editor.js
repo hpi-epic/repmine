@@ -1,43 +1,3 @@
-// jsPlumb initializer - creates the drawing canvas and binds the 'connection' event
-jsPlumb.ready(function() {
-  
-  jsPlumb.importDefaults({
-    Container: "drawing_canvas"
-	});	
-	
-	$("form[class=edit_node]").each(function(index){
-	  addNodeToGraph($(this).parent());
-	});
-	
-	$(connect_these_nodes).each(function(index, el){
-	  var free_source = freeRelationEndpointOn("node_" + el.source);
-	  var free_target = freeRelationEndpointOn("node_" + el.target);
-	  var connection = jsPlumb.connect({source: free_source, target: free_target});
-	  createConnection(connection, true, el.url);
-	});
-	
-	for (var node_id in load_their_attribute_constraints){
-    var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
-    var more_link = createNodeAttributeFilter(endpoint, node_id);
-    for (var i in load_their_attribute_constraints[node_id]){      
-      addAttributeFilter(node_id, more_link, load_their_attribute_constraints[node_id][i]);
-    }
-  }	
-	
-	jsPlumb.bind("connection", function(info, originalEvent) {
-	  if(info.connection.scope == "relations") {  
-		  createConnection(info.connection, true);
-	  }
-	});
-});
-
-// handler for pressing the 'create node' button
-$("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
-  var node = $(xhr.responseText);
-  node.appendTo($("#drawing_canvas"));
-  addNodeToGraph(node);
-});
-
 // makes a node draggable and creates the onclick and 
 var addNodeToGraph = function(node){
   var node_id = node.attr("data-node-id");
@@ -45,13 +5,10 @@ var addNodeToGraph = function(node){
   
   // make the node draggable
   jsPlumb.draggable(node_html_id);
-  // endpoint for relations
-  jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
-  // endpoint for attributes
-  var ae = jsPlumb.addEndpoint(node_html_id, attributeEndpoint());  
-
+  var endpoints = addNodeEndpoints(node_html_id);
+  
   // bind the doubleclick to the attribute filter opening button
-  ae.bind("dblclick", function(endpoint) {
+  endpoints[endpoints.length - 1].bind("dblclick", function(endpoint) {
     // only perform actions, when there is no filter present
     if(endpoint.connections.length == 0) {
       addAttributeFilter(node_id, createNodeAttributeFilter(endpoint, node_id));
@@ -63,6 +20,35 @@ var addNodeToGraph = function(node){
     updateConnectionsAndAttributes($(this).closest("div"));
   })
 };
+
+// adds only the endpoints to a given node without making it draggable or registering callbacks
+var addNodeEndpoints = function(node_html_id){
+  var endpoints = []
+  endpoints.push(jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint()));
+  endpoints.push(jsPlumb.addEndpoint(node_html_id, attributeEndpoint()));    
+  return endpoints;
+};
+
+var removeUnusedEndpoint = function(){
+  
+};
+
+var loadExistingConnections = function(make_static){
+  $(connect_these_nodes).each(function(index, el){
+	  var free_source = freeRelationEndpointOn("node_" + el.source);
+	  var free_target = freeRelationEndpointOn("node_" + el.target);
+	  var connection = jsPlumb.connect({source: free_source, target: free_target});
+	  createConnection(connection, true, el.url);
+	});
+	
+	for (var node_id in load_their_attribute_constraints){
+    var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
+    var more_link = createNodeAttributeFilter(endpoint, node_id, make_static);
+    for (var i in load_their_attribute_constraints[node_id]){      
+      addAttributeFilter(node_id, more_link, load_their_attribute_constraints[node_id][i]);
+    }
+  }
+}
 
 // handler for the 'save' button. basically submits all forms
 var savePattern = function(){
@@ -167,28 +153,38 @@ var createConnection = function(connection, reinstall_endpoints, url) {
 };
 
 // creates the box-nodes for attribute filtering
-var createNodeAttributeFilter = function(endpoint, node_id) {
+var createNodeAttributeFilter = function(endpoint, node_id, make_static) {
   // build the div
   var node_html_id = "node_" + node_id + "_attributes";
-  var attributeFilter = "<div id='" + node_html_id  + "' class='attributeFilter' style='left: ";
+  var node_class = "attributeFilter";
+  if(make_static == true){
+    node_class += " static";
+  }
+  var attributeFilter = "<div id='" + node_html_id  + "' class='" + node_class + "' style='left: ";
   attributeFilter += (endpoint.canvas.offsetLeft + 3) + "px; top: " + (endpoint.canvas.offsetTop - 120) + "px;'></div>";
   
   // make the div draggable and connect it to the node
   $("#drawing_canvas").append(attributeFilter);  
-  jsPlumb.draggable(node_html_id);
+  
   var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
   jsPlumb.connect({source: endpoint, target: ae});  
   
   // create the '+ add filter' link at the bottom of the div
-  var more_link = jQuery('<a/>',{
-    id: "append_attribute_filter_" + node_id,
-    href: "#",
-    text: "+ add filter"
-  });
-  more_link.appendTo($("#" + node_html_id));  
+  var more_link;
   
-  // define onclick function for new filters
-  more_link.click(function(){addAttributeFilter(node_id, more_link)});
+  if(make_static != true){
+    jsPlumb.draggable(node_html_id);    
+    more_link = jQuery('<a/>',{
+      id: "append_attribute_filter_" + node_id,
+      href: "#",
+      text: "+ add filter"
+    });  
+    more_link.click(function(){addAttributeFilter(node_id, more_link)});    
+  } else {
+    more_link = jQuery("<span></span>");
+  };
+  
+  more_link.appendTo($("#" + node_html_id));  
   return more_link;
 };
 

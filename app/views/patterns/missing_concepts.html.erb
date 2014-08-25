@@ -2,7 +2,7 @@
   <% if @missing_concepts.empty? %>
     <%= button_tag("Execute Query", :class => "btn btn-success")%>
   <% else %>
-    <%= link_to(button_tag("Match (#{@missing_concepts.size})", :class => "btn btn-warning"), pattern_translator_path(@pattern))%>
+    <%= link_to("Match (#{@missing_concepts.size})", pattern_translate_path(@pattern), :class => "btn btn-warning")%>
   <% end %>
 <% else %>
   <%= fa_icon("exclamation", :text => @matching_error)%>

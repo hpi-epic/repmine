@@ -5,8 +5,12 @@ div.attributeFilter {
   position: absolute;
   padding: 5px;
   border: 1px solid #676767;
-  background-color: #CACACA;  
+  background-color: #48B7AB;  
   font-size: 13px;
+}
+
+div.static {
+  background-color: #CACACA;    
 }
 
 div.attributeFilter select {
@@ -38,6 +42,10 @@ div.relConstraints {
   font-weight: bold;
 }
 
+form.edit_relation_constraint{
+  padding: 5px;
+}
+
 .veryNarrow {
   width: 50px;
 }
@@ -54,11 +62,10 @@ div.relConstraints {
   width: 130px;
 }
 
-.verticalLine {
-  min-height: 700px;
-  width: 1px;
-  position: absolute;
-  left: 650px;
-  top: 130px;
-  border-left: 2px dotted black;
+div.translationControls {
+  position: absolute; 
+  width: 95%;
+  margin-top: 12em;
+  border-top: 1px solid #cacaca; 
+  padding: 10px;
 }

@@ -41,4 +41,8 @@ class AttributeConstraintsController < ApplicationController
     end
   end
   
+  def static
+    @ac = AttributeConstraint.find(params[:attribute_constraint_id])
+  end
+  
 end

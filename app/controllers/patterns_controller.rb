@@ -8,29 +8,15 @@ class PatternsController < ApplicationController
   
   def show
     @pattern = Pattern.find(params[:id])
-    
     # little performance tweak, only load the hierarchy, if we have nodes that go with it
     @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
-    
-    # load existing relation constraints
-    @relations = @pattern.nodes.collect do |node|
-      node.source_relation_constraints.collect do |src| 
-        {:source => node.id, :target => src.target_id, :url => pattern_relation_constraint_path(@pattern, src)}
-      end
-    end.flatten
-    
-    # and attribute constraints, as well
-    @attributes = {}
-    @pattern.nodes.each do |node|
-      node.attribute_constraints.each do |nac|
-        @attributes[node.id] ||= []
-        @attributes[node.id] << pattern_attribute_constraint_path(@pattern, nac)
-      end
-    end
+    load_attributes_and_constraints!
   end
   
-  def translator
+  def translate
     @pattern = Pattern.find(params[:pattern_id])
+    @offset = @pattern.nodes.collect{|n| n.y}.max
+    load_attributes_and_constraints!(true)    
   end
     
   def create
@@ -107,5 +93,29 @@ class PatternsController < ApplicationController
   def possible_attributes
     @pattern = Pattern.find(params[:pattern_id])
     render :json => @pattern.possible_attributes_for(params[:node_class])
+  end
+  
+  private 
+  
+  def load_attributes_and_constraints!(static = false)
+    # load existing relation constraints
+    @relations = @pattern.nodes.collect do |node|
+      node.source_relation_constraints.collect do |src| 
+        {:source => node.id, :target => src.target_id, :url => static ? pattern_relation_constraint_static_path(@pattern, src) : pattern_relation_constraint_path(@pattern, src)}
+      end
+    end.flatten
+    
+    # and attribute constraints, as well
+    @attributes = {}
+    @pattern.nodes.each do |node|
+      node.attribute_constraints.each do |nac|
+        @attributes[node.id] ||= []
+        @attributes[node.id] << if static 
+          pattern_attribute_constraint_static_path(@pattern, nac)          
+        else
+          pattern_attribute_constraint_path(@pattern, nac)
+        end
+      end
+    end
   end
 end

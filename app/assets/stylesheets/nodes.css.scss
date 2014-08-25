@@ -13,6 +13,12 @@ div.node {
   text-align: center;
 }
 
+div.immutable_node {
+  background-image:url(circle_grey.png);
+  background-repeat: no-repeat;
+  background-size: cover;  
+}
+
 div.node select{
   font-size: 13px;
   width: 130px;

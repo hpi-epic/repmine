@@ -1,0 +1,22 @@
+<%= javascript_tag do %>
+  var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@pattern) %>';
+  var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@pattern) %>';
+  var connect_these_nodes = <%= @relations.to_json.html_safe %>;
+  var load_their_attribute_constraints = <%= @attributes.to_json.html_safe %>
+<% end %>
+
+<% content_for :javascript_includes do %>
+  <%= javascript_include_tag "editor.js" %>
+  <%= javascript_include_tag "translate_pattern.js" %>  
+<% end %>
+
+<div id="drawing_canvas" class="canvas">
+  <% @pattern.nodes.each do |node| %>
+    <%= render :partial => "nodes/show_immutable", :locals => {:node => node, :pattern => @pattern}%>
+  <% end %>
+</div>
+
+<div class="translationControls" style="top: <%= @offset %>px" />
+  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success" %>
+  <%= link_to 'Create Node', translation_node_pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_translation_node" %>
+</div>
