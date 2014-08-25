@@ -24,3 +24,12 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   node.appendTo($("#drawing_canvas"));
   addNodeToGraph(node);
 });
+
+jsPlumb.bind("connectionDetached", function(info, originalEvent){
+  if(info.connection.scope == "relations"){
+    var delete_me_link = $(info.connection.getOverlays()[0].canvas).find("form[class='edit_relation_constraint']").attr("action");
+    if(delete_me_link != undefined){
+      $.ajax({url: delete_me_link, method: "DELETE"});
+    };
+  }
+});

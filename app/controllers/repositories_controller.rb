@@ -1,9 +1,4 @@
-# workaround for development mode bug
-Dir[Rails.root.join("app", "models","repositories", "*.rb")].each{|file| require file}
-
 class RepositoriesController < ApplicationController
-  
-  protect_from_forgery :except => [:import_json]
   
   # GET /repositories
   # GET /repositories.json

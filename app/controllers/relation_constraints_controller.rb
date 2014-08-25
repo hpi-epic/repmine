@@ -16,7 +16,7 @@ class RelationConstraintsController < ApplicationController
   
   def show
     @rc = RelationConstraint.find(params[:id])
-    @possible_relations ||= @rc.possible_relations()
+    @possible_relations ||= @rc.possible_relations(params[:source_type], params[:target_type])
   end
   
   def update
@@ -28,6 +28,12 @@ class RelationConstraintsController < ApplicationController
         format.json { render json: @rc.errors, status: :unprocessable_entity }
       end
     end
+  end
+  
+  def destroy
+    @rc = RelationConstraint.find(params[:id])
+    @rc.destroy
+    render :json => {}
   end
   
   def static

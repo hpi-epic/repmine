@@ -44,7 +44,6 @@ var addOnclickHandler = function(){
       }
     })
   });
-  
 };
 
 var loadExistingTranslations = function(){

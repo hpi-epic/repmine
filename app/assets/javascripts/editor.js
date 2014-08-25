@@ -24,8 +24,8 @@ var addNodeToGraph = function(node){
 // adds only the endpoints to a given node without making it draggable or registering callbacks
 var addNodeEndpoints = function(node_html_id){
   var endpoints = []
-  endpoints.push(jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint()));
-  endpoints.push(jsPlumb.addEndpoint(node_html_id, attributeEndpoint()));    
+  endpoints.push(jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}], deleteEndpointsOnDetach:true }, connectionEndpoint()));
+  endpoints.push(jsPlumb.addEndpoint(node_html_id, attributeEndpoint()));
   return endpoints;
 };
 
@@ -34,7 +34,7 @@ var loadExistingConnections = function(make_static){
   $(connect_these_nodes).each(function(index, el){
 	  var free_source = freeRelationEndpointOn("node_" + el.source);
 	  var free_target = freeRelationEndpointOn("node_" + el.target);
-	  var connection = jsPlumb.connect({source: free_source, target: free_target});
+	  var connection = jsPlumb.connect({source: free_source, target: free_target, deleteEndpointsOnDetach:true});
 	  createConnection(connection, true, el.url);
 	});
 	
@@ -110,17 +110,18 @@ var submitAndHighlight = function(form){
 var updateConnectionsAndAttributes = function(node){
   var node_id = node.attr("id")
   $(jsPlumb.getConnections("relations")).each(function(index, connection){
-    if(connection.sourceId == node_id || connection.targetId == node_id){
-      createConnection(connection, false);
+    if(connection.sourceId == node_id || connection.targetId == node_id){    
+      var overlay = $(connection.getOverlay("customOverlay").getElement());
+      var update_url = overlay.find("form").attr("action");
+      var params = { source_type: rdfTypeForHTMLNode(connection.sourceId), target_type: rdfTypeForHTMLNode(connection.targetId)};
+      $.get(update_url, params, function(data) {overlay.html(data);});
     }
   })
 };
 
 // creates a connection between two endpoints
 var createConnection = function(connection, reinstall_endpoints, url) {
-  var source_id = $(connection.source).attr("data-node-id");
-  var target_id = $(connection.target).attr("data-node-id");
-  
+
   // reinstall the endpoints
   if(reinstall_endpoints){
     jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
@@ -131,22 +132,28 @@ var createConnection = function(connection, reinstall_endpoints, url) {
 
   // get the available relations from the server oder simply load the existing one
   if(url){
-    $.ajax({url: url, success: function(data){overlay.html(data)}})
+    $.ajax({url: url, success: function(data){
+      overlay.html(data)}
+    });  
   } else {
-    $.ajax({
-      url: new_relation_constraint_path,
-      type: "POST",
-      data: {
-        source_id: source_id, 
-        target_id: target_id,
-        source_type: rdfTypeForNode(source_id), 
-        target_type: rdfTypeForNode(target_id)
-      },
-      success: function(data) {
-        overlay.html(data);
-      }
-    });    
+    createNewConnection(connection, overlay)
   }
+};
+
+var createNewConnection = function(connection, overlay){
+  $.ajax({
+    url: new_relation_constraint_path,
+    type: "POST",
+    data: {
+      source_id: $(connection.source).attr("data-node-id"), 
+      target_id: $(connection.target).attr("data-node-id"),
+      source_type: rdfTypeForHTMLNode(connection.sourceId), 
+      target_type: rdfTypeForHTMLNode(connection.targetId),
+    },
+    success: function(data) {
+      overlay.html(data);
+    }
+  });  
 };
 
 // creates the box-nodes for attribute filtering
@@ -204,6 +211,10 @@ var addAttributeFilter = function(node_id, bottom, url) {
 // returns the rdf type value for a node
 var rdfTypeForNode = function(node_id) {
   return $("#node_" + node_id).find("select").val();
+};
+
+var rdfTypeForHTMLNode = function(node_html_id){
+  return $("#" + node_html_id).find("select").val();
 };
 
 // highlights a type selector upon click
@@ -269,7 +280,7 @@ var connectionEndpoint = function() {
   return {
 		endpoint:["Dot", {radius:4} ],
 		paintStyle:{ fillStyle:"#ffa500", opacity:0.5 },
-		isSource:true,
+		isSource: true,
 		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
 		connectorOverlays:[
@@ -284,13 +295,13 @@ var connectionEndpoint = function() {
 		],
 		connector : "Straight",
 		isTarget:true,
-		dropOptions : {
+    dropOptions : {
   		tolerance:"touch",
   		hoverClass:"dropHover",
   		activeClass:"dragActive"
   	},
 		beforeDetach:function(conn) { 
-			return confirm("Detach connection?"); 
+			return confirm("Remove relation?"); 
 		}
 	};
 };
@@ -303,9 +314,6 @@ var attributeEndpoint = function() {
 		paintStyle:{ fillStyle:"#0087CF", opacity:0.5 },
 		scope: "attributes",
 		connectorStyle:{ strokeStyle:"#0087CF", lineWidth:3 },		
-		connector : "Straight",
-		beforeDetach:function(conn) { 
-			return confirm("Detach connection?"); 
-		}
+		connector : "Straight"
 	};
 };
