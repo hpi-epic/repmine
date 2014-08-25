@@ -10,6 +10,7 @@ jsPlumb.ready(function() {
 	});
 	
   loadExistingConnections(true);
+  removeExcessEndpoints();
 });
 
 // handler for pressing the 'create node' button
@@ -18,3 +19,14 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   node.appendTo($("#drawing_canvas"));
   addNodeToGraph(node);
 });
+
+// removes all unconnected Endpoints so users cannot somehow create new connections
+var removeExcessEndpoints = function(){
+  $("div.immutable_node").each(function(i,node){
+    $(jsPlumb.getEndpoints($(node).attr("id"))).each(function(ii,endpoint){
+      if(endpoint.connections.length == 0){
+        jsPlumb.deleteEndpoint(endpoint);
+      }
+    });
+  });
+};

@@ -29,10 +29,6 @@ var addNodeEndpoints = function(node_html_id){
   return endpoints;
 };
 
-var removeUnusedEndpoint = function(){
-  
-};
-
 var loadExistingConnections = function(make_static){
   $(connect_these_nodes).each(function(index, el){
 	  var free_source = freeRelationEndpointOn("node_" + el.source);

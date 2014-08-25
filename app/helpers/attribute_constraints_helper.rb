@@ -13,5 +13,4 @@ module AttributeConstraintsHelper
     options_for_select([[ac.attribute_name.split("/").last.split("#").last, ac.attribute_name]], ac.attribute_name)
   end
   
-  
 end
