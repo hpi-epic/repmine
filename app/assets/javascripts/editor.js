@@ -121,7 +121,6 @@ var updateConnectionsAndAttributes = function(node){
 
 // creates a connection between two endpoints
 var createConnection = function(connection, reinstall_endpoints, url) {
-
   // reinstall the endpoints
   if(reinstall_endpoints){
     jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
@@ -129,6 +128,7 @@ var createConnection = function(connection, reinstall_endpoints, url) {
   }
   
   var overlay = $(connection.getOverlay("customOverlay").getElement())
+  console.log(overlay);
 
   // get the available relations from the server oder simply load the existing one
   if(url){

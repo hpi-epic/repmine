@@ -74,7 +74,7 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
     @repository = Repository.find(params[:repository_id])
     @matching_error = nil
-    @missing_concepts = begin
+    @mc = begin
       @pattern.unmatched_concepts(@repository)
     rescue OntologyMatcher::MatchingError => e
       @matching_error = e.message

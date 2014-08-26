@@ -1,6 +1,6 @@
-<%= form_for([@pattern, @rc]) do |f| %>
+<%= form_for([@pattern, @rc], :html => {:class => "edit_relation_constraint_static_form"}) do |f| %>
 
-  <%= f.select(:relation_type, static_select(@rc), {}, {:class => "needs_no_space"}) %><br /><br />
+  <%= f.select(:relation_type, static_select(@rc), {}, {:class => "needs_no_space"}) %><br />
   
   <% if !@rc.min_cardinality.blank? || !@rc.max_cardinality.blank? %>
     <br /><div id="rel_const_cards_<%= @rc.id %>">

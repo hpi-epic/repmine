@@ -1,8 +1,8 @@
 <% if @matching_error.nil? %>
-  <% if @missing_concepts.empty? %>
-    <%= button_tag("Execute Query", :class => "btn btn-success")%>
+  <% if @mc.empty? %>
+  <%= button_tag("Execute Query", :class => "btn btn-success")%>
   <% else %>
-    <%= link_to("Match (#{@missing_concepts.size})", pattern_translate_path(@pattern), :class => "btn btn-warning")%>
+  <%= link_to("Match (#{@mc.size})", pattern_translate_to_repository_path(@pattern, @repository), :class => "btn btn-warning") %>
   <% end %>
 <% else %>
   <%= fa_icon("exclamation", :text => @matching_error)%>

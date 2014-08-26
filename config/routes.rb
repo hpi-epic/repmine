@@ -3,12 +3,15 @@ RepMine::Application.routes.draw do
 
   resources :patterns do 
     
+    get "/translate/:repository_id", :to => "patterns#translate", :as => :translate_to_repository
+    
     resources :nodes do
       collection do
         post :translation_node
       end
       
       get :fancy_rdf_string 
+      
       resources :type_expressions do
         post :add_below
         post :add_same_level
@@ -24,9 +27,8 @@ RepMine::Application.routes.draw do
       get :static
     end
     
-    get :translate
     get :missing_concepts
-    post :run_on_repository 
+    post :run_on_repository
     post :reset
     get :autocomplete_tag_name, :on => :collection
   end

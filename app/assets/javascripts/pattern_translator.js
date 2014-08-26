@@ -36,14 +36,25 @@ var removeExcessEndpoints = function(){
 // adds an onclick handler to nodes, relations, and attributes
 var addOnclickHandler = function(){
   $("div.immutable_node").each(function(i, node){
-    $(node).on("click", function(){
-      if($(this).hasClass("selected_node")){
-        $(this).removeClass("selected_node");        
-      } else {
-        $(this).addClass("selected_node");        
-      }
-    })
+    $(node).on("click", function(){addClassToThingy($(this), "selected_node")});
   });
+  
+  $(jsPlumb.getConnections("relations")).each(function(i, connection){
+    var overlay = connection.getOverlay("customOverlay").getElement();
+    $(overlay).on("click", function(){highlightRelation($(overlay))});
+  })
+};
+
+var addClassToThingy = function(thingy, css_class){  
+  if(thingy.hasClass(css_class)){
+    thingy.removeClass(css_class);        
+  } else {
+    thingy.addClass(css_class);
+  }
+};
+
+var highlightRelation = function(overlay){
+  addClassToThingy(overlay, "selected_thingy")
 };
 
 var loadExistingTranslations = function(){
