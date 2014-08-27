@@ -9,7 +9,7 @@ class RdbmsRepository < Repository
     return Repository.model_name
   end
   
-  def extract_ontology!()
+  def create_ontology!()
     cmd = Rails.root.join("externals", "d2rq", "generate-mapping").to_s
     options = ["-v", "-u #{db_username} -p #{db_password}", "-o #{ont_file_path}", "#{connection_string}"]
     errors = ""

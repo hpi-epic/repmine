@@ -41,6 +41,9 @@ class NodesController < ApplicationController
   end
   
   def translation_node
-    render :json => {}
+    @node = Node.create()
+    @repository = Repository.find(params[:repository_id])
+    @type_hierarchy = @repository.type_hierarchy
+    render :show
   end
 end

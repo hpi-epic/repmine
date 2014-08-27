@@ -27,7 +27,7 @@ class MongoDbRepository < Repository
     return stats
   end
   
-  def extract_ontology!
+  def create_ontology!
     ontology.clear!
     db.collection_names.each do |c_name|
       next if COLLECTION_BLACKLIST.include?(c_name)
@@ -35,7 +35,7 @@ class MongoDbRepository < Repository
       class_schema(get_schema_info(c_name), owl_class, c_name)
     end
     ontology.create_graph!
-    ontology.download!
+    ontology.download!    
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'

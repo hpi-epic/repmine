@@ -15,7 +15,7 @@ var addNodeToGraph = function(node){
     }
   });
   
-  // insert an onchange handler for each node's type selector
+  // insert an onchange handler for the node's type selector
   node.find("#node_rdf_type").change(function(event){
     updateConnectionsAndAttributes($(this).closest("div"));
   })
@@ -128,7 +128,6 @@ var createConnection = function(connection, reinstall_endpoints, url) {
   }
   
   var overlay = $(connection.getOverlay("customOverlay").getElement())
-  console.log(overlay);
 
   // get the available relations from the server oder simply load the existing one
   if(url){
@@ -155,6 +154,16 @@ var createNewConnection = function(connection, overlay){
     }
   });  
 };
+
+// handler for detaching connections
+jsPlumb.bind("connectionDetached", function(info, originalEvent){
+  if(info.connection.scope == "relations"){
+    var delete_me_link = $(info.connection.getOverlays()[0].canvas).find("form[class='edit_relation_constraint']").attr("action");
+    if(delete_me_link != undefined){
+      $.ajax({url: delete_me_link, method: "DELETE"});
+    };
+  }
+});
 
 // creates the box-nodes for attribute filtering
 var createNodeAttributeFilter = function(endpoint, node_id, make_static) {

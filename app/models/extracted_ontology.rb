@@ -40,7 +40,7 @@ class ExtractedOntology < Ontology
   end
   
   def load_ontology
-    does_exist? ? RDF::Graph.load(ont_file_path) : nil
+    does_exist? ? RDF::Graph.load(local_file_path) : nil
   end
   
   def prefixes

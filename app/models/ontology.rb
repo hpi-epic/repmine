@@ -24,11 +24,29 @@ class Ontology < ActiveRecord::Base
     self.url = ont_url if url.blank?
   end
   
-  def load_to_repository!(repository_name)
-    # store it in a repository and remove all duplicates
-    ag_connection = AgraphConnection.new(repository_name)
+  def load_to_repository!(repo_name)
     download!
-    ag_connection.insert_file!(local_file_path)
+    ag_connection(repo_name).insert_file!(local_file_path)
+  end
+  
+  def ag_connection(repo_name = nil)
+    @ag_connection ||= AgraphConnection.new(repo_name || repository_name)
+  end
+  
+  def load_to_dedicated_repository!
+    load_to_repository!(repository_name)
+  end
+  
+  def type_hierarchy
+    return ag_connection.type_hierarchy
+  end
+  
+  def repository_name
+    repository_name = get_url.strip
+    repository_name.gsub!("/", "_")
+    repository_name.gsub!(" ", "_")
+    repository_name.gsub!("#", "_")
+    return repository_name
   end
   
   def imports()

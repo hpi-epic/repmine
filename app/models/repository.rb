@@ -35,7 +35,12 @@ class Repository < ActiveRecord::Base
   end
 
   def extract_ontology!
-    raise "implement #{extract_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
+    create_ontology!
+    ontology.load_to_dedicated_repository!
+  end
+  
+  def create_ontology!
+    raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
   end
   
   def get_type_stats()

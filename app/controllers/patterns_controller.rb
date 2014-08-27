@@ -10,13 +10,16 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:id])
     # little performance tweak, only load the hierarchy, if we have nodes that go with it
     @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
-    load_attributes_and_constraints!
+    @attributes, @relations = load_attributes_and_constraints!(@pattern)
   end
   
   def translate
-    @pattern = Pattern.find(params[:pattern_id])
-    @offset = @pattern.nodes.collect{|n| n.y}.max
-    load_attributes_and_constraints!(true)    
+    @source_pattern = Pattern.find(params[:pattern_id])
+    @repository = Repository.find(params[:repository_id])
+    @target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @repository)
+    @offset = @source_pattern.nodes.collect{|n| n.y}.max
+    @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
+    @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern, true)    
   end
     
   def create
@@ -34,7 +37,7 @@ class PatternsController < ApplicationController
   end
   
   def index
-    @patterns = Pattern.all
+    @patterns = Pattern.where(:type => nil)
     if @patterns.empty?
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
@@ -97,25 +100,26 @@ class PatternsController < ApplicationController
   
   private 
   
-  def load_attributes_and_constraints!(static = false)
+  def load_attributes_and_constraints!(pattern, static = false)
     # load existing relation constraints
-    @relations = @pattern.nodes.collect do |node|
+    relations = pattern.nodes.collect do |node|
       node.source_relation_constraints.collect do |src| 
-        {:source => node.id, :target => src.target_id, :url => static ? pattern_relation_constraint_static_path(@pattern, src) : pattern_relation_constraint_path(@pattern, src)}
+        {:source => node.id, :target => src.target_id, :url => static ? pattern_relation_constraint_static_path(pattern, src) : pattern_relation_constraint_path(pattern, src)}
       end
     end.flatten
     
     # and attribute constraints, as well
-    @attributes = {}
-    @pattern.nodes.each do |node|
+    attributes = {}
+    pattern.nodes.each do |node|
       node.attribute_constraints.each do |nac|
-        @attributes[node.id] ||= []
-        @attributes[node.id] << if static 
-          pattern_attribute_constraint_static_path(@pattern, nac)          
+        attributes[node.id] ||= []
+        attributes[node.id] << if static 
+          pattern_attribute_constraint_static_path(pattern, nac)          
         else
-          pattern_attribute_constraint_path(@pattern, nac)
+          pattern_attribute_constraint_path(pattern, nac)
         end
       end
     end
+    return attributes, relations
   end
 end

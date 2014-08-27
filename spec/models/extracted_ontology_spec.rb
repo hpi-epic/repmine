@@ -17,4 +17,9 @@ RSpec.describe ExtractedOntology, :type => :model do
     ont.create_graph!
     expect{RDF::RDFXML::Reader.new(ont.rdf_xml)}.to_not raise_error
   end
+  
+  it "should raise an error if the graph is not set" do
+    ont = ExtractedOntology.new()
+    expect{ont.rdf_xml}.to raise_error
+  end
 end

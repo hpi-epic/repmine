@@ -4,14 +4,10 @@ RepMine::Application.routes.draw do
   resources :patterns do 
     
     get "/translate/:repository_id", :to => "patterns#translate", :as => :translate_to_repository
+    get "/translate/:repository_id/translation_node", :to => "nodes#translation_node", :as => :translation_node
     
     resources :nodes do
-      collection do
-        post :translation_node
-      end
-      
       get :fancy_rdf_string 
-      
       resources :type_expressions do
         post :add_below
         post :add_same_level

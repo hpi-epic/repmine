@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140808090037) do
+ActiveRecord::Schema.define(:version => 20140827132718) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "node_id"
@@ -72,7 +72,13 @@ ActiveRecord::Schema.define(:version => 20140808090037) do
     t.integer  "query_language_cd"
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
+    t.string   "type"
+    t.integer  "pattern_id"
+    t.integer  "repository_id"
   end
+
+  add_index "patterns", ["pattern_id"], :name => "index_patterns_on_pattern_id"
+  add_index "patterns", ["repository_id"], :name => "index_patterns_on_repository_id"
 
   create_table "patterns_swe_patterns", :id => false, :force => true do |t|
     t.integer "pattern_id"
@@ -143,6 +149,11 @@ ActiveRecord::Schema.define(:version => 20140808090037) do
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
+
+  create_table "translation_patterns", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "type_expressions", :force => true do |t|
     t.string   "operator"

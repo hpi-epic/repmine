@@ -15,12 +15,19 @@ jsPlumb.ready(function() {
   loadExistingTranslations();
 });
 
-// handler for pressing the 'create node' button
-$("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
-  var node = $(xhr.responseText);
-  node.appendTo($("#drawing_canvas"));
-  addNodeToGraph(node);
-});
+// function called when the "new Node" button is being clicked
+var newTranslationNode = function(url){
+  var selected_elements = $(".selected");
+  if(selected_elements.length == 0){
+    alert("You have to select at least one element from the input graph");
+  } else {
+    $.post(url, function(data){
+      var node = $(data);
+      node.appendTo($("#drawing_canvas"))
+      addNodeToGraph(node);
+    });
+  }
+}
 
 // removes all unconnected Endpoints so users cannot somehow create new connections
 var removeExcessEndpoints = function(){
@@ -36,7 +43,7 @@ var removeExcessEndpoints = function(){
 // adds an onclick handler to nodes, relations, and attributes
 var addOnclickHandler = function(){
   $("div.immutable_node").each(function(i, node){
-    $(node).on("click", function(){addClassToThingy($(this), "selected_node")});
+    $(node).on("click", function(){toggleClasses($(this), ["selected","red_node"])});
   });
   
   $(jsPlumb.getConnections("relations")).each(function(i, connection){
@@ -45,18 +52,23 @@ var addOnclickHandler = function(){
   })
 };
 
-var addClassToThingy = function(thingy, css_class){  
-  if(thingy.hasClass(css_class)){
-    thingy.removeClass(css_class);        
-  } else {
-    thingy.addClass(css_class);
-  }
+// adds or removes the provided classes on the thingy
+var toggleClasses = function(element, css_classes){  
+  $(css_classes).each(function(i, css_class){
+    if(element.hasClass(css_class)){
+      element.removeClass(css_class);        
+    } else {
+      element.addClass(css_class);
+    }
+  })  
 };
 
+// highlights a relation. TODO: highlight the arrow, as well...
 var highlightRelation = function(overlay){
-  addClassToThingy(overlay, "selected_thingy")
+  toggleClasses(overlay, ["red_background", "selected"])
 };
 
+// loads every translation that we already know of. TODO: do!
 var loadExistingTranslations = function(){
   
 };

@@ -2,7 +2,7 @@ class Pattern < ActiveRecord::Base
   
   include RdfSerialization
   
-  attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :repository_name, :tag_list, :original_query
+  attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :repository_name, :tag_list
   attr_accessor :ag_connection, :ag_alignment
   
   acts_as_taggable_on :tags
@@ -75,7 +75,7 @@ class Pattern < ActiveRecord::Base
     self.repository_name = self.name.strip
     self.repository_name.gsub!("/", "_")
     self.repository_name.gsub!(" ", "_")
-    self.repository_name.gsub!("#", "_")    
+    self.repository_name.gsub!("#", "_")
     self.repository_name += "_" + SecureRandom.urlsafe_base64
   end
   
