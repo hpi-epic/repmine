@@ -4,6 +4,10 @@ class MongoDbRepository < Repository
   def self.rdf_format
     "rdf"
   end
+  
+  def self.default_port
+    27017
+  end
 
   def self.model_name
     return Repository.model_name

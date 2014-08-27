@@ -15,6 +15,10 @@ class Repository < ActiveRecord::Base
     "ttl"
   end
   
+  def self.default_port
+    return nil
+  end
+  
   def self.for_type(type, params = {})
     if TYPES.include?(type)
       return class_eval(type).new(params)
