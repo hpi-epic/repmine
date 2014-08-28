@@ -67,8 +67,3 @@ var toggleClasses = function(element, css_classes){
 var highlightRelation = function(overlay){
   toggleClasses(overlay, ["red_background", "selected"])
 };
-
-// loads every translation that we already know of. TODO: do!
-var loadExistingTranslations = function(){
-  
-};

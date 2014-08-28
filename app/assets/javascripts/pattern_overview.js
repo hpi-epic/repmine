@@ -1,6 +1,6 @@
-var checkExecutionStatus = function(form, url, button){
+var checkExecutionStatus = function(select, url, button){
   // return if users chose the blank value
-  if(form.find("select").val() == ""){
+  if(select.val() == ""){
     button.html("<i class='fa fa-chevron-circle-left'></i>&nbsp;choose")
     return;
   };
@@ -9,7 +9,7 @@ var checkExecutionStatus = function(form, url, button){
   button.html("<i class='fa fa-spinner fa-spin'></i>&nbsp;matching...");
   $.ajax({
     url: url, 
-    data: {repository_id: form.find("select").val()},
+    data: {repository_id: select.val()},
     success: function(data,status,stuff){
       button.html(data);
     },

@@ -4,7 +4,8 @@ RepMine::Application.routes.draw do
   resources :patterns do 
     
     get "/translate/:repository_id", :to => "patterns#translate", :as => :translate_to_repository
-    get "/translate/:repository_id/translation_node", :to => "nodes#translation_node", :as => :translation_node
+    get "/query/:repository_id", :to => "patterns#query", :as => :query_for_repository
+    post "/run_on_repository/:repository_id", :to => "patterns#run_on_repository", :as => :run_on_repository
     
     resources :nodes do
       get :fancy_rdf_string 

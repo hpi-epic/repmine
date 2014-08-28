@@ -77,11 +77,17 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
     @repository = Repository.find(params[:repository_id])
     @matching_error = nil
-    @mc = begin
-      @pattern.unmatched_concepts(@repository)
-    rescue OntologyMatcher::MatchingError => e
-      @matching_error = e.message
-      nil
+    
+    # do not match when using the same ontology...
+    if @pattern.ontologies.size == 1 && @pattern.ontologies.first == @repository.ontology
+      @mc = []
+    else
+      @mc = begin
+        @pattern.unmatched_concepts(@repository)
+      rescue OntologyMatcher::MatchingError => e
+        @matching_error = e.message
+        nil
+      end
     end
     
     render :layout => false 
@@ -96,6 +102,13 @@ class PatternsController < ApplicationController
   def possible_attributes
     @pattern = Pattern.find(params[:pattern_id])
     render :json => @pattern.possible_attributes_for(params[:node_class])
+  end
+  
+  def query
+    @pattern = Pattern.find(params[:pattern_id])
+    @repository = Repository.find(params[:repository_id])
+    #@target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @repository)
+    @query = "SELECT * FROM data"
   end
   
   private 

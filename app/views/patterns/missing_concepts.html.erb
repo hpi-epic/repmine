@@ -1,6 +1,6 @@
 <% if @matching_error.nil? %>
   <% if @mc.empty? %>
-  <%= button_tag("Execute Query", :class => "btn btn-success")%>
+  <%= link_to("Show Query",pattern_query_for_repository_path(@pattern, @repository), :class => "btn btn-success")%>
   <% else %>
   <%= link_to("Match (#{@mc.size})", pattern_translate_to_repository_path(@pattern, @repository), :class => "btn btn-warning") %>
   <% end %>
