@@ -1,4 +1,4 @@
-<div class="node immutable_node" style="top: <%= node.y %>px;left: <%= node.x %>px;" id="node_<%=node.id%>" data-node-id="<%= node.id %>">
+<div class="node immutable_node" style="top: <%= (node.y - 50) %>px;left: <%= node.x %>px;" id="node_<%=node.id%>" data-node-id="<%= node.id %>">
   <%= form_for([pattern, node]) do |f| %>
     <%= f.select(:rdf_type, options_from_collection_for_select([node.type_expression.fancy_string(true)], "to_s", "to_s"), {} ,{:class => "classSelector"}) %>
   <% end %>

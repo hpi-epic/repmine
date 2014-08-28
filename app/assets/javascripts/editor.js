@@ -162,6 +162,10 @@ jsPlumb.bind("connectionDetached", function(info, originalEvent){
     if(delete_me_link != undefined){
       $.ajax({url: delete_me_link, method: "DELETE"});
     };
+  } else {
+    $(info.connection.target).find("form").each(function(i, form){
+      $.ajax({url: $(form).attr("action"), method: "DELETE"});      
+    })
   }
 });
 
@@ -180,7 +184,7 @@ var createNodeAttributeFilter = function(endpoint, node_id, make_static) {
   $("#drawing_canvas").append(attributeFilter);  
   
   var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
-  jsPlumb.connect({source: endpoint, target: ae});  
+  jsPlumb.connect({source: endpoint, target: ae, deleteEndpointsOnDetach:true});  
   
   // create the '+ add filter' link at the bottom of the div
   var more_link;
@@ -215,6 +219,35 @@ var addAttributeFilter = function(node_id, bottom, url) {
       }
     });    
   }
+};
+
+// removes a node from the graph
+var deleteNode = function(node){
+  if(confirm("Really delete the node and all of its connections?") == false) return;
+  
+  var delete_url = node.find("form").attr("action");
+  var node_id = node.attr("id");
+
+  // remove all relations
+  var connections = jsPlumb.getConnections({scope:["relations", "attributes"]});
+  $(connections["relations"]).each(function(i, connection){
+    if(connection.sourceId == node_id || connection.targetId == node_id){      
+      jsPlumb.detach(connection);
+    }
+  });
+
+  $(connections["attributes"]).each(function(i, connection){
+    if(connection.sourceId == node_id){
+      var target = $(connection.target);
+      jsPlumb.detach(connection);      
+      target.remove();
+    }
+  });
+  
+  $.ajax({url: delete_url, method: "DELETE", success: function(data){
+    $(jsPlumb.getEndpoints(node_id)).each(function(i, endpoint){jsPlumb.deleteEndpoint(endpoint)});
+    node.remove();
+  }});
 };
 
 // returns the rdf type value for a node
@@ -290,6 +323,7 @@ var connectionEndpoint = function() {
 		endpoint:["Dot", {radius:4} ],
 		paintStyle:{ fillStyle:"#ffa500", opacity:0.5 },
 		isSource: true,
+    deleteEndpointsOnDetach:true,				
 		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
 		connectorOverlays:[
@@ -308,10 +342,7 @@ var connectionEndpoint = function() {
   		tolerance:"touch",
   		hoverClass:"dropHover",
   		activeClass:"dragActive"
-  	},
-		beforeDetach:function(conn) { 
-			return confirm("Remove relation?"); 
-		}
+  	}
 	};
 };
 

@@ -34,10 +34,15 @@ class NodesController < ApplicationController
     end
   end
   
+  def destroy
+    @node = Node.find(params[:id])
+    @node.destroy
+    render :json => {}
+  end
+  
   def fancy_rdf_string
     @node = Node.find(params[:node_id])
     @te = @node.type_expression
-    render :layout => false
   end
   
   def translation_node
