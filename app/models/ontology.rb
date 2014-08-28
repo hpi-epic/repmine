@@ -27,6 +27,7 @@ class Ontology < ActiveRecord::Base
   def load_to_repository!(repo_name)
     download!
     ag_connection(repo_name).insert_file!(local_file_path)
+    load_imports!(repo_name)
   end
   
   def ag_connection(repo_name = nil)
@@ -49,12 +50,13 @@ class Ontology < ActiveRecord::Base
     return repository_name
   end
   
-  def imports()
-    return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).reject{|res| 
-      res.object.to_s == Vocabularies::SchemaExtraction.to_s}.collect do |res|
-        Ontology.where("url = ? OR prefix_url = ?", res.object.to_s, res.object.to_s).first_or_create
-      end
-    )
+  # TODO: make this recursive and avoid infinite loops
+  def load_imports!(repo_name = nil)
+    rdf_graph.query(:predicate => RDF::OWL.imports).reject do |res|
+      res.object.to_s == Vocabularies::SchemaExtraction.to_s
+    end.collect do |res|
+      ag_connection(repo_name).insert_file!(res.object.to_s)
+    end
   end
   
   def rdf_graph

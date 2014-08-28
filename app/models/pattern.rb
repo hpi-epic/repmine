@@ -9,8 +9,8 @@ class Pattern < ActiveRecord::Base
   
   as_enum :query_language, sql: 0, cypher: 1, sparql: 2, mongo_js: 3, gremlin: 4
 
-  # relations
-  has_and_belongs_to_many :ontologies
+  # relations -> TODO: make ontologies a 1-many
+  has_many :ontologies
   has_and_belongs_to_many :swe_patterns
   has_many :nodes, :dependent => :destroy
 
@@ -44,17 +44,7 @@ class Pattern < ActiveRecord::Base
   end
     
   def initialize_repository!
-    imported = Set.new(self.ontologies)
-    
-    self.ontologies.each do |ontology|
-      (ontology.imports() - imported).each do |ont|
-        ont.load_to_repository!(self.repository_name)
-      end
-      
-      imported.merge(ontology.imports)
-      ontology.load_to_repository!(self.repository_name)
-    end
-    
+    ontologies.first.load_to_repository!(self.repository_name)
     ag_connection.remove_duplicates!
   end
   

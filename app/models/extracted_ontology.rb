@@ -69,7 +69,7 @@ class ExtractedOntology < Ontology
   end
   
   def file_format
-    return repository.nil? ? "rdf" : repository.class.rdf_format
+    return repository.nil? ? "owl" : repository.class.rdf_format
   end
   
   # returns an rdf file of the graph
@@ -77,7 +77,6 @@ class ExtractedOntology < Ontology
     if @rdf_graph.nil?
       raise "please either load or create the graph before generating rdf/xml!"
     end
-    fix_seon_imports!
     buffer = RDF::RDFXML::Writer.buffer(:prefixes => prefixes) do |writer|
       writer.write_graph(@rdf_graph)
     end
@@ -86,25 +85,5 @@ class ExtractedOntology < Ontology
   
   def does_exist?
     return File.exist?(local_file_path)
-  end
-  
-  private
-  
-  # this fixes some URL issues in the SEON ontologies. A more general fix would be to follow all owl:imports
-  # and then check whether or not they are a valid URI...
-  def fix_seon_imports!()
-    seon_404 = "http://se-on.org/"
-    seon_200 = "https://seal-team.ifi.uzh.ch/seon/"
-    to_insert = []
-    to_remove = []
-    q = RDF::Query.new{pattern([:ont, RDF::OWL.imports, :imported_ont])}
-    @rdf_graph.query(q).each do |res|
-      if res[:imported_ont].to_s.starts_with?(seon_404)
-        to_remove << [res[:ont], RDF::OWL.imports, res[:imported_ont]]
-        to_insert << [res[:ont], RDF::OWL.imports, RDF::Resource.new(res[:imported_ont].to_s.gsub(seon_404, seon_200))]
-      end
-    end
-    @rdf_graph.delete(*to_remove)
-    @rdf_graph.insert(*to_insert)
   end
 end

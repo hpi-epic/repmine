@@ -1,3 +1,9 @@
+seon = ExtractedOntology.find_or_create_by_url("http://se-on.org/ontologies/seon.owl")
+seon.prefix_url = "http://se-on.org/",
+seon.short_name = "Software Evolution Ontologies (SEON)"
+
+seon.instance_variable_set("@rdf_graph", RDF::Graph.new())
+
 [
   "https://seal-team.ifi.uzh.ch/seon/ontologies/general/2012/02/main.owl",
   "https://seal-team.ifi.uzh.ch/seon/ontologies/general/2012/02/measurement.owl",
@@ -19,10 +25,8 @@
   "https://seal-team.ifi.uzh.ch/seon/ontologies/nl/2012/02/annotations-nl.owl",
   "https://seal-team.ifi.uzh.ch/seon/ontologies/nl/2012/02/code-nl.owl"
 ].each do |ontology_url|
-  Ontology.where(
-    url: ontology_url, 
-    prefix_url: ontology_url.gsub("https://seal-team.ifi.uzh.ch/seon/", "http://se-on.org/"),
-    short_name: "Seon##{ontology_url.split("/").last}",
-    group: "SEON"
-  ).first_or_create  
+  puts "loading: #{ontology_url}"
+  seon.rdf_graph.load(ontology_url)
 end
+
+seon.download!

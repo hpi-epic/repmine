@@ -25,4 +25,12 @@ module NodesHelper
     
     return options
   end
+  
+  def node_position(node)
+    if node.y == 0
+      return "top: 10em;left: #{node.x == 0 ? 20 : node.x}px;"
+    else
+      return "top: #{node.y}px;left: #{node.x == 0 ? 20 : node.x}px;"
+    end
+  end
 end

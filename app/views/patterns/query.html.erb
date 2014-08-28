@@ -1,0 +1,7 @@
+<%= form_tag(pattern_run_on_repository_path(@pattern, @repository)) do %>
+  <div class="center_everything">
+  <%= text_area_tag(:query_string, @query, :class => "form-control full_page", :rows => 10)%><br />
+  <%= submit_tag("Run on repository", :class => "btn btn-danger")%>
+  <%= link_to("Back to Overview", patterns_path(), :class => "btn")%>
+  </div>
+<% end %>
