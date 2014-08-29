@@ -65,7 +65,7 @@ class ExtractedOntology < Ontology
   end
   
   def name_url_safe
-    return short_name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_')
+    return short_name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_') + "_#{repository.id}"
   end
   
   def file_format

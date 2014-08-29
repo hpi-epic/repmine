@@ -50,7 +50,6 @@ ActiveRecord::Schema.define(:version => 20140827132718) do
   create_table "ontologies", :force => true do |t|
     t.string   "url"
     t.text     "description"
-    t.string   "prefix_url"
     t.string   "short_name"
     t.string   "group"
     t.boolean  "does_exist",    :default => true

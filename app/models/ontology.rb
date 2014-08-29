@@ -1,20 +1,15 @@
 require 'rdf/turtle'
 
 class Ontology < ActiveRecord::Base
-  attr_accessible :url, :description, :prefix_url, :short_name, :does_exist, :group
+  attr_accessible :url, :description, :short_name, :does_exist, :group
   attr_accessor :ag_connection, :rdf_graph
   
   validates_url :url
   
   validates :url, :uniqueness => true
-  validates :prefix_url, :uniqueness => true
   
   has_and_belongs_to_many :patterns
-  before_validation :set_ontology_url, :set_prefix_if_empty ,:set_short_name_if_empty
-    
-  def set_prefix_if_empty
-    self.prefix_url = url if prefix_url.blank?
-  end
+  before_validation :set_ontology_url ,:set_short_name_if_empty
   
   def set_short_name_if_empty
     self.short_name = url.split("/").last.split("\.").first if short_name.blank?
@@ -51,7 +46,7 @@ class Ontology < ActiveRecord::Base
   
   def imports()
     return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).collect do |res|
-      Ontology.where("url = ? OR prefix_url = ?", res.object.to_s, res.object.to_s).first_or_create
+      Ontology.where("url = ?", res.object.to_s, res.object.to_s).first_or_create
     end)
   end
   
