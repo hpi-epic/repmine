@@ -97,13 +97,13 @@ class Pattern < ActiveRecord::Base
     Set.new(nodes.collect{|n| n.used_concepts}.flatten)
   end
   
-  def unmatched_concepts(repository)
-    matched = match_concepts(repository)
+  def unmatched_concepts(ontology)
+    matched = match_concepts(ontology)
     return concepts_used.select{|concept| matched.find{|match| match[:entity] == concept}.nil?  }
   end
   
-  def match_concepts(repository)
-    om = OntologyMatcher.new(self, repository.ontology)
+  def match_concepts(ontology)
+    om = OntologyMatcher.new(self, ontology)
     om.match!
     return concepts_used.collect{|concept| om.get_substitutes_for(concept)}.flatten
   end

@@ -5,11 +5,11 @@ jsPlumb.ready(function() {
     Container: "drawing_canvas"
 	});	
 	
-	$("form[class=edit_node]").each(function(index){
-	  addNodeToGraph($(this).parent());
+	$("div[class=node]").each(function(index,node_div){
+	  addNodeToGraph($(node_div));
 	});
 	
-	loadExistingConnections();
+	loadExistingConnections(connect_these_nodes, load_their_attribute_constraints);
 	
 	jsPlumb.bind("connection", function(info, originalEvent) {
 	  if(info.connection.scope == "relations") {  

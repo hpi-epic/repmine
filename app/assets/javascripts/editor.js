@@ -30,15 +30,15 @@ var addNodeEndpoints = function(node_html_id){
 };
 
 // creates the relations and attribute constraint thingies
-var loadExistingConnections = function(make_static){
-  $(connect_these_nodes).each(function(index, el){
+var loadExistingConnections = function(connect_them, load_attributes, make_static){
+  $(connect_them).each(function(index, el){
 	  var free_source = freeRelationEndpointOn("node_" + el.source);
 	  var free_target = freeRelationEndpointOn("node_" + el.target);
 	  var connection = jsPlumb.connect({source: free_source, target: free_target, deleteEndpointsOnDetach:true});
 	  createConnection(connection, true, el.url);
 	});
 	
-	for (var node_id in load_their_attribute_constraints){
+	for (var node_id in load_attributes){
     var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
     var more_link = createNodeAttributeFilter(endpoint, node_id, make_static);
     for (var i in load_their_attribute_constraints[node_id]){      

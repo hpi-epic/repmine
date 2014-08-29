@@ -15,11 +15,14 @@
         <%= f.submit(:class => "btn btn-success") %>
       </td>
       <td style="padding-left: 50px; vertical-align: top;">
-        <legend>Ontologies</legend>
         <div class="control-group">
-          <% Ontology.where(:does_exist => true).each do |ont| %>
-            <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
-            <br />
+          <% Ontology.pluck(:group).uniq.each do |group| %>
+            <fieldset class="fieldset"><legend><%= group %></legend>
+            <% Ontology.where(:does_exist => true, :group => group).each do |ont| %>
+              <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
+              <br />
+            <% end %>
+            </fieldset>
           <% end %>
         </div>
       </td> 

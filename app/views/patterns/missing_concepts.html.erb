@@ -1,8 +1,8 @@
 <% if @matching_error.nil? %>
   <% if @mc.empty? %>
-  <%= link_to("Show Query",pattern_query_for_repository_path(@pattern, @repository), :class => "btn btn-success")%>
+  <%= link_to("Show Query",pattern_query_for_ontology_path(@pattern, @ontology), :class => "btn btn-success")%>
   <% else %>
-  <%= link_to("Match (#{@mc.size})", pattern_translate_to_repository_path(@pattern, @repository), :class => "btn btn-warning") %>
+  <%= link_to("Match (#{@mc.size})", pattern_translate_to_ontology_path(@pattern, @ontology), :class => "btn btn-warning") %>
   <% end %>
 <% else %>
   <%= fa_icon("exclamation", :text => @matching_error)%>

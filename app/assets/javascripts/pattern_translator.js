@@ -5,28 +5,24 @@ jsPlumb.ready(function() {
     Container: "drawing_canvas"
 	});	
 	
-	$("form[class=edit_node]").each(function(index){
-	  addNodeEndpoints($(this).parent().attr("id"));
+  $(".immutable_node").each(function(index, node_div){
+	  addNodeEndpoints($(node_div).attr("id"));
 	});
 	
-  loadExistingConnections(true);
+  loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
+  
   removeExcessEndpoints();
   addOnclickHandler();
-  loadExistingTranslations();
+  loadTranslationPattern();
 });
 
 // function called when the "new Node" button is being clicked
 var newTranslationNode = function(url){
-  var selected_elements = $(".selected");
-  if(selected_elements.length == 0){
-    alert("You have to select at least one element from the input graph");
-  } else {
-    $.post(url, function(data){
-      var node = $(data);
-      node.appendTo($("#drawing_canvas"))
-      addNodeToGraph(node);
-    });
-  }
+  $.post(url, function(data){
+    var node = $(data);
+    node.appendTo($("#drawing_canvas"))
+    addNodeToGraph(node);
+  });
 }
 
 // removes all unconnected Endpoints so users cannot somehow create new connections
@@ -66,4 +62,36 @@ var toggleClasses = function(element, css_classes){
 // highlights a relation. TODO: highlight the arrow, as well...
 var highlightRelation = function(overlay){
   toggleClasses(overlay, ["red_background", "selected"])
+};
+
+var loadTranslationPattern = function(){
+  $(".node").not(".immutable_node").each(function(index,node_div){
+	  addNodeToGraph($(node_div));
+	});
+	
+  loadExistingConnections(connect_these_nodes, load_their_attribute_constraints);
+  
+	jsPlumb.bind("connection", function(info, originalEvent) {
+	  if(info.connection.scope == "relations") {  
+		  createConnection(info.connection, true);
+	  }
+	});
+};
+
+var saveTranslation = function(){
+  var selected_elements = $(".selected");
+  if(selected_elements.length == 0){
+    alert("You have to select at least one element from the input graph");
+  } else {
+    str = "Save Translation pattern? The following elements are thereby translated:\n";
+    $(selected_elements.find(".node")).each(function(i, element){
+      console.log($(element).find("form select").val());
+    });
+    $(selected_elements.find(".relation")).each(function(i, element){
+      console.log($(element).find("form select").val());
+    });
+    $(selected_elements.find(".relation")).each(function(i, element){
+      console.log($(element).find("form select").val());
+    });
+  }
 };

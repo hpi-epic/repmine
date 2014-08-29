@@ -70,15 +70,15 @@ ActiveRecord::Schema.define(:version => 20140827132718) do
     t.string   "repository_name"
     t.text     "original_query"
     t.integer  "query_language_cd"
-    t.datetime "created_at",        :null => false
-    t.datetime "updated_at",        :null => false
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
     t.string   "type"
+    t.integer  "target_ontology_id"
     t.integer  "pattern_id"
-    t.integer  "repository_id"
   end
 
   add_index "patterns", ["pattern_id"], :name => "index_patterns_on_pattern_id"
-  add_index "patterns", ["repository_id"], :name => "index_patterns_on_repository_id"
+  add_index "patterns", ["target_ontology_id"], :name => "index_patterns_on_target_ontology_id"
 
   create_table "patterns_swe_patterns", :id => false, :force => true do |t|
     t.integer "pattern_id"

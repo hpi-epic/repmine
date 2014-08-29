@@ -3,8 +3,8 @@ RepMine::Application.routes.draw do
 
   resources :patterns do 
     
-    get "/translate/:repository_id", :to => "patterns#translate", :as => :translate_to_repository
-    get "/query/:repository_id", :to => "patterns#query", :as => :query_for_repository
+    get "/translate/:ontology_id", :to => "patterns#translate", :as => :translate_to_ontology
+    get "/query/:ontology_id", :to => "patterns#query", :as => :query_for_ontology
     post "/run_on_repository/:repository_id", :to => "patterns#run_on_repository", :as => :run_on_repository
     
     resources :nodes do
@@ -24,7 +24,7 @@ RepMine::Application.routes.draw do
       get :static
     end
     
-    get :missing_concepts
+    get :missing_concepts, :on => :collection
     post :run_on_repository
     post :reset
     get :autocomplete_tag_name, :on => :collection

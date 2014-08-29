@@ -4,41 +4,51 @@
 
 <h3>Existing Graph Patterns</h3>
 <%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
-
-<table class="table">
+<br />
+<table class="table table-striped" style="width: 73%; float:left;">
   <thead>
     <tr>
       <th>Name</th>
-      <th style="width: 20%;">Description</th>
-      <th>Concepts Used</th>
-      <th>Transfer</th>
+      <th style="width: 40%;">Description</th>
+      <th>Concepts</th>
+      <th>Ontologies</th>
       <th>Actions</th>
     </tr>
   </thead>
+  <tbody>
   <% @patterns.each_with_index do |pattern, i| %>
     <tr>
-      <td><%= link_to(pattern.name, pattern_path(pattern)) %></td>
+      <td><%= radio_button_tag(:pattern_id, pattern.id)%>&nbsp;<%= link_to(pattern.name, pattern_path(pattern)) %></td>
       <td><%= pattern.description %></td>
       <td><%= pattern.concept_count %></td>
-      <td>
-      <%= select_tag(
-        :repository_id, 
-        options_from_collection_for_select(@repositories, "id", "name"), 
-        { :include_blank => true, 
-          :class => "needs_no_space", 
-          :id => "repository_id_#{pattern.id}",
-          :onchange => "checkExecutionStatus($('#repository_id_#{pattern.id}'), '#{pattern_missing_concepts_path(pattern)}', $('#query_button_#{pattern.id}'));".html_safe,
-          :disabled => @repositories.empty?}
-      )%>
-      <span id="query_button_<%= pattern.id %>">
-        <% unless @repositories.empty? %>
-          <%= fa_icon("chevron-circle-left", :text => "choose") %>
-        <% else %>
-          <%= fa_icon("exclamation", :text => "no repository with extracted ontology") %>
-        <% end %>
-      </span>
-      </td>   
+      <td><%= pattern.ontologies.collect{|ont| ont.short_name}.join("<br />").html_safe%>
       <td><%= link_to("Delete", pattern_path(pattern), :method => :delete, :class => "btn btn-danger", :confirm => "Really delete #{pattern.name}?") %></td>
-    </tr>    
+    </tr>
   <% end %>
+  </tbody>
+</table>
+
+<table class="table table-bordered" style="width: 25%; float:left; margin-left: 15px;">
+  <tbody>
+  <tr>
+    <td>
+      <%= button_tag(
+        "Check Matching", 
+        :remote => true, 
+        :onclick => "checkExecutionStatus('pattern_id', '#{missing_concepts_patterns_path()}', 'ontology_id', $('#matching_status'));",
+        :class => "btn"
+        )
+      %>
+      <span id="matching_status"></span>
+      <% Ontology.pluck(:group).uniq.each do |group| %>
+        <hr />
+        <% Ontology.where(:does_exist => true, :group => group).each do |ont| %>
+          <%= radio_button_tag("ontology_id", ont.id) %> <%= ont.short_name %>
+          <br />
+        <% end %>
+        </fieldset>
+      <% end %>
+    </td>
+  </tr>
+  </tbody>
 </table>

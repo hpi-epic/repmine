@@ -46,7 +46,7 @@ class Ontology < ActiveRecord::Base
   
   def imports()
     return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).collect do |res|
-      Ontology.where("url = ?", res.object.to_s, res.object.to_s).first_or_create
+      Ontology.where("url = ?", res.object.to_s).first_or_create
     end)
   end
   

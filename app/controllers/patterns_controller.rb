@@ -15,11 +15,13 @@ class PatternsController < ApplicationController
   
   def translate
     @source_pattern = Pattern.find(params[:pattern_id])
-    @repository = Repository.find(params[:repository_id])
-    @target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @repository)
+    @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)    
     @offset = @source_pattern.nodes.collect{|n| n.y}.max
-    @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
-    @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern, true)    
+        
+    @ontology = Ontology.find(params[:ontology_id])
+    @target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @ontology)
+    @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.type_hierarchy    
+    @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)    
   end
     
   def create
@@ -75,15 +77,15 @@ class PatternsController < ApplicationController
   
   def missing_concepts
     @pattern = Pattern.find(params[:pattern_id])
-    @repository = Repository.find(params[:repository_id])
+    @ontology = Ontology.find(params[:ontology_id])
     @matching_error = nil
     
     # do not match when using the same ontology...
-    if @pattern.ontologies.size == 1 && @pattern.ontologies.first == @repository.ontology
+    if @pattern.ontologies.size == 1 && @pattern.ontologies.first == @ontology
       @mc = []
     else
       @mc = begin
-        @pattern.unmatched_concepts(@repository)
+        @pattern.unmatched_concepts(@ontology)
       rescue OntologyMatcher::MatchingError => e
         @matching_error = e.message
         nil
@@ -106,7 +108,7 @@ class PatternsController < ApplicationController
   
   def query
     @pattern = Pattern.find(params[:pattern_id])
-    @repository = Repository.find(params[:repository_id])
+    @ontology = Ontology.find(params[:ontology_id])
     #@target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @repository)
     @query = "SELECT * FROM data"
   end

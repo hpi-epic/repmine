@@ -15,6 +15,7 @@ class OntologyMatcher
     prepare_matching!  
     unless already_matched?    
       cmd = "java -jar aml.jar -m -s #{source_ont.local_file_path} -t #{target_ont.local_file_path} -o #{alignment_path}"
+      puts cmd
       errors = nil
       Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
         errors = stderr.read
