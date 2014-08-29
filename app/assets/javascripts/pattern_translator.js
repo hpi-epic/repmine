@@ -9,11 +9,14 @@ jsPlumb.ready(function() {
 	  addNodeEndpoints($(node_div).attr("id"));
 	});
 	
-  loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
+	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
+  $.when.apply($, requests).done(function(){
+    removeExcessEndpoints();
+    addOnclickHandler();	  
+	});
   
-  removeExcessEndpoints();
-  addOnclickHandler();
-  loadTranslationPattern();
+
+  //loadTranslationPattern();
 });
 
 // function called when the "new Node" button is being clicked
@@ -46,6 +49,10 @@ var addOnclickHandler = function(){
     var overlay = connection.getOverlay("customOverlay").getElement();
     $(overlay).on("click", function(){highlightRelation($(overlay))});
   })
+  console.log($("div.immutable_attribute_constraint"));
+  $("div.immutable_attribute_constraint").each(function(i, ac){
+    $(ac).on("click", function(){toggleClasses($(this), ["selected","red_background"])});
+  });
 };
 
 // adds or removes the provided classes on the thingy

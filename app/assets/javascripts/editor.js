@@ -31,20 +31,22 @@ var addNodeEndpoints = function(node_html_id){
 
 // creates the relations and attribute constraint thingies
 var loadExistingConnections = function(connect_them, load_attributes, make_static){
+  requests = []
   $(connect_them).each(function(index, el){
 	  var free_source = freeRelationEndpointOn("node_" + el.source);
 	  var free_target = freeRelationEndpointOn("node_" + el.target);
 	  var connection = jsPlumb.connect({source: free_source, target: free_target, deleteEndpointsOnDetach:true});
-	  createConnection(connection, true, el.url);
+	  requests.push(createConnection(connection, true, el.url));
 	});
 	
 	for (var node_id in load_attributes){
     var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
     var more_link = createNodeAttributeFilter(endpoint, node_id, make_static);
-    for (var i in load_their_attribute_constraints[node_id]){      
-      addAttributeFilter(node_id, more_link, load_their_attribute_constraints[node_id][i]);
+    for (var i in load_attributes[node_id]){      
+      requests.push(addAttributeFilter(node_id, more_link, load_attributes[node_id][i]));
     }
   }
+  return requests;
 };
 
 // handler for the 'save' button. basically submits all forms
@@ -54,7 +56,7 @@ var savePattern = function(){
   $("form[class*=edit_][class*=_constraint]").each(function(index){
     requests.push(submitAndHighlight($(this)));
   });
-  $.when(requests).done(function(){
+  $.when.apply($, requests).done(function(){
     submitAndHighlight($("form[class=edit_pattern]")); 
   });
 };
@@ -131,16 +133,16 @@ var createConnection = function(connection, reinstall_endpoints, url) {
 
   // get the available relations from the server oder simply load the existing one
   if(url){
-    $.ajax({url: url, success: function(data){
+    return $.ajax({url: url, success: function(data){
       overlay.html(data)}
     });  
   } else {
-    createNewConnection(connection, overlay)
+    return createNewConnection(connection, overlay)
   }
 };
 
 var createNewConnection = function(connection, overlay){
-  $.ajax({
+  return $.ajax({
     url: new_relation_constraint_path,
     type: "POST",
     data: {
@@ -208,9 +210,9 @@ var createNodeAttributeFilter = function(endpoint, node_id, make_static) {
 // call the backend and retrieve the next attribute filter line
 var addAttributeFilter = function(node_id, bottom, url) {
   if(url){
-    $.ajax({url: url, success: function(data) {$(data).insertBefore(bottom)}})
+    return $.ajax({url: url, success: function(data) {$(data).insertBefore(bottom)}})
   } else {
-    $.ajax({
+    return $.ajax({
       url: new_attribute_constraint_path,
       type: "POST",
       data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
@@ -274,7 +276,7 @@ var addTypeExpression = function(url,selected_element, list, operator){
   if(selected_element.length == 1){
     var target_url = url.replace("XXX", selected_element.attr("data-id"));
     // save each type expression in this list
-    $.when(saveAllTypeExpressions(list)).done(function(){
+    $.when.apply($, saveAllTypeExpressions(list)).done(function(){
       $.ajax({url: target_url, data: {operator: operator}, type: "POST", success: function(data){
         $(list).html(data);}
       });
@@ -293,7 +295,7 @@ var saveAllTypeExpressions = function(list){
 };
 
 var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selector, modal){
-  $.when(saveAllTypeExpressions(list)).done(function(){
+  $.when.apply($, saveAllTypeExpressions(list)).done(function(){
     $.ajax({url: fancy_string_url, success: function(data){
       var new_option = $(data);
       var old_option = node_rdf_type_selector.find("option[id=" + new_option.attr("id") + "]");
