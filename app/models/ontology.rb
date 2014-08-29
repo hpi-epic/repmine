@@ -1,7 +1,7 @@
 require 'rdf/turtle'
 
 class Ontology < ActiveRecord::Base
-  attr_accessible :url, :description, :prefix_url, :short_name
+  attr_accessible :url, :description, :prefix_url, :short_name, :does_exist, :group
   attr_accessor :ag_connection, :rdf_graph
   
   validates_url :url
@@ -27,7 +27,6 @@ class Ontology < ActiveRecord::Base
   def load_to_repository!(repo_name)
     download!
     ag_connection(repo_name).insert_file!(local_file_path)
-    load_imports!(repo_name)
   end
   
   def ag_connection(repo_name = nil)
@@ -50,13 +49,10 @@ class Ontology < ActiveRecord::Base
     return repository_name
   end
   
-  # TODO: make this recursive and avoid infinite loops
-  def load_imports!(repo_name = nil)
-    rdf_graph.query(:predicate => RDF::OWL.imports).reject do |res|
-      res.object.to_s == Vocabularies::SchemaExtraction.to_s
-    end.collect do |res|
-      ag_connection(repo_name).insert_file!(res.object.to_s)
-    end
+  def imports()
+    return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).collect do |res|
+      Ontology.where("url = ? OR prefix_url = ?", res.object.to_s, res.object.to_s).first_or_create
+    end)
   end
   
   def rdf_graph
@@ -84,10 +80,6 @@ class Ontology < ActiveRecord::Base
     if !File.exist?(local_file_path) || force
       File.open(local_file_path, "w+"){|f| f.puts rdf_xml} 
     end
-  end
-  
-  def does_exist?
-    true
   end
   
   # prefixes for the graph. not needed for imported ontologies

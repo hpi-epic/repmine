@@ -1,32 +1,52 @@
-seon = ExtractedOntology.find_or_create_by_url("http://se-on.org/ontologies/seon.owl")
-seon.prefix_url = "http://se-on.org/",
-seon.short_name = "Software Evolution Ontologies (SEON)"
-
-seon.instance_variable_set("@rdf_graph", RDF::Graph.new())
-
+# SEON ontologies
 [
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/general/2012/02/main.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/general/2012/02/measurement.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/general/2012/02/measurement.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/clones.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/code-flaws.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/change-couplings.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/integration-history-issues.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/integration-code-history.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/integration-history-issues-code.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-spanning/2012/02/fine-grained-changes.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-specific/2012/02/issues.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-specific/2012/02/code.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-specific/2012/02/code-metrics.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/domain-specific/2012/02/history.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/system-specific/2012/02/jira.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/system-specific/2012/02/java.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/system-specific/2012/02/bugzilla.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/nl/2012/02/annotations-nl.owl",
-  "https://seal-team.ifi.uzh.ch/seon/ontologies/nl/2012/02/code-nl.owl"
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/main.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/measurement.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/measurement.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/clones.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/code-flaws.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/change-couplings.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/integration-history-issues.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/integration-code-history.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/integration-history-issues-code.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/fine-grained-changes.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/issues.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/code.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/code-metrics.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/history.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/jira.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/java.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/bugzilla.owl"
 ].each do |ontology_url|
-  puts "loading: #{ontology_url}"
-  seon.rdf_graph.load(ontology_url)
+  Ontology.where(
+    url: ontology_url, 
+    short_name: "Seon##{ontology_url.split("/").last}",
+    group: "SEON"
+  ).first_or_create
 end
 
-seon.download!
+# Conference Ontologies (OAEI)
+[
+  "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/Conference.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/sigkdd.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/iasted.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/MICRO.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/confious.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/PCS.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/OpenConf.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/confOf.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/cmt.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/cocus.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/paperdyne.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/edas.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/MyReview.owl",
+  "http://oaei.ontologymatching.org/2014/conference/data/linklings.owl"
+].each do |ontology_url|
+  Ontology.where(
+    url: ontology_url, 
+    short_name: "Conference##{ontology_url.split("/").last}",
+    group: "OAEI Conference"
+  ).first_or_create
+end

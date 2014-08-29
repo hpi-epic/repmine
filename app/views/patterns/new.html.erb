@@ -17,7 +17,7 @@
       <td style="padding-left: 50px; vertical-align: top;">
         <legend>Ontologies</legend>
         <div class="control-group">
-          <% Ontology.all.select{|o| o.does_exist?}.each do |ont| %>
+          <% Ontology.where(:does_exist => true).each do |ont| %>
             <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
             <br />
           <% end %>

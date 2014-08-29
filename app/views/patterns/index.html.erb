@@ -24,10 +24,18 @@
       <%= select_tag(
         :repository_id, 
         options_from_collection_for_select(@repositories, "id", "name"), 
-        {:include_blank => true, :class => "needs_no_space", :id => "repository_id_#{pattern.id}",:onchange => "checkExecutionStatus($('#repository_id_#{pattern.id}'), '#{pattern_missing_concepts_path(pattern)}', $('#query_button_#{pattern.id}'));".html_safe}
-      ) %>
+        { :include_blank => true, 
+          :class => "needs_no_space", 
+          :id => "repository_id_#{pattern.id}",
+          :onchange => "checkExecutionStatus($('#repository_id_#{pattern.id}'), '#{pattern_missing_concepts_path(pattern)}', $('#query_button_#{pattern.id}'));".html_safe,
+          :disabled => @repositories.empty?}
+      )%>
       <span id="query_button_<%= pattern.id %>">
-        <%= fa_icon("chevron-circle-left", :text => "choose") %>
+        <% unless @repositories.empty? %>
+          <%= fa_icon("chevron-circle-left", :text => "choose") %>
+        <% else %>
+          <%= fa_icon("exclamation", :text => "no repository with extracted ontology") %>
+        <% end %>
       </span>
       </td>   
       <td><%= link_to("Delete", pattern_path(pattern), :method => :delete, :class => "btn btn-danger", :confirm => "Really delete #{pattern.name}?") %></td>

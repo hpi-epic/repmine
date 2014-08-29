@@ -34,6 +34,9 @@ RepMine::Application.routes.draw do
     get :extract_schema
   end
   
-  resources :ontologies
+  resources :ontologies do
+    get :autocomplete_ontology_group, :on => :collection
+  end
+  
   root :to => "patterns#index"
 end

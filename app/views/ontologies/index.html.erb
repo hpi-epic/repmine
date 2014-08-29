@@ -1,25 +1,24 @@
 <h1>Listing ontologies</h1>
-
-<table class="table">
+<table class="table table-striped">
+  <thead>
   <tr>
     <th>Url</th>
     <th>Description</th>
     <th>Actions</th>
   </tr>
-
+  </thead>
+  <tbody>
 <% @ontologies.each do |ontology| %>
   <tr>
-    <td><%= link_to(ontology.short_name, ontology.get_url) %></td>
+    <td><%= ontology.does_exist ? link_to(ontology.short_name, ontology.get_url) : ontology.short_name %></td>
     <td><%= ontology.description%></td>
     <td>
-      <%= link_to 'Destroy', ontology, method: :delete, data: { confirm: 'Are you sure?' } %>
-      <br />
-      
+      <%= link_to 'Delete', ontology, method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger" %>
     </td>
   </tr>
 <% end %>
+  </tbody>
 </table>
 
-<br />
-
 <%= link_to 'New Ontology', new_ontology_path, :class => "btn btn-success" %>
+<br /><br />

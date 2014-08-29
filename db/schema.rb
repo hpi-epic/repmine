@@ -53,8 +53,9 @@ ActiveRecord::Schema.define(:version => 20140827132718) do
     t.string   "prefix_url"
     t.string   "short_name"
     t.string   "group"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.boolean  "does_exist",    :default => true
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.string   "type"
     t.integer  "repository_id"
   end
@@ -149,11 +150,6 @@ ActiveRecord::Schema.define(:version => 20140827132718) do
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
-
-  create_table "translation_patterns", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
 
   create_table "type_expressions", :force => true do |t|
     t.string   "operator"

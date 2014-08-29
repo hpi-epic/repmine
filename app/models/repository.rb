@@ -30,13 +30,14 @@ class Repository < ActiveRecord::Base
   end
   
   def build_ontology
-    self.ontology = ExtractedOntology.new(:short_name => self.name + "_#{self.id}")
+    self.ontology = ExtractedOntology.new(:short_name => self.name, :does_exist => false, :group => "Extracted")
     self.save
   end
 
   def extract_ontology!
     create_ontology!
     ontology.load_to_dedicated_repository!
+    ontology.update_attributes({:does_exist => true})
   end
   
   def create_ontology!
@@ -69,6 +70,6 @@ class Repository < ActiveRecord::Base
   end
   
   def self.all_that_have_an_ontology
-    self.all.select{|repo| repo.ontology.does_exist?}
+    self.all.select{|repo| repo.ontology.does_exist}
   end
 end

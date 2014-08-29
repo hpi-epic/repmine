@@ -1,4 +1,5 @@
 class OntologiesController < ApplicationController
+  
   # GET /ontologies
   # GET /ontologies.json
   def index
@@ -44,7 +45,7 @@ class OntologiesController < ApplicationController
 
     respond_to do |format|
       if @ontology.save
-        format.html { redirect_to @ontology, notice: 'Ontology was successfully created.' }
+        format.html { redirect_to ontologies_path, notice: 'Ontology was successfully created.' }
         format.json { render json: @ontology, status: :created, location: @ontology }
       else
         format.html { render action: "new" }
@@ -79,5 +80,10 @@ class OntologiesController < ApplicationController
       format.html { redirect_to ontologies_url }
       format.json { head :no_content }
     end
+  end
+  
+  def autocomplete_ontology_group
+    groups = Ontology.pluck(:group).uniq.compact.select{|gr| gr.downcase.match(params[:term].downcase)}
+    render :json => groups.collect{|group| {:value => group, :label => group}}
   end
 end

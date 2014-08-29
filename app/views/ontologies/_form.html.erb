@@ -8,8 +8,10 @@
   
   <%= f.label :description %>
   <%= f.text_area :description, :class => "form-control", :rows => 5 %>
+  
+  <%= f.input :group, :url => autocomplete_ontology_group_ontologies_path, :as => :autocomplete %>
 
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit("Create Ontology", :class => "btn btn-success") %>
   </div>
 <% end %>
