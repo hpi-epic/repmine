@@ -51,26 +51,31 @@ var loadExistingConnections = function(connect_them, load_attributes, make_stati
 
 // handler for the 'save' button. basically submits all forms
 var savePattern = function(){
-  var requests = saveNodes();
-  // all forms that edit_*_constraints (you get the hint) are submitted
-  $("form[class*=edit_][class*=_constraint]").each(function(index){
+  var requests = saveNodes().concat(saveConstraints());
+  $.when.apply($, requests).done(function(){
+    submitAndHighlight($("form.edit_pattern")); 
+  });
+};
+
+// all forms that edit_*_constraints (you get the hint) are submitted
+var saveConstraints = function(){
+  var requests = [];
+  $("form[class*=edit_][class*=_constraint]").not(".static").each(function(index){
     requests.push(submitAndHighlight($(this)));
   });
-  $.when.apply($, requests).done(function(){
-    submitAndHighlight($("form[class=edit_pattern]")); 
-  });
+  return requests;
 };
 
 // sets position variables for each node and submits the form
 var saveNodes = function(){
   var requests = [];
-  $("form[class=edit_node]").each(function(index){
+  $("form.edit_node").not(".static").each(function(index){
     var position = $(this).parent().position()
     $(this).find("input[id=node_x]").val(position.left);
     $(this).find("input[id=node_y]").val(position.top);
     requests.push(submitAndHighlight($(this)));
   });
-  return requests
+  return requests;
 };
 
 var removeAttributeConstraint = function(url, div_id){

@@ -14,6 +14,7 @@
 <% end %>
 
 <div class="translation_controls" style="left: <%= @offset %>px" />
+  <%= form_for(@target_pattern) do |f| %><% end %>  
   <span>Translation to: <strong><%= link_to(@ontology.short_name, @ontology) %></strong></span>&nbsp;|&nbsp;
   <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success" %>
   <%= link_to 'New Node', "#", :class => "btn", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');" %>

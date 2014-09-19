@@ -14,8 +14,7 @@ jsPlumb.ready(function() {
     removeExcessEndpoints();
     addOnclickHandler();	  
 	});
-  
-
+	
   loadTranslationPattern();
 });
 
@@ -89,25 +88,57 @@ var saveTranslation = function(){
   if(selected_elements.length == 0){
     alert("You have to select at least one element from the input graph");
   } else {
-    str = "Save Translation pattern? The following elements are thereby translated\n\n";
-    str += addInformation("Nodes", ".node.selected");
-    str += addInformation("Relations", "._jsPlumb_overlay.selected");
-    str += addInformation("Attributes", ".attribute_constraint.selected");
-    if(confirm(str)){
-      console.log("please submit me...")
+    var selected_elements = getSelectedElements();
+    if(confirm(infoString(selected_elements))){
+      var requests = saveNodes().concat(saveConstraints());      
+      $.when.apply($, requests).done(function(){
+        submitTranslationPattern(selected_elements);
+      });
     };
   }
 };
 
-var addInformation = function(name, search_string){
-  var stuff = "";
-  $(search_string).each(function(i, element){
-    stuff += $(element).find("form select").first().text() + "\n";
+var submitTranslationPattern = function(selected_elements){
+  var form = $("form.edit_pattern");
+  return $.ajax({
+    url : form.attr("action"),
+    type: "POST",
+    data : form.serialize() + "&" + $.param(selected_elements),
+    success: function(data, textStatus, jqXHR){
+      if(data.message){alert(data.message)};
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+      alert(jqXHR);
+    }
   });
-  
-  if(stuff.length > 0){
-    return name + ":\n\t" + stuff
-  } else {
-    return stuff;
-  }
+};
+
+var infoString = function(selected_elements){
+  str = "Save Translation pattern? The following elements are thereby translated\n\n";
+  for(var key in selected_elements){
+    if(selected_elements[key].length > 0){
+      str += key + ":\n\t";
+      $(selected_elements[key]).each(function(i, el){
+        str += el["value"];
+        if(i != selected_elements[key].length - 1){str += ", "};
+      })
+    }
+  } 
+  return str;
+};
+
+var getSelectedElements = function(){
+  var info = {}
+  info["Nodes"] = addInformation(".node.selected");
+  info["Relations"] = addInformation("._jsPlumb_overlay.selected");
+  info["Attributes"] = addInformation(".attribute_constraint.selected");
+  return info
+};
+
+var addInformation = function(search_string){
+  var info = [];
+  $(search_string).each(function(i, element){
+    info.push({url: $(element).find("form").attr("action"), value: $(element).find("form").first().text().trim()});
+  });
+  return info;
 }
