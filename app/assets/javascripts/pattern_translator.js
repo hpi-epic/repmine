@@ -106,6 +106,7 @@ var submitTranslationPattern = function(selected_elements){
     data : form.serialize() + "&" + $.param(selected_elements),
     success: function(data, textStatus, jqXHR){
       if(data.message){alert(data.message)};
+      $(".selected").click();
     },
     error: function(jqXHR, textStatus, errorThrown){
       alert(jqXHR);
