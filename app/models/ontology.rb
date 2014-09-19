@@ -29,6 +29,7 @@ class Ontology < ActiveRecord::Base
   end
   
   def load_to_dedicated_repository!
+    ag_connection(repository_name).clear!
     load_to_repository!(repository_name)
   end
   
@@ -45,9 +46,12 @@ class Ontology < ActiveRecord::Base
   end
   
   def imports()
-    return Set.new(rdf_graph.query(:predicate => RDF::OWL.imports).collect do |res|
-      Ontology.where("url = ?", res.object.to_s).first_or_create
-    end)
+    imps = Set.new()
+    rdf_graph.query(:predicate => RDF::OWL.imports).each do |res|
+      imp_url = res.object.to_s
+      imps << Ontology.where("url = ?", imp_url).first_or_create unless imp_url == Vocabularies::SchemaExtraction.to_s
+    end
+    return imps
   end
   
   def rdf_graph
@@ -64,6 +68,10 @@ class Ontology < ActiveRecord::Base
   end
   
   def get_url
+    return url
+  end
+  
+  def ont_url
     return url
   end
   

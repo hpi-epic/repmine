@@ -35,6 +35,10 @@ class AgraphConnection
     @repository = nil
   end
   
+  def clear!
+    repository.clear
+  end
+  
   def relations_between(source, target)
     outbound = relations_with(source, target)
     inbound = relations_with(target, source)
