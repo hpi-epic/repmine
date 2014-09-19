@@ -24,9 +24,10 @@ div.red_background {
 div.translation_controls {
   position: absolute; 
   width: 95%;
-  margin-top: 12em;
-  border-top: 1px solid #cacaca; 
-  padding: 10px;
+  margin-left: 12em;
+  border-left: 1px solid #cacaca; 
+  min-height: 900px;
+  padding-left: 10px;
 }
 
 div.center_everything {

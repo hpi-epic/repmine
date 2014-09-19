@@ -16,7 +16,7 @@ jsPlumb.ready(function() {
 	});
   
 
-  //loadTranslationPattern();
+  loadTranslationPattern();
 });
 
 // function called when the "new Node" button is being clicked
@@ -45,12 +45,11 @@ var addOnclickHandler = function(){
     $(node).on("click", function(){toggleClasses($(this), ["selected","red_node"])});
   });
   
-  $(jsPlumb.getConnections("relations")).each(function(i, connection){
-    var overlay = connection.getOverlay("customOverlay").getElement();
-    $(overlay).on("click", function(){highlightRelation($(overlay))});
+  $(".relation.static").each(function(i, relation){
+    $(relation).parent().on("click", function(){highlightRelation($(this))});
   })
-  console.log($("div.immutable_attribute_constraint"));
-  $("div.immutable_attribute_constraint").each(function(i, ac){
+  
+  $(".attribute_constraint.static").each(function(i, ac){
     $(ac).on("click", function(){toggleClasses($(this), ["selected","red_background"])});
   });
 };
@@ -68,7 +67,7 @@ var toggleClasses = function(element, css_classes){
 
 // highlights a relation. TODO: highlight the arrow, as well...
 var highlightRelation = function(overlay){
-  toggleClasses(overlay, ["red_background", "selected"])
+  toggleClasses(overlay, ["selected", "red_background"])
 };
 
 var loadTranslationPattern = function(){
@@ -90,15 +89,25 @@ var saveTranslation = function(){
   if(selected_elements.length == 0){
     alert("You have to select at least one element from the input graph");
   } else {
-    str = "Save Translation pattern? The following elements are thereby translated:\n";
-    $(selected_elements.find(".node")).each(function(i, element){
-      console.log($(element).find("form select").val());
-    });
-    $(selected_elements.find(".relation")).each(function(i, element){
-      console.log($(element).find("form select").val());
-    });
-    $(selected_elements.find(".relation")).each(function(i, element){
-      console.log($(element).find("form select").val());
-    });
+    str = "Save Translation pattern? The following elements are thereby translated\n\n";
+    str += addInformation("Nodes", ".node.selected");
+    str += addInformation("Relations", "._jsPlumb_overlay.selected");
+    str += addInformation("Attributes", ".attribute_constraint.selected");
+    if(confirm(str)){
+      console.log("please submit me...")
+    };
   }
 };
+
+var addInformation = function(name, search_string){
+  var stuff = "";
+  $(search_string).each(function(i, element){
+    stuff += $(element).find("form select").first().text() + "\n";
+  });
+  
+  if(stuff.length > 0){
+    return name + ":\n\t" + stuff
+  } else {
+    return stuff;
+  }
+}

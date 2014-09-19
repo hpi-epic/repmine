@@ -331,7 +331,7 @@ var connectionEndpoint = function() {
 		connectorOverlays:[
       ["Custom", {
         create: function(component) {
-          return $("<div class='relation'><select></select></div>");
+          return $("<div><select></select></div>");
         },
         location:0.5,
         id:"customOverlay"

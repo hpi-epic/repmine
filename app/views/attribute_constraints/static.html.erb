@@ -1,4 +1,4 @@
-<div id="node_<%=@ac.node.id %>_attributes_<%= @ac.id %>" class="immutable_attribute_constraint">
+<div id="node_<%=@ac.node.id %>_attributes_<%= @ac.id %>" class="attribute_constraint static">
   <%= form_for([@pattern,@ac], :html => {:class => "needs_no_space edit_attribute_constraint"}) do |f| %>
     <%= f.select(:attribute_name, fixed_select(@ac), {}, {:class => "just_right"})%>
     <%= f.select(:operator, operator_selector([@ac.operator]), {}, {:class => "very_narrow"})%>
