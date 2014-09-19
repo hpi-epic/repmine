@@ -13,6 +13,12 @@
   <%= javascript_include_tag "pattern_translator.js" %>
 <% end %>
 
+<div class="translation_controls" style="left: <%= @offset %>px" />
+  <span>Translation to: <strong><%= link_to(@ontology.short_name, @ontology) %></strong></span>&nbsp;|&nbsp;
+  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success" %>
+  <%= link_to 'New Node', "#", :class => "btn", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');" %>
+</div>
+
 <div id="drawing_canvas" class="canvas">
   <% @source_pattern.nodes.each do |node| %>
     <%= render :partial => "nodes/show_immutable", :locals => {:node => node, :pattern => @source_pattern}%>
@@ -21,9 +27,4 @@
   <% @target_pattern.nodes.each do |node| %>
     <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy }%>
   <% end %>
-</div>
-
-<div class="translation_controls" style="top: <%= @offset %>px" />
-  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success" %>
-  <%= link_to 'New Node', "#", :class => "btn", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');" %>
 </div>
