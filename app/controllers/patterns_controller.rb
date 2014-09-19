@@ -50,13 +50,15 @@ class PatternsController < ApplicationController
   
   def update
     @pattern = Pattern.find(params[:id])
-    respond_to do |format|
-      if @pattern.update_attributes(params[:pattern])
-        @pattern.touch
-        format.json { render json: {:message => "Pattern successfully saved!"}, status => :ok}
-      else
-        format.json { render json: @node.errors, status: :unprocessable_entity }
-      end
+    if @pattern.is_a?(TranslationPattern)
+      @pattern.infer_correspondences(params[:selected_elements])
+    end
+      
+    if @pattern.update_attributes(params[:pattern])
+      @pattern.touch
+      render json: {:message => "Pattern successfully saved!"}, :status => :ok
+    else
+      render json: @node.errors, :status => :unprocessable_entity
     end
   end
   

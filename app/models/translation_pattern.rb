@@ -24,4 +24,13 @@ class TranslationPattern < Pattern
   def create_repository_name!
     self.repository_name = ontologies.first.repository_name
   end
+
+  def infer_correspondences(selected_elements)
+    # outline of the algorithm:
+    # - get all changes since last save
+    # - throw them into the rule engine along with the input graph
+    # - save the correspondence
+    # - report back
+  end
+  
 end

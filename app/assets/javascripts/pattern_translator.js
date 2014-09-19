@@ -103,7 +103,7 @@ var submitTranslationPattern = function(selected_elements){
   return $.ajax({
     url : form.attr("action"),
     type: "POST",
-    data : form.serialize() + "&" + $.param(selected_elements),
+    data : form.serialize() + "&" + $.param({selected_elements:selected_elements}),
     success: function(data, textStatus, jqXHR){
       if(data.message){alert(data.message)};
       $(".selected").click();
