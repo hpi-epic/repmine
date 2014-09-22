@@ -109,7 +109,7 @@ var submitTranslationPattern = function(selected_elements){
       $(".selected").click();
     },
     error: function(jqXHR, textStatus, errorThrown){
-      alert(jqXHR);
+      alert(jqXHR.statusText);
     }
   });
 };
@@ -117,14 +117,12 @@ var submitTranslationPattern = function(selected_elements){
 var infoString = function(selected_elements){
   str = "Save Translation pattern? The following elements are thereby translated\n\n";
   for(var key in selected_elements){
-    if(selected_elements[key].length > 0){
+    if(selected_elements[key].concepts.length > 0){
       str += key + ":\n\t";
-      $(selected_elements[key]).each(function(i, el){
-        str += el["value"];
-        if(i != selected_elements[key].length - 1){str += ", "};
-      })
+      $(selected_elements[key].concepts).each(function(i, el){str += el + ", ";});
+      str = str.substring(0, str.length - 2) + "\n"
     }
-  } 
+  }
   return str;
 };
 
@@ -137,9 +135,10 @@ var getSelectedElements = function(){
 };
 
 var addInformation = function(search_string){
-  var info = [];
+  var info = {ids:[], concepts:[]};
   $(search_string).each(function(i, element){
-    info.push({url: $(element).find("form").attr("action"), value: $(element).find("form").first().text().trim()});
+    info.ids.push($(element).find("form").parent().attr("data-id"));
+    info.concepts.push($(element).find("form select").first().text().trim());
   });
   return info;
 }

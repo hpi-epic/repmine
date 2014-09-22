@@ -1,4 +1,4 @@
-<div class="node" style="<%= node_position(node)%>" id="node_<%=node.id%>" data-node-id="<%= node.id %>">
+<div class="node" style="<%= node_position(node)%>" id="node_<%=node.id%>" data-id="<%= node.id %>">
 <%= form_for([pattern, node]) do |f| %>
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>  

@@ -25,7 +25,7 @@ class Repository < ActiveRecord::Base
     end
   end
   
-  def editable_attributes()
+  def editable_attributes
     return self.class.accessible_attributes.select{|at| !at.blank?}
   end
   
@@ -44,7 +44,7 @@ class Repository < ActiveRecord::Base
     raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
   end
   
-  def get_type_stats()
+  def get_type_stats
     raise "implement 'get_type_stats' in #{self.class.name}"
   end
   

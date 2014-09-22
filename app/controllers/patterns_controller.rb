@@ -51,9 +51,9 @@ class PatternsController < ApplicationController
   def update
     @pattern = Pattern.find(params[:id])
     if @pattern.is_a?(TranslationPattern)
-      @pattern.infer_correspondences(params[:selected_elements])
+      @pattern.infer_correspondences(get_selected_elements(params[:selected_elements]))
     end
-      
+    
     if @pattern.update_attributes(params[:pattern])
       @pattern.touch
       render json: {:message => "Pattern successfully saved!"}, :status => :ok
@@ -138,5 +138,13 @@ class PatternsController < ApplicationController
       end
     end
     return attributes, relations
+  end
+  
+  def get_selected_elements(hash)
+    elements ={}
+    elements[:nodes] = Node.find(hash["Nodes"]["ids"]) unless hash["Nodes"].nil?
+    elements[:attributes] = AttributeConstraint.find(hash["Attributes"]["ids"]) unless hash["Attributes"].nil?
+    elements[:relations] = RelationConstraint.find(hash["Relations"]["ids"]) unless hash["Relations"].nil?
+    return elements
   end
 end

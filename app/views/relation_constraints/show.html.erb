@@ -1,4 +1,4 @@
-<div class="relation">
+<div class="relation" data-id="<%= @rc.id %>">
   <%= form_for([@pattern, @rc]) do |f| %>
 
     <%= f.select(:relation_type, options_from_collection_for_select(@possible_relations, "relation_url", "name", @rc.relation_type), {}, {:class => "needs_no_space"}) %><br />

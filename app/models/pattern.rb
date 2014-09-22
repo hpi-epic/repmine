@@ -139,4 +139,7 @@ class Pattern < ActiveRecord::Base
     return prefixes
   end
   
+  def infer_correspondences()
+    
+  end
 end

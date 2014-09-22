@@ -1,6 +1,6 @@
 // makes a node draggable and creates the onclick and 
 var addNodeToGraph = function(node){
-  var node_id = node.attr("data-node-id");
+  var node_id = node.attr("data-id");
   var node_html_id = node.attr("id");
   
   // make the node draggable
@@ -108,7 +108,7 @@ var submitAndHighlight = function(form){
       if(data.message){alert(data.message)};
     },
     error: function(jqXHR, textStatus, errorThrown){
-      alert(jqXHR);
+      alert(jqXHR.statusText);
     }
   });
 };
@@ -151,8 +151,8 @@ var createNewConnection = function(connection, overlay){
     url: new_relation_constraint_path,
     type: "POST",
     data: {
-      source_id: $(connection.source).attr("data-node-id"), 
-      target_id: $(connection.target).attr("data-node-id"),
+      source_id: $(connection.source).attr("data-id"), 
+      target_id: $(connection.target).attr("data-id"),
       source_type: rdfTypeForHTMLNode(connection.sourceId), 
       target_type: rdfTypeForHTMLNode(connection.targetId),
     },
