@@ -57,5 +57,22 @@ RSpec.describe Pattern, :type => :model do
     assert_equal @pattern.nodes.first.attribute_constraints.first.attribute_name, "http://example2.org"
     assert_equal @pattern.nodes.first.source_relation_constraints.first.relation_type, "http://example2.org"
   end
+  
+  it "should find recent changes properly" do 
+    @pattern = FactoryGirl.create(:pattern)
+    @pattern.update_attribute(:updated_at,Time.now)    
+    @new_node = @pattern.nodes.create()
+    assert_equal @pattern.recent_changes[:nodes].include?(@new_node), true
+    assert_equal @pattern.recent_changes[:nodes].size, 1
+    @pattern.update_attribute(:updated_at,Time.now)    
+    assert_equal @pattern.recent_changes[:nodes].size, 0
+    @new_node.update_attribute(:updated_at,Time.now)
+    assert_equal @pattern.recent_changes[:nodes].include?(@new_node), true
+    assert_equal @pattern.recent_changes[:nodes].size, 1
+    
+    @pattern.nodes.first.attribute_constraints.first.update_attribute(:updated_at, Time.now)    
+    assert_equal @pattern.recent_changes[:attributes].include?(@pattern.nodes.first.attribute_constraints.first), true
+    assert_equal @pattern.recent_changes[:attributes].size, 1    
+  end
 
 end

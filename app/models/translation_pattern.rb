@@ -26,6 +26,8 @@ class TranslationPattern < Pattern
   end
 
   def infer_correspondences(selected_elements)
+    input_graph = get_subgraph(selected_elements)
+    output_graph = get_subgraph(recent_changes)
     # outline of the algorithm:
     # - get all changes since last save
     # - throw them into the rule engine along with the input graph

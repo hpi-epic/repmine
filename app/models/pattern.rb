@@ -139,7 +139,22 @@ class Pattern < ActiveRecord::Base
     return prefixes
   end
   
-  def infer_correspondences()
-    
+  # determines the correspondences we can identify from the selected input and our recent changes
+  def infer_correspondences(selected_elements)
+    return true
+  end
+  
+  # determines which elements where added or updated since the last 'save' of the pattern
+  def recent_changes()
+    changes = {}
+    changes[:nodes] = nodes.find(:all, :conditions => ["updated_at > ?", self.updated_at])
+    changes[:attributes] = nodes.collect{|n| n.attribute_constraints.find(:all, :conditions => ["updated_at > ?", self.updated_at])}.flatten
+    changes[:relations] = nodes.collect{|n| n.source_relation_constraints.find(:all, :conditions => ["updated_at > ?", self.updated_at])}.flatten
+    return changes
+  end
+
+  # transforms a given set of elements into a proper graph
+  def get_subgraph(elements)
+    # TODO: implement me
   end
 end
