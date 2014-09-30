@@ -152,9 +152,4 @@ class Pattern < ActiveRecord::Base
     changes[:relations] = nodes.collect{|n| n.source_relation_constraints.find(:all, :conditions => ["updated_at > ?", self.updated_at])}.flatten
     return changes
   end
-
-  # transforms a given set of elements into a proper graph
-  def get_subgraph(elements)
-    # TODO: implement me
-  end
 end

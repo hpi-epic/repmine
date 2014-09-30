@@ -72,7 +72,19 @@ RSpec.describe Pattern, :type => :model do
     
     @pattern.nodes.first.attribute_constraints.first.update_attribute(:updated_at, Time.now)    
     assert_equal @pattern.recent_changes[:attributes].include?(@pattern.nodes.first.attribute_constraints.first), true
-    assert_equal @pattern.recent_changes[:attributes].size, 1    
+    assert_equal @pattern.recent_changes[:attributes].size, 1 
+    @pattern.update_attribute(:updated_at,Time.now)     
+    assert_equal @pattern.recent_changes[:attributes].size, 0     
+    
+    @pattern.nodes.first.source_relation_constraints.first.update_attribute(:updated_at, Time.now)
+    assert_equal @pattern.recent_changes[:relations].include?(@pattern.nodes.first.source_relation_constraints.first), true
+    assert_equal @pattern.recent_changes[:relations].size, 1
+    @pattern.update_attribute(:updated_at,Time.now) 
+    assert_equal @pattern.recent_changes[:relations].size, 0       
+    
+    @pattern.nodes.first.target_relation_constraints.first.update_attribute(:updated_at, Time.now)
+    assert_equal @pattern.recent_changes[:relations].include?(@pattern.nodes.first.target_relation_constraints.first), false
+    assert_equal @pattern.recent_changes[:relations].size, 0    
   end
 
 end

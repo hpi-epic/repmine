@@ -1,6 +1,7 @@
 class TranslationPattern < Pattern
   
   attr_accessible :pattern_id, :target_ontology_id
+  
   belongs_to :pattern
   belongs_to :target_ontology, :class_name => "Ontology"
   
