@@ -91,6 +91,10 @@ RSpec.describe Pattern, :type => :model do
     @pattern = FactoryGirl.create(:pattern)
     @graph = @pattern.rdf_graph
     assert_equal @pattern.nodes.size, query_graph_for_type(@graph, Vocabularies::GraphPattern.Node).size
+    ac_count = @pattern.nodes.inject(0){|x,node| x += node.attribute_constraints.size}
+    assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.AttributeConstraint).size
+    rc_count = @pattern.nodes.inject(0){|x,node| x += node.source_relation_constraints.size}    
+    assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.RelationConstraint).size    
   end
   
   def query_graph_for_type(graph, rdf_type)

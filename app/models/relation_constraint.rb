@@ -9,6 +9,14 @@ class RelationConstraint < ActiveRecord::Base
     return []
   end
   
+  def url
+    return (source || target).url + "/relation_constraints/#{id}"
+  end
+  
+  def rdf_types
+    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.RelationConstraint]
+  end
+  
   def used_concepts
     return [relation_type]
   end

@@ -63,9 +63,22 @@ class Node < ActiveRecord::Base
   end
   
   def rdf_statements
-    [
+    stmts = [
       [resource, Vocabularies::GraphPattern.nodeType, type_expression.resource]
     ]
+    
+    attribute_constraints.each do |ac| 
+      stmts << [resource, Vocabularies::GraphPattern.attributeConstraint, ac.resource]
+      stmts.concat(ac.rdf)
+    end
+    
+    source_relation_constraints.each do |src| 
+      stmts << [resource, Vocabularies::GraphPattern.outgoingRelation, src.resource]
+      stmts.concat(src.rdf)
+    end
+    
+    target_relation_constraints.each{|trc| stmts << [resource, Vocabularies::GraphPattern.incomingRelation, trc.resource]}
+    return stmts
   end
     
   def rdf_types
