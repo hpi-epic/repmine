@@ -54,16 +54,12 @@ class Ontology < ActiveRecord::Base
     return imps
   end
   
-  def rdf_graph
-    return @rdf_graph ||= load_ontology
-  end
-  
   def vocabulary_class_name
     return short_name.gsub("#", "_").gsub("-", "_").gsub(".owl", "").gsub(".rdf", "").camelcase
   end
   
   # loads an ontology from a url
-  def load_ontology
+  def rdf_graph
     RDF::Graph.load(self.url)
   end
   

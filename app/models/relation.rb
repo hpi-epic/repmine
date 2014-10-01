@@ -20,7 +20,7 @@ class Relation
     return relation_url || (domain.url + "/" + name)
   end
   
-  def statements
+  def rdf_statements
     stmts = [
       [resource, RDF.type, RDF::OWL.ObjectProperty],
       [resource, RDF::RDFS.domain, domain.resource],

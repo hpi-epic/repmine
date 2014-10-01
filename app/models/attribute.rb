@@ -21,7 +21,7 @@ class Attribute
     return attribute_url || domain.url + "/" + name
   end
   
-  def statements
+  def rdf_statements
     stmts = [
       [resource, RDF.type, RDF::OWL.DatatypeProperty],
       [resource, RDF::RDFS.domain, domain.resource],

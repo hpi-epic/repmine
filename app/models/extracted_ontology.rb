@@ -4,8 +4,7 @@ class ExtractedOntology < Ontology
   
   attr_accessor :classes
   belongs_to :repository
-
-  include RdfSerialization  
+  include RdfSerialization    
   
   def self.model_name
     return Ontology.model_name
@@ -24,29 +23,30 @@ class ExtractedOntology < Ontology
     @classes = Set.new()
   end
   
-  def create_graph!
-    @rdf_graph = RDF::Graph.new()
+  def custom_rdf_statements
     # we describe an ontology
-    @rdf_graph << [resource, RDF.type, RDF::OWL.Ontology]
-    repository.imports.each{|vocab| @rdf_graph << [resource, RDF::OWL.imports, vocab]}
-    @rdf_graph << [resource, RDF::DC.title, repository.name]
-    @rdf_graph << [resource, RDF::DC.creator, RDF::Literal.new("Repmine Schema Extractor")]
-    @rdf_graph << [resource, Vocabularies::SchemaExtraction.repository_database, RDF::Literal.new(repository.database_type)]
-    @rdf_graph << [resource, Vocabularies::SchemaExtraction.repository_database_version, RDF::Literal.new(repository.database_version)] 
-    # it contains the classes themselves
-    classes.each{|klazz| @rdf_graph.insert(*klazz.all_statements)}
-    # then, their attributes and relations. This should prevent inline classes
-    classes.each{|klazz| @rdf_graph.insert(*klazz.schema_statements)}    
+    stmts = []
+    repository.imports.each{|vocab| stmts << [resource, RDF::OWL.imports, vocab]}
+    stmts << [resource, RDF::DC.title, repository.name]
+    stmts << [resource, RDF::DC.creator, RDF::Literal.new("Repmine Schema Extractor")]
+    stmts << [resource, Vocabularies::SchemaExtraction.repository_database, RDF::Literal.new(repository.database_type)]
+    stmts << [resource, Vocabularies::SchemaExtraction.repository_database_version, RDF::Literal.new(repository.database_version)] 
+    
+    # and simply get all statements for each class
+    classes.each{|klazz| stmts.concat(klazz.rdf)}
+    return stmts
+  end
+  
+  def rdf_types
+    [RDF::OWL.Ontology]
   end
   
   def load_ontology
     does_exist ? RDF::Graph.load(local_file_path) : nil
   end
   
-  def prefixes
+  def custom_prefixes
     return {
-     :rdfs => RDF::RDFS,
-     :owl => RDF::OWL,
      :schema_extraction => Vocabularies::SchemaExtraction,
      url.split("/").last.underscore => url
     }
@@ -72,17 +72,6 @@ class ExtractedOntology < Ontology
   
   def file_format
     return repository.nil? ? "owl" : repository.class.rdf_format
-  end
-  
-  # returns an rdf file of the graph
-  def rdf_xml
-    if @rdf_graph.nil?
-      raise "please either load or create the graph before generating rdf/xml!"
-    end
-    buffer = RDF::RDFXML::Writer.buffer(:prefixes => prefixes) do |writer|
-      writer.write_graph(@rdf_graph)
-    end
-    return buffer
   end
   
 end

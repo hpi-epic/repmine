@@ -3,7 +3,7 @@ class Pattern < ActiveRecord::Base
   include RdfSerialization
   
   attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :repository_name, :tag_list
-  attr_accessor :ag_connection, :ag_alignment
+  attr_accessor :ag_connection
   
   acts_as_taggable_on :tags
   
@@ -116,32 +116,28 @@ class Pattern < ActiveRecord::Base
     self.reload
   end
   
-  def rdf_xml
-    buffer = RDF::RDFXML::Writer.buffer(:prefixes => self.xml_prefixes) do |writer|
-      writer.write_graph(rdf_statements)
-    end
-    return buffer
-  end
-  
+  # RDF Serialization
   def rdf_statements
-    graph = RDF::Graph.new()
-    graph << nodes.collect{|qn| qn.rdf_statements}
-    graph << relation_constraints.collect{|qn| qrc.rdf_statements}
-    return graph
+    nodes.collect{|qn| qn.rdf}.flatten(1)
   end
   
-  def xml_prefixes()
-    prefixes = {
-     :rdfs => RDF::RDFS,
-     :owl => RDF::OWL
-    }
+  def custom_prefixes()
+    prefixes = {}
     ontologies.each{|ont| prefixes[ont.short_prefix] = ont.url}
     return prefixes
   end
   
+  def url
+    ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:patterns_path] + id.to_s
+  end
+  
+  def rdf_types
+    [Vocabularies::GraphPattern.GraphPattern]
+  end
+  
   # determines the correspondences we can identify from the selected input and our recent changes
   def infer_correspondences(selected_elements)
-    return true
+    true
   end
   
   # determines which elements where added or updated since the last 'save' of the pattern

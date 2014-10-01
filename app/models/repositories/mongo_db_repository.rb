@@ -34,7 +34,6 @@ class MongoDbRepository < Repository
       owl_class = OwlClass.new(ontology, c_name.singularize.camelcase)
       class_schema(get_schema_info(c_name), owl_class, c_name)
     end
-    ontology.create_graph!
     ontology.download!    
   end
   

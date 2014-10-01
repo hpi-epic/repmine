@@ -43,7 +43,7 @@ RSpec.describe MongoDbRepository, :type => :model do
     allow(@mdb_repo).to receive(:get_schema_info){[]}    
     @mdb_repo.extract_ontology!    
     classes = @mdb_repo.ontology.classes
-    classes.first.url.should == "http://hpi-web.de/ns/ontologies/repmine/schemas/extracted/sample_db_#{@mdb_repo.id}/Item"
+    classes.first.url.should == ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + "sample_db_#{@mdb_repo.id}/Item"
   end
   
   it "it should find direct ancestors" do

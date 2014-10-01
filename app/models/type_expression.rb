@@ -3,6 +3,11 @@ class TypeExpression < ActiveRecord::Base
   belongs_to :node
   has_ancestry
   
+  def resource
+    # TODO: create OWL Union and so on...
+    return RDF::Resource.new(self.fancy_string)
+  end
+  
   def fancy_string(shorten = false)
     if operator?
       if operator == OwlClass::SET_OPS[:not]

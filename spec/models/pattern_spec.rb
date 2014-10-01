@@ -84,7 +84,20 @@ RSpec.describe Pattern, :type => :model do
     
     @pattern.nodes.first.target_relation_constraints.first.update_attribute(:updated_at, Time.now)
     assert_equal @pattern.recent_changes[:relations].include?(@pattern.nodes.first.target_relation_constraints.first), false
-    assert_equal @pattern.recent_changes[:relations].size, 0    
+    assert_equal 0, @pattern.recent_changes[:relations].size
+  end
+  
+  it "should create a proper RDF graph for a simple pattern" do
+    @pattern = FactoryGirl.create(:pattern)
+    @graph = @pattern.rdf_graph
+    assert_equal @pattern.nodes.size, query_graph_for_type(@graph, Vocabularies::GraphPattern.Node).size
+  end
+  
+  def query_graph_for_type(graph, rdf_type)
+    results = []
+    query = RDF::Query.new({:thingy => {RDF.type  => rdf_type}})
+    query.execute(graph){|solution| results << solution}
+    return results
   end
 
 end

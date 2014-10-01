@@ -11,13 +11,11 @@ class Node < ActiveRecord::Base
   has_many :attribute_constraints, :dependent => :destroy
   
   after_create :build_type_expression
+  
+  include RdfSerialization  
     
   def query_variable()
     return rdf_type.split("/").last.downcase + self.id.to_s
-  end
-  
-  def rdf_statements
-    return []
   end
   
   def build_type_expression()
@@ -58,5 +56,19 @@ class Node < ActiveRecord::Base
   
   def used_concepts
     return type_expression.used_concepts + source_relation_constraints.collect{|src| src.used_concepts} + attribute_constraints.collect{|src| src.used_concepts}
+  end
+  
+  def url
+    return pattern.url + "/nodes/#{id}"
+  end
+  
+  def rdf_statements
+    [
+      [resource, Vocabularies::GraphPattern.nodeType, type_expression.resource]
+    ]
+  end
+    
+  def rdf_types
+    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.Node]
   end
 end
