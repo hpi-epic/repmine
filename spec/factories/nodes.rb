@@ -2,9 +2,9 @@
 
 FactoryGirl.define do
   factory :node do
-    attribute_constraints {build_list :attribute_constraint, 1}
-    source_relation_constraints {build_list :relation_constraint, 1}        
-    target_relation_constraints {build_list :relation_constraint, 1}            
+    attribute_constraints {create_list :attribute_constraint, 1}
+    source_relation_constraints { create_list(:relation_constraint, 1) }
+    target_relation_constraints { create_list(:relation_constraint, 1) }    
     type_expression
   end
 end
