@@ -90,16 +90,37 @@ RSpec.describe Pattern, :type => :model do
   it "should create a proper RDF graph for a simple pattern" do
     @pattern = FactoryGirl.create(:pattern)
     @graph = @pattern.rdf_graph
-    assert_equal @pattern.nodes.size, query_graph_for_type(@graph, Vocabularies::GraphPattern.Node).size
+    nodes = query_graph_for_type(@graph, Vocabularies::GraphPattern.Node)
+    assert_equal 1, nodes.size
+    
+    res = query(@graph, {nodes.first => {Vocabularies::GraphPattern.attributeConstraint => :ac}})
+    assert_equal 1, res.size
+    assert_equal @pattern.nodes.first.attribute_constraints.first.url, res.first[:ac]
+    
+    res = query(@graph, {nodes.first => {Vocabularies::GraphPattern.outgoingRelation => :orc}})
+    assert_equal 1, res.size
+    assert_equal @pattern.nodes.first.source_relation_constraints.first.url, res.first[:orc]
+    
+    res = query(@graph, {nodes.first => {Vocabularies::GraphPattern.incomingRelation => :irc}})
+    assert_equal 1, res.size
+    assert_equal @pattern.nodes.first.target_relation_constraints.first.url, res.first[:irc]
+    
     ac_count = @pattern.nodes.inject(0){|x,node| x += node.attribute_constraints.size}
     assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.AttributeConstraint).size
-    rc_count = @pattern.nodes.inject(0){|x,node| x += node.source_relation_constraints.size}    
-    assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.RelationConstraint).size    
+    rc_count = @pattern.nodes.inject(0){|x,node| x += node.source_relation_constraints.size}
+    assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.RelationConstraint).size
   end
   
   def query_graph_for_type(graph, rdf_type)
     results = []
-    query = RDF::Query.new({:thingy => {RDF.type  => rdf_type}})
+    query = RDF::Query.new({:thing => {RDF.type  => rdf_type}})
+    query.execute(graph){|solution| results << solution.thing}
+    return results
+  end
+
+  def query(graph, query_hash)
+    results = []
+    query = RDF::Query.new(query_hash)
     query.execute(graph){|solution| results << solution}
     return results
   end
