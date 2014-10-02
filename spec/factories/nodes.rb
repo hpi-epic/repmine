@@ -7,4 +7,8 @@ FactoryGirl.define do
     target_relation_constraints { create_list(:relation_constraint, 1) }    
     type_expression
   end
+  
+  factory :plain_node, :class => Node do 
+    type_expression
+  end
 end

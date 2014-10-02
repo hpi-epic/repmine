@@ -6,7 +6,9 @@ class RelationConstraint < ActiveRecord::Base
   include RdfSerialization
   
   def rdf_statements
-    return []
+    return [
+      [resource, Vocabularies::GraphPattern.belongsTo, (source || target).pattern.resource]      
+    ]
   end
   
   def url

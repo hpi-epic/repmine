@@ -5,7 +5,9 @@ class AttributeConstraint < ActiveRecord::Base
   include RdfSerialization
   
   def rdf_statements
-    return []
+    return [
+      [resource, Vocabularies::GraphPattern.belongsTo, node.pattern.resource]
+    ]
   end
   
   def url

@@ -90,6 +90,16 @@ RSpec.describe Pattern, :type => :model do
   it "should create a proper RDF graph for a simple pattern" do
     @pattern = FactoryGirl.create(:pattern)
     @graph = @pattern.rdf_graph
+    
+    # there is one graph pattern
+    graph_pattern = query_graph_for_type(@graph, Vocabularies::GraphPattern.GraphPattern).first
+    assert_not_nil graph_pattern
+    # three pattern elements
+    assert_equal 3, query_graph_for_type(@graph, Vocabularies::GraphPattern.PatternElement).size
+    # and they are linked to the graph pattern
+    res = query(@graph, {:ge => {Vocabularies::GraphPattern.belongsTo => graph_pattern}})    
+    assert_equal 3, res.size
+    
     nodes = query_graph_for_type(@graph, Vocabularies::GraphPattern.Node)
     assert_equal 1, nodes.size
     

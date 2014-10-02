@@ -2,39 +2,43 @@ class CorrespondenceExtractor
   attr_accessor :rule_engine
   
   def initialize()
-    @rule_engine = Wongi::Engine.create
+    reset!  
   end
   
-  def extract_correspondences(input_graph)
+  def extract_correspondences!(input_graph)
     input_graph.each{|stmt| rule_engine << stmt}
-    rule_engine << classification_ruleset
   end
+  
+  def productions_for(rule_name)
+    rule_engine.productions[rule_name]
+  end
+  
+  def reset!
+    @rule_engine = Wongi::Engine.create
+    install_classification_ruleset! 
+  end
+  
+  private
   
   # classifies the input and output graphs
-  def classification_ruleset
-    ruleset do 
-      rule("simple graph") do
+  def install_classification_ruleset!
+    rule_engine << ruleset do
+      rule("simple_graph") do
         forall {
-          has(:graph, Vocabularies::GraphPattern.contains, :graph_element)
-          neg {
-            has(:graph, Vocabularies::GraphPattern.contains, :different_element)
-            diff(:graph_element, :different_element)
+          has(:Graph_element, Vocabularies::GraphPattern.belongsTo, :Graph)
+          none {
+            has(:Different_element, Vocabularies::GraphPattern.belongsTo, :Graph)
+            diff(:Graph_element, :Different_element)
           }
+        }
+        make {
+          gen(:Graph, "classification", "simple")
         }
       end
     end
   end
   
   # extracts the correspondences
-  def extraction_ruleset
-    ruleset do
-      rule("1:1") do
-        forall {
-        }
-      end
-      rule("PC") do
-        
-      end
-    end
+  def install_extraction_ruleset!
   end
 end

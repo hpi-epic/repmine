@@ -118,7 +118,7 @@ class Pattern < ActiveRecord::Base
   
   # RDF Serialization
   def rdf_statements
-    nodes.collect{|qn| qn.rdf}.flatten(1)
+    return nodes.collect{|qn| qn.rdf}.flatten(1)
   end
   
   def custom_prefixes()
