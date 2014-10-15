@@ -47,16 +47,17 @@ module Vocabularies
       range: "graphpattern:PatternElementGraphPattern".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze,
-      "owl:inverseOf" => %(graphpattern:belongsTo).freeze    
+      "owl:inverseOf" => %(graphpattern:belongsTo).freeze
+      
+    property :elementType,
+      comment: %(The type or complex expression (unionOf, etc.) a pattern element can have.).freeze,
+      domain: "graphpattern:PatternElement".freeze,
+      label: "element type".freeze,
+      range: "owl:ObjectProperty".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:ObjectProperty".freeze    
   
     # properties - node
-    property :nodeType,
-      comment: %(The type or complex expression (unionOf, etc.) a node can have.).freeze,
-      domain: "graphpattern:Node".freeze,
-      label: "node type".freeze,
-      range: "owl:Class".freeze,
-      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:ObjectProperty".freeze
     property :outgoingRelation,
       comment: %(links a node to an outgoing relation.).freeze,
       domain: "graphpattern:Node".freeze,
@@ -81,24 +82,10 @@ module Vocabularies
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze
     
-    # properties - relation constraint    
-    property :relationType,
-      comment: %(The type or complex expression (unionOf, etc.) a relation can have.).freeze,
-      domain: "graphpattern:RelationConstraint".freeze,
-      label: "relation type".freeze,
-      range: "owl:ObjectProperty".freeze,
-      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:ObjectProperty".freeze
-    
+    # properties - relation constraint
+    # TODO: all the cardinality stuff
+        
     # properties - attribute constraint
-    property :attributeType,
-      comment: %(The type or complex expression (unionOf, etc.) a relation can have.).freeze,
-      domain: "graphpattern:AttributeConstraint".freeze,
-      label: "attribute type".freeze,
-      range: "owl:DatatypeProperty".freeze,
-      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:ObjectProperty".freeze
-    
     property :attributeOperator,
       comment: %(The comparison operator used in the query.).freeze,
       domain: "graphpattern:AttributeConstraint".freeze,
@@ -115,6 +102,5 @@ module Vocabularies
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:DatatypeProperty".freeze    
     
-    # TODO: all the cardinality stuff
   end        
 end

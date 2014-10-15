@@ -12,4 +12,10 @@ FactoryGirl.define do
     nodes {create_list(:plain_node, 1)}
     ontologies {create_list :ontology, 1}    
   end
+  
+  factory :empty_pattern, :class => Pattern do
+    name "sample pattern"
+    description "a simple pattern without anything"
+    ontologies {create_list :ontology, 1}
+  end
 end

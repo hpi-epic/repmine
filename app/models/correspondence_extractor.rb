@@ -1,7 +1,14 @@
 class CorrespondenceExtractor
   attr_accessor :rule_engine
   
-  CLASSIFICATION_RULES = [:simple_graph]#, :node_relation_node, :node_attribute]
+  # TODO: substitute with RDF::Resource.new(xyz)
+  C_PROP = "classification"
+  
+  # RULE IDENTIFIERS
+  SG = "simple_graph"
+  N_RC_N = "n-rc-n"
+  N_AC = "n-ac"
+  N_RC_N_RC_N = "n-rc-n-rc-n"
   
   def extract_correspondences!(input_graph)
     reset!
@@ -15,12 +22,14 @@ class CorrespondenceExtractor
   
   # install the rules to classify the input and output graph
   def install_classification_rule_set!
-    CLASSIFICATION_RULES.each{|cr| rule_engine << self.send("#{cr}_rule".to_sym)}
+    self.methods.select{|m| m.to_s.ends_with?("_rule")}.each do |rule_method|
+      rule_engine << self.send(rule_method)
+    end
   end
   
   # determine whether a graph only has one element
   def simple_graph_rule()
-    rule("simple_graph") do 
+    rule("simple_graph") do
       forall {
         has(:Graph_element, Vocabularies::GraphPattern.belongsTo, :Graph)
         none {
@@ -29,26 +38,55 @@ class CorrespondenceExtractor
         }
       }
       make {
-        gen(:Graph, "classification", "simple")
+        gen(:Graph, C_PROP, SG)
       }
     end
   end
-  
+
+  # identifies node-relation->node subgraphs
   def node_relation_node_rule()
-    rule("n-r-n") do
+    rule(N_RC_N) do
       forall {
         has(:Relation, Vocabularies::GraphPattern.belongsTo, :Graph)
         has(:Relation, RDF.type, Vocabularies::GraphPattern.RelationConstraint)
         has(:Node, Vocabularies::GraphPattern.outgoingRelation, :Relation)
         has(:Node2, Vocabularies::GraphPattern.incomingRelation, :Relation)
-        none {
-          has(:Diff, Vocabularies::GraphPattern.belongsTo, :Graph)
-          # different thatn Node, Node2, or Relation
-        }
       }
       make {
-        gen(:Graph, "classification", "simple")
+        gen(:Graph, C_PROP, N_RC_N)
       }
     end
+  end
+  
+  def node_attribute_constraint_rule()
+    rule(N_AC) do
+      forall {
+        has(:Ac, Vocabularies::GraphPattern.belongsTo, :Graph)
+        has(:Ac, RDF.type, Vocabularies::GraphPattern.AttributeConstraint)
+        has(:Node, Vocabularies::GraphPattern.attributeConstraint, :Ac)
+      }
+      make {
+        gen(:Graph, C_PROP, N_AC)
+      }
+    end
+  end
+  
+  def node_rel_node_rel_node_rule()
+    rule(N_RC_N_RC_N) do
+      forall {
+        has(:Relation, Vocabularies::GraphPattern.belongsTo, :Graph)
+        has(:Relation, RDF.type, Vocabularies::GraphPattern.RelationConstraint)
+        has(:Node, Vocabularies::GraphPattern.outgoingRelation, :Relation)
+        has(:Node2, Vocabularies::GraphPattern.incomingRelation, :Relation)
+        has(:Relation2, Vocabularies::GraphPattern.belongsTo, :Graph)
+        has(:Relation2, RDF.type, Vocabularies::GraphPattern.RelationConstraint)
+        diff(:Relation1, :Relation2)
+        has(:Node2, Vocabularies::GraphPattern.outgoingRelation, :Relation)
+        has(:Node3, Vocabularies::GraphPattern.incomingRelation, :Relation)        
+      }
+      make {
+        gen(:Graph, C_PROP, N_RC_N)
+      }
+    end    
   end
 end

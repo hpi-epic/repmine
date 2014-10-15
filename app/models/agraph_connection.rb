@@ -39,25 +39,20 @@ class AgraphConnection
     repository.clear
   end
   
-  def relations_between(source, target)
-    outbound = relations_with(source, target)
-    inbound = relations_with(target, source)
-    return {
-      "inbound" => inbound - outbound,
-      "outbound" => outbound - inbound,
-      "bidirectional" => outbound & inbound
-    }
-  end
-  
+  # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
     rels = Set.new
     
-    repository.build_query(:infer => true) do |q|
-      q.pattern([:rel, RDF.type, RDF::OWL.ObjectProperty])
-      q.pattern([:rel, RDF::RDFS.domain, RDF::Resource.new(domain)])
-      q.pattern([:rel, RDF::RDFS.range, RDF::Resource.new(range)])
-    end.run do |res|
-      rels << Relation.from_url(res.rel.to_s, domain, range)
+    ([domain] + get_all_superclasses(domain)).each do |ddomain|
+      ([range] + get_all_superclasses(range)).each do |rrange|
+        repository.build_query(:infer => true) do |q|
+          q.pattern([:rel, RDF.type, RDF::OWL.ObjectProperty])
+          q.pattern([:rel, RDF::RDFS.domain, RDF::Resource.new(ddomain)])
+          q.pattern([:rel, RDF::RDFS.range, RDF::Resource.new(rrange)])
+        end.run do |res|
+          rels << Relation.from_url(res.rel.to_s, ddomain, rrange)
+        end
+      end
     end
     
     return rels.to_a

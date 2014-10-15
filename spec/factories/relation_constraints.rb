@@ -2,5 +2,6 @@
 
 FactoryGirl.define do
   factory :relation_constraint do
+    
   end
 end

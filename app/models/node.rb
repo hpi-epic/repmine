@@ -64,7 +64,7 @@ class Node < ActiveRecord::Base
   
   def rdf_statements
     stmts = [
-      [resource, Vocabularies::GraphPattern.nodeType, type_expression.resource],
+      [resource, Vocabularies::GraphPattern.elementType, type_expression.resource],
       [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]
     ]
     

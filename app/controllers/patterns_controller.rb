@@ -96,17 +96,6 @@ class PatternsController < ApplicationController
     
     render :layout => false 
   end
-
-  # callbacks from here on
-  def possible_relations
-    @pattern = Pattern.find(params[:pattern_id])
-    render :json => @pattern.possible_relations_between(params[:source], params[:target])
-  end
-  
-  def possible_attributes
-    @pattern = Pattern.find(params[:pattern_id])
-    render :json => @pattern.possible_attributes_for(params[:node_class])
-  end
   
   def query
     @pattern = Pattern.find(params[:pattern_id])

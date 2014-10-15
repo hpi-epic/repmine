@@ -30,12 +30,8 @@ class Pattern < ActiveRecord::Base
     return ag_connection.type_hierarchy()
   end
   
-  def possible_relations_between(source, target, oneway = false)
-    if oneway
-      return ag_connection.relations_with(source, target)
-    else
-      return ag_connection.relations_between(source, target)
-    end
+  def possible_relations_from_to(source, target, oneway = false)
+    return ag_connection.relations_with(source, target)
   end
   
   def possible_attributes_for(node_class)

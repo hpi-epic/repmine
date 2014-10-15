@@ -24,6 +24,6 @@ class RelationConstraint < ActiveRecord::Base
   end
   
   def possible_relations(source_type = nil, target_type = nil)
-    return source.pattern.possible_relations_between(source_type || source.rdf_type, target_type || target.rdf_type, true)
+    return source.pattern.possible_relations_from_to(source_type || source.rdf_type, target_type || target.rdf_type)
   end
 end
