@@ -2,7 +2,6 @@ class NodesController < ApplicationController
   
   # these are always just embedded, no need for a layout
   layout false
-
   before_filter :get_pattern
   
   def get_pattern
@@ -15,7 +14,7 @@ class NodesController < ApplicationController
       @node.equivalent_to = Node.find(params[:element_id])
       @node.save
     else
-      flash[:notice] = "Please click on the equivalent original node or close dialog if n/a!"
+      flash[:notice] = "Next time, please select the equivalent input node before creating a new one. Thank you!"
     end
 
     @type_hierarchy = @pattern.type_hierarchy
@@ -50,12 +49,5 @@ class NodesController < ApplicationController
   def fancy_rdf_string
     @node = Node.find(params[:node_id])
     @te = @node.type_expression
-  end
-  
-  def translation_node
-    @node = Node.create()
-    @repository = Repository.find(params[:repository_id])
-    @type_hierarchy = @repository.type_hierarchy
-    render :show
   end
 end

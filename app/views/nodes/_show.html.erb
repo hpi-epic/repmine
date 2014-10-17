@@ -7,5 +7,16 @@
   :onclick => "openComplexDialog('#{pattern_node_type_expression_path(pattern, node, node.type_expression)}',$('#node_#{ node.id}_modal_tree'), $('#node_#{node.id}_modal'))") %>&nbsp;|&nbsp; 
   <%= link_to(fa_icon("times-circle"), "#", :onclick => "deleteNode($('#node_#{node.id}'))") %>
 <% end %>
+
+<% if pattern.is_a?(TranslationPattern) && node.equivalent_to.nil? %>
+  <%= form_tag(pattern_feedback_channel_path(pattern), :class => "feedback_channel_form") do |f| %>
+    <%= hidden_field_tag(:node_id, node.id) %>
+    <%= hidden_field_tag(:element_id) %>
+    <%= hidden_field_tag(:element_class) %>
+  <% end %>
+<% end %>
+
 </div>
+
 <%= render :partial => "nodes/modal", :locals => {:type_hierarchy => type_hierarchy, :pattern => pattern, :node => node} %>
+

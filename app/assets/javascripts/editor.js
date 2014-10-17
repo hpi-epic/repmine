@@ -105,10 +105,10 @@ var submitAndHighlight = function(form){
     type: "POST",
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
-      if(data.message){alert(data.message)};
+      showGrowlNotification(jqXHR);
     },
     error: function(jqXHR, textStatus, errorThrown){
-      alert(jqXHR.statusText);
+      showGrowlNotification(jqXHR);
     }
   });
 };
@@ -272,6 +272,15 @@ var highlightSelector = function(element) {
     $(ts).removeClass("highlighted");
   });
   element.addClass("highlighted");
+};
+
+// takes a jqXHR object and if it has the X-Message header set, displays a growl message
+var showGrowlNotification = function(request){
+  var msg = request.getResponseHeader('X-Message');
+  var msg_type = request.getResponseHeader('X-Message-Type');
+  if(msg){
+    $.jGrowl(msg, { theme: msg_type});
+  }
 };
 
 // adds a type expression above, below, or on the same level as the selected_element (determined by url)

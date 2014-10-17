@@ -50,14 +50,12 @@ class PatternsController < ApplicationController
   
   def update
     @pattern = Pattern.find(params[:id])
-    if @pattern.is_a?(TranslationPattern)
-      flash[:error] = "Something Darkside"
-    end
-    
     if @pattern.update_attributes(params[:pattern])
       @pattern.touch
+      flash[:notice] = "Pattern successfully saved!"
       render json: @pattern, :status => :ok
     else
+      flash[:error] = "Could not save pattern!"
       render json: @pattern.errors, :status => :unprocessable_entity
     end
   end

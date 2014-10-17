@@ -20,7 +20,7 @@ jsPlumb.ready(function() {
 
 // function called when the "new Node" button is being clicked
 var newTranslationNode = function(url){
-  $.post(url, getSelectedElement(), function(data, textStatus, jqXHR){
+  $.post(url, getSelectedTargetElement(), function(data, textStatus, jqXHR){
     var node = $(data);
     node.appendTo($("#drawing_canvas"));
     addNodeToGraph(node);
@@ -28,20 +28,12 @@ var newTranslationNode = function(url){
   });
 };
 
-var getSelectedElement = function(){
+var getSelectedTargetElement = function(){
   return {
-    element_id: $(".selected").attr("data-id"),
-    element_type: $(".selected").attr("data-class")
+    element_id: $(".static.selected").attr("data-id"),
+    element_type: $(".static.selected").attr("data-class")
   }
 };
-
-var showGrowlNotification = function(request){
-  var msg = jqXHR.getResponseHeader('X-Message');
-  var msg_type = jqXHR.getResponseHeader('X-Message-Type');
-  if(msg){
-    $.jGrowl(msg, { header: msg_type});
-  };
-}
 
 // removes all unconnected Endpoints so users cannot somehow create new connections
 var removeExcessEndpoints = function(){
@@ -62,12 +54,25 @@ var addOnclickHandler = function(){
 };
 
 var toggleAndSubmit = function(element, css_classes){
-  $(".selected").each(function(i, el){
+  $(".static.selected").each(function(i, el){
     $(el).removeClass("selected");
   })
   element.addClass("selected");
-  $.post(feedback_channel_path, getSelectedElement(), function())
 };
+
+var toogleOntologyMatchingMode = function(btn){
+  if(btn.hasClass("btn-danger")){
+    $.jGrowl("Select one of the unmatched input nodes and choose its equivalent from the input!");
+    btn.removeClass("btn-danger");
+    btn.addClass("btn-warning");
+    btn.text("Normal Mode")    
+  } else {
+    btn.addClass("btn-danger");
+    btn.removeClass("btn-warning");
+    btn.text("OM Mode");        
+  }
+  $("#new_node_button").toggle();
+}
 
 
 var loadTranslationPattern = function(){
@@ -98,10 +103,10 @@ var submitTranslationPattern = function(){
     type: "POST",
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
-      // TODO: start a feedback loop regarding open questions...
+      showGrowlNotification(jqXHR);
     },
     error: function(jqXHR, textStatus, errorThrown){
-      alert(jqXHR.statusText);
+      showGrowlNotification(jqXHR);
     }
   });
 };

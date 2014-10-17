@@ -38,3 +38,17 @@ div.center_everything {
 .full_page {
   width: 95%;
 }
+
+div.jGrowl div.warning {
+  color: #000;
+}
+
+div.jGrowl div.error {
+  border-color: #CC3412;
+  color: #000;
+}
+
+div.jGrowl div.notice {
+  border-color: #3E9117;
+  color: #000;
+}
