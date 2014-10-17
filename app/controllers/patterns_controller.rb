@@ -1,7 +1,7 @@
 class PatternsController < ApplicationController
 
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
-  
+    
   def new
     @pattern = Pattern.new
   end
@@ -51,14 +51,14 @@ class PatternsController < ApplicationController
   def update
     @pattern = Pattern.find(params[:id])
     if @pattern.is_a?(TranslationPattern)
-      @pattern.infer_correspondences(get_selected_elements(params[:selected_elements]))
+      flash[:error] = "Something Darkside"
     end
     
     if @pattern.update_attributes(params[:pattern])
       @pattern.touch
-      render json: {:message => "Pattern successfully saved!"}, :status => :ok
+      render json: @pattern, :status => :ok
     else
-      render json: @node.errors, :status => :unprocessable_entity
+      render json: @pattern.errors, :status => :unprocessable_entity
     end
   end
   
@@ -104,6 +104,10 @@ class PatternsController < ApplicationController
     @query = "SELECT * FROM data"
   end
   
+  def feedback_channel
+    flash[:notice] = "Thanks for your feedback!"
+  end
+  
   private 
   
   def load_attributes_and_constraints!(pattern, static = false)
@@ -127,13 +131,5 @@ class PatternsController < ApplicationController
       end
     end
     return attributes, relations
-  end
-  
-  def get_selected_elements(hash)
-    elements ={}
-    elements[:nodes] = Node.find(hash["Nodes"]["ids"]) unless hash["Nodes"].nil?
-    elements[:attributes] = AttributeConstraint.find(hash["Attributes"]["ids"]) unless hash["Attributes"].nil?
-    elements[:relations] = RelationConstraint.find(hash["Relations"]["ids"]) unless hash["Relations"].nil?
-    return elements
   end
 end

@@ -6,6 +6,7 @@ RepMine::Application.routes.draw do
     get "/translate/:ontology_id", :to => "patterns#translate", :as => :translate_to_ontology
     get "/query/:ontology_id", :to => "patterns#query", :as => :query_for_ontology
     post "/run_on_repository/:repository_id", :to => "patterns#run_on_repository", :as => :run_on_repository
+    post "/feedback_channel", :to => "patterns#feedback_channel", :as => :feedback_channel
     
     resources :nodes do
       get :fancy_rdf_string 

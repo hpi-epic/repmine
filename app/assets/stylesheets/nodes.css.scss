@@ -3,33 +3,30 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 div.node {
-  background-image:url(circle.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 10em;
+  height: 5em;
   width: 10em;
   position: absolute;
   padding: 5px;
   text-align: center;
+  background: #48B7AB;
+  border: 2px solid #676767;
+  border-radius: 25px;
 }
 
 div.immutable_node {
-  background-image:url(circle_grey.png);
-}
-
-div.red_node {
-  background-image:url(circle_red.png);  
+  background: #CACACA;
+  border: 2px solid #676767;
+  height: 3.5em;    
 }
 
 div.node select{
   font-size: 13px;
   width: 130px;
   height: 2em;
-  margin-top: 5px;
 }
 
 div.node form{
-  margin-top: 3.5em;
+  margin-top: 10px;
 }
 
 div.node_modal {

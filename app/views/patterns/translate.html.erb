@@ -1,6 +1,7 @@
 <%= javascript_tag do %>
   var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@target_pattern) %>';
   var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@target_pattern) %>';
+  var feedback_channel_path = '<%= pattern_feedback_channel_path(@target_pattern) %>';
   
   var connect_these_static_nodes = <%= @source_relations.to_json.html_safe %>;
   var load_static_attribute_constraints = <%= @source_attributes.to_json.html_safe %>
@@ -12,6 +13,8 @@
   <%= javascript_include_tag "editor.js" %>
   <%= javascript_include_tag "pattern_translator.js" %>
 <% end %>
+
+<div id="flash_hook"></div>
 
 <div class="translation_controls" style="left: <%= @offset %>px" />
   <%= form_for(@target_pattern) do |f| %><% end %>  

@@ -17,4 +17,5 @@
 //= require jquery-ui-1.9.2-min
 //= require autocomplete-rails
 //= require jquery.jsPlumb-1.5.5-min
+//= require jquery.jgrowl.min
 //= require_self

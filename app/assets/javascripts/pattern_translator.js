@@ -20,11 +20,27 @@ jsPlumb.ready(function() {
 
 // function called when the "new Node" button is being clicked
 var newTranslationNode = function(url){
-  $.post(url, function(data){
+  $.post(url, getSelectedElement(), function(data, textStatus, jqXHR){
     var node = $(data);
-    node.appendTo($("#drawing_canvas"))
+    node.appendTo($("#drawing_canvas"));
     addNodeToGraph(node);
+    showGrowlNotification(jqXHR);
   });
+};
+
+var getSelectedElement = function(){
+  return {
+    element_id: $(".selected").attr("data-id"),
+    element_type: $(".selected").attr("data-class")
+  }
+};
+
+var showGrowlNotification = function(request){
+  var msg = jqXHR.getResponseHeader('X-Message');
+  var msg_type = jqXHR.getResponseHeader('X-Message-Type');
+  if(msg){
+    $.jGrowl(msg, { header: msg_type});
+  };
 }
 
 // removes all unconnected Endpoints so users cannot somehow create new connections
@@ -40,34 +56,19 @@ var removeExcessEndpoints = function(){
 
 // adds an onclick handler to nodes, relations, and attributes
 var addOnclickHandler = function(){
-  $("div.immutable_node").each(function(i, node){
-    $(node).on("click", function(){toggleClasses($(this), ["selected","red_node"])});
-  });
-  
-  $(".relation.static").each(function(i, relation){
-    $(relation).parent().on("click", function(){highlightRelation($(this))});
+  $(".immutable_node, .relation.static, .attribute_constraint.static").each(function(i, node){
+    $(node).on("click", function(){toggleAndSubmit($(this))})
+  });  
+};
+
+var toggleAndSubmit = function(element, css_classes){
+  $(".selected").each(function(i, el){
+    $(el).removeClass("selected");
   })
-  
-  $(".attribute_constraint.static").each(function(i, ac){
-    $(ac).on("click", function(){toggleClasses($(this), ["selected","red_background"])});
-  });
+  element.addClass("selected");
+  $.post(feedback_channel_path, getSelectedElement(), function())
 };
 
-// adds or removes the provided classes on the thingy
-var toggleClasses = function(element, css_classes){  
-  $(css_classes).each(function(i, css_class){
-    if(element.hasClass(css_class)){
-      element.removeClass(css_class);        
-    } else {
-      element.addClass(css_class);
-    }
-  })  
-};
-
-// highlights a relation. TODO: highlight the arrow, as well...
-var highlightRelation = function(overlay){
-  toggleClasses(overlay, ["selected", "red_background"])
-};
 
 var loadTranslationPattern = function(){
   $(".node").not(".immutable_node").each(function(index,node_div){
@@ -84,61 +85,23 @@ var loadTranslationPattern = function(){
 };
 
 var saveTranslation = function(){
-  var selected_elements = $(".selected");
-  if(selected_elements.length == 0){
-    alert("You have to select at least one element from the input graph");
-  } else {
-    var selected_elements = getSelectedElements();
-    if(confirm(infoString(selected_elements))){
-      var requests = saveNodes().concat(saveConstraints());      
-      $.when.apply($, requests).done(function(){
-        submitTranslationPattern(selected_elements);
-      });
-    };
-  }
+  var requests = saveNodes().concat(saveConstraints());
+  $.when.apply($, requests).done(function(){
+    submitTranslationPattern();
+  });
 };
 
-var submitTranslationPattern = function(selected_elements){
+var submitTranslationPattern = function(){
   var form = $("form.edit_pattern");
   return $.ajax({
     url : form.attr("action"),
     type: "POST",
-    data : form.serialize() + "&" + $.param({selected_elements:selected_elements}),
+    data : form.serialize(),
     success: function(data, textStatus, jqXHR){
-      if(data.message){alert(data.message)};
-      $(".selected").click();
+      // TODO: start a feedback loop regarding open questions...
     },
     error: function(jqXHR, textStatus, errorThrown){
       alert(jqXHR.statusText);
     }
   });
 };
-
-var infoString = function(selected_elements){
-  str = "Save Translation pattern? The following elements are thereby translated\n\n";
-  for(var key in selected_elements){
-    if(selected_elements[key].concepts.length > 0){
-      str += key + ":\n\t";
-      $(selected_elements[key].concepts).each(function(i, el){str += el + ", ";});
-      str = str.substring(0, str.length - 2) + "\n"
-    }
-  }
-  return str;
-};
-
-var getSelectedElements = function(){
-  var info = {}
-  info["Nodes"] = addInformation(".node.selected");
-  info["Relations"] = addInformation("._jsPlumb_overlay.selected");
-  info["Attributes"] = addInformation(".attribute_constraint.selected");
-  return info
-};
-
-var addInformation = function(search_string){
-  var info = {ids:[], concepts:[]};
-  $(search_string).each(function(i, element){
-    info.ids.push($(element).find("form").parent().attr("data-id"));
-    info.concepts.push($(element).find("form select").first().text().trim());
-  });
-  return info;
-}

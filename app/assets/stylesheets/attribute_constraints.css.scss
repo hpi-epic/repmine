@@ -4,18 +4,18 @@
 
 div.attribute_constraints {
   position: absolute;
-  padding: 5px;
+  padding: 5px 5px 0px 5px;
   border: 1px solid #676767;
   background-color: #48B7AB;  
   font-size: 13px;
 }
 
 div.attribute_constraints select {
-  font-size: 13px;
-  height: 30px;  
-  font-size: 13px;
+  font-size: 12px;
+  margin-top: 5px;  
 }
 
 div.attribute_constraints input {
-  font-size: 13px;  
+  font-size: 12px;
+  margin-top: 5px;
 }

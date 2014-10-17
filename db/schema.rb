@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140827132718) do
+ActiveRecord::Schema.define(:version => 20141016134423) do
 
   create_table "attribute_constraints", :force => true do |t|
     t.integer  "node_id"
@@ -41,11 +41,14 @@ ActiveRecord::Schema.define(:version => 20140827132718) do
   create_table "nodes", :force => true do |t|
     t.integer  "pattern_id"
     t.boolean  "root_node"
-    t.integer  "x",          :default => 0
-    t.integer  "y",          :default => 0
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.integer  "x",             :default => 0
+    t.integer  "y",             :default => 0
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
+    t.integer  "equivalent_to"
   end
+
+  add_index "nodes", ["equivalent_to"], :name => "index_nodes_on_equivalent_to"
 
   create_table "ontologies", :force => true do |t|
     t.string   "url"
