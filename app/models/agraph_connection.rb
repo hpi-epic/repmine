@@ -1,5 +1,5 @@
 class AgraphConnection
-  
+
   attr_accessor :repository, :repository_name
   
   def config

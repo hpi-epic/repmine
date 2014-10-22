@@ -20,19 +20,15 @@ jsPlumb.ready(function() {
 
 // function called when the "new Node" button is being clicked
 var newTranslationNode = function(url){
-  $.post(url, getSelectedTargetElement(), function(data, textStatus, jqXHR){
+  $.post(url, getSelectedSourceElement(), function(data, textStatus, jqXHR){
     var node = $(data);
     node.appendTo($("#drawing_canvas"));
     addNodeToGraph(node);
     showGrowlNotification(jqXHR);
+    // this will select the newly created node and, thus, allow users for 10 seconds to click on the target one
+    node.addClass("selected");
+    setTimeout(function(){node.removeClass("selected")}, 10000);
   });
-};
-
-var getSelectedTargetElement = function(){
-  return {
-    element_id: $(".static.selected").attr("data-id"),
-    element_type: $(".static.selected").attr("data-class")
-  }
 };
 
 // removes all unconnected Endpoints so users cannot somehow create new connections
@@ -50,30 +46,72 @@ var removeExcessEndpoints = function(){
 var addOnclickHandler = function(){
   $(".immutable_node, .relation.static, .attribute_constraint.static").each(function(i, node){
     $(node).on("click", function(){toggleAndSubmit($(this))})
-  });  
+  });
 };
 
+// out of the static elements (i.e., the ones on the left), the selected one is retrieved
+var getSelectedSourceElement = function(){
+  return {
+    element_id: $(".static.selected").data("id"),
+    element_type: $(".static.selected").data("class")
+  }
+};
+
+var getSelectedTranslationElements = function(){
+  return $(".selected").not(".static").map(function(){
+    return {
+      element_id: $(this).data("id"),
+      element_type: $(this).data("class")
+    }
+  });
+};
+
+// removes the selection from all selected elements and toggles the one that was just clicked
+// this also ensures that you can 'unselect' an element
 var toggleAndSubmit = function(element, css_classes){
   $(".static.selected").each(function(i, el){
-    $(el).removeClass("selected");
-  })
-  element.addClass("selected");
+    if($(el).attr("id") != element.attr("id")) {$(el).removeClass("selected")}
+  });
+  element.toggleClass("selected");
+  // submit some form...
+  if(element.hasClass("selected") && getSelectedTranslationElements().length > 0){
+    
+  };  
 };
 
+// switches from pure translation to an interaction suitable for providing OM user input
 var toogleOntologyMatchingMode = function(btn){
-  if(btn.hasClass("btn-danger")){
-    $.jGrowl("Select one of the unmatched input nodes and choose its equivalent from the input!");
-    btn.removeClass("btn-danger");
-    btn.addClass("btn-warning");
-    btn.text("Normal Mode")    
-  } else {
-    btn.addClass("btn-danger");
-    btn.removeClass("btn-warning");
-    btn.text("OM Mode");        
-  }
-  $("#new_node_button").toggle();
-}
+  var switch_on = btn.hasClass("btn-danger");
+  toggleOmControls(switch_on, btn);
+  toggleOutputSelection(switch_on);
+};
 
+// either switches on or disables clickable target elements
+var toggleOutputSelection = function(switch_on){
+  $(".node, .relation, .attribute_constraint").not(".static").each(function(i, el){
+    if(switch_on){
+      $(el).on("click", function(){$(this).toggleClass("selected")});
+    } else {
+      $(el).removeClass("selected");
+      $(el).unbind("click");
+    }
+  });
+};
+
+// updates the controls by changing the button and disabling the 'new node' button
+var toggleOmControls = function(switch_on, btn){
+  if(switch_on){
+    btn.text("Translation Mode")
+    $.jGrowl("Select Input and Output Elements and store the correspondence when done.")
+  } else {
+    btn.text("OM Mode");
+  }
+  btn.toggleClass("btn-danger");
+  btn.toggleClass("btn-warning");
+  $("#new_node_button").toggle();
+  $("#save_correspondence_button").toggle();
+  $("#save_pattern_button").toggle();  
+};
 
 var loadTranslationPattern = function(){
   $(".node").not(".immutable_node").each(function(index,node_div){

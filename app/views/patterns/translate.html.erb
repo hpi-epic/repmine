@@ -13,19 +13,18 @@
   <%= javascript_include_tag "pattern_translator.js" %>
 <% end %>
 
-<div id="feedback_form"></div>
-
 <div class="translation_controls" style="left: <%= @offset %>px" />
   <%= form_for(@target_pattern) do |f| %><% end %>  
   <span>Translation to: <strong><%= link_to(@ontology.short_name, @ontology) %></strong></span>&nbsp;|&nbsp;
-  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success" %>
-  <%= link_to 'New Node', "#", :class => "btn", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>
+  <%= link_to 'New Node', "#", :class => "btn", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>  
+  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success", :id => "save_pattern_button" %>
+  <%= link_to 'Store Correspondence', "#", :class => "btn btn-info hide", :onclick => "saveCorrespondence();", :id => "save_correspondence_button" %>    
   <%= link_to 'OM Mode', "#", :class => "btn btn-danger", :onclick => "toogleOntologyMatchingMode($(this));" %>
 </div>
 
 <div id="drawing_canvas" class="canvas">
   <% @source_pattern.nodes.each do |node| %>
-    <%= render :partial => "nodes/show_immutable", :locals => {:node => node, :pattern => @source_pattern}%>
+    <%= render :partial => "nodes/static", :locals => {:node => node, :pattern => @source_pattern}%>
   <% end %>
   
   <% @target_pattern.nodes.each do |node| %>
