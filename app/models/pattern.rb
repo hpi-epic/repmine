@@ -2,7 +2,7 @@ class Pattern < ActiveRecord::Base
   
   include RdfSerialization
   
-  attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :repository_name, :tag_list
+  attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :tag_list
   attr_accessor :ag_connection
   
   acts_as_taggable_on :tags
@@ -11,20 +11,15 @@ class Pattern < ActiveRecord::Base
 
   has_and_belongs_to_many :ontologies
   has_and_belongs_to_many :swe_patterns
-  has_many :nodes, :dependent => :destroy
+  has_many :pattern_elements, :dependent => :destroy
 
   # hooks
-  before_create :create_repository_name!
   before_destroy :delete_repository!
 
   # validations
   validates :name, :presence => true
   validates :description, :presence => true  
   validates :ontologies, :length => {:minimum => 1, :too_short => "requires at least one selection"}
-  
-  def root_node
-    return nodes.where(:root_node => true).first
-  end
   
   def type_hierarchy()
     return ag_connection.type_hierarchy()
@@ -36,6 +31,15 @@ class Pattern < ActiveRecord::Base
   
   def possible_attributes_for(node_class)
     return ag_connection.attributes_for(node_class)
+  end
+  
+  def nodes
+    pattern_elements.where(:type => "Node")
+  end
+  
+  def create_node!
+    node = self.nodes.create!
+    return node.becomes(Node)
   end
     
   def initialize_repository!
@@ -63,12 +67,8 @@ class Pattern < ActiveRecord::Base
     target_ontology.load_to_repository!(self.repository_name)
   end
   
-  def create_repository_name!
-    self.repository_name = self.name.strip
-    self.repository_name.gsub!("/", "_")
-    self.repository_name.gsub!(" ", "_")
-    self.repository_name.gsub!("#", "_")
-    self.repository_name += "_" + SecureRandom.urlsafe_base64
+  def repository_name
+    return "pattern_#{self.id}"
   end
   
   def comprehensive_ontology
@@ -95,7 +95,7 @@ class Pattern < ActiveRecord::Base
   
   def unmatched_concepts(ontology)
     matched = match_concepts(ontology)
-    return concepts_used.select{|concept| matched.find{|match| match[:entity] == concept}.nil?  }
+    return concepts_used.select{|concept| matched.find{|match| match[:entity] == concept}.nil?}
   end
   
   def match_concepts(ontology)

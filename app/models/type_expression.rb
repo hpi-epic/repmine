@@ -1,6 +1,6 @@
 class TypeExpression < ActiveRecord::Base
-  attr_accessible :operator, :rdf_type, :node
-  belongs_to :node
+  attr_accessible :operator, :rdf_type, :pattern_element
+  belongs_to :pattern_element
   has_ancestry
   
   def resource
@@ -42,7 +42,7 @@ class TypeExpression < ActiveRecord::Base
   end
   
   def reset!
-    pattern = node.nil? ? root.node.pattern : node.pattern
+    pattern = pattern_element.nil? ? root.pattern_element.pattern : pattern_element.pattern
     if self.created_at > pattern.updated_at
       self.destroy
     else

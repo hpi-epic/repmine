@@ -40,9 +40,9 @@ RSpec.describe Pattern, :type => :model do
     @pattern.update_attribute(:updated_at,Time.now)
     @pattern.nodes.first.rdf_type = "http://example2.org"
     @pattern.nodes.first.save
-    @pattern.nodes.first.attribute_constraints.first.attribute_name = "http://example2.org"
+    @pattern.nodes.first.attribute_constraints.first.rdf_type = "http://example2.org"
     @pattern.nodes.first.attribute_constraints.first.save
-    @pattern.nodes.first.source_relation_constraints.first.relation_type = "http://example2.org"
+    @pattern.nodes.first.source_relation_constraints.first.rdf_type = "http://example2.org"
     @pattern.nodes.first.source_relation_constraints.first.save
     
     nodes_before = Node.count
@@ -54,21 +54,25 @@ RSpec.describe Pattern, :type => :model do
     assert_equal ac_before, AttributeConstraint.count
     assert_equal rc_before, RelationConstraint.count
     
-    assert_equal @pattern.nodes.first.attribute_constraints.first.attribute_name, "http://example2.org"
-    assert_equal @pattern.nodes.first.source_relation_constraints.first.relation_type, "http://example2.org"
+    assert_equal @pattern.nodes.first.attribute_constraints.first.rdf_type, "http://example2.org"
+    assert_equal @pattern.nodes.first.source_relation_constraints.first.rdf_type, "http://example2.org"
   end
   
   it "should find recent changes properly" do 
     @pattern = FactoryGirl.create(:pattern)
     @pattern.update_attribute(:updated_at,Time.now)    
     @new_node = @pattern.nodes.create()
-    assert_equal @pattern.recent_changes[:nodes].include?(@new_node), true
-    assert_equal @pattern.recent_changes[:nodes].size, 1
-    @pattern.update_attribute(:updated_at,Time.now)    
+    
+    assert_equal @pattern.recent_changes[:nodes].size, 1    
+    # stupid id comparison, since rails returns a PatternElement and not a node upon pattern.nodes.create
+    # once you load that thing from the DB, however, you get a Node ...
+    assert_equal @new_node.id, @pattern.recent_changes[:nodes].first.id
+    @pattern.update_attribute(:updated_at,Time.now)
     assert_equal @pattern.recent_changes[:nodes].size, 0
     @new_node.update_attribute(:updated_at,Time.now)
-    assert_equal @pattern.recent_changes[:nodes].include?(@new_node), true
-    assert_equal @pattern.recent_changes[:nodes].size, 1
+    assert_equal @pattern.recent_changes[:nodes].size, 1    
+    assert_equal @new_node.id, @pattern.recent_changes[:nodes].first.id    
+
     
     @pattern.nodes.first.attribute_constraints.first.update_attribute(:updated_at, Time.now)    
     assert_equal @pattern.recent_changes[:attributes].include?(@pattern.nodes.first.attribute_constraints.first), true

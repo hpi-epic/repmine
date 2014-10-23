@@ -10,7 +10,7 @@ module AttributeConstraintsHelper
   end
   
   def fixed_select(ac)
-    options_for_select([[ac.attribute_name.split("/").last.split("#").last, ac.attribute_name]], ac.attribute_name)
+    options_for_select([[ac.short_rdf_type, ac.rdf_type]], ac.rdf_type)
   end
   
 end

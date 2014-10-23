@@ -1,6 +1,6 @@
-class AttributeConstraint < ActiveRecord::Base
-  attr_accessible :attribute_name, :value, :operator, :node
-  belongs_to :node
+class AttributeConstraint < PatternElement
+  attr_accessible :value, :operator, :node
+  belongs_to :node, :class_name => "PatternElement"
   
   include RdfSerialization
   
@@ -19,7 +19,7 @@ class AttributeConstraint < ActiveRecord::Base
   end
   
   def used_concepts
-    return [attribute_name]
+    return [rdf_type]
   end
   
   def rdf_types

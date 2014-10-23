@@ -16,6 +16,16 @@ FactoryGirl.define do
     rdf_type "http://example.org/MyType3"
   end  
   
+  factory :type_expression_rel1, :class => TypeExpression do
+    operator nil
+    rdf_type "http://example.org/rel1"
+  end
+  
+  factory :type_expression_rel2, :class => TypeExpression do
+    operator nil
+    rdf_type "http://example.org/rel2"
+  end  
+  
   factory :type_expression_sup, :class => TypeExpression do
     operator OwlClass::SET_OPS[:sup]
     rdf_type nil

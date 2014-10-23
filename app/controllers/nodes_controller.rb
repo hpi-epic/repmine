@@ -9,7 +9,7 @@ class NodesController < ApplicationController
   end
   
   def create
-    @node = @pattern.nodes.create!
+    @node = @pattern.create_node!
     if params[:element_type] == "Node"
       @node.equivalent_to = Node.find(params[:element_id])
       @node.save

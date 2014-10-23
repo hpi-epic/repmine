@@ -1,10 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe MongoDbRepository, :type => :model do  
+RSpec.describe MongoDbRepository, :type => :model do
+  
   before(:each) do
     @mdb_repo = MongoDbRepository.create({:db_name => "sample_db", :name => "sample_db"})
     # make sure that we don't require a mongodb connection
     @mdb_repo.stub("db"){double("mongodb", "collection_names" => ["collection1", "collection2", "fancy_collection"])}
+    Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)    
   end
   
   def schema_info

@@ -10,6 +10,7 @@ class Ontology < ActiveRecord::Base
   
   has_and_belongs_to_many :patterns
   before_validation :set_ontology_url ,:set_short_name_if_empty
+  before_destroy :delete_repository!
   
   def set_short_name_if_empty
     self.short_name = url.split("/").last.split("\.").first if short_name.blank?
@@ -28,6 +29,10 @@ class Ontology < ActiveRecord::Base
     @ag_connection ||= AgraphConnection.new(repo_name || repository_name)
   end
   
+  def delete_repository!
+    ag_connection.delete!
+  end
+  
   def load_to_dedicated_repository!
     ag_connection(repository_name).clear!
     load_to_repository!(repository_name)
@@ -38,11 +43,7 @@ class Ontology < ActiveRecord::Base
   end
   
   def repository_name
-    repository_name = get_url.strip
-    repository_name.gsub!("/", "_")
-    repository_name.gsub!(" ", "_")
-    repository_name.gsub!("#", "_")
-    return repository_name
+    return id.nil? ? self.short_name : "ontology_#{self.id}"
   end
   
   def imports()

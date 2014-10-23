@@ -11,16 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141016134423) do
-
-  create_table "attribute_constraints", :force => true do |t|
-    t.integer  "node_id"
-    t.string   "attribute_name"
-    t.string   "value"
-    t.string   "operator"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-  end
+ActiveRecord::Schema.define(:version => 20141022161434) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -38,18 +29,6 @@ ActiveRecord::Schema.define(:version => 20141016134423) do
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
-  create_table "nodes", :force => true do |t|
-    t.integer  "pattern_id"
-    t.boolean  "root_node"
-    t.integer  "x",             :default => 0
-    t.integer  "y",             :default => 0
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
-    t.integer  "equivalent_to"
-  end
-
-  add_index "nodes", ["equivalent_to"], :name => "index_nodes_on_equivalent_to"
-
   create_table "ontologies", :force => true do |t|
     t.string   "url"
     t.text     "description"
@@ -65,6 +44,25 @@ ActiveRecord::Schema.define(:version => 20141016134423) do
   create_table "ontologies_patterns", :id => false, :force => true do |t|
     t.integer "ontology_id"
     t.integer "pattern_id"
+  end
+
+  create_table "pattern_elements", :force => true do |t|
+    t.string   "type"
+    t.integer  "type_expression_id"
+    t.integer  "pattern_id"
+    t.integer  "node_id"
+    t.string   "value"
+    t.string   "operator"
+    t.string   "min_cardinality"
+    t.string   "max_cardinality"
+    t.string   "min_path_length"
+    t.string   "max_path_length"
+    t.integer  "x",                  :default => 0
+    t.integer  "y",                  :default => 0
+    t.integer  "source_id"
+    t.integer  "target_id"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
   end
 
   create_table "patterns", :force => true do |t|
@@ -86,23 +84,6 @@ ActiveRecord::Schema.define(:version => 20141016134423) do
   create_table "patterns_swe_patterns", :id => false, :force => true do |t|
     t.integer "pattern_id"
     t.integer "swe_pattern_id"
-  end
-
-  create_table "relation_constraints", :force => true do |t|
-    t.integer  "source_id"
-    t.integer  "target_id"
-    t.string   "min_cardinality"
-    t.string   "max_cardinality"
-    t.string   "min_path_length"
-    t.string   "max_path_length"
-    t.string   "relation_type"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
-  end
-
-  create_table "relations", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "repositories", :force => true do |t|
@@ -156,9 +137,9 @@ ActiveRecord::Schema.define(:version => 20141016134423) do
   create_table "type_expressions", :force => true do |t|
     t.string   "operator"
     t.string   "rdf_type"
-    t.integer  "node_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "pattern_element_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
     t.string   "ancestry"
   end
 

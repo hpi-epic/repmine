@@ -3,7 +3,7 @@ class CreateTypeExpressions < ActiveRecord::Migration
     create_table :type_expressions do |t|
       t.string :operator
       t.string :rdf_type
-      t.references :node
+      t.references :pattern_element
       t.timestamps
     end
   end

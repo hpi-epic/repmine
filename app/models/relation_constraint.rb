@@ -1,7 +1,7 @@
-class RelationConstraint < ActiveRecord::Base
+class RelationConstraint < PatternElement
   belongs_to :source, :class_name => "Node"
   belongs_to :target, :class_name => "Node"
-  attr_accessible :relation_type, :min_cardinality, :max_cardinality, :min_path_length, :max_path_length, :source_id, :target_id
+  attr_accessible :min_cardinality, :max_cardinality, :min_path_length, :max_path_length, :source_id, :target_id
   
   include RdfSerialization
   
@@ -17,10 +17,6 @@ class RelationConstraint < ActiveRecord::Base
   
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.RelationConstraint]
-  end
-  
-  def used_concepts
-    return [relation_type]
   end
   
   def possible_relations(source_type = nil, target_type = nil)

@@ -1,46 +1,18 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-class Node < ActiveRecord::Base
+class Node < PatternElement
   attr_accessible :x, :y
-  has_one :type_expression, :dependent => :destroy
-
-  belongs_to :pattern
   has_many :source_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "source_id", :dependent => :destroy
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy  
   has_many :attribute_constraints, :dependent => :destroy
-  
-  after_create :build_type_expression
   
   include RdfSerialization  
     
   def query_variable()
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
-  
-  def build_type_expression()
-    self.type_expression ||= TypeExpression.create(:node => self, :rdf_type => nil)
-    type_expression.children.create(:rdf_type => "")
-  end
-  
-  def rdf_type
-    return type_expression.nil? ? "" : type_expression.fancy_string
-  end
-  
-  # if only the string is set, everything should work as normal
-  def rdf_type=(str)
-    if type_expression.fancy_string != str
-      if type_expression.children.size == 1 && !type_expression.children.first.operator?
-        type_expression.children.first.update_attributes(:rdf_type => str)
-      else
-        type_expression.destroy
-        type_expression = TypeExpression.create(:node => self, :rdf_type => nil)
-        type_expression.children.create(:rdf_type => str)
-        type_expression.save
-      end
-    end
-  end
-  
+    
   def reset!
     # remove the newly created ones
     source_relation_constraints.find(:all, :conditions => ["created_at > ?", self.pattern.updated_at]).each{|rc| rc.destroy}
