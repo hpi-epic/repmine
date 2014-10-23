@@ -13,15 +13,17 @@ class OntologyMatcher
   
   def match!()
     prepare_matching!  
-    unless already_matched?    
-      cmd = "java -jar aml.jar -m -s #{source_ont.local_file_path} -t #{target_ont.local_file_path} -o #{alignment_path}"
-      errors = nil
-      Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
-        errors = stderr.read
-        raise MatchingError, errors unless errors.blank?
-      end
-    end
+    call_matcher! unless already_matched?
     build_alignment_graph!    
+  end
+  
+  def call_matcher!
+    cmd = "java -jar aml.jar -m -s #{source_ont.local_file_path} -t #{target_ont.local_file_path} -o #{alignment_path}"
+    errors = nil
+    Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml")) do |stdin, stdout, stderr, wait_thr|
+      errors = stderr.read
+      raise MatchingError, errors unless errors.blank?
+    end
   end
   
   def build_alignment_graph!()
@@ -55,7 +57,12 @@ class OntologyMatcher
   end
   
   def alignment_path
-    Rails.root.join("public", "ontologies", "alignments",  "#{source_ont.id}_#{target_ont.id}.rdf")
+    filename = unless @source_ont.new_record?
+      "ont_#{source_ont.id}_ont_#{target_ont.id}.rdf"
+    else 
+      "pattern_#{pattern.id}_ont_#{target_ont.id}.rdf"
+    end
+    return Rails.root.join("public", "ontologies", "alignments",  filename).to_s
   end
   
 end
