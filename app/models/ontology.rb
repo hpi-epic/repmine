@@ -9,14 +9,14 @@ class Ontology < ActiveRecord::Base
   validates :url, :uniqueness => true
   
   has_and_belongs_to_many :patterns
-  before_validation :set_ontology_url ,:set_short_name_if_empty
+  before_validation :set_ontology_url! ,:set_short_name_if_empty!
   before_destroy :delete_repository!
   
-  def set_short_name_if_empty
+  def set_short_name_if_empty!
     self.short_name = url.split("/").last.split("\.").first if short_name.blank?
   end
   
-  def set_ontology_url
+  def set_ontology_url!
     self.url = ont_url if url.blank?
   end
   

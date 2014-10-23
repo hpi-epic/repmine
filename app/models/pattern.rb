@@ -81,7 +81,7 @@ class Pattern < ActiveRecord::Base
     ontologies.each{|o| g.load(o.url)}
     name = "pattern_tmp_#{self.id}"
     ont = ExtractedOntology.new(:short_name => name)
-    ont.set_ontology_url
+    ont.set_ontology_url!
     ont.rdf_graph = g
     return ont
   end
