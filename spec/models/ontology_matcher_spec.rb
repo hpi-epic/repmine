@@ -4,7 +4,11 @@ RSpec.describe OntologyMatcher, :type => :model do
   
   def alignment_test_file
     Rails.root.join("spec","26_17.rdf").to_s
-  end  
+  end
+  
+  def aml_test_file
+    Rails.root.join("spec","test_me.rdf").to_s    
+  end
   
   before(:each) do
     Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)
@@ -55,5 +59,15 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal "http://ekaw#Paper_Author", subs.first[:entity]
     subs = @om.get_substitutes_for("http://crs_dr#author_not_present_in_this_ontology")
     assert_empty subs
+  end
+  
+  it "should properly run for two of the conference ontologies" do
+    o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")
+    o2 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl", :short_name => "ekaw")
+    @pattern.ontologies = [o1]
+    @om = OntologyMatcher.new(@pattern, o2)
+    File.delete(aml_test_file) if File.exists?(aml_test_file)
+    @om.stub(:alignment_path => aml_test_file)    
+    @om.match!
   end
 end

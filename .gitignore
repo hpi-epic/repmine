@@ -31,3 +31,5 @@ externals/aml/store/*log*
 /coverage
 .DS_Store
 /externals/aml/store/error.log
+
+spec/test_me.rdf
