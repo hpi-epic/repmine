@@ -1,6 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe Pattern, :type => :model do  
+RSpec.describe Pattern, :type => :model do
+  
+  before(:each) do
+    Pattern.any_instance.stub(:initialize_repository! => true)
+  end
+  
   it "should only remove unsaved elements upon 'reset'" do
     @pattern = FactoryGirl.create(:pattern)
     @pattern.update_attribute(:updated_at,Time.now)

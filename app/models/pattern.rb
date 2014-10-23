@@ -14,6 +14,7 @@ class Pattern < ActiveRecord::Base
   has_many :pattern_elements, :dependent => :destroy
 
   # hooks
+  after_create :initialize_repository!
   before_destroy :delete_repository!
 
   # validations

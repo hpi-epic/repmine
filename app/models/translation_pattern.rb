@@ -21,10 +21,6 @@ class TranslationPattern < Pattern
   def self.model_name
     return Pattern.model_name
   end
-  
-  def create_repository_name!
-    self.repository_name = ontologies.first.repository_name
-  end
 
   def infer_correspondences(selected_elements)
     input_graph = get_subgraph(selected_elements)

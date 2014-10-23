@@ -4,6 +4,7 @@ RSpec.describe CorrespondenceExtractor, :type => :model do
   
   before(:each) do
     @ce = CorrespondenceExtractor.new
+    Pattern.any_instance.stub(:initialize_repository! => true)
   end
   
   it "should figure out a simple pattern" do 

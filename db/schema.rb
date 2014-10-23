@@ -68,7 +68,6 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
   create_table "patterns", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.string   "repository_name"
     t.text     "original_query"
     t.integer  "query_language_cd"
     t.datetime "created_at",         :null => false
