@@ -6,7 +6,6 @@ class ApplicationController < ActionController::Base
   def flash_to_headers
     # only run this in case it's an Ajax request.
     return unless request.xhr?
-    puts flash_message, flash_type
     response.headers['X-Message'] = flash_message unless flash_message.nil?
     response.headers["X-Message-Type"] = flash_type unless flash_type.nil?
     flash.discard # don't want the flash to appear when you reload page
