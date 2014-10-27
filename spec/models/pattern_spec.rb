@@ -66,19 +66,16 @@ RSpec.describe Pattern, :type => :model do
   it "should find recent changes properly" do 
     @pattern = FactoryGirl.create(:pattern)
     @pattern.update_attribute(:updated_at,Time.now)    
-    @new_node = @pattern.nodes.create()
+    @new_node = @pattern.create_node!
     
     assert_equal @pattern.recent_changes[:nodes].size, 1    
-    # stupid id comparison, since rails returns a PatternElement and not a node upon pattern.nodes.create
-    # once you load that thing from the DB, however, you get a Node ...
-    assert_equal @new_node.id, @pattern.recent_changes[:nodes].first.id
+    assert_equal @new_node, @pattern.recent_changes[:nodes].first
     @pattern.update_attribute(:updated_at,Time.now)
     assert_equal @pattern.recent_changes[:nodes].size, 0
     @new_node.update_attribute(:updated_at,Time.now)
     assert_equal @pattern.recent_changes[:nodes].size, 1    
     assert_equal @new_node.id, @pattern.recent_changes[:nodes].first.id    
 
-    
     @pattern.nodes.first.attribute_constraints.first.update_attribute(:updated_at, Time.now)    
     assert_equal @pattern.recent_changes[:attributes].include?(@pattern.nodes.first.attribute_constraints.first), true
     assert_equal @pattern.recent_changes[:attributes].size, 1 

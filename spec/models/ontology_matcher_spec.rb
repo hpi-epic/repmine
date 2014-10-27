@@ -61,6 +61,26 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_empty subs
   end
   
+  it "should find substitutes within the rdf files and ignore slight URL deviations" do
+    @om.stub(:alignment_path => alignment_test_file)
+    @om.build_alignment_graph!
+    subs = @om.get_substitutes_for("http://crs_dr/#author")
+    assert_equal 1, subs.size
+    assert_equal "http://ekaw#Paper_Author", subs.first[:entity]
+    subs = @om.get_substitutes_for("http://crs_dr/#author_not_present_in_this_ontology")
+    assert_empty subs
+  end
+  
+  it "should find substitutes if you omit the ontology namespace" do
+    @om.stub(:alignment_path => alignment_test_file)
+    @om.build_alignment_graph!
+    subs = @om.get_substitutes_for("#author")
+    assert_equal 1, subs.size
+    assert_equal "http://ekaw#Paper_Author", subs.first[:entity]
+    subs = @om.get_substitutes_for("http://crs_dr/#author_not_present_in_this_ontology")
+    assert_empty subs    
+  end
+  
   it "should properly run for two of the conference ontologies" do
     o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")
     o2 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl", :short_name => "ekaw")

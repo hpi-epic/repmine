@@ -5,6 +5,8 @@ class PatternElement < ActiveRecord::Base
 
   has_one :type_expression, :dependent => :destroy
   belongs_to :pattern
+  #belongs_to :equivalent_input, :class_name => "PatternElement"
+  #has_many :equivalent_elements,
   after_create :build_type_expression
   
   def build_type_expression()

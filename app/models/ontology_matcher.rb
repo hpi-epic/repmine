@@ -36,8 +36,9 @@ class OntologyMatcher
   
   # this is where the magic will happen
   def get_substitutes_for(element)
+    fixed_element = RDF::Resource.new(fix_ontology_namespaces(element))
     q = RDF::Query.new{
-      pattern([:alignment, Vocabularies::Alignment.entity1, RDF::Resource.new(element)])
+      pattern([:alignment, Vocabularies::Alignment.entity1, fixed_element])
       pattern([:alignment, Vocabularies::Alignment.entity2, :target])
       pattern([:alignment, Vocabularies::Alignment.relation, :relation])
       pattern([:alignment, Vocabularies::Alignment.measure, :measure])
@@ -48,6 +49,23 @@ class OntologyMatcher
       subs << {:entity => res[:target].to_s, :relation => res[:relation].to_s, :measure => res[:measure].to_s}
     end
     return subs
+  end
+  
+  def fix_ontology_namespaces(element)
+    q = RDF::Query.new {pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])}
+    @alignment_graph.query(q) do |res|
+      onto1 = res[:onto1].to_s
+      # fixes the extra / that is inserted somewhere between rdf.load and ag_connection.load... 
+      if !onto1.ends_with?("/") && element.starts_with?(onto1 + "/")
+        return element.gsub(onto1 + "/", onto1)
+      end
+      # adds the onto namespace in case we query only with the element label
+      unless element.starts_with?(onto1)
+        return onto1 + element
+      end
+    end
+    # fallback ... just return the element
+    return element
   end
   
   def prepare_matching!
