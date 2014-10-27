@@ -86,7 +86,7 @@ class Pattern < ActiveRecord::Base
   end
   
   def match_concepts(ontology)
-    om = OntologyMatcher.new(self, ontology)
+    om = OntologyMatcher.new(self, [ontology])
     om.match!
     return concepts_used.collect{|concept| om.get_substitutes_for(concept)}.flatten
   end
