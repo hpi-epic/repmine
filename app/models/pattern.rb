@@ -72,20 +72,6 @@ class Pattern < ActiveRecord::Base
     return "pattern_#{self.id}"
   end
   
-  def comprehensive_ontology
-    return ontologies.size == 1 ? ontologies.first : create_comprehensive_ontology
-  end
-  
-  def create_comprehensive_ontology
-    g = RDF::Graph.new()
-    ontologies.each{|o| g.load(o.url)}
-    name = "pattern_tmp_#{self.id}"
-    ont = ExtractedOntology.new(:short_name => name)
-    ont.set_ontology_url!
-    ont.rdf_graph = g
-    return ont
-  end
-  
   def concept_count
     concepts_used.size
   end
@@ -96,7 +82,7 @@ class Pattern < ActiveRecord::Base
   
   def unmatched_concepts(ontology)
     matched = match_concepts(ontology)
-    return concepts_used.select{|concept| matched.find{|match| match[:entity] == concept}.nil?}
+    return concepts_used.select{|concept| matched.find{|match| match[:entity1] == concept}.nil?}
   end
   
   def match_concepts(ontology)
