@@ -5,6 +5,7 @@ class CreatePatternElements < ActiveRecord::Migration
       t.string :type
       t.references :type_expression
       t.references :pattern
+      t.references :equivalent
       # attribute constraint stuff
       t.references :node
       t.string :value

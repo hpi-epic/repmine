@@ -57,15 +57,18 @@ class OntologyMatcher
   # this is where the magic happens. We search the alignment graph for matches regarding the provided element
   def get_substitutes_for(element)
     q = RDF::Query.new{
-      pattern([:alignment, Vocabularies::Alignment.entity1, RDF::Resource.new(element)])
-      pattern([:alignment, Vocabularies::Alignment.entity2, :target])
-      pattern([:alignment, Vocabularies::Alignment.relation, :relation])
-      pattern([:alignment, Vocabularies::Alignment.measure, :measure])
+      pattern([:alignment, Vocabularies::Alignment.map, :cell])
+      pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])
+      pattern([:alignment, Vocabularies::Alignment.onto2, :onto2])
+      pattern([:cell, Vocabularies::Alignment.entity1, RDF::Resource.new(element)])
+      pattern([:cell, Vocabularies::Alignment.entity2, :target])
+      pattern([:cell, Vocabularies::Alignment.relation, :relation])
+      pattern([:cell, Vocabularies::Alignment.measure, :measure])
     }
     
     subs = []
     @alignment_graph.query(q) do |res|
-      subs << {:entity2 => res[:target].to_s, :relation => res[:relation].to_s, :measure => res[:measure].to_s, :entity1 => element}
+      subs << OntologyCorrespondence.new(element, res[:target].to_s, res[:measure].to_s, res[:relation].to_s, res[:onto1].to_s, res[:onto2].to_s)
     end
 
     return subs

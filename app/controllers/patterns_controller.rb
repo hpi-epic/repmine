@@ -19,7 +19,7 @@ class PatternsController < ApplicationController
     @offset = @source_pattern.nodes.collect{|n| n.attribute_constraints.empty? ? n.x : n.x + 280}.max
     
     @ontology = Ontology.find(params[:ontology_id])
-    @target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @ontology)
+    @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @ontology)
     @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.type_hierarchy    
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)    
   end

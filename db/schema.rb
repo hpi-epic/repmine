@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
     t.string   "type"
     t.integer  "type_expression_id"
     t.integer  "pattern_id"
+    t.integer  "equivalent_id"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"

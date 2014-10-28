@@ -5,9 +5,12 @@ class TranslationPattern < Pattern
   belongs_to :pattern
   belongs_to :target_ontology, :class_name => "Ontology"
   
-  def self.for_pattern_and_repository(pattern, ontology)
+  after_create :prepare!
+  
+  def self.for_pattern_and_ontology(pattern, ontology)
     params = {:name => pattern_name(pattern, ontology), :description => description, :ontology_ids => [ontology.id]}
-    return self.where(:pattern_id => pattern.id, :target_ontology_id => ontology.id).first_or_create(params)
+    translation_pattern = self.where(:pattern_id => pattern.id, :target_ontology_id => ontology.id).first_or_create(params)
+    return translation_pattern
   end
   
   def self.pattern_name(pattern, ontology)
@@ -20,6 +23,20 @@ class TranslationPattern < Pattern
 
   def self.model_name
     return Pattern.model_name
+  end
+  
+  # this loads nodes and relations for concepts we already know are equivalent
+  def prepare!
+    correspondences = pattern.match_concepts(ontologies.first)
+    pattern.nodes.each do |node|
+      corr = correspondences.find{|c| c.entity1 == node.rdf_type}
+      unless corr.nil?
+        new_node = create_node!
+        new_node.rdf_type = corr.entity2
+        new_node.equivalent = node
+        new_node.save
+      end
+    end
   end
 
   def infer_correspondences(selected_elements)
