@@ -16,12 +16,12 @@ class PatternsController < ApplicationController
   def translate
     @source_pattern = Pattern.find(params[:pattern_id])
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)    
-    @offset = @source_pattern.nodes.collect{|n| n.attribute_constraints.empty? ? n.x : n.x + 280}.max
+    @offset = @source_pattern.node_offset
     
     @ontology = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @ontology)
-    @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.type_hierarchy    
-    @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)    
+    @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.type_hierarchy
+    @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
   end
     
   def create

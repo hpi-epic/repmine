@@ -28,12 +28,15 @@ class TranslationPattern < Pattern
   # this loads nodes and relations for concepts we already know are equivalent
   def prepare!
     correspondences = pattern.match_concepts(ontologies.first)
+    offset = pattern.node_offset + 120
     pattern.nodes.each do |node|
       corr = correspondences.find{|c| c.entity1 == node.rdf_type}
       unless corr.nil?
         new_node = create_node!
         new_node.rdf_type = corr.entity2
         new_node.equivalent = node
+        new_node.x = node.x + offset
+        new_node.y = node.y
         new_node.save
       end
     end

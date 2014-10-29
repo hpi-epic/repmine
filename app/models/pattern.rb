@@ -72,6 +72,10 @@ class Pattern < ActiveRecord::Base
     return "pattern_#{self.id}"
   end
   
+  def node_offset
+    return nodes.collect{|n| n.attribute_constraints.empty? ? n.x : n.x + 280}.max
+  end
+  
   def concept_count
     concepts_used.size
   end
