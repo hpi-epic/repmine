@@ -3,7 +3,6 @@ class CreatePatternElements < ActiveRecord::Migration
     create_table :pattern_elements do |t|
       # general properties and foreign keys
       t.string :type
-      t.references :type_expression
       t.references :pattern
       t.references :equivalent
       # attribute constraint stuff

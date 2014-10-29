@@ -25,9 +25,6 @@ var newTranslationNode = function(url){
     node.appendTo($("#drawing_canvas"));
     addNodeToGraph(node);
     showGrowlNotification(jqXHR);
-    // this will select the newly created node and, thus, allow users for 10 seconds to click on the target one
-    node.addClass("selected");
-    setTimeout(function(){node.removeClass("selected")}, 10000);
   });
 };
 
@@ -45,7 +42,7 @@ var removeExcessEndpoints = function(){
 // adds an onclick handler to nodes, relations, and attributes
 var addOnclickHandler = function(){
   $(".immutable_node, .relation.static, .attribute_constraint.static").each(function(i, node){
-    $(node).on("click", function(){toggleAndSubmit($(this))})
+    $(node).on("click", function(){$(this).toggleClass("selected")})
   });
 };
 
@@ -64,19 +61,6 @@ var getSelectedTranslationElements = function(){
       element_type: $(this).data("class")
     }
   });
-};
-
-// removes the selection from all selected elements and toggles the one that was just clicked
-// this also ensures that you can 'unselect' an element
-var toggleAndSubmit = function(element, css_classes){
-  $(".static.selected").each(function(i, el){
-    if($(el).attr("id") != element.attr("id")) {$(el).removeClass("selected")}
-  });
-  element.toggleClass("selected");
-  // submit some form...
-  if(element.hasClass("selected") && getSelectedTranslationElements().length > 0){
-    
-  };  
 };
 
 // switches from pure translation to an interaction suitable for providing OM user input
