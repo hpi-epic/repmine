@@ -19,6 +19,7 @@ gem "rdf"
 gem "rdf-raptor"
 gem "rdf-turtle"
 gem "rdf-rdfxml"
+gem "sparql-client"
 
 # rule engine for translations
 gem 'wongi-engine'

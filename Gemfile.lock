@@ -336,6 +336,7 @@ DEPENDENCIES
   simple_enum (~> 1.6)
   simple_form
   simplecov
+  sparql-client
   therubyracer
   twitter-bootstrap-rails
   uglifier (>= 1.0.3)
