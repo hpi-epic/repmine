@@ -103,8 +103,9 @@ class PatternsController < ApplicationController
     @query = "SELECT * FROM data"
   end
   
-  def feedback_channel
+  def save_correspondence
     flash[:notice] = "Thanks for your feedback!"
+    render :json => {}
   end
   
   private 

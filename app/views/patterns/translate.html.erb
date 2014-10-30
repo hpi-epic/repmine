@@ -1,7 +1,7 @@
 <%= javascript_tag do %>
   var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@target_pattern) %>';
   var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@target_pattern) %>';
-    
+
   var connect_these_static_nodes = <%= @source_relations.to_json.html_safe %>;
   var load_static_attribute_constraints = <%= @source_attributes.to_json.html_safe %>
   var connect_these_nodes = <%= @target_relations.to_json.html_safe %>;
@@ -22,6 +22,11 @@
   <%= link_to 'Store Correspondence', "#", :class => "btn btn-info hide", :onclick => "saveCorrespondence();", :id => "save_correspondence_button" %>    
   <%= link_to 'OM Mode', "#", :class => "btn btn-danger", :onclick => "toogleOntologyMatchingMode($(this));" %>
 </div>
+
+<%= form_tag(pattern_save_correspondence_path(@source_pattern, @target_pattern), :id => "save_correspondence_form") do %>
+  <%= hidden_field_tag :source_element_id %>
+  <%= hidden_field_tag "target_element_ids[]" %>
+<% end %>
 
 <div id="drawing_canvas" class="canvas">
   <% @source_pattern.nodes.each do |node| %>

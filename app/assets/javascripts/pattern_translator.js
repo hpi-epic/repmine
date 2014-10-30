@@ -58,19 +58,15 @@ var addOnclickHandler = function(){
 
 // out of the static elements (i.e., the ones on the left), the selected one is retrieved
 var getSelectedSourceElement = function(){
-  return {
-    element_id: $(".static.selected").data("id"),
-    element_type: $(".static.selected").data("class")
-  }
+  return $(".static.selected").data("id");
 };
 
 var getSelectedTranslationElements = function(){
-  return $(".selected").not(".static").map(function(){
-    return {
-      element_id: $(this).data("id"),
-      element_type: $(this).data("class")
-    }
+  values = []
+  $(".selected").not(".static").each(function(i,el){
+    values.push($(el).data("id"));
   });
+  return values;
 };
 
 // switches from pure translation to an interaction suitable for providing OM user input
@@ -142,4 +138,22 @@ var submitTranslationPattern = function(){
       showGrowlNotification(jqXHR);
     }
   });
+};
+
+// submits the correspondence selected by the user...
+var saveCorrespondence = function(){
+  var form = $("#save_correspondence_form");
+  form.find("#source_element_id").val(getSelectedSourceElement());
+  form.find("#target_element_ids_").val(getSelectedTranslationElements());
+  return $.ajax({
+    url : form.attr("action"),
+    type: "POST",
+    data : form.serialize(),
+    success: function(data, textStatus, jqXHR){
+      showGrowlNotification(jqXHR);
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+      showGrowlNotification(jqXHR);
+    }
+  });  
 };
