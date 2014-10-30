@@ -23,8 +23,7 @@ class SparqlQueryCreator < QueryCreator
         patterns << [node_variable(node), rc.rdf_type, node_variable(rc.target)]
       end
       node.attribute_constraints.each do |ac|
-        # TODO: use the operator to determine how to integrate this...
-        patterns << [node_variable(node), ac.rdf_type, ac.value]
+        patterns << pattern_for_attribute_constraint(node, ac) unless ac.value.nil?
       end
     end
     return patterns
@@ -32,6 +31,10 @@ class SparqlQueryCreator < QueryCreator
   
   def node_variable(node)
     return "node_#{node.id}".to_sym
+  end
+  
+  def pattern_for_attribute_constraint(node, ac)
+    return [node_variable(node), ac.rdf_type, ac.value]
   end
   
 end
