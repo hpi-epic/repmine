@@ -1,7 +1,30 @@
 class TypeExpression < ActiveRecord::Base
   attr_accessible :operator, :rdf_type, :pattern_element
   belongs_to :pattern_element
-  has_ancestry
+  has_ancestry()
+  
+  def self.create_new(pe, rdf_type = "", operator = nil)
+    te = self.create!(:pattern_element => pe, :rdf_type => nil, :operator => operator)
+    te.children.create!(:rdf_type => rdf_type)
+    return te
+  end
+  
+  def self.for_rdf_type(pe, rdft)
+    create_new(pe, rdft, nil)
+  end
+  
+  def self.for_operator(pe, operator)
+    create_new(pe, nil, operator)
+  end
+  
+  def self.for_rdf_type_and_operator(pe, rdf_type, operator)
+    create_new(pe, rdf_type, operator)
+  end
+  
+  # this is the 'simple' structure -> an empty first expression with one RDF type child
+  def is_simple?
+    return operator.nil? && children.size == 1 && !children.first.operator?
+  end
   
   def resource
     # TODO: create OWL Union and so on...

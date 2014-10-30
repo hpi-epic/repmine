@@ -1,5 +1,4 @@
 class PatternElement < ActiveRecord::Base
-
   # explicitly allows setting the rdf type of a node
   attr_accessible :rdf_type
 
@@ -9,11 +8,10 @@ class PatternElement < ActiveRecord::Base
   belongs_to :equivalent, :class_name => "PatternElement"
   has_many :equivalents, :class_name => "PatternElement", :foreign_key => "equivalent_id"
   
-  after_create :build_type_expression
+  after_create :build_type_expression!
   
-  def build_type_expression()
-    self.type_expression ||= TypeExpression.create(:pattern_element => self, :rdf_type => nil)
-    type_expression.children.create(:rdf_type => "")
+  def build_type_expression!()
+    TypeExpression.for_rdf_type(self, "")
   end
   
   def rdf_type
@@ -24,16 +22,15 @@ class PatternElement < ActiveRecord::Base
     return type_expression.nil? ? "" : type_expression.fancy_string(true)
   end
   
-  # if only the string is set, everything should work as normal
+  # this method allows overwriting an existing type expression with a SIMPLE rdf type
   def rdf_type=(str)
+    # we only need to overwrite if the strings differ...
     if type_expression.fancy_string != str
-      if type_expression.children.size == 1 && !type_expression.children.first.operator?
+      if type_expression.is_simple?
         type_expression.children.first.update_attributes(:rdf_type => str)
       else
         type_expression.destroy
-        type_expression = TypeExpression.create(:pattern_element => self, :rdf_type => nil)
-        type_expression.children.create(:rdf_type => str)
-        type_expression.save
+        self.type_expression = TypeExpression.for_rdf_type(self, str)
       end
     end
   end

@@ -3,6 +3,14 @@
 FactoryGirl.define do
   factory :type_expression do
     operator nil
+    rdf_type nil
+    after(:create) do |te, evaluator|
+      te.children.create(:rdf_type => "http://example.org/MyType")
+    end
+  end
+  
+  factory :type_expression_plain, :class => TypeExpression do
+    operator nil
     rdf_type "http://example.org/MyType"
   end
   

@@ -24,15 +24,6 @@ RSpec.describe Pattern, :type => :model do
     assert_equal (rc_before - 1), RelationConstraint.count    
   end
   
-  it "should revert unsaved changes for existing elements" do
-    @pattern = FactoryGirl.create(:pattern)
-    @pattern.update_attribute(:updated_at,Time.now)
-    assert_not_equal "http://example2.org", @pattern.nodes.first.rdf_type
-    @pattern.nodes.first.rdf_type = "http://example2.org"
-    @pattern.reset!
-    assert_not_equal "http://example2.org", @pattern.nodes.first.rdf_type
-  end
-  
   it "should not change its repository name after the first save" do
     @pattern = FactoryGirl.create(:pattern)
     res_before = @pattern.repository_name
@@ -46,9 +37,8 @@ RSpec.describe Pattern, :type => :model do
     @pattern.nodes.first.rdf_type = "http://example2.org"
     @pattern.nodes.first.save
     @pattern.nodes.first.attribute_constraints.first.rdf_type = "http://example2.org"
-    @pattern.nodes.first.attribute_constraints.first.save
+    @pattern.nodes.first.attribute_constraints.first.save    
     @pattern.nodes.first.source_relation_constraints.first.rdf_type = "http://example2.org"
-    @pattern.nodes.first.source_relation_constraints.first.save
     
     nodes_before = Node.count
     ac_before = AttributeConstraint.count
@@ -85,12 +75,8 @@ RSpec.describe Pattern, :type => :model do
     @pattern.nodes.first.source_relation_constraints.first.update_attribute(:updated_at, Time.now)
     assert_equal @pattern.recent_changes[:relations].include?(@pattern.nodes.first.source_relation_constraints.first), true
     assert_equal @pattern.recent_changes[:relations].size, 1
-    @pattern.update_attribute(:updated_at,Time.now) 
+    @pattern.update_attribute(:updated_at,Time.now)
     assert_equal @pattern.recent_changes[:relations].size, 0       
-    
-    @pattern.nodes.first.target_relation_constraints.first.update_attribute(:updated_at, Time.now)
-    assert_equal @pattern.recent_changes[:relations].include?(@pattern.nodes.first.target_relation_constraints.first), false
-    assert_equal 0, @pattern.recent_changes[:relations].size
   end
   
   it "should create a proper RDF graph for a simple pattern" do

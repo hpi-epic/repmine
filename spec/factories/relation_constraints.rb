@@ -2,6 +2,6 @@
 
 FactoryGirl.define do
   factory :relation_constraint do
-    
+    type_expression
   end
 end
