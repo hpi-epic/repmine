@@ -12,6 +12,7 @@ jsPlumb.ready(function() {
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
   $.when.apply($, requests).done(function(){
     removeExcessEndpoints();
+    addMatchedClass();
     addOnclickHandler();	  
 	});
 	
@@ -28,6 +29,15 @@ var newTranslationNode = function(url){
   });
 };
 
+// adds the css class 'matched' to all elements we already know have a mactching concept
+var addMatchedClass = function(){
+  $("div.static").each(function(i, el){
+    if(matched_concepts.indexOf($(el).find("select[id$='rdf_type']").val()) > -1){
+      $(el).addClass("matched")
+    }
+  })
+};
+
 // removes all unconnected Endpoints so users cannot somehow create new connections
 var removeExcessEndpoints = function(){
   $("div.immutable_node").each(function(i,node){
@@ -39,9 +49,9 @@ var removeExcessEndpoints = function(){
   });
 };
 
-// adds an onclick handler to nodes, relations, and attributes
+// adds an onclick handler to nodes, relations, and attributes that are not matched
 var addOnclickHandler = function(){
-  $(".immutable_node, .relation.static, .attribute_constraint.static").each(function(i, node){
+  $(".immutable_node, .relation.static, .attribute_constraint.static").not(".matched").each(function(i, node){
     $(node).on("click", function(){$(this).toggleClass("selected")})
   });
 };

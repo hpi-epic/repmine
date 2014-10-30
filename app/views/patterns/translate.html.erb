@@ -5,7 +5,8 @@
   var connect_these_static_nodes = <%= @source_relations.to_json.html_safe %>;
   var load_static_attribute_constraints = <%= @source_attributes.to_json.html_safe %>
   var connect_these_nodes = <%= @target_relations.to_json.html_safe %>;
-  var load_their_attribute_constraints = <%= @target_attributes.to_json.html_safe %>  
+  var load_their_attribute_constraints = <%= @target_attributes.to_json.html_safe %>;
+  var matched_concepts = <%= @matched_concepts.to_json.html_safe %>;
 <% end %>
 
 <% content_for :javascript_includes do %>
