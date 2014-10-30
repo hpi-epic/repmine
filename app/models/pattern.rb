@@ -42,6 +42,7 @@ class Pattern < ActiveRecord::Base
   end
     
   def initialize_repository!
+    ag_connection.clear!
     imported = Set.new(self.ontologies)
     ontologies.each do |ontology|
       (ontology.imports() - imported).each do |ont|
