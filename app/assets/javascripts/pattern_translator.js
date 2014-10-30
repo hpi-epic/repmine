@@ -78,6 +78,7 @@ var toogleOntologyMatchingMode = function(btn){
   var switch_on = btn.hasClass("btn-danger");
   toggleOmControls(switch_on, btn);
   toggleOutputSelection(switch_on);
+  $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});
 };
 
 // either switches on or disables clickable target elements
