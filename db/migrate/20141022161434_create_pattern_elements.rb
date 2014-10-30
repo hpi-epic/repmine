@@ -18,7 +18,7 @@ class CreatePatternElements < ActiveRecord::Migration
       t.integer :y, :default => 0
       t.integer :source_id
       t.integer :target_id      
-      # node stuff          
+      # node stuff
       t.timestamps
     end
   end

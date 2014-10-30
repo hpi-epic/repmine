@@ -6,8 +6,6 @@ class Pattern < ActiveRecord::Base
   attr_accessor :ag_connection
   
   acts_as_taggable_on :tags
-  
-  as_enum :query_language, sql: 0, cypher: 1, sparql: 2, mongo_js: 3, gremlin: 4
 
   has_and_belongs_to_many :ontologies
   has_and_belongs_to_many :swe_patterns

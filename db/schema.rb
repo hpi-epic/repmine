@@ -48,7 +48,6 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
 
   create_table "pattern_elements", :force => true do |t|
     t.string   "type"
-    t.integer  "type_expression_id"
     t.integer  "pattern_id"
     t.integer  "equivalent_id"
     t.integer  "node_id"
@@ -58,19 +57,17 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
     t.string   "max_cardinality"
     t.string   "min_path_length"
     t.string   "max_path_length"
-    t.integer  "x",                  :default => 0
-    t.integer  "y",                  :default => 0
+    t.integer  "x",               :default => 0
+    t.integer  "y",               :default => 0
     t.integer  "source_id"
     t.integer  "target_id"
-    t.datetime "created_at",                        :null => false
-    t.datetime "updated_at",                        :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
   end
 
   create_table "patterns", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.text     "original_query"
-    t.integer  "query_language_cd"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
     t.string   "type"
