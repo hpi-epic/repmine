@@ -1,10 +1,7 @@
 module PatternsHelper
-  def uri_for_res(date)
-    return date["data"]["html_url"] || date["data"]["link"] || date["data"]["url"]
-  end
-  
-  def name_for_res(date)
-    return date["data"]["title"]
+
+  def static_select(pattern_element)
+    options_for_select([[pattern_element.short_rdf_type, pattern_element.rdf_type]], pattern_element.rdf_type)
   end
 
 end

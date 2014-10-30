@@ -4,6 +4,8 @@ class AttributeConstraint < PatternElement
   
   include RdfSerialization
   
+  OPERATORS = ["?", "~=", "=", "<", ">", "!"]
+  
   def rdf_statements
     return [
       [resource, Vocabularies::GraphPattern.belongsTo, node.pattern.resource]
