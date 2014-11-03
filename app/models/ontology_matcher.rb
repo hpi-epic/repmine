@@ -25,6 +25,31 @@ class OntologyMatcher
   def add_to_alignment_graph!(path)
     alignment_graph.load!(path)
   end
+  
+  def add_correspondence_and_write_output!(correspondence, output_path)
+    add_correspondence!(correspondence)
+    write_alignment_graph!(output_path)
+  end
+  
+  def write_alignment_graph!(output_path)
+    RDF::Writer.open(output_path, :prefixes => {:alignment => Vocabularies::Alignment.to_s}) { |writer| writer << alignment_graph }
+  end
+  
+  def add_correspondence!(correspondence)
+    if correspondence.alignment.nil?
+      q = RDF::Query.new{
+        pattern([:alignment, RDF.type, Vocabularies::Alignment.Alignment])
+      }
+      alignment_graph.query(q).each do |res|
+        correspondence.alignment = res[:alignment]
+      end
+    end
+    alignment_graph.insert!(*correspondence.rdf)
+  end
+  
+  def reset!
+    @alignment_graph = RDF::Graph.new()
+  end
     
   def call_matcher!(s_ont, t_ont)
     cmd = "java -jar AgreementMakerLightCLI.jar -m -s #{s_ont.local_file_path} -t #{t_ont.local_file_path} -o #{alignment_path(s_ont, t_ont)}"

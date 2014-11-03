@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:alignment="http://knowledgeweb.semanticweb.org/heterogeneity/alignment" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentAlignment"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentxml xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">yes</ns0:alignmentxml>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentlevel xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">0</ns0:alignmentlevel>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmenttype xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">11</ns0:alignmenttype>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentonto1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">http://crs_dr/</ns0:alignmentonto1>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentonto2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">http://ekaw/</ns0:alignmentonto2>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmenturi1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">http://crs_dr/</ns0:alignmenturi1>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmenturi2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">http://ekaw/</ns0:alignmenturi2>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222531973860"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222531934880"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222533835060"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222533828940"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222531826380"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222546706700"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222601849140"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222601842060"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222620161520">
+    <ns0:alignmentmap xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:nodeID="g70222606286080"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531973860">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531973860">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#abstract"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531973860">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Abstract"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531973860">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531973860">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531934880">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531934880">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#person"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531934880">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531934880">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531934880">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533835060">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533835060">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#document"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533835060">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Document"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533835060">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533835060">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533828940">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533828940">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#session"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533828940">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Session"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533828940">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222533828940">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531826380">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531826380">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#event"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531826380">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Event"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531826380">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222531826380">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222546706700">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222546706700">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#conference"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222546706700">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Conference"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222546706700">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222546706700">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601849140">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601849140">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#review"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601849140">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Review"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601849140">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9801</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601849140">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601842060">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601842060">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://crs_dr/#author"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601842060">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://ekaw/#Paper_Author"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601842060">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.6651</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222601842060">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222606286080">
+    <rdf:type rdf:resource="http://knowledgeweb.semanticweb.org/heterogeneity/alignmentCell"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222606286080">
+    <ns0:alignmententity1 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://example.org/entity1"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222606286080">
+    <ns0:alignmententity2 xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/" rdf:resource="http://example.org/entity2"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222606286080">
+    <ns0:alignmentmeasure xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">1.0</ns0:alignmentmeasure>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="g70222606286080">
+    <ns0:alignmentrelation xmlns:ns0="http://knowledgeweb.semanticweb.org/heterogeneity/">=</ns0:alignmentrelation>
+  </rdf:Description>
+</rdf:RDF>

@@ -6,6 +6,10 @@ RSpec.describe OntologyMatcher, :type => :model do
     Rails.root.join("spec", "testfiles","test_alignment.rdf").to_s
   end
   
+  def alignment_test_output_file
+    Rails.root.join("spec", "testfiles","test_alignment_output.rdf").to_s    
+  end
+  
   def broken_alignment_test_file_original
     Rails.root.join("spec", "testfiles","test_alignment_broken_uris.rdf").to_s
   end
@@ -75,6 +79,30 @@ RSpec.describe OntologyMatcher, :type => :model do
       assert_equal true, res[:ent2].to_s.starts_with?("http://ekaw/")      
     end
   end
+  
+  it "should survive an rdf import/export cycle" do
+    @om.add_to_alignment_graph!(alignment_test_file)
+    assert_not_empty @om.get_substitutes_for("http://crs_dr/#author")            
+    File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
+    @om.write_alignment_graph!(alignment_test_output_file)
+    @om.reset!
+    @om.add_to_alignment_graph!(alignment_test_output_file)    
+    assert_not_empty @om.get_substitutes_for("http://crs_dr/#author")    
+  end
+  
+  it "should properly export a new mapping once we've added that to the alignment graph" do
+    # create the alignment graph
+    @om.add_to_alignment_graph!(alignment_test_file)
+    correspondence = FactoryGirl.build(:ontology_correspondence)
+    File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
+    @om.add_correspondence_and_write_output!(correspondence, alignment_test_output_file)
+    assert_equal true, File.exists?(alignment_test_output_file)
+    assert_not_empty @om.get_substitutes_for(correspondence.entity1)
+    # here, we check whether a newly created matcher can work with that
+    @om.reset!
+    @om.add_to_alignment_graph!(alignment_test_output_file)
+    assert_not_empty @om.get_substitutes_for(correspondence.entity1)
+  end  
   
   it "should properly run for two of the conference ontologies" do
     o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")

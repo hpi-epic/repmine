@@ -1,7 +1,7 @@
 module RdfSerialization
   
   def resource()
-    return RDF::Resource.new(self.url)
+    return self.url.nil? ? RDF::Node.new : RDF::Resource.new(self.url)
   end
   
   def add_custom_property(property, value)

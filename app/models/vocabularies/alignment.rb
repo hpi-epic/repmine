@@ -1,5 +1,6 @@
 module Vocabularies
   class Alignment < RDF::StrictVocabulary("http://knowledgeweb.semanticweb.org/heterogeneity/alignment")
+    term :Alignment
     property :entity1
     property :entity2
     property :uri1
@@ -9,6 +10,6 @@ module Vocabularies
     property :map
     property :relation
     property :measure
-    property :Cell
+    term :Cell
   end 
 end
