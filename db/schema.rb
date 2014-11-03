@@ -78,11 +78,6 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
   add_index "patterns", ["pattern_id"], :name => "index_patterns_on_pattern_id"
   add_index "patterns", ["target_ontology_id"], :name => "index_patterns_on_target_ontology_id"
 
-  create_table "patterns_swe_patterns", :id => false, :force => true do |t|
-    t.integer "pattern_id"
-    t.integer "swe_pattern_id"
-  end
-
   create_table "repositories", :force => true do |t|
     t.string  "name"
     t.string  "db_name"
@@ -104,13 +99,6 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
 
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
-
-  create_table "swe_patterns", :force => true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
-  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

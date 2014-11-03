@@ -2,13 +2,12 @@ class Pattern < ActiveRecord::Base
   
   include RdfSerialization
   
-  attr_accessible :name, :description, :ontology_ids, :swe_pattern_ids, :tag_list
+  attr_accessible :name, :description, :ontology_ids, :tag_list
   attr_accessor :ag_connection
   
   acts_as_taggable_on :tags
 
   has_and_belongs_to_many :ontologies
-  has_and_belongs_to_many :swe_patterns
   has_many :pattern_elements, :dependent => :destroy
 
   # hooks

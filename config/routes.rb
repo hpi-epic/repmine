@@ -1,7 +1,4 @@
-RepMine::Application.routes.draw do
-  resources :swe_patterns
-
-  resources :patterns do 
+RepMine::Application.routes.draw do  resources :patterns do 
     
     get "/translate/:ontology_id", :to => "patterns#translate", :as => :translate_to_ontology
     get "/query/:ontology_id", :to => "patterns#query", :as => :query_for_ontology

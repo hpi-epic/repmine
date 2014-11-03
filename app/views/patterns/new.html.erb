@@ -14,27 +14,18 @@
         <br />
         <%= f.submit(:class => "btn btn-success") %>
       </td>
-      <td style="padding-left: 50px; vertical-align: top;">
-        <div class="control-group">
-          <% Ontology.pluck(:group).uniq.each do |group| %>
+      <% Ontology.pluck(:group).uniq.each do |group| %>
+        <td style="padding-left: 50px; vertical-align: top;">
+          <div class="control-group">
             <fieldset class="fieldset"><legend><%= group %></legend>
-            <% Ontology.where(:does_exist => true, :group => group).each do |ont| %>
+              <% Ontology.where(:does_exist => true, :group => group).each do |ont| %>
               <%= check_box_tag("pattern[ontology_ids][]", ont.id, @pattern.ontology_ids.include?(ont.id)) %> <%= ont.short_name %>
               <br />
-            <% end %>
+              <% end %>
             </fieldset>
-          <% end %>
-        </div>
-      </td> 
-      <td style="padding-left: 50px; vertical-align: top;">
-        <legend>Software Engineering Patterns</legend>
-        <div class="control-group">
-        <%= select_tag(
-              "pattern[swe_pattern_ids][]", options_from_collection_for_select(SwePattern.all, "id", "name"), 
-              {:multiple => true, :size =>10 })
-        %>
-        </div>
-      </td> 
+            </div>
+          </td>                
+      <% end %>
     </tr>
 </table>  
 <% end %>
