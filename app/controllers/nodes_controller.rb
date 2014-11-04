@@ -10,13 +10,6 @@ class NodesController < ApplicationController
   
   def create
     @node = @pattern.create_node!
-    if params[:element_type] == "Node"
-      @node.equivalent_to = Node.find(params[:element_id])
-      @node.save
-    else
-      flash[:notice] = "Next time, please select the equivalent input node before creating a new one. Thank you!"
-    end
-
     @type_hierarchy = @pattern.type_hierarchy
     render :show
   end

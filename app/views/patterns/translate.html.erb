@@ -17,14 +17,16 @@
 <div class="translation_controls" style="left: <%= @offset %>px" />
   <%= form_for(@target_pattern) do |f| %><% end %>  
   <span>Translation to: <strong><%= link_to(@ontology.short_name, @ontology) %></strong></span>&nbsp;|&nbsp;
-  <%= link_to 'New Node', "#", :class => "btn", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>  
-  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success", :id => "save_pattern_button" %>
-  <%= link_to 'Store Correspondence', "#", :class => "btn btn-info hide", :onclick => "saveCorrespondence();", :id => "save_correspondence_button" %>    
-  <%= link_to 'OM Mode', "#", :class => "btn btn-danger", :onclick => "toogleOntologyMatchingMode($(this));" %>
+  <%= link_to 'New Node', "#", :class => "btn om-control", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>  
+  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success om-control" %>
+  <%= link_to 'Save Mapping', "#", :class => "btn btn-info hide om-control", :onclick => "saveCorrespondence();" %>
+  <%= link_to 'Next', "#", :class => "btn btn-primary hide om-control", :onclick => "selectNextElement();" %>
+  <%= link_to 'Match Concepts', "#", :class => "btn btn-danger om-control", :onclick => "toggleOntologyMatchingMode(true);" %>
+  <%= link_to 'Stop Matching', "#", :class => "btn btn-danger om-control hide", :onclick => "toggleOntologyMatchingMode(false);" %>
 </div>
 
 <%= form_tag(pattern_save_correspondence_path(@source_pattern, @target_pattern), :id => "save_correspondence_form") do %>
-  <%= hidden_field_tag :source_element_id %>
+  <%= hidden_field_tag "source_element_ids[]" %>
   <%= hidden_field_tag "target_element_ids[]" %>
 <% end %>
 

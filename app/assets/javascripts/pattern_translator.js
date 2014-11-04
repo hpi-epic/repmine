@@ -12,8 +12,7 @@ jsPlumb.ready(function() {
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
   $.when.apply($, requests).done(function(){
     removeExcessEndpoints();
-    addMatchedClass();
-    addOnclickHandler();	  
+    addMatchedClass();	  
 	});
 	
   loadTranslationPattern();
@@ -21,7 +20,7 @@ jsPlumb.ready(function() {
 
 // function called when the "new Node" button is being clicked
 var newTranslationNode = function(url){
-  $.post(url, getSelectedSourceElement(), function(data, textStatus, jqXHR){
+  $.post(url, function(data, textStatus, jqXHR){
     var node = $(data);
     node.appendTo($("#drawing_canvas"));
     addNodeToGraph(node);
@@ -49,39 +48,45 @@ var removeExcessEndpoints = function(){
   });
 };
 
-// adds an onclick handler to nodes, relations, and attributes that are not matched
-var addOnclickHandler = function(){
-  $(".immutable_node, .relation.static, .attribute_constraint.static").not(".matched").each(function(i, node){
-    $(node).on("click", function(){$(this).toggleClass("selected")})
-  });
-};
-
-// out of the static elements (i.e., the ones on the left), the selected one is retrieved
-var getSelectedSourceElement = function(){
-  return $(".static.selected").data("id");
-};
-
-var getSelectedTranslationElements = function(){
+// returns the selections, except for the exceptions
+var getSelectedElements = function(selector, exception){
   values = []
-  $(".selected").not(".static").each(function(i,el){
+  $(selector).not(exception).each(function(i,el){
     values.push($(el).data("id"));
   });
   return values;
 };
 
 // switches from pure translation to an interaction suitable for providing OM user input
-var toogleOntologyMatchingMode = function(btn){
-  var switch_on = btn.hasClass("btn-danger");
-  toggleOmControls(switch_on, btn);
-  toggleOutputSelection(switch_on);
-  $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});
+var toggleOntologyMatchingMode = function(on){
+  $("a.om-control").each(function(i,el){$(el).toggle()});
+  $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});  
+  toggleSelectability(on);  
+  if(on){
+    saveTranslation();
+    selectNextElement();
+  };
 };
 
-// either switches on or disables clickable target elements
-var toggleOutputSelection = function(switch_on){
-  $(".node, .relation, .attribute_constraint").not(".static").each(function(i, el){
+var selectNextElement = function(){
+  var available = $(".node.static, .relation.static, .attribute_constraint.static").not(".matched");
+  var selected = $(".static.selected");
+  var next_one = available.index(selected[selected.size() - 1]) + 1;
+  if(next_one >= available.size()){next_one = 0};
+  selected.each(function(i, el){$(el).removeClass("selected")});
+  $(available[next_one]).click();
+}
+
+// makes everything clickable, except the 
+var toggleSelectability = function(switch_on){
+  $(".node, .relation, .attribute_constraint").not(".matched").each(function(i, el){
     if(switch_on){
-      $(el).on("click", function(){$(this).toggleClass("selected")});
+      $(el).on("click", function(){
+        $(this).toggleClass("selected");
+        var selected_in = $(".selected.static select[id$='rdf_type']");
+        var selected_out = $(".selected").not(".static").find("select[id$='rdf_type']");
+        showHelpfulMessage(selected_in, selected_out);        
+      });
     } else {
       $(el).removeClass("selected");
       $(el).unbind("click");
@@ -89,20 +94,37 @@ var toggleOutputSelection = function(switch_on){
   });
 };
 
-// updates the controls by changing the button and disabling the 'new node' button
-var toggleOmControls = function(switch_on, btn){
-  if(switch_on){
-    btn.text("Translation Mode")
-    $.jGrowl("Select Input and Output Elements and store the correspondence when done.")
-  } else {
-    btn.text("OM Mode");
+var showHelpfulMessage = function(selected_in, selected_out){
+  var msg = ""
+  switch(selected_in.size()){
+    case 0:
+      msg += "<b>Please select an <u>input</u> element!</b>";
+      break;
+    case 1:
+      msg += "Input: <b>" + $(selected_in[0]).val() +"</b>";
+      break;
+    default:
+      msg += "Input: <b>" + selected_in.size() +" concepts</b>";
+      break;
   }
-  btn.toggleClass("btn-danger");
-  btn.toggleClass("btn-warning");
-  $("#new_node_button").toggle();
-  $("#save_correspondence_button").toggle();
-  $("#save_pattern_button").toggle();  
-};
+  msg += "<br />";
+  switch(selected_out.size()){
+    case 0:
+      msg += "<b>Please select an <u>output</u> element!</b>";
+      break;
+    case 1:
+      msg += "Output: <b>" + $(selected_out[0]).val() +"</b>";
+      break;
+    default:
+      msg += "Output: <b>" + selected_out.size() +" concepts</b>";
+      break;
+  }
+  msg += "<br />";
+  if(selected_in.size() > 0 && selected_out.size() > 0){
+    msg += "Press <i><u>Save Mapping</u></i> when ready!"
+  }
+  $.jGrowl(msg);
+}
 
 var loadTranslationPattern = function(){
   $(".node").not(".immutable_node").each(function(index,node_div){
@@ -143,14 +165,15 @@ var submitTranslationPattern = function(){
 // submits the correspondence selected by the user...
 var saveCorrespondence = function(){
   var form = $("#save_correspondence_form");
-  form.find("#source_element_id").val(getSelectedSourceElement());
-  form.find("#target_element_ids_").val(getSelectedTranslationElements());
+  form.find("#source_element_ids_").val(getSelectedElements(".static.selected"));
+  form.find("#target_element_ids_").val(getSelectedElements(".selected", ".static"));
   return $.ajax({
     url : form.attr("action"),
     type: "POST",
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
       showGrowlNotification(jqXHR);
+      
     },
     error: function(jqXHR, textStatus, errorThrown){
       showGrowlNotification(jqXHR);

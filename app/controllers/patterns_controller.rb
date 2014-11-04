@@ -106,7 +106,8 @@ class PatternsController < ApplicationController
   
   def save_correspondence
     flash[:notice] = "Thanks for your feedback!"
-    render :json => {}
+    
+    render :json => []
   end
   
   private 
