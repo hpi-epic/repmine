@@ -2,7 +2,7 @@ require 'open3'
 
 class RdbmsRepository < Repository
   
-  attr_accessible :rdbms_type, :db_username, :db_password
+  attr_accessible :rdbms_type
   as_enum :rdbms_type, mysql: 1, postgresql: 2
   
   def self.model_name
@@ -28,7 +28,7 @@ class RdbmsRepository < Repository
     return "jdbc:#{rdbms_type}://#{host}:#{port}/#{db_name}"
   end  
   
-  def get_type_stats
+  def type_statistics
     return []
   end
 end

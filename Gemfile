@@ -21,6 +21,13 @@ gem "rdf-turtle"
 gem "rdf-rdfxml"
 gem "sparql-client"
 
+# ontology work with allegrograph
+gem "rdf-agraph"
+gem "rest-client"
+gem "equivalent-xml"
+gem "rdf-xsd"
+gem "linkeddata"
+
 # rule engine for translations
 gem 'wongi-engine'
 
@@ -68,10 +75,3 @@ gem "delayed_job_web"
 gem 'daemons'
 # logging...
 gem "logging"
-
-# ontology work with allegrograph
-gem "rdf-agraph"
-gem "rest-client"
-gem "equivalent-xml"
-gem "rdf-xsd"
-gem "linkeddata"

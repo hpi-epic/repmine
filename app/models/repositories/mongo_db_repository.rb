@@ -19,7 +19,7 @@ class MongoDbRepository < Repository
     return @db
   end
   
-  def get_type_stats
+  def type_statistics
     stats = []
     db.collection_names.each do |c_name|
       stats << [c_name, db[c_name].find().count()]

@@ -1,5 +1,5 @@
 class Repository < ActiveRecord::Base
-  attr_accessible :name, :description, :host, :port, :db_name
+  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
   has_one :ontology, :dependent => :destroy
   
   TYPES = ["MongoDbRepository", "RdfRepository", "RdbmsRepository"]
@@ -44,8 +44,8 @@ class Repository < ActiveRecord::Base
     raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
   end
   
-  def get_type_stats
-    raise "implement 'get_type_stats' in #{self.class.name}"
+  def type_statistics
+    raise "implement 'type_statistics' in #{self.class.name}"
   end
   
   def database_type

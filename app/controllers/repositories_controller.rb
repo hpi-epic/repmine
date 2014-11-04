@@ -16,7 +16,7 @@ class RepositoriesController < ApplicationController
   def show
     @repository = Repository.find(params[:id])
     @stats = [["Item Type", "Occurrences in Repository"]]
-    @stats.concat(@repository.get_type_stats)
+    @stats.concat(@repository.type_statistics)
 
     respond_to do |format|
       format.html # show.html.erb
