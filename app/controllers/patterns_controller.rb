@@ -80,6 +80,7 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
     @ontology = Ontology.find(params[:ontology_id])
     @matching_error = nil
+    @concept_count = @pattern.concepts_used.size
     
     # do not match when using the same ontology...
     if @pattern.ontologies.size == 1 && @pattern.ontologies.first == @ontology
