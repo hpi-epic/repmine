@@ -2,7 +2,7 @@ class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name
   has_one :ontology, :dependent => :destroy
   
-  TYPES = ["MongoDbRepository", "Neo4jRepository", "HanaGraphEngineRepository", "RdfRepository", "RdbmsRepository"]
+  TYPES = ["MongoDbRepository", "RdfRepository", "RdbmsRepository"]
   
   # custom error class for ontology extraction
   class OntologyExtractionError < StandardError
