@@ -58,18 +58,22 @@ var getSelectedElements = function(selector, exception){
 };
 
 // switches from pure translation to an interaction suitable for providing OM user input
-var toggleOntologyMatchingMode = function(on){
-  $("a.om-control").each(function(i,el){$(el).toggle()});
-  $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});  
-  toggleSelectability(on);  
-  if(on){
-    saveTranslation();
-    selectNextElement();
-  };
+var toggleOntologyMatchingMode = function(on, save = true){
+  if(allUnmatchedElementsOf(allStaticPatternElements()).size() == 0){
+    $.jGrowl("All elements are matched. Thank you!");
+  } else {
+    $("a.om-control").each(function(i,el){$(el).toggle()});
+    $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});
+    toggleSelectability(on);
+    if(on){selectNextElement()};    
+  }
 };
 
+// determines which static elements are not yet matched and clicks on the next one
 var selectNextElement = function(){
-  var available = $(".node.static, .relation.static, .attribute_constraint.static").not(".matched");
+  var available = $(".node.static").not(".matched");
+  available = available.add($(".relation.static").not(".matched"));
+  available = available.add($(".attribute_constraint.static").not("matched"));
   var selected = $(".static.selected");
   var next_one = available.index(selected[selected.size() - 1]) + 1;
   if(next_one >= available.size()){next_one = 0};
@@ -79,7 +83,7 @@ var selectNextElement = function(){
 
 // makes everything clickable, except the 
 var toggleSelectability = function(switch_on){
-  $(".node, .relation, .attribute_constraint").not(".matched").each(function(i, el){
+  allUnmatchedElementsOf(allPatternElements()).each(function(i, el){
     if(switch_on){
       $(el).on("click", function(){
         $(this).toggleClass("selected");
@@ -94,6 +98,19 @@ var toggleSelectability = function(switch_on){
   });
 };
 
+var allPatternElements = function(){
+  return $(".node, .relation, .attribute_constraint");
+}
+
+var allStaticPatternElements = function(){
+  return $(".node.static, .relation.static, .attribute_constraint.static");
+}
+
+var allUnmatchedElementsOf = function(elements){
+  return elements.not(".matched")
+}
+
+// provides the users with feedback regarding the current state of matching
 var showHelpfulMessage = function(selected_in, selected_out){
   var msg = ""
   switch(selected_in.size()){
@@ -140,21 +157,21 @@ var loadTranslationPattern = function(){
 	});
 };
 
-var saveTranslation = function(){
+var saveTranslation = function(show_growl = true){
   var requests = saveNodes().concat(saveConstraints());
-  $.when.apply($, requests).done(function(){
-    submitTranslationPattern();
+  $.when.apply($, requests).done(function(final_request){
+    submitTranslationPattern(show_growl);
   });
 };
 
-var submitTranslationPattern = function(){
+var submitTranslationPattern = function(show_growl){
   var form = $("form.edit_pattern");
   return $.ajax({
     url : form.attr("action"),
     type: "POST",
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
-      showGrowlNotification(jqXHR);
+      if(show_growl){showGrowlNotification(jqXHR)};
     },
     error: function(jqXHR, textStatus, errorThrown){
       showGrowlNotification(jqXHR);
@@ -164,6 +181,7 @@ var submitTranslationPattern = function(){
 
 // submits the correspondence selected by the user...
 var saveCorrespondence = function(){
+  saveTranslation(false);
   var form = $("#save_correspondence_form");
   form.find("#source_element_ids_").val(getSelectedElements(".static.selected"));
   form.find("#target_element_ids_").val(getSelectedElements(".selected", ".static"));
@@ -173,7 +191,10 @@ var saveCorrespondence = function(){
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
       showGrowlNotification(jqXHR);
-      
+      toggleOntologyMatchingMode(false);      
+      matched_concepts = matched_concepts.concat(data);
+      addMatchedClass();
+      toggleOntologyMatchingMode(true, false);
     },
     error: function(jqXHR, textStatus, errorThrown){
       showGrowlNotification(jqXHR);
