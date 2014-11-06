@@ -31,12 +31,12 @@ class AgraphConnection
   end
   
   def delete!()
-    repository.delete!
+    repository(false).delete!
     @repository = nil
   end
   
   def clear!
-    repository.clear
+    repository(false).clear
   end
   
   # at some point, this could be replaced with a fancy SPARQL query...
