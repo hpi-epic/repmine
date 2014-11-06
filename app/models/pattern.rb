@@ -84,21 +84,14 @@ class Pattern < ActiveRecord::Base
   
   def unmatched_concepts(ontology)
     matched = match_concepts(ontology)
-    return concepts_used.select{|concept| matched.find{|match| match[:entity1] == concept}.nil?}
+    unmatched = pattern_elements.select{|pe| matched.find{|match| match.input_elements.include?(pe)}.nil?}
+    return Set.new(unmatched.collect{|pe| pe.used_concepts}.flatten)
   end
   
   def match_concepts(ontology)
     om = OntologyMatcher.new(self, [ontology])
     om.match!
-    return concepts_used.collect{|concept| om.get_substitutes_for(concept)}.flatten
-  end
-  
-  def reset!
-    # first remove all newly created nodes...
-    nodes.find(:all, :conditions => ["created_at > ?", self.updated_at]).each{|node| node.destroy}
-    # then we reset the remainder
-    nodes.each{|node| node.reset!}
-    self.reload
+    return om.get_substitutes_for(pattern_elements)
   end
   
   # RDF Serialization
@@ -118,19 +111,5 @@ class Pattern < ActiveRecord::Base
   
   def rdf_types
     [Vocabularies::GraphPattern.GraphPattern]
-  end
-  
-  # determines the correspondences we can identify from the selected input and our recent changes
-  def infer_correspondences(selected_elements)
-    true
-  end
-  
-  # determines which elements where added or updated since the last 'save' of the pattern
-  def recent_changes()
-    changes = {}
-    changes[:nodes] = nodes.find(:all, :conditions => ["updated_at > ?", self.updated_at])
-    changes[:attributes] = nodes.collect{|n| n.attribute_constraints.find(:all, :conditions => ["updated_at > ?", self.updated_at])}.flatten
-    changes[:relations] = nodes.collect{|n| n.source_relation_constraints.find(:all, :conditions => ["updated_at > ?", self.updated_at])}.flatten
-    return changes
   end
 end

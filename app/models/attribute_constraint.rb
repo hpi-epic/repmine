@@ -2,22 +2,28 @@ class AttributeConstraint < PatternElement
   attr_accessible :value, :operator, :node
   belongs_to :node, :class_name => "PatternElement"
   
+  before_save :assign_to_pattern!
+  
   include RdfSerialization
   
   OPERATORS = ["?", "~=", "=", "<", ">", "!"]
   
   def rdf_statements
     return [
-      [resource, Vocabularies::GraphPattern.belongsTo, node.pattern.resource]
+      [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]
     ]
   end
   
+  def assign_to_pattern!
+    self.pattern = node.pattern
+  end
+  
   def url
-    return node.url + "/attribute_constraints/#{id}"
+    return pattern.url + "/attribute_constraints/#{id}"
   end
   
   def possible_attributes(rdf_type = nil)
-    return node.pattern.possible_attributes_for(rdf_type || node.rdf_type)
+    return pattern.possible_attributes_for(rdf_type || node.rdf_type)
   end
   
   def used_concepts

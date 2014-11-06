@@ -3,16 +3,22 @@ class RelationConstraint < PatternElement
   belongs_to :target, :class_name => "Node"
   attr_accessible :min_cardinality, :max_cardinality, :min_path_length, :max_path_length, :source_id, :target_id
   
+  before_save :assign_to_pattern!
+  
   include RdfSerialization
   
   def rdf_statements
     return [
-      [resource, Vocabularies::GraphPattern.belongsTo, (source || target).pattern.resource]      
+      [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]      
     ]
   end
   
+  def assign_to_pattern!
+    self.pattern = source.pattern
+  end
+  
   def url
-    return (source || target).url + "/relation_constraints/#{id}"
+    return pattern.url + "/relation_constraints/#{id}"
   end
   
   def rdf_types
@@ -20,6 +26,6 @@ class RelationConstraint < PatternElement
   end
   
   def possible_relations(source_type = nil, target_type = nil)
-    return source.pattern.possible_relations_from_to(source_type || source.rdf_type, target_type || target.rdf_type)
+    return pattern.possible_relations_from_to(source_type || source.rdf_type, target_type || target.rdf_type)
   end
 end
