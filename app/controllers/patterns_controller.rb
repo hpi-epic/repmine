@@ -68,13 +68,6 @@ class PatternsController < ApplicationController
     flash[:notice] = "Destroyed Pattern '#{qn}'"
     redirect_to patterns_path
   end
-    
-  def reset
-    @pattern = Pattern.find(params[:pattern_id])
-    @pattern.reset!
-    flash[:notice] = "Resetted Pattern to state of: #{@pattern.updated_at}"    
-    redirect_to pattern_path(@pattern)
-  end
   
   def missing_concepts
     @pattern = Pattern.find(params[:pattern_id])

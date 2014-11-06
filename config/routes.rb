@@ -24,7 +24,6 @@ RepMine::Application.routes.draw do  resources :patterns do
     
     get :missing_concepts, :on => :collection
     post :run_on_repository
-    post :reset
     get :autocomplete_tag_name, :on => :collection
   end
 

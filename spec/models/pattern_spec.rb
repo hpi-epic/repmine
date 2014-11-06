@@ -6,77 +6,11 @@ RSpec.describe Pattern, :type => :model do
     Pattern.any_instance.stub(:initialize_repository! => true)
   end
   
-  it "should only remove unsaved elements upon 'reset'" do
-    @pattern = FactoryGirl.create(:pattern)
-    @pattern.update_attribute(:updated_at,Time.now)
-    
-    @node = @pattern.nodes.create!    
-    AttributeConstraint.create!(:node => @node)
-    RelationConstraint.create(:source_id => @node.id, :target_id => @node.id)
-    
-    nodes_before = Node.count
-    ac_before = AttributeConstraint.count
-    rc_before = RelationConstraint.count
-    @pattern.reset!
-    
-    assert_equal (nodes_before - 1), Node.count
-    assert_equal (ac_before - 1), AttributeConstraint.count
-    assert_equal (rc_before - 1), RelationConstraint.count    
-  end
-  
   it "should not change its repository name after the first save" do
     @pattern = FactoryGirl.create(:pattern)
     res_before = @pattern.repository_name
     @pattern.save 
     assert_equal res_before, @pattern.repository_name    
-  end
-  
-  it "should not remove updated nodes and constraints" do
-    @pattern = FactoryGirl.create(:pattern)
-    @pattern.update_attribute(:updated_at,Time.now)
-    @pattern.nodes.first.rdf_type = "http://example2.org"
-    @pattern.nodes.first.save
-    @pattern.nodes.first.attribute_constraints.first.rdf_type = "http://example2.org"
-    @pattern.nodes.first.attribute_constraints.first.save    
-    @pattern.nodes.first.source_relation_constraints.first.rdf_type = "http://example2.org"
-    
-    nodes_before = Node.count
-    ac_before = AttributeConstraint.count
-    rc_before = RelationConstraint.count
-    @pattern.reset!
-    
-    assert_equal nodes_before, Node.count
-    assert_equal ac_before, AttributeConstraint.count
-    assert_equal rc_before, RelationConstraint.count
-    
-    assert_equal @pattern.nodes.first.attribute_constraints.first.rdf_type, "http://example2.org"
-    assert_equal @pattern.nodes.first.source_relation_constraints.first.rdf_type, "http://example2.org"
-  end
-  
-  it "should find recent changes properly" do 
-    @pattern = FactoryGirl.create(:pattern)
-    @pattern.update_attribute(:updated_at,Time.now)    
-    @new_node = @pattern.create_node!
-    
-    assert_equal @pattern.recent_changes[:nodes].size, 1    
-    assert_equal @new_node, @pattern.recent_changes[:nodes].first
-    @pattern.update_attribute(:updated_at,Time.now)
-    assert_equal @pattern.recent_changes[:nodes].size, 0
-    @new_node.update_attribute(:updated_at,Time.now)
-    assert_equal @pattern.recent_changes[:nodes].size, 1    
-    assert_equal @new_node.id, @pattern.recent_changes[:nodes].first.id    
-
-    @pattern.nodes.first.attribute_constraints.first.update_attribute(:updated_at, Time.now)    
-    assert_equal @pattern.recent_changes[:attributes].include?(@pattern.nodes.first.attribute_constraints.first), true
-    assert_equal @pattern.recent_changes[:attributes].size, 1 
-    @pattern.update_attribute(:updated_at,Time.now)     
-    assert_equal @pattern.recent_changes[:attributes].size, 0     
-    
-    @pattern.nodes.first.source_relation_constraints.first.update_attribute(:updated_at, Time.now)
-    assert_equal @pattern.recent_changes[:relations].include?(@pattern.nodes.first.source_relation_constraints.first), true
-    assert_equal @pattern.recent_changes[:relations].size, 1
-    @pattern.update_attribute(:updated_at,Time.now)
-    assert_equal @pattern.recent_changes[:relations].size, 0       
   end
   
   it "should create a proper RDF graph for a simple pattern" do
@@ -111,6 +45,37 @@ RSpec.describe Pattern, :type => :model do
     assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.AttributeConstraint).size
     rc_count = @pattern.nodes.inject(0){|x,node| x += node.source_relation_constraints.size}
     assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.RelationConstraint).size
+  end
+  
+  it "should properly link all elements to the pattern for node only patterns" do
+    @pattern = FactoryGirl.create(:node_only_pattern)
+    assert_not_nil Node.all.find{|n| n.pattern == @pattern}
+    assert_equal 1, @pattern.pattern_elements.size
+  end
+  
+  it "should properly link all elements to the pattern for simple patterns" do
+     @pattern = FactoryGirl.create(:pattern)
+     assert_not_nil Node.all.find{|n| n.pattern == @pattern}
+     assert_not_nil AttributeConstraint.all.find{|n| n.pattern == @pattern}
+     assert_not_nil RelationConstraint.all.find{|n| n.pattern == @pattern}          
+     assert_equal 3, @pattern.pattern_elements.size
+   end
+  
+  it "should properly return all unmatched concepts" do
+    @pattern = FactoryGirl.create(:pattern)
+    # should be http://example.org/node|relation|attribute
+    assert_equal 3, @pattern.concept_count
+    OntologyMatcher.any_instance.stub(:match! => true, :get_substitutes_for => [])
+    assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
+    # create the correspondence
+    correspondence = FactoryGirl.create(:ontology_correspondence)
+    correspondence.input_elements = [@pattern.nodes.first]
+    correspondence.output_elements = [PatternElement.for_rdf_type(@pattern.nodes.first.rdf_type + "_matched")]
+    correspondence.save
+    # noe only return this one correspondence, which should eliminate http://example.org/node from the unmatched list
+    OntologyMatcher.any_instance.stub(:match! => true, :get_substitutes_for => [correspondence])
+    assert_equal 2, @pattern.unmatched_concepts(Ontology.first).size
+    assert_not_include @pattern.unmatched_concepts(Ontology.first), @pattern.nodes.first.rdf_type + "_matched"
   end
   
   def query_graph_for_type(graph, rdf_type)

@@ -11,7 +11,6 @@
 <% end %>
 
 <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success" %>
-<%= link_to 'Reset', pattern_reset_path(@pattern), :method => :post, :class => "btn btn-danger", :confirm => "Return to last saved state?" %>
 <%= link_to 'Create Node', pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_node" %>
 
 <%= form_for(@pattern) do |f| %><% end %>

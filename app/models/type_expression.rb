@@ -63,13 +63,4 @@ class TypeExpression < ActiveRecord::Base
     children.each{|child| concepts.concat(child.used_concepts)}
     return concepts  
   end
-  
-  def reset!
-    pattern = pattern_element.nil? ? root.pattern_element.pattern : pattern_element.pattern
-    if self.created_at > pattern.updated_at
-      self.destroy
-    else
-      self.reload
-    end
-  end
 end
