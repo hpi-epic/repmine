@@ -36,7 +36,7 @@ class AgraphConnection
   end
   
   def clear!
-    repository(false).clear
+    repository().clear
   end
   
   # at some point, this could be replaced with a fancy SPARQL query...
