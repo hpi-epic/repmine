@@ -2,6 +2,6 @@
 
 FactoryGirl.define do
   factory :relation_constraint do
-    type_expression
+    association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/relation"  
   end
 end
