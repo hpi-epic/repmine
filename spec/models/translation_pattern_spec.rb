@@ -15,16 +15,15 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_empty @tp.pattern_elements
   end
   
-  it "should create a node for each matched concept" do
+  it "should transfer pattern elements to the translation pattern for each matched concept" do
     # let's translate the first node
-    type = @pattern.nodes.first.rdf_type
-    correspondence = OntologyCorrespondence.new(type, type + "_matched")
+    correspondence = FactoryGirl.create(:ontology_correspondence)
+    correspondence.input_elements << @pattern.nodes.first
     Pattern.any_instance.stub(:match_concepts => [correspondence])
     @tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
-    assert_not_empty @tp.nodes
-    assert_equal type + "_matched", @tp.nodes.first.rdf_type
-    assert_equal @pattern.nodes.first, @tp.nodes.first.equivalent
-    assert_equal 1, @pattern.nodes.first.equivalents.size
+    assert_equal 1, @tp.pattern_elements.size
+    assert_equal correspondence.entity2, @tp.pattern_elements.first
+    assert_equal @pattern.pattern_elements.first, @tp.pattern_elements.first.equivalent
   end
   
 end

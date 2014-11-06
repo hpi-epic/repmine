@@ -4,8 +4,11 @@ FactoryGirl.define do
   factory :type_expression do
     operator nil
     rdf_type nil
+    transient do 
+      rdf_override "http://example.org/MyType"
+    end
     after(:create) do |te, evaluator|
-      te.children.create(:rdf_type => "http://example.org/MyType")
+      te.children.create(:rdf_type => evaluator.rdf_override)
     end
   end
   

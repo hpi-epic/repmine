@@ -19,4 +19,9 @@ RSpec.describe PatternElement, :type => :model do
     assert_equal "http://example.org/MyType2", @pe.rdf_type  
   end
   
+  it "should create a proper element for a given rdf type" do
+    @pe = PatternElement.for_rdf_type("http://example.org/fancy_type")
+    assert_equal "http://example.org/fancy_type", @pe.rdf_type
+  end
+  
 end

@@ -58,7 +58,7 @@ var getSelectedElements = function(selector, exception){
 };
 
 // switches from pure translation to an interaction suitable for providing OM user input
-var toggleOntologyMatchingMode = function(on, save = true){
+var toggleOntologyMatchingMode = function(on){
   if(allUnmatchedElementsOf(allStaticPatternElements()).size() == 0){
     $.jGrowl("All elements are matched. Thank you!");
   } else {
@@ -157,21 +157,21 @@ var loadTranslationPattern = function(){
 	});
 };
 
-var saveTranslation = function(show_growl = true){
+var saveTranslation = function(hide_growl){
   var requests = saveNodes().concat(saveConstraints());
   $.when.apply($, requests).done(function(final_request){
-    submitTranslationPattern(show_growl);
+    submitTranslationPattern(hide_growl);
   });
 };
 
-var submitTranslationPattern = function(show_growl){
+var submitTranslationPattern = function(hide_growl){
   var form = $("form.edit_pattern");
   return $.ajax({
     url : form.attr("action"),
     type: "POST",
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
-      if(show_growl){showGrowlNotification(jqXHR)};
+      if(!hide_growl){showGrowlNotification(jqXHR)};
     },
     error: function(jqXHR, textStatus, errorThrown){
       showGrowlNotification(jqXHR);
@@ -181,7 +181,7 @@ var submitTranslationPattern = function(show_growl){
 
 // submits the correspondence selected by the user...
 var saveCorrespondence = function(){
-  saveTranslation(false);
+  saveTranslation(true);
   var form = $("#save_correspondence_form");
   form.find("#source_element_ids_").val(getSelectedElements(".static.selected"));
   form.find("#target_element_ids_").val(getSelectedElements(".selected", ".static"));
@@ -194,7 +194,7 @@ var saveCorrespondence = function(){
       toggleOntologyMatchingMode(false);      
       matched_concepts = matched_concepts.concat(data);
       addMatchedClass();
-      toggleOntologyMatchingMode(true, false);
+      toggleOntologyMatchingMode(true);
     },
     error: function(jqXHR, textStatus, errorThrown){
       showGrowlNotification(jqXHR);

@@ -79,13 +79,13 @@ class OntologyMatcher
     return File.exist?(alignment_path(s_ont, t_ont))
   end
   
-  # this is where the magic happens. We search the alignment graph for matches regarding the provided element
-  def get_substitutes_for(element)
+  # this is where the magic happens. We search the alignment graph for matches regarding the provided pattern element
+  def get_substitutes_for(pattern_elements)
     q = RDF::Query.new{
       pattern([:alignment, Vocabularies::Alignment.map, :cell])
       pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])
       pattern([:alignment, Vocabularies::Alignment.onto2, :onto2])
-      pattern([:cell, Vocabularies::Alignment.entity1, RDF::Resource.new(element)])
+      pattern([:cell, Vocabularies::Alignment.entity1, RDF::Resource.new(pattern_elements.first.rdf_type)])
       pattern([:cell, Vocabularies::Alignment.entity2, :target])
       pattern([:cell, Vocabularies::Alignment.relation, :relation])
       pattern([:cell, Vocabularies::Alignment.measure, :measure])
@@ -93,7 +93,13 @@ class OntologyMatcher
     
     subs = []
     @alignment_graph.query(q) do |res|
-      subs << OntologyCorrespondence.new(element, res[:target].to_s, res[:measure].to_s, res[:relation].to_s, res[:onto1].to_s, res[:onto2].to_s)
+      o1 = Ontology.find_by_url(res[:onto1].to_s)
+      o2 = Ontology.find_by_url(res[:onto2].to_s)
+      oc = OntologyCorrespondence.create(:input_ontology => o1, :output_ontology => o2, :measure => res[:measure].to_s, :relation => res[:relation].to_s)
+      oc.input_elements = pattern_elements
+      oc.output_elements << PatternElement.for_rdf_type(res[:target].to_s)
+      oc.save
+      subs << oc
     end
 
     return subs

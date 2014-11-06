@@ -14,6 +14,12 @@ class PatternElement < ActiveRecord::Base
     TypeExpression.for_rdf_type(self, "")
   end
   
+  def self.for_rdf_type(rdf_type)
+    pe = PatternElement.create()
+    pe.rdf_type = rdf_type
+    return pe
+  end
+  
   def rdf_type
     return type_expression.nil? ? "" : type_expression.fancy_string
   end

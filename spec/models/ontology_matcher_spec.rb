@@ -49,20 +49,20 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should find substitutes within the rdf files..." do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
-    subs = @om.get_substitutes_for("http://crs_dr/#author")
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])
     assert_equal 1, subs.size
-    assert_equal "http://ekaw/#Paper_Author", subs.first[:entity2]
-    subs = @om.get_substitutes_for("http://crs_dr#author_not_present_in_this_ontology")
+    assert_equal "http://ekaw/#Paper_Author", subs.first.entity2.rdf_type
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author_not_present_in_this_ontology")])
     assert_empty subs
   end
   
   it "should find substitutes within the rdf files and ignore slight URL deviations" do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
-    subs = @om.get_substitutes_for("http://crs_dr/#author")
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])
     assert_equal 1, subs.size
-    assert_equal "http://ekaw/#Paper_Author", subs.first[:entity2]
-    subs = @om.get_substitutes_for("http://crs_dr/#author_not_present_in_this_ontology")
+    assert_equal "http://ekaw/#Paper_Author", subs.first.entity2.rdf_type
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author_not_present_in_this_ontology")])
     assert_empty subs
   end
   
@@ -82,26 +82,26 @@ RSpec.describe OntologyMatcher, :type => :model do
   
   it "should survive an rdf import/export cycle" do
     @om.add_to_alignment_graph!(alignment_test_file)
-    assert_not_empty @om.get_substitutes_for("http://crs_dr/#author")            
+    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])            
     File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
     @om.write_alignment_graph!(alignment_test_output_file)
     @om.reset!
     @om.add_to_alignment_graph!(alignment_test_output_file)    
-    assert_not_empty @om.get_substitutes_for("http://crs_dr/#author")    
+    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])    
   end
   
   it "should properly export a new mapping once we've added that to the alignment graph" do
     # create the alignment graph
     @om.add_to_alignment_graph!(alignment_test_file)
-    correspondence = FactoryGirl.build(:ontology_correspondence)
+    correspondence = FactoryGirl.create(:ontology_correspondence)
     File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
     @om.add_correspondence_and_write_output!(correspondence, alignment_test_output_file)
     assert_equal true, File.exists?(alignment_test_output_file)
-    assert_not_empty @om.get_substitutes_for(correspondence.entity1)
+    assert_not_empty @om.get_substitutes_for(correspondence.input_elements)
     # here, we check whether a newly created matcher can work with that
     @om.reset!
     @om.add_to_alignment_graph!(alignment_test_output_file)
-    assert_not_empty @om.get_substitutes_for(correspondence.entity1)
+    assert_not_empty @om.get_substitutes_for(correspondence.input_elements)
   end  
   
   it "should properly run for two of the conference ontologies" do

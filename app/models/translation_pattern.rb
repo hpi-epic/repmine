@@ -29,15 +29,18 @@ class TranslationPattern < Pattern
   def prepare!
     correspondences = pattern.match_concepts(ontologies.first)
     offset = pattern.node_offset + 120
-    pattern.nodes.each do |node|
-      corr = correspondences.find{|c| c.entity1 == node.rdf_type}
+    pattern.pattern_elements.each do |input_element|
+      corr = correspondences.find{|c| c.input_elements.include?(input_element)}
       unless corr.nil?
-        new_node = create_node!
-        new_node.rdf_type = corr.entity2
-        new_node.equivalent = node
-        new_node.x = node.x + offset
-        new_node.y = node.y
-        new_node.save
+        corr.output_elements.each do |output_element|
+          output_element.pattern = self
+          output_element.equivalent = input_element
+          if input_element.is_a?(Node)
+            output_element.x = input_element.x + offset
+            output_element.y = input_element.y
+          end
+          output_element.save
+        end
       end
     end
   end
