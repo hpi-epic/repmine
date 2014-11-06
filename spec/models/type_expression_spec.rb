@@ -53,4 +53,9 @@ RSpec.describe TypeExpression, :type => :model do
     nott.fancy_string.should == "#{@not}(#{te1.rdf_type}#{@sub}#{te2.rdf_type})"    
   end
   
+  it "should create a proper structure for operators" do
+    nott = TypeExpression.for_operator(nil, @not)
+    assert_equal "#{@not}()", nott.fancy_string
+  end
+  
 end

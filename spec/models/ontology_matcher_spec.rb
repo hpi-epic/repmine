@@ -22,6 +22,14 @@ RSpec.describe OntologyMatcher, :type => :model do
     Rails.root.join("spec", "testfiles","test_me.rdf").to_s
   end
   
+  def author
+    "http://crs_dr/#author"
+  end
+  
+  def not_present
+    "http://crs_dr/#author_not_present_in_this_ontology"
+  end
+  
   before(:each) do
     Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)
     Pattern.any_instance.stub(:initialize_repository! => true)
@@ -49,7 +57,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should find substitutes within the rdf files..." do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
-    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
     assert_equal 1, subs.size
     assert_equal "http://ekaw/#Paper_Author", subs.first.entity2.rdf_type
     subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author_not_present_in_this_ontology")])
@@ -59,10 +67,10 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should find substitutes within the rdf files and ignore slight URL deviations" do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
-    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
     assert_equal 1, subs.size
     assert_equal "http://ekaw/#Paper_Author", subs.first.entity2.rdf_type
-    subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author_not_present_in_this_ontology")])
+    subs = @om.get_substitutes_for([PatternElement.for_rdf_type(not_present)])
     assert_empty subs
   end
   
@@ -80,14 +88,24 @@ RSpec.describe OntologyMatcher, :type => :model do
     end
   end
   
+  it "should provide correspondences only for the matched elements" do
+    @om.add_to_alignment_graph!(alignment_test_file)
+    pe1 = PatternElement.for_rdf_type(author)
+    pe2 = PatternElement.for_rdf_type(not_present)
+    subs = @om.get_substitutes_for([pe1, pe2])
+    assert_equal 1, subs.size
+    assert_equal 1, subs.first.input_elements.size
+    assert_not_include subs.first.input_elements, pe2
+  end
+  
   it "should survive an rdf import/export cycle" do
     @om.add_to_alignment_graph!(alignment_test_file)
-    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])            
+    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])            
     File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
     @om.write_alignment_graph!(alignment_test_output_file)
     @om.reset!
     @om.add_to_alignment_graph!(alignment_test_output_file)    
-    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author")])    
+    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])    
   end
   
   it "should properly export a new mapping once we've added that to the alignment graph" do
