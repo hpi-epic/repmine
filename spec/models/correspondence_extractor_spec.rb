@@ -29,7 +29,6 @@ RSpec.describe CorrespondenceExtractor, :type => :model do
     assert_equal 1, select_classification(@ce, @pattern, CorrespondenceExtractor::N_RC_N).size    
     r2 = FactoryGirl.create(:relation_constraint, :source => n2, :target => n1, :type_expression => FactoryGirl.create(:type_expression_rel2))
     @ce.extract_correspondences!(@pattern.rdf)    
-    #assert_equal 2, select_classification(@ce, @pattern, CorrespondenceExtractor::N_RC_N).size        
   end
   
   def select_classification(ce, pattern, classification)

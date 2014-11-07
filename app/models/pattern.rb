@@ -2,12 +2,12 @@ class Pattern < ActiveRecord::Base
   
   include RdfSerialization
   
-  attr_accessible :name, :description, :ontology_ids, :tag_list
+  attr_accessible :name, :description, :tag_list, :ontology_id
   attr_accessor :ag_connection
   
   acts_as_taggable_on :tags
 
-  has_and_belongs_to_many :ontologies
+  belongs_to :ontology
   has_many :pattern_elements, :dependent => :destroy
 
   # hooks
@@ -16,8 +16,8 @@ class Pattern < ActiveRecord::Base
 
   # validations
   validates :name, :presence => true
-  validates :description, :presence => true  
-  validates :ontologies, :length => {:minimum => 1, :too_short => "requires at least one selection"}
+  validates :description, :presence => true
+  validates :ontology, :presence => true
   
   def type_hierarchy()
     return ag_connection.type_hierarchy()
@@ -42,14 +42,7 @@ class Pattern < ActiveRecord::Base
     
   def initialize_repository!
     ag_connection.clear!
-    imported = Set.new(self.ontologies)
-    ontologies.each do |ontology|
-      (ontology.imports() - imported).each do |ont|
-        ont.load_to_repository!(self.repository_name)
-      end
-      imported.merge(ontology.imports)
-      ontology.load_to_repository!(self.repository_name)
-    end
+    ontology.load_to_repository!(self.repository_name)
     ag_connection.remove_duplicates!
   end
   
@@ -82,14 +75,14 @@ class Pattern < ActiveRecord::Base
     Set.new(nodes.collect{|n| n.used_concepts}.flatten)
   end
   
-  def unmatched_concepts(ontology)
-    matched = match_concepts(ontology)
+  def unmatched_concepts(ont)
+    matched = match_concepts(ont)
     unmatched = pattern_elements.select{|pe| matched.find{|match| match.input_elements.include?(pe)}.nil?}
     return Set.new(unmatched.collect{|pe| pe.used_concepts}.flatten)
   end
   
-  def match_concepts(ontology)
-    om = OntologyMatcher.new(self, ontology)
+  def match_concepts(ont)
+    om = OntologyMatcher.new(ontology, ont)
     om.match!
     return om.get_substitutes_for(pattern_elements)
   end
@@ -100,9 +93,7 @@ class Pattern < ActiveRecord::Base
   end
   
   def custom_prefixes()
-    prefixes = {}
-    ontologies.each{|ont| prefixes[ont.short_prefix] = ont.url}
-    return prefixes
+    return {ontology.short_prefix => ont.url}
   end
   
   def url
@@ -111,5 +102,9 @@ class Pattern < ActiveRecord::Base
   
   def rdf_types
     [Vocabularies::GraphPattern.GraphPattern]
+  end
+  
+  def infer_correspondences!
+    return []
   end
 end

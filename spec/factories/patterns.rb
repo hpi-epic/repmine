@@ -3,7 +3,7 @@ FactoryGirl.define do
     name "sample pattern"
     description "a simple pattern with a node, a relation constraint, and an attribute constraint"
     transient{node_count 1}
-    ontologies {create_list :ontology, 1}
+    ontology
     after(:create) do |pattern, evaluator|
       create_list(:node, evaluator.node_count, pattern: pattern)
     end
@@ -12,7 +12,7 @@ FactoryGirl.define do
   factory :node_only_pattern, :class => Pattern do
     name "sample pattern"
     description "a simple pattern with a node, a relation constraint, and an attribute constraint"
-    ontologies {create_list :ontology, 1}    
+    ontology
     transient{node_count 1}    
     after(:create) do |pattern, evaluator|
       create_list(:plain_node, evaluator.node_count, pattern: pattern)
@@ -22,6 +22,6 @@ FactoryGirl.define do
   factory :empty_pattern, :class => Pattern do
     name "sample pattern"
     description "a simple pattern without anything"
-    ontologies {create_list :ontology, 1}
+    ontology
   end
 end

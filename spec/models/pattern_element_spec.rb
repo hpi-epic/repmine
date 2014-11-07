@@ -23,4 +23,10 @@ RSpec.describe PatternElement, :type => :model do
     assert_equal "http://example.org/fancy_type", @pe.rdf_type
   end
   
+  it "should create just what you want it to be" do
+    assert Node.for_rdf_type("http://example.org/fancy_type").is_a?(Node)
+    assert AttributeConstraint.for_rdf_type("http://example.org/fancy_type").is_a?(AttributeConstraint)
+    assert RelationConstraint.for_rdf_type("http://example.org/fancy_type").is_a?(RelationConstraint)        
+  end
+  
 end

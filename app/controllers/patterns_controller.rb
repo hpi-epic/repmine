@@ -76,7 +76,7 @@ class PatternsController < ApplicationController
     @concept_count = @pattern.concepts_used.size
     
     # do not match when using the same ontology...
-    if @pattern.ontologies.size == 1 && @pattern.ontologies.first == @ontology
+    if @pattern.ontology == @ontology
       @mc = []
     else
       @mc = begin
@@ -107,8 +107,8 @@ class PatternsController < ApplicationController
     else
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
-      # TODO: throw them in the matcher and return, what was matched...
-      flash[:notice] = "Thanks for your feedback!"
+      ocs = OntologyCorrespondence.for_elements!(input_elements, output_elements)
+      flash[:notice] = "Thanks. We extracted #{ocs.size} correspondence#{ocs.size > 1 ? "s" : ""} from your input!"
       @correspondence = OntologyCorrespondence.for_elements!(input_elements, output_elements)
       input_elements.collect{|pe| pe.rdf_type}
     end

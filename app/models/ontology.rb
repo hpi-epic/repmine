@@ -90,4 +90,8 @@ class Ontology < ActiveRecord::Base
   def rdf_xml
     RestClient.get(self.url).body
   end
+  
+  def element_class_for_rdf_type(rdf_type)
+    ag_connection.element_class_for_rdf_type(rdf_type)
+  end
 end

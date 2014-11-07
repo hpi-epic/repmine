@@ -2,22 +2,20 @@ require 'open3'
 
 class OntologyMatcher
   
-  attr_accessor :ag_connection, :target_ontology, :pattern, :alignment_graph
+  attr_accessor :ag_connection, :target_ontology, :source_ontology, :alignment_graph
   
   class MatchingError < StandardError;end
   
-  def initialize(pattern, target_ontology)
-    @pattern = pattern
+  def initialize(source_ontology, target_ontology)
+    @source_ontology = source_ontology
     @target_ontology = target_ontology
     @alignment_graph = RDF::Graph.new()
   end
   
   def match!()
     prepare_matching!
-    pattern.ontologies.each do |s_ont|
-      call_matcher!(s_ont, target_ontology) unless already_matched?(s_ont, target_ontology)
-      add_to_alignment_graph!(alignment_path(s_ont, target_ontology))
-    end
+    call_matcher!(source_ontology, target_ontology) unless already_matched?(source_ontology, target_ontology)
+    add_to_alignment_graph!(alignment_path(source_ontology, target_ontology))
   end
   
   def alignment_graph
@@ -93,26 +91,19 @@ class OntologyMatcher
       # otherwhise create the query patterns
       q = RDF::Query.new{
         pattern([:alignment, Vocabularies::Alignment.map, :cell])
-        pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])
         pattern([:cell, Vocabularies::Alignment.entity1, RDF::Resource.new(pattern_element.rdf_type)])
         pattern([:cell, Vocabularies::Alignment.entity2, :target])
         pattern([:cell, Vocabularies::Alignment.relation, :relation])
         pattern([:cell, Vocabularies::Alignment.measure, :measure])
       }
     
-      # and issue them on the graph
+      # and issue them on the graph. TODO: check how complex correspondences are stored
       @alignment_graph.query(q) do |res|
-        o1 = Ontology.find_by_url(res[:onto1].to_s)
-        oc = OntologyCorrespondence.create(
-          :input_ontology => o1,
-          :output_ontology => target_ontology, 
-          :measure => res[:measure].to_s,
-          :relation => res[:relation].to_s
-        )
+        oc = OntologyCorrespondence.create(:input_ontology => source_ontology, :output_ontology => target_ontology, :measure => res[:measure].to_s, :relation => res[:relation].to_s)
         # add the input elements
         oc.input_elements << pattern_element
-        # and the output_elements -> TODO: complex correspondences
-        oc.output_elements << pattern_element.class.for_rdf_type(res[:target].to_s)
+        # and the output_elements
+        oc.output_elements << target_ontology.element_class_for_rdf_type(res[:target].to_s).for_rdf_type(res[:target].to_s)
         correspondences << oc
       end
     end
@@ -121,7 +112,7 @@ class OntologyMatcher
   
   def prepare_matching!
     target_ontology.download!
-    pattern.ontologies.each{|p| p.download!}
+    source_ontology.download!    
   end
   
   def alignment_path(s_ont, t_ont)

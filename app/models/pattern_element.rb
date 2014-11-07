@@ -13,7 +13,7 @@ class PatternElement < ActiveRecord::Base
   end
   
   def self.for_rdf_type(rdf_type)
-    pe = PatternElement.create()
+    pe = self.create!()
     pe.rdf_type = rdf_type
     return pe
   end

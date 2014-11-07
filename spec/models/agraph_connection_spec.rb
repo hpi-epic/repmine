@@ -59,6 +59,13 @@ RSpec.describe AgraphConnection, :type => :model do
     assert_equal TestOntology.ClassC.to_s, classA.subclasses.first.url
   end
   
+  it "should return the right pattern element class for everything" do
+    assert_equal Node, @agc.element_class_for_rdf_type(TestOntology.ClassA.to_s)
+    assert_equal AttributeConstraint, @agc.element_class_for_rdf_type(TestOntology.attrib_1.to_s)
+    assert_equal RelationConstraint, @agc.element_class_for_rdf_type(TestOntology.relation1.to_s)
+    assert_equal PatternElement, @agc.element_class_for_rdf_type("http://jibbetgarnich/alsoechtnicht")
+  end
+  
   def insert_ontology!(ag, ont)
     stmts = []
     ont.each_statement{|stmt| stmts << stmt}

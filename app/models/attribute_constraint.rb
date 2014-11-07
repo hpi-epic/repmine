@@ -15,7 +15,7 @@ class AttributeConstraint < PatternElement
   end
   
   def assign_to_pattern!
-    self.pattern = node.pattern
+    self.pattern = node.pattern unless node.nil?
   end
   
   def url

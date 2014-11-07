@@ -34,8 +34,8 @@ RSpec.describe OntologyMatcher, :type => :model do
     Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)
     Pattern.any_instance.stub(:initialize_repository! => true)
     @pattern = FactoryGirl.create(:pattern)    
-    @ontology = FactoryGirl.create(:ontology, :url => "http://example.org/myOntology2")    
-    @om = OntologyMatcher.new(@pattern, @ontology)
+    @ontology = FactoryGirl.create(:ontology)
+    @om = OntologyMatcher.new(@pattern.ontology, @ontology)
   end
   
   it "should not call the matcher when an existing file is present" do
@@ -98,6 +98,14 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_not_include subs.first.input_elements, pe2
   end
   
+  it "should return matched elements of the proper type" do
+    @om.add_to_alignment_graph!(alignment_test_file)
+    pe1 = PatternElement.for_rdf_type(author)
+    Ontology.any_instance.stub(:element_class_for_rdf_type => AttributeConstraint)
+    subs = @om.get_substitutes_for([pe1])
+    assert subs.first.output_elements.first.is_a?(AttributeConstraint)
+  end
+  
   it "should survive an rdf import/export cycle" do
     @om.add_to_alignment_graph!(alignment_test_file)
     assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])            
@@ -126,11 +134,10 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should properly run for two of the conference ontologies" do
     o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")
     o2 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl", :short_name => "ekaw")
-    @pattern.ontologies = [o1]
-    @om = OntologyMatcher.new(@pattern, o2)
+    @om = OntologyMatcher.new(o1, o2)
     File.delete(aml_test_file) if File.exists?(aml_test_file)
     assert_equal true, @om.alignment_path(o1,o2).ends_with?("ont_#{o1.id}_ont_#{o2.id}.rdf")
-    @om.stub(:alignment_path => aml_test_file)    
+    @om.stub(:alignment_path => aml_test_file)
     @om.match!
     assert_equal true, File.exists?(aml_test_file)
   end
@@ -148,4 +155,5 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal oc, subs.first
     assert_equal count_before, OntologyCorrespondence.count
   end
+  
 end

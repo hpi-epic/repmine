@@ -21,7 +21,7 @@
       <td><%= radio_button_tag(:pattern_id, pattern.id)%>&nbsp;<%= link_to(pattern.name, pattern_path(pattern)) %></td>
       <td><%= pattern.description %></td>
       <td><%= pattern.concept_count %></td>
-      <td><%= pattern.ontologies.collect{|ont| ont.short_name}.join("<br />").html_safe%>
+      <td><%= pattern.ontology.short_name %>
       <td><%= link_to("Delete", pattern_path(pattern), :method => :delete, :class => "btn btn-danger", :confirm => "Really delete #{pattern.name}?") %></td>
     </tr>
   <% end %>

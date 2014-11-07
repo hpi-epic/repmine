@@ -1,29 +1,8 @@
-# SEON ontologies
-[
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/main.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/measurement.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/measurement.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/clones.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/code-flaws.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/change-couplings.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/integration-history-issues.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/integration-code-history.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/integration-history-issues-code.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/fine-grained-changes.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/issues.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/code.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/code-metrics.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/history.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/jira.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/java.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/bugzilla.owl"
-].each do |ontology_url|
-  Ontology.where(
-    url: ontology_url, 
-    short_name: "Seon##{ontology_url.split("/").last}",
-    group: "SEON"
-  ).first_or_create
-end
+Ontology.where(
+  url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl", 
+  short_name: "Seon#seon.owl",
+  group: "Software Repositories"
+).first_or_create
 
 # Conference Ontologies (OAEI)
 [

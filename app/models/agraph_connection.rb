@@ -86,6 +86,24 @@ class AgraphConnection
     return superclasses.to_a
   end
   
+  def element_class_for_rdf_type(rdf_type)
+    repository.build_query(:infer => true) do |q|
+      q.pattern([RDF::Resource.new(rdf_type), RDF.type, :clazz])
+    end.run do |res|
+      case res[:clazz]
+      when RDF::OWL.Class
+        return Node
+      when RDF::RDFS.Class
+        return Node
+      when RDF::OWL.DatatypeProperty
+        return AttributeConstraint
+      when RDF::OWL.ObjectProperty
+        return RelationConstraint
+      end
+    end
+    return PatternElement
+  end
+  
   # gets the entire type hierarchy from an ontology. ditches anonymous classes (e.g., owl:unions as the users should provide them)
   def type_hierarchy
     classes = {}

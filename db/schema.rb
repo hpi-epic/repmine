@@ -41,11 +41,6 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
     t.integer  "repository_id"
   end
 
-  create_table "ontologies_patterns", :id => false, :force => true do |t|
-    t.integer "ontology_id"
-    t.integer "pattern_id"
-  end
-
   create_table "ontology_correspondences", :force => true do |t|
     t.float    "measure"
     t.string   "relation"
@@ -82,15 +77,15 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
   create_table "patterns", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
+    t.integer  "ontology_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
     t.string   "type"
-    t.integer  "target_ontology_id"
     t.integer  "pattern_id"
   end
 
+  add_index "patterns", ["ontology_id"], :name => "index_patterns_on_ontology_id"
   add_index "patterns", ["pattern_id"], :name => "index_patterns_on_pattern_id"
-  add_index "patterns", ["target_ontology_id"], :name => "index_patterns_on_target_ontology_id"
 
   create_table "repositories", :force => true do |t|
     t.string  "name"
