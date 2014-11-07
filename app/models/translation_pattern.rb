@@ -34,7 +34,6 @@ class TranslationPattern < Pattern
       unless corr.nil?
         corr.output_elements.each do |output_element|
           output_element.pattern = self
-          output_element.equivalent = input_element
           if input_element.is_a?(Node)
             output_element.x = input_element.x + offset
             output_element.y = input_element.y

@@ -23,7 +23,6 @@ RSpec.describe TranslationPattern, :type => :model do
     @tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
     assert_equal 1, @tp.pattern_elements.size
     assert_equal correspondence.entity2, @tp.pattern_elements.first
-    assert_equal @pattern.pattern_elements.first, @tp.pattern_elements.first.equivalent
   end
   
 end

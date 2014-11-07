@@ -2,11 +2,9 @@ class PatternElement < ActiveRecord::Base
   # explicitly allows setting the rdf type of a node
   attr_accessible :rdf_type
 
-  has_one :type_expression, :dependent => :destroy
   belongs_to :pattern
-  
-  belongs_to :equivalent, :class_name => "PatternElement"
-  has_many :equivalents, :class_name => "PatternElement", :foreign_key => "equivalent_id"
+  has_one :type_expression, :dependent => :destroy
+  has_and_belongs_to_many :ontology_correspondences, :foreign_key => "input_element_id"
   
   after_create :build_type_expression!
   
