@@ -105,7 +105,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.write_alignment_graph!(alignment_test_output_file)
     @om.reset!
     @om.add_to_alignment_graph!(alignment_test_output_file)    
-    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])    
+    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
   end
   
   it "should properly export a new mapping once we've added that to the alignment graph" do
@@ -132,5 +132,19 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.stub(:alignment_path => aml_test_file)    
     @om.match!
     assert_equal true, File.exists?(aml_test_file)
+  end
+  
+  it "should not return a new correspondence if we already have one" do
+    @om.add_to_alignment_graph!(alignment_test_file)
+    pe1 = PatternElement.for_rdf_type(author)
+    pe2 = PatternElement.for_rdf_type(not_present)
+    oc = OntologyCorrespondence.create(:input_ontology => @ontology, :output_ontology => @ontology, :measure => 1.0, :relation => "=")
+    oc.input_elements << pe1
+    oc.output_elements << pe2
+    count_before = OntologyCorrespondence.count
+    subs = @om.get_substitutes_for([pe1])
+    assert_equal 1, subs.size
+    assert_equal oc, subs.first
+    assert_equal count_before, OntologyCorrespondence.count
   end
 end
