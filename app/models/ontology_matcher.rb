@@ -2,23 +2,21 @@ require 'open3'
 
 class OntologyMatcher
   
-  attr_accessor :ag_connection, :target_ontologies, :pattern, :alignment_graph
+  attr_accessor :ag_connection, :target_ontology, :pattern, :alignment_graph
   
   class MatchingError < StandardError;end
   
-  def initialize(pattern, target_ontologies)
+  def initialize(pattern, target_ontology)
     @pattern = pattern
-    @target_ontologies = target_ontologies
+    @target_ontology = target_ontology
     @alignment_graph = RDF::Graph.new()
   end
   
   def match!()
     prepare_matching!
-    target_ontologies.each do |t_ont|
-      pattern.ontologies.each do |s_ont|
-        call_matcher!(s_ont, t_ont) unless already_matched?(s_ont, t_ont)
-        add_to_alignment_graph!(alignment_path(s_ont, t_ont))
-      end
+    pattern.ontologies.each do |s_ont|
+      call_matcher!(s_ont, target_ontology) unless already_matched?(s_ont, target_ontology)
+      add_to_alignment_graph!(alignment_path(s_ont, target_ontology))
     end
   end
   
@@ -80,34 +78,48 @@ class OntologyMatcher
   end
   
   # this is where the magic happens. We search the alignment graph for matches regarding the provided pattern element
+  # TODO: widen the search to combinations, e.g., node -> relation -> node, etc.
   def get_substitutes_for(pattern_elements)
     correspondences = []
     pattern_elements.each do |pattern_element|
+      # if we already have a correspondence -> no need to query the alignment graph
+      existing_correspondences = pattern_element.ontology_correspondences.where(:output_ontology_id => target_ontology)
+      unless existing_correspondences.empty?
+        correspondences << existing_correspondences.first
+        next
+      end
+      
+      # otherwhise create the query patterns
       q = RDF::Query.new{
         pattern([:alignment, Vocabularies::Alignment.map, :cell])
         pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])
-        pattern([:alignment, Vocabularies::Alignment.onto2, :onto2])
         pattern([:cell, Vocabularies::Alignment.entity1, RDF::Resource.new(pattern_element.rdf_type)])
         pattern([:cell, Vocabularies::Alignment.entity2, :target])
         pattern([:cell, Vocabularies::Alignment.relation, :relation])
         pattern([:cell, Vocabularies::Alignment.measure, :measure])
       }
     
+      # and issue them on the graph
       @alignment_graph.query(q) do |res|
         o1 = Ontology.find_by_url(res[:onto1].to_s)
-        o2 = Ontology.find_by_url(res[:onto2].to_s)
-        oc = OntologyCorrespondence.create(:input_ontology => o1, :output_ontology => o2, :measure => res[:measure].to_s, :relation => res[:relation].to_s)
+        oc = OntologyCorrespondence.create(
+          :input_ontology => o1,
+          :output_ontology => target_ontology, 
+          :measure => res[:measure].to_s,
+          :relation => res[:relation].to_s
+        )
+        # add the input elements
         oc.input_elements << pattern_element
-        oc.output_elements << PatternElement.for_rdf_type(res[:target].to_s)
+        # and the output_elements -> TODO: complex correspondences
+        oc.output_elements << pattern_element.class.for_rdf_type(res[:target].to_s)
         correspondences << oc
       end
     end
-    
     return correspondences
   end
   
   def prepare_matching!
-    target_ontologies.each{|t| t.download!}
+    target_ontology.download!
     pattern.ontologies.each{|p| p.download!}
   end
   

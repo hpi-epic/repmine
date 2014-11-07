@@ -35,7 +35,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     Pattern.any_instance.stub(:initialize_repository! => true)
     @pattern = FactoryGirl.create(:pattern)    
     @ontology = FactoryGirl.create(:ontology, :url => "http://example.org/myOntology2")    
-    @om = OntologyMatcher.new(@pattern, [@ontology])
+    @om = OntologyMatcher.new(@pattern, @ontology)
   end
   
   it "should not call the matcher when an existing file is present" do
@@ -126,7 +126,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")
     o2 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl", :short_name => "ekaw")
     @pattern.ontologies = [o1]
-    @om = OntologyMatcher.new(@pattern, [o2])
+    @om = OntologyMatcher.new(@pattern, o2)
     File.delete(aml_test_file) if File.exists?(aml_test_file)
     assert_equal true, @om.alignment_path(o1,o2).ends_with?("ont_#{o1.id}_ont_#{o2.id}.rdf")
     @om.stub(:alignment_path => aml_test_file)    
