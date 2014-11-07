@@ -20,13 +20,13 @@ class OntologyMatcher
     end
   end
   
-  def add_to_alignment_graph!(path)
-    alignment_graph.load!(path)
+  def alignment_graph
+    match! if @alignment_graph.nil?
+    return @alignment_graph
   end
   
-  def add_correspondence_and_write_output!(correspondence, output_path)
-    add_correspondence!(correspondence)
-    write_alignment_graph!(output_path)
+  def add_to_alignment_graph!(path)
+    alignment_graph.load!(path)
   end
   
   def write_alignment_graph!(output_path)
@@ -43,6 +43,7 @@ class OntologyMatcher
       end
     end
     alignment_graph.insert!(*correspondence.rdf)
+    write_alignment_graph!(alignment_path(correspondence.input_ontology, correspondence.output_ontology))
   end
   
   def reset!

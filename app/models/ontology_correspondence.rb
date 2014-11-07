@@ -10,6 +10,21 @@ class OntologyCorrespondence < ActiveRecord::Base
   attr_accessible :measure, :relation, :input_ontology, :output_ontology
   attr_accessor :alignment
   
+  # creates a new correspondence and adds it to the alignment graph
+  def self.for_elements!(input_elements, output_elements, source_pattern, input_ontology, output_ontology)
+    oc = OntologyCorrespondence.create(
+      :input_ontology => input_ontology,
+      :output_ontology => output_ontology,       
+      :relation => "=",
+      :measure => 1.0
+    )
+    oc.input_elements = input_elements
+    oc.output_elements = output_elements
+    om = OntologyMatcher.new(source_pattern, output_ontology)
+    om.add_correspondence!(oc)
+    return oc
+  end
+  
   def rdf_types
     [Vocabularies::Alignment.Cell]
   end

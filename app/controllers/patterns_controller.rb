@@ -100,6 +100,7 @@ class PatternsController < ApplicationController
   def save_correspondence
     sources = (params[:source_element_ids] || []).reject{|x| x.blank?}.first  
     targets = (params[:target_element_ids] || []).reject{|x| x.blank?}.first
+
     matched_concepts = if sources.blank? || targets.blank?
       flash[:error] = "You forgot to specify in or output elements. Please, watch the notifications in the top right corner!"
       []
@@ -108,9 +109,7 @@ class PatternsController < ApplicationController
       output_elements = PatternElement.find(targets.split(","))
       # TODO: throw them in the matcher and return, what was matched...
       flash[:notice] = "Thanks for your feedback!"
-      @source_pattern = Pattern.find(params[:pattern_id])
-      @target_pattern = Pattern.find(params[:target_pattern_id])
-      # source_pattern.add_match(input_elements, output_elements)
+      @correspondence = OntologyCorrespondence.for_elements!(input_elements, output_elements)
       input_elements.collect{|pe| pe.rdf_type}
     end
     render :json => matched_concepts

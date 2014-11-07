@@ -42,7 +42,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.stub(:alignment_path => alignment_test_file)
     assert_equal true, @om.already_matched?(@ontology, @ontology)
     expect(@om).to receive(:call_matcher!).never
-    expect(@om).to receive(:add_to_alignment_graph!).once    
+    expect(@om).to receive(:add_to_alignment_graph!).once
     @om.match!
   end
   
@@ -113,7 +113,8 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.add_to_alignment_graph!(alignment_test_file)
     correspondence = FactoryGirl.create(:ontology_correspondence)
     File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
-    @om.add_correspondence_and_write_output!(correspondence, alignment_test_output_file)
+    @om.stub(:alignment_path => alignment_test_output_file)
+    @om.add_correspondence!(correspondence)
     assert_equal true, File.exists?(alignment_test_output_file)
     assert_not_empty @om.get_substitutes_for(correspondence.input_elements)
     # here, we check whether a newly created matcher can work with that
