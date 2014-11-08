@@ -20,6 +20,12 @@ SimpleCov.start 'rails'
 RSpec.configure do |config|
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.
+
+  config.before(:each) do
+    Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)
+    Pattern.any_instance.stub(:initialize_repository! => true)
+  end
+  
 begin
   # These two settings work together to allow you to limit a spec run
   # to individual examples or groups you care about by tagging them with

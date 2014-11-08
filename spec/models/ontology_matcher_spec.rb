@@ -31,8 +31,6 @@ RSpec.describe OntologyMatcher, :type => :model do
   end
   
   before(:each) do
-    Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)
-    Pattern.any_instance.stub(:initialize_repository! => true)
     @pattern = FactoryGirl.create(:pattern)    
     @ontology = FactoryGirl.create(:ontology)
     @om = OntologyMatcher.new(@pattern.ontology, @ontology)
