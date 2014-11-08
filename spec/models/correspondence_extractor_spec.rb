@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe CorrespondenceExtractor, :type => :model do
   
   before(:each) do
-    Pattern.any_instance.stub(:initialize_repository! => true)
     @ce = CorrespondenceExtractor.new()    
   end
   
@@ -14,7 +13,7 @@ RSpec.describe CorrespondenceExtractor, :type => :model do
   end
   
   it "should not think a multi-element pattern is simple" do 
-    @pattern = FactoryGirl.create(@pattern)
+    @pattern = FactoryGirl.create(:pattern)
     @ce.classify!(@pattern.rdf)
     assert_equal 0, select_classification(@ce, @pattern, CorrespondenceExtractor::SG).size
   end

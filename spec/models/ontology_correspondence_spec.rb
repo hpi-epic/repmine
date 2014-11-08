@@ -12,7 +12,6 @@ RSpec.describe OntologyCorrespondence, :type => :model do
   
   it "should create a new correspondence" do
     OntologyMatcher.any_instance.stub(:alignment_path => alignment_test_output_file)    
-    Pattern.any_instance.stub(:initialize_repository! => true)
     alignment_graph = RDF::Graph.new
     alignment_graph.load!(alignment_test_file)
     OntologyMatcher.any_instance.stub(:alignment_graph => alignment_graph)        

@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe TranslationPattern, :type => :model do
   
   before(:each) do
-    Pattern.any_instance.stub(:initialize_repository! => true)
     Pattern.any_instance.stub(:match_concepts => [])    
     @pattern = FactoryGirl.create(:pattern)
     @ontology = FactoryGirl.create(:ontology, :url => "http://example.org/ontology2")

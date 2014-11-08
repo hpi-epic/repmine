@@ -2,17 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Pattern, :type => :model do
   
-  before(:each) do
-    Pattern.any_instance.stub(:initialize_repository! => true)
-  end
-  
-  it "should not change its repository name after the first save" do
-    @pattern = FactoryGirl.create(:pattern)
-    res_before = @pattern.repository_name
-    @pattern.save 
-    assert_equal res_before, @pattern.repository_name    
-  end
-  
   it "should create a proper RDF graph for a simple pattern" do
     @pattern = FactoryGirl.create(:pattern)
     @graph = @pattern.rdf_graph

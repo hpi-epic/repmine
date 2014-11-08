@@ -14,17 +14,17 @@ class OntologyMatcher
   
   def match!()
     prepare_matching!
-    call_matcher!(source_ontology, target_ontology) unless already_matched?(source_ontology, target_ontology)
-    add_to_alignment_graph!(alignment_path(source_ontology, target_ontology))
+    call_matcher! unless already_matched?
+    add_to_alignment_graph!(alignment_path)
   end
   
   def alignment_graph
-    match! if @alignment_graph.nil?
+    add_to_alignment_graph!(alignment_path) if @alignment_graph.empty?
     return @alignment_graph
   end
   
   def add_to_alignment_graph!(path)
-    alignment_graph.load!(path)
+    @alignment_graph.load!(path) if File.exists?(path)
   end
   
   def write_alignment_graph!(output_path)
@@ -41,21 +41,21 @@ class OntologyMatcher
       end
     end
     alignment_graph.insert!(*correspondence.rdf)
-    write_alignment_graph!(alignment_path(correspondence.input_ontology, correspondence.output_ontology))
+    write_alignment_graph!(alignment_path)
   end
   
   def reset!
     @alignment_graph = RDF::Graph.new()
   end
     
-  def call_matcher!(s_ont, t_ont)
-    cmd = "java -jar AgreementMakerLightCLI.jar -m -s #{s_ont.local_file_path} -t #{t_ont.local_file_path} -o #{alignment_path(s_ont, t_ont)}"
+  def call_matcher!
+    cmd = "java -jar AgreementMakerLightCLI.jar -m -s #{source_ontology.local_file_path} -t #{target_ontology.local_file_path} -o #{alignment_path}"
     errors = nil
     Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml-jar")) do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
       raise MatchingError, errors unless errors.blank?
     end
-    clean_uris!(alignment_path(s_ont, t_ont))
+    clean_uris!(alignment_path)
   end
   
   def clean_uris!(path)
@@ -72,8 +72,8 @@ class OntologyMatcher
     end
   end
   
-  def already_matched?(s_ont, t_ont)
-    return File.exist?(alignment_path(s_ont, t_ont))
+  def already_matched?
+    return File.exist?(alignment_path)
   end
   
   # this is where the magic happens. We search the alignment graph for matches regarding the provided pattern element
@@ -116,8 +116,8 @@ class OntologyMatcher
     source_ontology.download!    
   end
   
-  def alignment_path(s_ont, t_ont)
-    return Rails.root.join("public", "ontologies", "alignments", "ont_#{s_ont.id}_ont_#{t_ont.id}.rdf").to_s
+  def alignment_path()
+    return Rails.root.join("public", "ontologies", "alignments", "ont_#{source_ontology.id}_ont_#{target_ontology.id}.rdf").to_s
   end
 
 end

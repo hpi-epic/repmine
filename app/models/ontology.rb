@@ -10,6 +10,7 @@ class Ontology < ActiveRecord::Base
   
   has_and_belongs_to_many :patterns
   before_validation :set_ontology_url! ,:set_short_name_if_empty!
+  after_create :load_to_dedicated_repository!
   before_destroy :delete_repository!
   
   def set_short_name_if_empty!
@@ -76,10 +77,8 @@ class Ontology < ActiveRecord::Base
     return Rails.root.join("public", "ontologies", "tmp", url.split("/").last)
   end
   
-  def download!(force = false)
-    if !File.exist?(local_file_path) || force
-      File.open(local_file_path, "w+"){|f| f.puts rdf_xml} 
-    end
+  def download!()
+    File.open(local_file_path, "w+"){|f| f.puts rdf_xml} unless File.exist?(local_file_path)
   end
   
   # prefixes for the graph. not needed for imported ontologies

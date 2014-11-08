@@ -22,8 +22,12 @@ RSpec.configure do |config|
 # with RSpec, but feel free to customize to your heart's content.
 
   config.before(:each) do
-    Ontology.any_instance.stub(:download! => true, :load_to_dedicated_repository! => true)
-    Pattern.any_instance.stub(:initialize_repository! => true)
+    Ontology.any_instance.stub(
+      :download! => true, 
+      :load_to_dedicated_repository! => true, 
+      :delete_repository! => true,
+      :element_class_for_rdf_type => Node
+    )
   end
   
 begin

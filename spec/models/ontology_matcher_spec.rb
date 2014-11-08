@@ -38,7 +38,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   
   it "should not call the matcher when an existing file is present" do
     @om.stub(:alignment_path => alignment_test_file)
-    assert_equal true, @om.already_matched?(@ontology, @ontology)
+    assert_equal true, @om.already_matched?    
     expect(@om).to receive(:call_matcher!).never
     expect(@om).to receive(:add_to_alignment_graph!).once
     @om.match!
@@ -47,8 +47,8 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should call the matcher when no file is present" do
     Open3.stub(:popen3 => true)
     @om.stub(:alignment_path => Rails.root.join("spec","this_file_should_not_exist.rdf"))
-    expect(@om.alignment_graph).to receive(:load!).once
-    expect(@om).to receive(:clean_uris!).once    
+    assert !@om.already_matched?
+    expect(@om).to receive(:clean_uris!).once  
     @om.match!
   end
   
@@ -131,11 +131,14 @@ RSpec.describe OntologyMatcher, :type => :model do
   
   it "should properly run for two of the conference ontologies" do
     o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")
+    o1.stub(:local_file_path => Rails.root.join("spec", "testfiles","crs_dr.owl").to_s)
     o2 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl", :short_name => "ekaw")
+    o2.stub(:local_file_path => Rails.root.join("spec", "testfiles","ekaw.owl").to_s)
     @om = OntologyMatcher.new(o1, o2)
     File.delete(aml_test_file) if File.exists?(aml_test_file)
-    assert_equal true, @om.alignment_path(o1,o2).ends_with?("ont_#{o1.id}_ont_#{o2.id}.rdf")
+    assert_equal true, @om.alignment_path.ends_with?("ont_#{o1.id}_ont_#{o2.id}.rdf")
     @om.stub(:alignment_path => aml_test_file)
+    assert !@om.already_matched?
     @om.match!
     assert_equal true, File.exists?(aml_test_file)
   end

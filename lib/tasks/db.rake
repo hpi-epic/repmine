@@ -6,10 +6,6 @@ namespace :db do
       puts "Deleting: #{o.repository_name}"
       o.delete_repository!
     }
-    Pattern.all.each{|p| 
-      puts "Deleting: #{p.repository_name}"
-      p.delete_repository!
-    }
     puts "Done. Continuing with standard db creation..."
     Rake::Task["db:drop"].invoke
     Rake::Task["db:create"].invoke

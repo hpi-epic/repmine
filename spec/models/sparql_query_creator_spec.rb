@@ -2,11 +2,6 @@ require 'rails_helper'
 
 RSpec.describe SparqlQueryCreator, :type => :model do
   
-  before(:each) do
-    # we need the patterns, not the repositories
-    Pattern.any_instance.stub(:initialize_repository! => true)
-  end
-  
   it "should create a simple one node query" do
     pattern = FactoryGirl.create(:node_only_pattern)
     qc = SparqlQueryCreator.new(pattern, nil)

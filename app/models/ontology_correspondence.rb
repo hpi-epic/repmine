@@ -17,7 +17,12 @@ class OntologyCorrespondence < ActiveRecord::Base
     oc = OntologyCorrespondence.create(:input_ontology => input_ontology, :output_ontology => output_ontology, :relation => "=", :measure => 1.0)
     oc.input_elements = input_elements
     oc.output_elements = output_elements
-    oc.add_to_alignment_graph!
+    begin
+      oc.add_to_alignment_graph!
+    rescue Exception => e
+      oc.destroy
+      return nil
+    end
     return oc
   end
   

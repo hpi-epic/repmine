@@ -29,7 +29,6 @@ class PatternsController < ApplicationController
     @pattern = Pattern.new(params[:pattern])
     respond_to do |format|
       if @pattern.save
-        @pattern.initialize_repository!
         flash[:notice] = 'Pattern was successfully created.'
         format.html { redirect_to @pattern}
       else
@@ -107,8 +106,13 @@ class PatternsController < ApplicationController
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
       @oc = OntologyCorrespondence.for_elements!(input_elements, output_elements)
-      flash[:notice] = "Thanks for the correspondence!"
-      oc.input_elements.collect{|pe| pe.rdf_type}
+      if @oc.nil?
+        flash[:error] = "Could not save correspondence! Contact your administrator"
+        []
+      else
+        flash[:notice] = "Thanks for the correspondence!"
+        @oc.input_elements.collect{|pe| pe.rdf_type}
+      end
     end
     render :json => matched_concepts
   end
