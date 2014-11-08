@@ -93,7 +93,6 @@ class PatternsController < ApplicationController
   def query
     @pattern = Pattern.find(params[:pattern_id])
     @ontology = Ontology.find(params[:ontology_id])
-    #@target_pattern = TranslationPattern.for_pattern_and_repository(@source_pattern, @repository)
     @query = "SELECT * FROM data"
   end
   
@@ -107,10 +106,9 @@ class PatternsController < ApplicationController
     else
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
-      ocs = OntologyCorrespondence.for_elements!(input_elements, output_elements)
-      flash[:notice] = "Thanks. We extracted #{ocs.size} correspondence#{ocs.size > 1 ? "s" : ""} from your input!"
-      @correspondence = OntologyCorrespondence.for_elements!(input_elements, output_elements)
-      input_elements.collect{|pe| pe.rdf_type}
+      @oc = OntologyCorrespondence.for_elements!(input_elements, output_elements)
+      flash[:notice] = "Thanks for the correspondence!"
+      oc.input_elements.collect{|pe| pe.rdf_type}
     end
     render :json => matched_concepts
   end

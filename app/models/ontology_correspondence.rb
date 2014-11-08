@@ -8,7 +8,7 @@ class OntologyCorrespondence < ActiveRecord::Base
   belongs_to :output_ontology, :class_name => "Ontology"
   
   attr_accessible :measure, :relation, :input_ontology, :output_ontology
-  attr_accessor :alignment
+  attr_accessor :alignment, :ontology_matcher
   
   # creates a new correspondence and adds it to the alignment graph
   def self.for_elements!(input_elements, output_elements)
@@ -17,13 +17,20 @@ class OntologyCorrespondence < ActiveRecord::Base
     oc = OntologyCorrespondence.create(:input_ontology => input_ontology, :output_ontology => output_ontology, :relation => "=", :measure => 1.0)
     oc.input_elements = input_elements
     oc.output_elements = output_elements
-    om = OntologyMatcher.new(input_ontology, output_ontology)
-    om.add_correspondence!(oc)
-    return [oc] + output_elements.first.pattern.infer_correspondences!()
+    oc.add_to_alignment_graph!
+    return oc
   end
   
   def rdf_types
     [Vocabularies::Alignment.Cell]
+  end
+  
+  def add_to_alignment_graph!
+    ontology_matcher.add_correspondence!(self)
+  end
+  
+  def ontology_matcher
+    @ontology_matcher ||= OntologyMatcher.new(input_ontology, output_ontology)
   end
   
   # he, who must not be named...

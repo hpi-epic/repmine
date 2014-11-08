@@ -21,12 +21,12 @@ RSpec.describe OntologyCorrespondence, :type => :model do
     @pattern2 = FactoryGirl.create(:node_only_pattern)
     input_elements = [@pattern.nodes.first]
     output_elements = [@pattern2.nodes.first]
-    ocs = OntologyCorrespondence.for_elements!(input_elements, output_elements)
+    oc = OntologyCorrespondence.for_elements!(input_elements, output_elements)
     OntologyMatcher.any_instance.unstub(:alignment_graph)
     om = OntologyMatcher.new(@pattern.ontology, @pattern2.ontology)
     subs = om.get_substitutes_for([@pattern.nodes.first])
     assert_equal 1, subs.size
-    assert_equal subs.first, ocs.first
+    assert_equal subs.first, oc
   end
   
 end
