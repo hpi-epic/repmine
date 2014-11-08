@@ -1,5 +1,5 @@
 class CorrespondenceExtractor
-  attr_accessor :rule_engine
+  attr_accessor :rule_engine, :source_pattern
   
   # TODO: substitute with RDF::Resource.new(xyz)
   C_PROP = "classification"
@@ -10,7 +10,7 @@ class CorrespondenceExtractor
   N_AC = "n-ac"
   N_RC_N_RC_N = "n-rc-n-rc-n"
   
-  def extract_correspondences!(input_graph)
+  def classify!(input_graph)
     reset!
     input_graph.each{|stmt| rule_engine << stmt}
   end
@@ -69,24 +69,5 @@ class CorrespondenceExtractor
         gen(:Graph, C_PROP, N_AC)
       }
     end
-  end
-  
-  def node_rel_node_rel_node_rule()
-    rule(N_RC_N_RC_N) do
-      forall {
-        has(:Relation, Vocabularies::GraphPattern.belongsTo, :Graph)
-        has(:Relation, RDF.type, Vocabularies::GraphPattern.RelationConstraint)
-        has(:Node, Vocabularies::GraphPattern.outgoingRelation, :Relation)
-        has(:Node2, Vocabularies::GraphPattern.incomingRelation, :Relation)
-        has(:Relation2, Vocabularies::GraphPattern.belongsTo, :Graph)
-        has(:Relation2, RDF.type, Vocabularies::GraphPattern.RelationConstraint)
-        diff(:Relation1, :Relation2)
-        has(:Node2, Vocabularies::GraphPattern.outgoingRelation, :Relation)
-        has(:Node3, Vocabularies::GraphPattern.incomingRelation, :Relation)        
-      }
-      make {
-        gen(:Graph, C_PROP, N_RC_N)
-      }
-    end    
   end
 end
