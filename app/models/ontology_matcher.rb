@@ -112,6 +112,7 @@ class OntologyMatcher
   
   def prepare_matching!
     target_ontology.download!
+    target_ontology.load_to_dedicated_repository!
     source_ontology.download!    
   end
   

@@ -20,7 +20,7 @@ class PatternsController < ApplicationController
     
     @ontology = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @ontology)
-    @matched_concepts = @source_pattern.match_concepts(@ontology).collect{|oc| oc.entity1}
+    @matched_concepts = @source_pattern.match_concepts(@ontology).collect{|oc| oc.input_elements.collect{|pe| pe.rdf_type}}.flatten
     @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.type_hierarchy
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
   end
