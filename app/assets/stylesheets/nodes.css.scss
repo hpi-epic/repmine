@@ -3,29 +3,29 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 div.node {
-  height: 5em;
-  width: 10em;
+  height: 4em;
+  width: 8em;
   position: absolute;
   padding: 5px;
   text-align: center;
   background: #C4C2C2;
   border: 2px solid #A8A8A8;
-  border-radius: 25px;
+  border-radius: 1em;
 }
 
 div.immutable_node {
-  height: 3.5em;    
+  height: 2em;    
   border: 2px solid #CACACA;
 }
 
 div.node select{
-  font-size: 13px;
-  width: 130px;
+  font-size: 0.75em;
+  width: 10em;
   height: 2em;
 }
 
 div.node form{
-  margin-top: 10px;
+  margin-top: 0.3em;
 }
 
 div.node_modal {

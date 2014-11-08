@@ -140,7 +140,7 @@ var showHelpfulMessage = function(selected_in, selected_out){
   if(selected_in.size() > 0 && selected_out.size() > 0){
     msg += "Press <i><u>Save Mapping</u></i> when ready!"
   }
-  $.jGrowl(msg);
+  $.jGrowl(msg, {theme: 'info'});
 }
 
 var loadTranslationPattern = function(){

@@ -43,16 +43,21 @@ div.center_everything {
   width: 95%;
 }
 
-div.jGrowl div.warning {
+.jGrowl .warning {
   color: #000;
 }
 
-div.jGrowl div.error {
-  border-color: #CC3412;
+.jGrowl .error {
+  border: 3px solid #CC3412;  
   color: #000;
 }
 
-div.jGrowl div.notice {
-  border-color: #3E9117;
+.jGrowl .notice {
+  border: 3px solid #3E9117;
+  color: #000;
+}
+
+.jGrowl .info {
+  border: 3px solid #17B3E3;
   color: #000;
 }
