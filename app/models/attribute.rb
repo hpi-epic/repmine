@@ -28,4 +28,8 @@ class Attribute
       [resource, RDF::RDFS.range, range]
     ]
   end
+  
+  def ==(other_object)
+    return self.url == other_object.url
+  end
 end

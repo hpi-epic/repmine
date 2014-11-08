@@ -41,7 +41,7 @@ class AgraphConnection
   
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
-    rels = Set.new
+    rels = []
     
     ([domain] + get_all_superclasses(domain)).each do |ddomain|
       ([range] + get_all_superclasses(range)).each do |rrange|
@@ -50,17 +50,18 @@ class AgraphConnection
           q.pattern([:rel, RDF::RDFS.domain, RDF::Resource.new(ddomain)])
           q.pattern([:rel, RDF::RDFS.range, RDF::Resource.new(rrange)])
         end.run do |res|
-          rels << Relation.from_url(res.rel.to_s, ddomain, rrange)
+          rel = Relation.from_url(res.rel.to_s, ddomain, rrange) 
+          rels << rel unless rels.include?(rel)
         end
       end
     end
     
-    return rels.to_a
+    return rels
   end
   
   # gets the attribuets whose domain is the given class or any of its top classes
   def attributes_for(node_class)
-    attribs = Set.new
+    attribs = []
     
     [node_class].concat(get_all_superclasses(node_class)).each do |clazz|
       domain = OwlClass.new(nil, nil, clazz)
@@ -69,7 +70,8 @@ class AgraphConnection
         qq.pattern([:attrib, RDF::RDFS.domain, RDF::Resource.new(clazz)])
         qq.pattern([:attrib, RDF::RDFS.range, :range], :optional => true)
       end.run do |res|
-        attribs << Attribute.from_url(res.attrib.to_s, res.bound?(:range) ? res.range : nil, domain)
+        attrib = Attribute.from_url(res.attrib.to_s, res.bound?(:range) ? res.range : nil, domain)
+        attribs << attrib unless attribs.include?(attrib)
       end
     end
     

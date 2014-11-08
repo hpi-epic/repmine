@@ -42,4 +42,8 @@ class OwlClass
     attributes.each{|att| stmts.concat(att.rdf)}
     return stmts    
   end
+  
+  def ==(other_object)
+    return self.url == other_object.url
+  end
 end

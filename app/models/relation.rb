@@ -27,4 +27,8 @@ class Relation
       [resource, RDF::RDFS.range, range.resource]
     ]
   end
+  
+  def ==(other_object)
+    return self.url == other_object.url
+  end
 end
