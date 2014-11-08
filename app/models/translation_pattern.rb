@@ -1,7 +1,7 @@
 class TranslationPattern < Pattern
   
   attr_accessible :pattern_id
-  belongs_to :pattern
+  belongs_to :source_pattern, :foreign_key => "pattern_id", :class_name => "Pattern"
   
   after_create :prepare!
   
@@ -23,11 +23,15 @@ class TranslationPattern < Pattern
     return Pattern.model_name
   end
   
+  def infer_correspondences!
+    
+  end
+  
   # this loads nodes and relations for concepts we already know are equivalent
   def prepare!
-    correspondences = pattern.match_concepts(ontology)
-    offset = pattern.node_offset + 120
-    pattern.pattern_elements.each do |input_element|
+    correspondences = source_pattern.match_concepts(ontology)
+    offset = source_pattern.node_offset + 120
+    source_pattern.pattern_elements.each do |input_element|
       corr = correspondences.find{|c| c.input_elements.include?(input_element)}
       unless corr.nil?
         corr.output_elements.each do |output_element|
