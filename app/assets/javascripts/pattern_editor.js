@@ -5,7 +5,7 @@ jsPlumb.ready(function() {
     Container: "drawing_canvas"
 	});	
 	
-	$("div[class=node]").each(function(index,node_div){
+	$(".node").each(function(index,node_div){
 	  addNodeToGraph($(node_div));
 	});
 	

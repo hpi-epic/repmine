@@ -1,4 +1,4 @@
-<div class="node immutable_node static" style="<%= node_position(node)%>" id="node_<%=node.id%>" data-id="<%= node.id %>">
+<div class="node immutable_node static <%= node.is_group ? "double-border" : "" %>" style="<%= node_position(node)%>" id="node_<%=node.id%>" data-id="<%= node.id %>">
   <%= form_for([pattern, node], :html => {:class => "static"}) do |f| %>
     <%= f.select(:rdf_type, static_select(node), {} ,{:class => "classSelector"}) %>
   <% end %>
