@@ -17,10 +17,6 @@ class RelationConstraint < PatternElement
     self.pattern = source.pattern unless source.nil?
   end
   
-  def url
-    return pattern.url + "/relation_constraints/#{id}"
-  end
-  
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.RelationConstraint]
   end

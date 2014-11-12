@@ -17,10 +17,6 @@ class Node < PatternElement
     return type_expression.used_concepts + source_relation_constraints.collect{|src| src.used_concepts} + attribute_constraints.collect{|src| src.used_concepts}
   end
   
-  def url
-    return pattern.url + "/nodes/#{id}"
-  end
-  
   def rdf_statements
     stmts = [
       [resource, Vocabularies::GraphPattern.elementType, type_expression.resource],

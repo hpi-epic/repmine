@@ -17,6 +17,14 @@ class PatternElement < ActiveRecord::Base
     pe.rdf_type = rdf_type
     return pe
   end
+
+  def self.find_by_url(url)
+    return self.find(url.split("/").last.to_i)
+  end
+  
+  def url
+    return pattern.url + "/#{self.class.name.underscore.pluralize}/#{id}"
+  end
   
   def rdf_type
     return type_expression.nil? ? "" : type_expression.fancy_string

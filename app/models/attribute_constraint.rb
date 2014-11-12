@@ -18,10 +18,6 @@ class AttributeConstraint < PatternElement
     self.pattern = node.pattern unless node.nil?
   end
   
-  def url
-    return pattern.url + "/attribute_constraints/#{id}"
-  end
-  
   def possible_attributes(rdf_type = nil)
     return pattern.possible_attributes_for(rdf_type || node.rdf_type)
   end
