@@ -27,8 +27,17 @@ class Pattern < ActiveRecord::Base
     ag_connection.attributes_for(node_class)
   end
   
+  # polymorphic finders....
   def nodes
     pattern_elements.where(:type => "Node")
+  end
+  
+  def attribute_constraints
+    pattern_elements.where(:type => "AttributeConstraint")
+  end
+  
+  def relation_constraints
+    pattern_elements.where(:type => "RelationConstraint")
   end
   
   def create_node!

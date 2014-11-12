@@ -4,7 +4,7 @@ module AttributeConstraintsHelper
   end
   
   def operator_selector(list = nil)
-    opts = list.nil? ? AttributeConstraint::OPERATORS : list
+    opts = list.nil? ? AttributeConstraint::OPERATORS.values : list
     options_for_select(opts)
   end
   

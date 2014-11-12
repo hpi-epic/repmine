@@ -1,40 +1,52 @@
 class SparqlQueryCreator < QueryCreator
+
+  attr_accessor :filter, :where, :variables
+  
+  def initialize(*args)
+    @where = []
+    @filter = []
+    @variables = []
+    super
+  end
   
   def query_string
-    return query_object.to_s
+    @sparql = SPARQL::Client.new(RDF::Repository.new())
+    fill_variables!
+    fill_where_clause!
+    query = @sparql.select(*variables).where(*where)
+    filter.each{|filter| query.filter(filter)}
+    return query.to_s
   end
   
-  def query_object
-    sparql = SPARQL::Client.new(RDF::Repository.new())
-    return sparql.select(*variables).where(*where_clause)
-  end
-  
-  def variables
-    return pattern.nodes.collect{|n| node_variable(n)}
-  end
-  
-  def where_clause
-    patterns = []
+  def fill_where_clause!
     pattern.nodes.each do |node|
-      patterns << [node_variable(node), RDF.type, RDF::Resource.new(node.rdf_type)]
+      where << [pe_variable(node), RDF.type, RDF::Resource.new(node.rdf_type)]
     end
     pattern.nodes.each do |node|
       node.source_relation_constraints.each do |rc|
-        patterns << [node_variable(node), rc.rdf_type, node_variable(rc.target)]
+        where << [pe_variable(node), rc.rdf_type, pe_variable(rc.target)]
       end
       node.attribute_constraints.each do |ac|
-        patterns << pattern_for_attribute_constraint(node, ac) unless ac.value.nil?
+        meth = "pattern_for_ac_#{AttributeConstraint::OPERATORS.key(ac.operator)}".to_sym
+        self.send(meth, node, ac) unless !self.respond_to?(meth) || ac.value.nil?
       end
     end
-    return patterns
   end
   
-  def node_variable(node)
-    return "node_#{node.id}".to_sym
+  def fill_variables!
+    @variables = pattern.nodes.collect{|n| pe_variable(n)}
   end
   
-  def pattern_for_attribute_constraint(node, ac)
-    return [node_variable(node), ac.rdf_type, ac.value]
+  def pe_variable(pe)
+    return "#{pe.class.name.underscore}_#{pe.id}".to_sym
   end
   
+  def pattern_for_ac_equals(node, ac)
+    where << [pe_variable(node), ac.rdf_type, ac.value]
+  end
+  
+  def pattern_for_ac_regex(node, ac)
+    filter << "regex(?#{pe_variable(ac)}, '#{ac.value}')"
+    where << [pe_variable(node), RDF::Resource.new(ac.rdf_type), pe_variable(ac)]
+  end
 end

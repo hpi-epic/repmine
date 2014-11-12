@@ -6,7 +6,14 @@ class AttributeConstraint < PatternElement
   
   include RdfSerialization
   
-  OPERATORS = ["?", "~=", "=", "<", ">", "!"]
+  OPERATORS = {
+    :var => "?",
+    :regex => "~=",
+    :equals => "=",
+    :less_than => "<",
+    :greater_than => ">",
+    :not => "!"
+  }
   
   def rdf_statements
     return [
