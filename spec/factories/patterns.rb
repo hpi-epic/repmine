@@ -24,4 +24,14 @@ FactoryGirl.define do
     description "a simple pattern without anything"
     ontology
   end
+  
+  factory :n_r_n_pattern, :class => Pattern do
+    name "n-r-n"
+    description "node-relation-node, that's it"
+    ontology
+    pattern_elements{create_list :plain_node, 2}
+    after(:create) do |pattern, evaluator|
+      pattern.pattern_elements << FactoryGirl.create(:relation_constraint, :source => pattern.nodes.first, :target => pattern.nodes.last)
+    end
+  end
 end

@@ -12,7 +12,7 @@ FactoryGirl.define do
     end
   end
   
-  factory :plain_node, :class => Node do 
+  factory :plain_node, :class => Node do
     association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/node"
   end
 end

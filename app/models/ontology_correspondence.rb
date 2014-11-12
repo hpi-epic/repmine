@@ -38,7 +38,6 @@ class OntologyCorrespondence < ActiveRecord::Base
     @ontology_matcher ||= OntologyMatcher.new(input_ontology, output_ontology)
   end
   
-  # he, who must not be named...
   def url
     ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:alignments_path] + self.id.to_s
   end
