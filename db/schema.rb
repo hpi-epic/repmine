@@ -58,8 +58,8 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
 
   create_table "pattern_elements", :force => true do |t|
     t.string   "type"
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.integer  "pattern_id"
     t.integer  "node_id"
     t.string   "value"
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
     t.integer  "target_id"
     t.integer  "x",               :default => 0
     t.integer  "y",               :default => 0
+    t.boolean  "is_group",        :default => false
   end
 
   create_table "patterns", :force => true do |t|

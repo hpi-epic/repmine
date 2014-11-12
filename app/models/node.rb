@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 class Node < PatternElement
-  attr_accessible :x, :y
+  attr_accessible :x, :y, :is_group
   has_many :source_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "source_id", :dependent => :destroy
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy  
   has_many :attribute_constraints, :dependent => :destroy

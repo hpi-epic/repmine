@@ -19,6 +19,7 @@ class CorrespondenceExtractor
   
   def detect_missing_correspondences!(input_pattern, output_pattern)
     i_engine = clean_inference_engine
+    # load the classified input and output patterns
     [classify(input_pattern), classify(output_pattern)].each{|g| g.each{|stmt| i_engine << stmt}}
     
     # inserts the matching relations into the engine. the already present rules will use them to, e.g., find missing links

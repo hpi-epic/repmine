@@ -1,10 +1,18 @@
 <div class="node" style="<%= node_position(node)%>" id="node_<%=node.id%>" data-id="<%= node.id %>">
-<%= form_for([pattern, node]) do |f| %>
+<%= simple_form_for([pattern, node]) do |f| %>
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>
   <%= f.select(:rdf_type, type_select(type_hierarchy, node), :class => "classSelector") %>
   <%= link_to(fa_icon("sitemap"), "#", 
-  :onclick => "openComplexDialog('#{pattern_node_type_expression_path(pattern, node, node.type_expression)}',$('#node_#{ node.id}_modal_tree'), $('#node_#{node.id}_modal'))") %>&nbsp;|&nbsp; 
+  :onclick => "openComplexDialog('#{pattern_node_type_expression_path(pattern, node, node.type_expression)}',$('#node_#{ node.id}_modal_tree'), $('#node_#{node.id}_modal'))") %>
+  &nbsp;|&nbsp;
+  <%= f.hidden_field :is_group %>
+  <%= link_to(
+    fa_icon(node.is_group ? "dot-circle-o" : "circle-o", :id => "nodeGroupIcon"), 
+    "#", 
+    :onclick => "toggleNodeGroup($('#node_#{node.id}'))") 
+  %>
+  &nbsp;|&nbsp;
   <%= link_to(fa_icon("times-circle"), "#", :onclick => "deleteNode($('#node_#{node.id}'))") %>
 <% end %>
 </div>
