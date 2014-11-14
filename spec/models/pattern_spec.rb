@@ -61,7 +61,7 @@ RSpec.describe Pattern, :type => :model do
     correspondence.input_elements = [@pattern.nodes.first]
     correspondence.output_elements = [PatternElement.for_rdf_type(@pattern.nodes.first.rdf_type + "_matched")]
     correspondence.save
-    # noe only return this one correspondence, which should eliminate http://example.org/node from the unmatched list
+    # now only return this one correspondence, which should eliminate http://example.org/node from the unmatched list
     OntologyMatcher.any_instance.stub(:match! => true, :get_substitutes_for => [correspondence])
     assert_equal 2, @pattern.unmatched_concepts(Ontology.first).size
     assert_not_include @pattern.unmatched_concepts(Ontology.first), @pattern.nodes.first.rdf_type + "_matched"

@@ -29,6 +29,14 @@ class AttributeConstraint < PatternElement
     return pattern.possible_attributes_for(rdf_type || node.rdf_type)
   end
   
+  def refers_to_variable?
+    return contains_variable?(self.value)
+  end
+  
+  def variable_name
+    value.start_with?("?") ? value[1..-1] : value
+  end
+  
   def used_concepts
     return [rdf_type]
   end

@@ -36,7 +36,7 @@ RSpec.describe CorrespondenceExtractor, :type => :model do
     assert_equal 2, OntologyCorrespondence.count
     @ce.detect_missing_correspondences!(@pattern1, @pattern2)
     assert_equal 3, OntologyCorrespondence.count
-  end  
+  end
   
   def select_classification(rule_engine, pattern, classification)
     rule_engine.select(pattern.resource, CorrespondenceExtractor::C_PROP, classification)

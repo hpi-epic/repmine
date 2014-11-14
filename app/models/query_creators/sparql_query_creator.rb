@@ -24,7 +24,7 @@ class SparqlQueryCreator < QueryCreator
     end
     pattern.nodes.each do |node|
       node.source_relation_constraints.each do |rc|
-        where << [pe_variable(node), rc.rdf_type, pe_variable(rc.target)]
+        where << [pe_variable(node), rc.type_expression.resource, pe_variable(rc.target)]
       end
       node.attribute_constraints.each do |ac|
         meth = "pattern_for_ac_#{AttributeConstraint::OPERATORS.key(ac.operator)}".to_sym
@@ -42,11 +42,20 @@ class SparqlQueryCreator < QueryCreator
   end
   
   def pattern_for_ac_equals(node, ac)
-    where << [pe_variable(node), ac.rdf_type, ac.value]
+    if ac.refers_to_variable?
+      where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
+      filter << "?#{pe_variable(ac)} = #{ac.value}"
+    else
+      where << [pe_variable(node), ac.type_expression.resource, ac.value]
+    end
   end
   
   def pattern_for_ac_regex(node, ac)
     filter << "regex(?#{pe_variable(ac)}, '#{ac.value}')"
-    where << [pe_variable(node), RDF::Resource.new(ac.rdf_type), pe_variable(ac)]
+    where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
+  end
+  
+  def pattern_for_ac_var(node, ac)
+    where << [pe_variable(node), ac.type_expression.resource, ac.variable_name.to_sym]
   end
 end

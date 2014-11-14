@@ -49,5 +49,9 @@ class PatternElement < ActiveRecord::Base
   
   def used_concepts
     return type_expression.used_concepts
-  end 
+  end
+  
+  def contains_variable?(str)
+    return !str.match(/\?([A-Za-z0-9\-_]+)/).nil?
+  end
 end
