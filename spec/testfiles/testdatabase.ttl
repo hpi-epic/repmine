@@ -1,0 +1,714 @@
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix :        <vocab/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:repositories_rdbms_type_cd
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_rdbms_type_cd" ;
+      rdfs:range xsd:integer .
+
+:taggings_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:repositories_name
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_name" ;
+      rdfs:range xsd:string .
+
+:sessions_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :sessions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "sessions_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:ontology_correspondences
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences" .
+
+:type_expressions_ancestry
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_ancestry" ;
+      rdfs:range xsd:string .
+
+:taggings_tagger_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_tagger_id" ;
+      rdfs:range xsd:integer .
+
+:taggings_taggable_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_taggable_type" ;
+      rdfs:range xsd:string .
+
+:ontologies_short_name
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_short_name" ;
+      rdfs:range xsd:string .
+
+:ontology_correspondences_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:type_expressions
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions" .
+
+:patterns_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:pattern_elements_x
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_x" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_operator
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_operator" ;
+      rdfs:range xsd:string .
+
+:ontology_correspondences_pattern_elements_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences_pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_pattern_elements_id" ;
+      rdfs:range xsd:integer .
+
+:ontology_correspondences_pattern_elements_output_element_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences_pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_pattern_elements_output_element_id" ;
+      rdfs:range xsd:integer .
+
+:tags_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :tags ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "tags_id" ;
+      rdfs:range xsd:integer .
+
+:ontologies_does_exist
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_does_exist" ;
+      rdfs:range xsd:boolean .
+
+:taggings
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings" .
+
+:patterns_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_type" ;
+      rdfs:range xsd:string .
+
+:delayed_jobs_handler
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_handler" ;
+      rdfs:range xsd:string .
+
+:delayed_jobs_locked_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_locked_at" ;
+      rdfs:range xsd:dateTime .
+
+:pattern_elements_target_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_target_id" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:ontology_correspondences_pattern_elements_ontology_correspondence_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences_pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_pattern_elements_ontology_correspondence_id" ;
+      rdfs:range xsd:integer .
+
+:ontology_correspondences_input_ontology_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_input_ontology_id" ;
+      rdfs:range xsd:integer .
+
+:ontology_correspondences_relation
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_relation" ;
+      rdfs:range xsd:string .
+
+:ontology_correspondences_output_ontology_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_output_ontology_id" ;
+      rdfs:range xsd:integer .
+
+:repositories_port
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_port" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_id" ;
+      rdfs:range xsd:integer .
+
+:repositories
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories" .
+
+:delayed_jobs_attempts
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_attempts" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_type" ;
+      rdfs:range xsd:string .
+
+:delayed_jobs_failed_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_failed_at" ;
+      rdfs:range xsd:dateTime .
+
+:pattern_elements_min_cardinality
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_min_cardinality" ;
+      rdfs:range xsd:string .
+
+:sessions_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :sessions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "sessions_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:ontologies_url
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_url" ;
+      rdfs:range xsd:string .
+
+:type_expressions_rdf_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_rdf_type" ;
+      rdfs:range xsd:string .
+
+:ontologies_description
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_description" ;
+      rdfs:range xsd:string .
+
+:schema_migrations_version
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :schema_migrations ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "schema_migrations_version" ;
+      rdfs:range xsd:string .
+
+:taggings_tagger_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_tagger_type" ;
+      rdfs:range xsd:string .
+
+:ontology_correspondences_pattern_elements
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_pattern_elements" .
+
+:patterns_ontology_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_ontology_id" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_max_cardinality
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_max_cardinality" ;
+      rdfs:range xsd:string .
+
+:delayed_jobs_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:type_expressions_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:pattern_elements
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements" .
+
+:taggings_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_id" ;
+      rdfs:range xsd:integer .
+
+:repositories_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_id" ;
+      rdfs:range xsd:integer .
+
+:type_expressions_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_id" ;
+      rdfs:range xsd:integer .
+
+:ontologies_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:type_expressions_operator
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_operator" ;
+      rdfs:range xsd:string .
+
+:patterns_description
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_description" ;
+      rdfs:range xsd:string .
+
+:ontology_correspondences_measure
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_measure" ;
+      rdfs:range xsd:double .
+
+:sessions_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :sessions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "sessions_id" ;
+      rdfs:range xsd:integer .
+
+:delayed_jobs_queue
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_queue" ;
+      rdfs:range xsd:string .
+
+:patterns_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_id" ;
+      rdfs:range xsd:integer .
+
+:patterns_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:repositories_description
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_description" ;
+      rdfs:range xsd:string .
+
+:pattern_elements_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:tags
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "tags" .
+
+:pattern_elements_max_path_length
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_max_path_length" ;
+      rdfs:range xsd:string .
+
+:delayed_jobs_last_error
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_last_error" ;
+      rdfs:range xsd:string .
+
+:ontologies_group
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_group" ;
+      rdfs:range xsd:string .
+
+:delayed_jobs_locked_by
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_locked_by" ;
+      rdfs:range xsd:string .
+
+:repositories_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_type" ;
+      rdfs:range xsd:string .
+
+:sessions
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "sessions" .
+
+:delayed_jobs_priority
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_priority" ;
+      rdfs:range xsd:integer .
+
+:repositories_host
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_host" ;
+      rdfs:range xsd:string .
+
+:sessions_data
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :sessions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "sessions_data" ;
+      rdfs:range xsd:string .
+
+:ontologies_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_id" ;
+      rdfs:range xsd:integer .
+
+:patterns_pattern_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_pattern_id" ;
+      rdfs:range xsd:integer .
+
+:ontologies_type
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_type" ;
+      rdfs:range xsd:string .
+
+:pattern_elements_node_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_node_id" ;
+      rdfs:range xsd:integer .
+
+:patterns_name
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :patterns ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns_name" ;
+      rdfs:range xsd:string .
+
+:taggings_taggable_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_taggable_id" ;
+      rdfs:range xsd:integer .
+
+:patterns
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "patterns" .
+
+:type_expressions_pattern_element_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_pattern_element_id" ;
+      rdfs:range xsd:integer .
+
+:ontology_correspondences_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:ontology_correspondences_pattern_elements_input_element_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences_pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_pattern_elements_input_element_id" ;
+      rdfs:range xsd:integer .
+
+:ontologies_repository_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_repository_id" ;
+      rdfs:range xsd:integer .
+
+:sessions_session_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :sessions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "sessions_session_id" ;
+      rdfs:range xsd:string .
+
+:repositories_db_name
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_db_name" ;
+      rdfs:range xsd:string .
+
+:ontologies
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies" .
+
+:schema_migrations
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "schema_migrations" .
+
+:pattern_elements_y
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_y" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_min_path_length
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_min_path_length" ;
+      rdfs:range xsd:string .
+
+:type_expressions_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :type_expressions ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "type_expressions_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:pattern_elements_pattern_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_pattern_id" ;
+      rdfs:range xsd:integer .
+
+:     a       owl:Ontology ;
+      dc:creator "D2RQ Mapping Generator" ;
+      owl:imports dc: .
+
+:delayed_jobs_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:taggings_context
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_context" ;
+      rdfs:range xsd:string .
+
+:pattern_elements_value
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_value" ;
+      rdfs:range xsd:string .
+
+:tags_taggings_count
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :tags ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "tags_taggings_count" ;
+      rdfs:range xsd:integer .
+
+:delayed_jobs_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_id" ;
+      rdfs:range xsd:integer .
+
+:delayed_jobs
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs" .
+
+:pattern_elements_is_group
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_is_group" ;
+      rdfs:range xsd:boolean .
+
+:ontology_correspondences_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontology_correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontology_correspondences_id" ;
+      rdfs:range xsd:integer .
+
+:delayed_jobs_run_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_run_at" ;
+      rdfs:range xsd:dateTime .
+
+:repositories_db_username
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_db_username" ;
+      rdfs:range xsd:string .
+
+:ontologies_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :ontologies ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "ontologies_created_at" ;
+      rdfs:range xsd:dateTime .
+
+:repositories_db_password
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_db_password" ;
+      rdfs:range xsd:string .
+
+:taggings_tag_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :taggings ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "taggings_tag_id" ;
+      rdfs:range xsd:integer .
+
+:pattern_elements_source_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_source_id" ;
+      rdfs:range xsd:integer .
+
+:tags_name
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :tags ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "tags_name" ;
+      rdfs:range xsd:string .

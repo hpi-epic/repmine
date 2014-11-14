@@ -2,6 +2,8 @@ class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
   has_one :ontology, :dependent => :destroy
   
+  validates :name, :presence => true
+  
   TYPES = ["MongoDbRepository", "RdfRepository", "RdbmsRepository"]
   
   # custom error class for ontology extraction
