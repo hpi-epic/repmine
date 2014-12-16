@@ -54,4 +54,8 @@ class PatternElement < ActiveRecord::Base
   def contains_variable?(str)
     return !str.match(/\?([A-Za-z0-9\-_]+)/).nil?
   end
+  
+  def query_variable()
+    "#{self.class.name.underscore}_#{self.id}"
+  end
 end

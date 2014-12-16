@@ -14,7 +14,7 @@ class MongoDbRepository < Repository
   end
   
   def db
-    @mongo_client ||= Mongo::MongoClient.new(self.host) 
+    @mongo_client ||= Mongo::MongoClient.new(self.host)
     @db ||= @mongo_client.db(self.db_name)
     return @db
   end
@@ -31,55 +31,44 @@ class MongoDbRepository < Repository
     ontology.clear!
     db.collection_names.each do |c_name|
       next if COLLECTION_BLACKLIST.include?(c_name)
-      owl_class = OwlClass.new(ontology, c_name.singularize.camelcase)
-      class_schema(get_schema_info(c_name), owl_class, c_name)
+      class_schema(get_schema_info(c_name), c_name)
     end
-    ontology.download!    
+    ontology.remove_local_copy!
+    ontology.download!
   end
   
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'
-  def class_schema(info, owl_class, collection_name)
-    relations = info.select{|inf| inf["value"]["type"] == "Array"}
-    attributes = info.reject{|inf| 
-      relations.include?(inf) || !relations.find{|rel| inf["_id"]["key"].starts_with?(rel["_id"]["key"])}.nil?
-    }
-    
-    relations.each do |rel|
-      key = rel["_id"]["key"].gsub(".XX", "")
-      target_class = OwlClass.new(ontology, key.split(".").last.singularize.camelcase)
-      target_class.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
-      class_schema(all_descendants(info, key), target_class, key)
-      r = owl_class.add_relation(key, target_class)
-      r.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(key))
-      r.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
-    end
-    
-    attributes.each do |attrib|
-      clean_name = attrib["_id"]["key"]
-      a = owl_class.add_attribute(clean_name, attrib["value"]["type"])
-      a.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(attrib["_id"]["key"].gsub(".XX", "")))
+  def class_schema(info, collection_name)
+    # first the base class for the collection
+    class_name = collection_name.singularize.camelcase
+    owl_class = OwlClass.new(ontology, class_name, ontology.url + "/" + class_name)
+    info.each do |attrib|
+      type = attrib["value"]["type"]
+      key = attrib["_id"]["key"]
+      next if type == "Object" || key == "_id"
+      
+      a = owl_class.add_attribute(key, type)
+      a.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new(key))
       a.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new(collection_name))
-    end
-  end
-  
-  # selects all elements that are below a given one
-  def all_descendants(info, key_prefix)
-    if key_prefix.empty?
-      return info
-    else
-      return info.select{|inf|
-        inf["_id"]["key"].starts_with?(key_prefix + ".") && inf["_id"]["key"].size > key_prefix.size
-      }
+      a.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_is_array, RDF::Literal.new(type == "Array"))
     end
   end
   
   def get_schema_info(collection_name)
+    puts "starting js query for #{collection_name}"
     info_js = File.open(Rails.root.join("public","javascripts","variety.js")).read    
-    return db.eval(info_js, collection_name, 20000)
+    info_hash = db.eval(info_js, collection_name, 20000)
+    puts "js query done for #{collection_name}"
+    info_hash.each{|info| info["_id"]["key"] = info["_id"]["key"].gsub(".XX", "")}
+    return info_hash
   end
   
   def database_type
     "MongoDB"
+  end
+  
+  def self.query_creator_class
+    MongoDbQueryCreator
   end
   
   def database_version

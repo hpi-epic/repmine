@@ -2,13 +2,14 @@ require 'open3'
 
 class OntologyMatcher
   
-  attr_accessor :ag_connection, :target_ontology, :source_ontology, :alignment_graph
+  attr_accessor :target_ontology, :source_ontology, :alignment_graph, :alignment_path, :speaking_names
   
   class MatchingError < StandardError;end
   
-  def initialize(source_ontology, target_ontology)
+  def initialize(source_ontology, target_ontology, use_speaking_names = false)
     @source_ontology = source_ontology
     @target_ontology = target_ontology
+    @speaking_names = use_speaking_names
     @alignment_graph = RDF::Graph.new()
   end
   
@@ -68,24 +69,35 @@ class OntologyMatcher
       rdfxml = File.open(path).read
       rdfxml.gsub!(res[:onto1].to_s, res[:onto1].to_s + "/") unless res[:onto1].to_s.ends_with?("/")
       rdfxml.gsub!(res[:onto2].to_s, res[:onto2].to_s + "/") unless res[:onto2].to_s.ends_with?("/")
-      File.open(path, "w+"){|f| f.puts rdfxml}
+      File.open(path, "wb"){|f| f.puts rdfxml}
     end
   end
   
+  # checks whether an alignment is present for source_ont_target_ont, if not, the same for the other way around
   def already_matched?
-    return File.exist?(alignment_path)
+    if File.exist?(alignment_path)
+      return true
+    else
+      if File.exist?(alignment_path_for(target_ontology, source_ontology))
+        @alignment_path = alignment_path_for(target_ontology, source_ontology)
+        return true
+      end
+    end
+    return false
   end
   
   # this is where the magic happens. We search the alignment graph for matches regarding the provided pattern element
   # TODO: widen the search to combinations, e.g., node -> relation -> node, etc.
-  def get_substitutes_for(pattern_elements)
+  def get_substitutes_for(pattern_elements, persist = true)
     correspondences = []
     pattern_elements.each do |pattern_element|
       # if we already have a correspondence -> no need to query the alignment graph
-      existing_correspondences = pattern_element.ontology_correspondences.where(:output_ontology_id => target_ontology)
-      unless existing_correspondences.empty?
-        correspondences << existing_correspondences.first
-        next
+      if persist
+        existing_correspondences = pattern_element.ontology_correspondences.where(:output_ontology_id => target_ontology)
+        unless existing_correspondences.empty?
+          correspondences << existing_correspondences.first
+          next
+        end
       end
       
       # otherwhise create the query patterns
@@ -99,15 +111,33 @@ class OntologyMatcher
     
       # and issue them on the graph. TODO: check how complex correspondences are stored
       @alignment_graph.query(q) do |res|
-        oc = OntologyCorrespondence.create(:input_ontology => source_ontology, :output_ontology => target_ontology, :measure => res[:measure].to_s, :relation => res[:relation].to_s)
-        # add the input elements
-        oc.input_elements << pattern_element
-        # and the output_elements
-        oc.output_elements << target_ontology.element_class_for_rdf_type(res[:target].to_s).for_rdf_type(res[:target].to_s)
+        oc = OntologyCorrespondence.new(:input_ontology => source_ontology, :output_ontology => target_ontology, :measure => res[:measure].to_s, :relation => res[:relation].to_s)
+        if persist
+          oc.save!
+          # add the input elements
+          oc.input_elements << pattern_element
+          # and the output_elements
+          oc.output_elements << target_ontology.element_class_for_rdf_type(res[:target].to_s).for_rdf_type(res[:target].to_s)
+        end
         correspondences << oc
       end
     end
     return correspondences
+  end
+  
+  def matched_concepts()
+    matched_concepts = {:source_ontology => [], :target_ontology => [], :correspondence_count => 0}
+    q = RDF::Query.new{
+      pattern([:alignment, Vocabularies::Alignment.map, :cell])
+      pattern([:cell, Vocabularies::Alignment.entity1, :source])
+      pattern([:cell, Vocabularies::Alignment.entity2, :target])
+    }
+    alignment_graph.query(q).each do |res|
+      matched_concepts[:source_ontology] << res[:source].to_s
+      matched_concepts[:target_ontology] << res[:target].to_s
+      matched_concepts[:correspondence_count] += 1
+    end
+    return matched_concepts
   end
   
   def prepare_matching!
@@ -117,7 +147,15 @@ class OntologyMatcher
   end
   
   def alignment_path()
-    return Rails.root.join("public", "ontologies", "alignments", "ont_#{source_ontology.id}_ont_#{target_ontology.id}.rdf").to_s
+    @alignment_path ||= alignment_path_for(source_ontology, target_ontology)
   end
-
+  
+  def alignment_path_for(source_ont, target_ont)
+    fn = if speaking_names
+      "#{source_ont.very_short_name}-#{target_ont.very_short_name}.rdf"
+    else
+      "ont_#{source_ont.id}_ont_#{target_ont.id}.rdf" 
+    end
+    Rails.root.join("public", "ontologies", "alignments", fn).to_s
+  end
 end

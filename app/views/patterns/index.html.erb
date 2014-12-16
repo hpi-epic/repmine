@@ -22,7 +22,11 @@
       <td><%= pattern.description %></td>
       <td><%= pattern.concept_count %></td>
       <td><%= pattern.ontology.short_name %>
-      <td><%= link_to("Delete", pattern_path(pattern), :method => :delete, :class => "btn btn-danger", :confirm => "Really delete #{pattern.name}?") %></td>
+      <td>
+        <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-xs") %><br />
+        <%= link_to("Delete", pattern_path(pattern), :method => :delete, :class => "btn btn-danger btn-xs", :confirm => "Really delete #{pattern.name}?") %>
+
+      </td>
     </tr>
   <% end %>
   </tbody>

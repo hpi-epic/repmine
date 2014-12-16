@@ -44,6 +44,14 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.match!
   end
   
+  it "should not call the matcher if we have a matching in the other direction" do
+    assert_not_equal @om.source_ontology, @om.target_ontology
+    File.stub(:exist?).with(@om.alignment_path){true}
+    @om2 = OntologyMatcher.new(@om.target_ontology, @om.source_ontology)
+    File.stub(:exist?).with(@om2.alignment_path){false}
+    assert_equal true, @om2.already_matched?
+  end
+  
   it "should call the matcher when no file is present" do
     Open3.stub(:popen3 => true)
     @om.stub(:alignment_path => Rails.root.join("spec","this_file_should_not_exist.rdf"))
@@ -156,5 +164,4 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal oc, subs.first
     assert_equal count_before, OntologyCorrespondence.count
   end
-  
 end

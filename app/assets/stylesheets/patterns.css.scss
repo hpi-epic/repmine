@@ -13,6 +13,10 @@ div.matched_marked {
   border: 2px solid #19B584;
 }
 
+div.briefly_highlighted {
+  border: 2px solid #F89239;
+}
+
 .very_narrow {
   width: 50px;
 }
@@ -37,6 +41,18 @@ div.translation_controls {
 div.center_everything {
   margin: 0 auto;
   text-align: center;
+}
+
+#editor_controls select {
+  font-size: 0.75em;
+  width: 10em;
+  height: 2em;
+}
+
+#editor_controls input {
+  font-size: 0.75em;
+  width: 7em;
+  height: 1em;
 }
 
 .full_page {

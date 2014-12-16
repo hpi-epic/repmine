@@ -1,6 +1,6 @@
 <% if @matching_error.nil? %>
   <% if @mc.empty? %>
-  <%= link_to("Query",pattern_query_for_ontology_path(@pattern, @ontology), :class => "btn btn-success")%>
+  <%= link_to("Query",pattern_query_path(@pattern, @ontology), :class => "btn btn-success")%>
   <% else %>
   <%= link_to("Match (#{@concept_count - @mc.size}/#{@concept_count})", pattern_translate_to_ontology_path(@pattern, @ontology), :class => "btn btn-warning") %>
   <% end %>

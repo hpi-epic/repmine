@@ -3,7 +3,6 @@ require 'vocabularies/schema_extraction.rb'
 class ExtractedOntology < Ontology
   
   attr_accessor :classes
-  belongs_to :repository
   include RdfSerialization    
   
   def self.model_name
@@ -23,7 +22,7 @@ class ExtractedOntology < Ontology
     @classes = Set.new()
   end
   
-  def custom_rdf_statements
+  def rdf_statements
     # we describe an ontology
     stmts = []
     repository.imports.each{|vocab| stmts << [resource, RDF::OWL.imports, vocab]}
@@ -39,10 +38,6 @@ class ExtractedOntology < Ontology
   
   def rdf_types
     [RDF::OWL.Ontology]
-  end
-  
-  def load_ontology
-    does_exist ? RDF::Graph.load(local_file_path) : nil
   end
   
   def custom_prefixes

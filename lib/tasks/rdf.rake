@@ -7,7 +7,7 @@ namespace :rdf do
       c.prefix = ont.prefix_url
       c.source = ont.url
       c.class_name = ont.vocabulary_class_name
-      f = File.open(Rails.root.join("app", "models", "vocabularies", c.class_name.underscore + ".rb"), "w+")
+      f = File.open(Rails.root.join("app", "models", "vocabularies", c.class_name.underscore + ".rb"), "wb")
       c.output = f
       c.run
       f.close

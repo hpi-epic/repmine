@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141105144229) do
+ActiveRecord::Schema.define(:version => 20141216140834) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -54,6 +54,11 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
     t.integer "ontology_correspondence_id"
     t.integer "input_element_id"
     t.integer "output_element_id"
+  end
+
+  create_table "oracles", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "pattern_elements", :force => true do |t|

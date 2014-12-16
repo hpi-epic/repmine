@@ -1,6 +1,6 @@
 class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
-  has_one :ontology, :dependent => :destroy
+  has_one :ontology
   
   validates :name, :presence => true
   
@@ -56,6 +56,14 @@ class Repository < ActiveRecord::Base
   
   def database_version
     return "1.0"
+  end
+  
+  def query_creator(pattern)
+    return self.class.query_creator_class.new(pattern, self)
+  end
+  
+  def self.query_creator_class
+    SparqlQueryCreator
   end
   
   def type_hierarchy

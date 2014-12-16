@@ -18,7 +18,18 @@ var addNodeToGraph = function(node){
   // insert an onchange handler for the node's type selector
   node.find("#node_rdf_type").change(function(event){
     updateConnectionsAndAttributes($(this).closest("div"));
-  })
+  });
+  
+  var div = "<span><select><option></option><option>Group By</option><option>Count</option><option>Sum</option><option>Ignore</option><select>";
+  div += ":&nbsp;<input type='text' value='" + node_html_id + "' class='narrow' disabled></input>, </span>";
+  div = $(div);
+  div.click(function(e){
+    $("#" + node_html_id).addClass("briefly_highlighted");
+    setTimeout(function() {
+      $("#" + node_html_id).removeClass("briefly_highlighted");
+    }, 2000);
+  });
+  $("#editor_controls").append(div);
 };
 
 // adds only the endpoints to a given node without making it draggable or registering callbacks

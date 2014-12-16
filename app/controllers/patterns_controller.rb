@@ -91,8 +91,8 @@ class PatternsController < ApplicationController
   
   def query
     @pattern = Pattern.find(params[:pattern_id])
-    @ontology = Ontology.find(params[:ontology_id])
-    @query = "SELECT * FROM data"
+    @repository = @pattern.ontology.repository || RdfRepository.new
+    @query = @repository.query_creator(@pattern).query_string
   end
   
   def save_correspondence

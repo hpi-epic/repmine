@@ -73,5 +73,12 @@ gem "font-awesome-rails"
 gem 'delayed_job_active_record'
 gem "delayed_job_web"
 gem 'daemons'
+
 # logging...
 gem "logging"
+
+# query generation
+gem 'sql-maker'
+
+# general convenience
+gem "thin"

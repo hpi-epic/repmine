@@ -10,8 +10,14 @@
   <%= javascript_include_tag "pattern_editor.js" %>  
 <% end %>
 
+
+<div>
 <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success" %>
 <%= link_to 'Create Node', pattern_nodes_path(@pattern), :method => :post, :remote => true, :class => "btn", :id => "new_pattern_node" %>
+<a href="#" onclick="$('#editor_controls').toggle();">Toggle Variables</a>
+<span id="editor_controls" class="hide">
+</span>
+</div>
 
 <%= form_for(@pattern) do |f| %><% end %>
 <hr />

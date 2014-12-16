@@ -9,10 +9,8 @@ module Vocabularies
 
     # mongo db specific information
     property :mongo_db_collection_name, :comment => %(An attribute required for query generation. Denotes which 
-    collection of the database schema contains elements of a certain class. This is implicitly clear for 
-    certain elements (i.e., source elements) bot not for classes detected during extraction)
-
-    property :mongo_db_navigation_path, :comment => %(We might find classes hidden deep within the document structure
-    of a MongoDB. This property allows the query creator to access certain elements directly)
+    collection of the database schema contains elements of a certain class.)
+    property :mongo_db_navigation_path, :comment => %(just for querying the attributes)
+    property :mongo_db_is_array,  :comment => %(determines whether we have to unwind)
   end
 end

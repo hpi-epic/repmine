@@ -39,13 +39,28 @@ class AgraphConnection
     repository().clear
   end
   
+  # gets all classes, object properties, and datatype properties
+  def all_concepts()
+    stats = {RDF::OWL.Class.to_s => Set.new, RDF::OWL.ObjectProperty.to_s => Set.new, RDF::OWL.DatatypeProperty.to_s => Set.new}
+    stats.keys.each do |concept|
+      repository.build_query(:infer => true) do |q|  
+        q.pattern([:concept, RDF.type, RDF::Resource.new(concept)])
+      end.run do |res|
+        stats[concept.to_s] << res.concept.to_s unless res.concept.anonymous?
+      end
+    end
+    
+    stats[:all] = repository.subjects
+    return stats
+  end
+  
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
     rels = []
     
     ([domain] + get_all_superclasses(domain)).each do |ddomain|
       ([range] + get_all_superclasses(range)).each do |rrange|
-        repository.build_query(:infer => true) do |q|
+        repository.build_query(:infer => true) do |q|  
           q.pattern([:rel, RDF.type, RDF::OWL.ObjectProperty])
           q.pattern([:rel, RDF::RDFS.domain, RDF::Resource.new(ddomain)])
           q.pattern([:rel, RDF::RDFS.range, RDF::Resource.new(rrange)])

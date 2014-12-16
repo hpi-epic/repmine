@@ -8,7 +8,8 @@ class Ontology < ActiveRecord::Base
   
   validates :url, :uniqueness => true
   
-  has_and_belongs_to_many :patterns
+  has_many :patterns
+  belongs_to :repository
   before_validation :set_ontology_url! ,:set_short_name_if_empty!
   after_create :load_to_dedicated_repository!
   before_destroy :delete_repository!
@@ -37,6 +38,10 @@ class Ontology < ActiveRecord::Base
   def load_to_dedicated_repository!
     ag_connection(repository_name).clear!
     load_to_repository!(repository_name)
+  end
+  
+  def all_concepts()
+    ag_connection.all_concepts()
   end
   
   def type_hierarchy
@@ -73,12 +78,28 @@ class Ontology < ActiveRecord::Base
     return url
   end
   
+  def very_short_name
+    # removes prefixes and file endings...
+    return short_name.split("#").last.split(".").first.camelize(:lower)
+  end
+  
   def local_file_path
     return Rails.root.join("public", "ontologies", "tmp", url.split("/").last)
   end
   
   def download!()
-    File.open(local_file_path, "w+"){|f| f.puts rdf_xml} unless File.exist?(local_file_path)
+    unless File.exist?(local_file_path)
+      begin
+        File.open(local_file_path, "wb"){|f| f.puts rdf_xml} 
+      rescue Exception => e
+        remove_local_copy!
+        raise e
+      end
+    end
+  end
+  
+  def remove_local_copy!
+    File.delete(local_file_path) if File.exist?(local_file_path)
   end
   
   # prefixes for the graph. not needed for imported ontologies
