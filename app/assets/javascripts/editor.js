@@ -1,12 +1,12 @@
-// makes a node draggable and creates the onclick and 
+// makes a node draggable and creates the onclick and
 var addNodeToGraph = function(node){
   var node_id = node.attr("data-id");
   var node_html_id = node.attr("id");
-  
+
   // make the node draggable
   jsPlumb.draggable(node_html_id);
   var endpoints = addNodeEndpoints(node_html_id);
-  
+
   // bind the doubleclick to the attribute filter opening button
   endpoints[endpoints.length - 1].bind("dblclick", function(endpoint) {
     // only perform actions, when there is no filter present
@@ -14,12 +14,12 @@ var addNodeToGraph = function(node){
       addAttributeFilter(node_id, createNodeAttributeFilter(endpoint, node_id));
     }
   });
-  
+
   // insert an onchange handler for the node's type selector
   node.find("#node_rdf_type").change(function(event){
     updateConnectionsAndAttributes($(this).closest("div"));
   });
-  
+
   var div = "<span><select><option></option><option>Group By</option><option>Count</option><option>Sum</option><option>Ignore</option><select>";
   div += ":&nbsp;<input type='text' value='" + node_html_id + "' class='narrow' disabled></input>, </span>";
   div = $(div);
@@ -49,11 +49,11 @@ var loadExistingConnections = function(connect_them, load_attributes, make_stati
 	  var connection = jsPlumb.connect({source: free_source, target: free_target, deleteEndpointsOnDetach:true});
 	  requests.push(createConnection(connection, true, el.url));
 	});
-	
+
 	for (var node_id in load_attributes){
     var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
     var more_link = createNodeAttributeFilter(endpoint, node_id, make_static);
-    for (var i in load_attributes[node_id]){      
+    for (var i in load_attributes[node_id]){
       requests.push(addAttributeFilter(node_id, more_link, load_attributes[node_id][i]));
     }
   }
@@ -64,7 +64,7 @@ var loadExistingConnections = function(connect_them, load_attributes, make_stati
 var savePattern = function(){
   var requests = saveNodes().concat(saveConstraints());
   $.when.apply($, requests).done(function(){
-    submitAndHighlight($("form.edit_pattern")); 
+    submitAndHighlight($("form.edit_pattern"));
   });
 };
 
@@ -101,7 +101,7 @@ var removeAttributeConstraint = function(url, div_id){
 
 var openComplexDialog = function(url, modal_tree, modal){
   $.ajax({
-    url: url, 
+    url: url,
     success: function(data, textStatus, jqXHR){
       modal_tree.html(data);
       modal.modal('show');
@@ -128,7 +128,7 @@ var submitAndHighlight = function(form){
 var updateConnectionsAndAttributes = function(node){
   var node_id = node.attr("id")
   $(jsPlumb.getConnections("relations")).each(function(index, connection){
-    if(connection.sourceId == node_id || connection.targetId == node_id){    
+    if(connection.sourceId == node_id || connection.targetId == node_id){
       var overlay = $(connection.getOverlay("customOverlay").getElement());
       var update_url = overlay.find("form").attr("action");
       var params = { source_type: rdfTypeForHTMLNode(connection.sourceId), target_type: rdfTypeForHTMLNode(connection.targetId)};
@@ -142,16 +142,16 @@ var createConnection = function(connection, reinstall_endpoints, url) {
   // reinstall the endpoints
   if(reinstall_endpoints){
     jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
-    jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());        
+    jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
   }
-  
+
   var overlay = $(connection.getOverlay("customOverlay").getElement())
 
   // get the available relations from the server oder simply load the existing one
   if(url){
     return $.ajax({url: url, success: function(data){
       overlay.html(data)}
-    });  
+    });
   } else {
     return createNewConnection(connection, overlay)
   }
@@ -162,15 +162,15 @@ var createNewConnection = function(connection, overlay){
     url: new_relation_constraint_path,
     type: "POST",
     data: {
-      source_id: $(connection.source).attr("data-id"), 
+      source_id: $(connection.source).attr("data-id"),
       target_id: $(connection.target).attr("data-id"),
-      source_type: rdfTypeForHTMLNode(connection.sourceId), 
+      source_type: rdfTypeForHTMLNode(connection.sourceId),
       target_type: rdfTypeForHTMLNode(connection.targetId),
     },
     success: function(data) {
       overlay.html(data);
     }
-  });  
+  });
 };
 
 // handler for detaching connections
@@ -197,29 +197,29 @@ var createNodeAttributeFilter = function(endpoint, node_id, make_static) {
   }
   var attributeFilter = "<div id='" + node_html_id  + "' class='" + node_class + "' style='left: ";
   attributeFilter += (endpoint.canvas.offsetLeft + 3) + "px; top: " + (endpoint.canvas.offsetTop - 120) + "px;'></div>";
-  
+
   // make the div draggable and connect it to the node
-  $("#drawing_canvas").append(attributeFilter);  
-  
+  $("#drawing_canvas").append(attributeFilter);
+
   var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
-  jsPlumb.connect({source: endpoint, target: ae, deleteEndpointsOnDetach:true});  
-  
+  jsPlumb.connect({source: endpoint, target: ae, deleteEndpointsOnDetach:true});
+
   // create the '+ add filter' link at the bottom of the div
   var more_link;
-  
+
   if(make_static != true){
-    jsPlumb.draggable(node_html_id);    
+    jsPlumb.draggable(node_html_id);
     more_link = jQuery('<a/>',{
       id: "append_attribute_filter_" + node_id,
       href: "#",
       text: "+ add filter"
-    });  
-    more_link.click(function(){addAttributeFilter(node_id, more_link)});    
+    });
+    more_link.click(function(){addAttributeFilter(node_id, more_link)});
   } else {
     more_link = jQuery("<span></span>");
   };
-  
-  more_link.appendTo($("#" + node_html_id));  
+
+  more_link.appendTo($("#" + node_html_id));
   return more_link;
 };
 
@@ -235,21 +235,21 @@ var addAttributeFilter = function(node_id, bottom, url) {
       success: function(data) {
         $(data).insertBefore(bottom);
       }
-    });    
+    });
   }
 };
 
 // removes a node from the graph
 var deleteNode = function(node){
   if(confirm("Really delete the node and all of its connections?") == false) return;
-  
+
   var delete_url = node.find("form").attr("action");
   var node_id = node.attr("id");
 
   // remove all relations
   var connections = jsPlumb.getConnections({scope:["relations", "attributes"]});
   $(connections["relations"]).each(function(i, connection){
-    if(connection.sourceId == node_id || connection.targetId == node_id){      
+    if(connection.sourceId == node_id || connection.targetId == node_id){
       jsPlumb.detach(connection);
     }
   });
@@ -257,11 +257,11 @@ var deleteNode = function(node){
   $(connections["attributes"]).each(function(i, connection){
     if(connection.sourceId == node_id){
       var target = $(connection.target);
-      jsPlumb.detach(connection);      
+      jsPlumb.detach(connection);
       target.remove();
     }
   });
-  
+
   $.ajax({url: delete_url, method: "DELETE", success: function(data){
     $(jsPlumb.getEndpoints(node_id)).each(function(i, endpoint){jsPlumb.deleteEndpoint(endpoint)});
     node.remove();
@@ -297,7 +297,7 @@ var showGrowlNotification = function(request){
 // adds a type expression above, below, or on the same level as the selected_element (determined by url)
 // for simplicity, we simply redraw the entire tree instead of fiddling with the DOM
 var addTypeExpression = function(url,selected_element, list, operator){
-  var requests = [];  
+  var requests = [];
   if(selected_element.length == 1){
     var target_url = url.replace("XXX", selected_element.attr("data-id"));
     // save each type expression in this list
@@ -350,7 +350,7 @@ var freeRelationEndpointOn = function(node_html_id){
   $(endpoints).each(function(i,e){
     if(e.scope == "relations"){free_endpoint = e}
   });
-  return free_endpoint  
+  return free_endpoint
 };
 
 // encapsulates the enpoint options for the orange connection thingies
@@ -359,7 +359,7 @@ var connectionEndpoint = function() {
 		endpoint:["Dot", {radius:4} ],
 		paintStyle:{ fillStyle:"#ffa500", opacity:0.5 },
 		isSource: true,
-    deleteEndpointsOnDetach:true,				
+    deleteEndpointsOnDetach:true,
 		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
 		connectorOverlays:[
@@ -369,7 +369,7 @@ var connectionEndpoint = function() {
         },
         location:0.5,
         id:"customOverlay"
-      }],		
+      }],
 		  ["Arrow",{ width:10, location:1, length:20, id:"arrow" }]
 		],
 		connector : "Straight",
@@ -389,7 +389,7 @@ var attributeEndpoint = function() {
 		anchor: ["Top"],
 		paintStyle:{ fillStyle:"#0087CF", opacity:0.5 },
 		scope: "attributes",
-		connectorStyle:{ strokeStyle:"#0087CF", lineWidth:3 },		
+		connectorStyle:{ strokeStyle:"#0087CF", lineWidth:3 },
 		connector : "Straight"
 	};
 };

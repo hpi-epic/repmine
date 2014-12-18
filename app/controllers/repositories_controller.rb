@@ -1,5 +1,5 @@
 class RepositoriesController < ApplicationController
-  
+
   # GET /repositories
   # GET /repositories.json
   def index
@@ -28,10 +28,10 @@ class RepositoriesController < ApplicationController
   # GET /repositories/new.json
   def new
     if params[:type].nil?
-      redirect_to repositories_path 
+      redirect_to repositories_path
       return
     end
-    
+
     @repository = Repository.for_type(params[:type])
 
     respond_to do |format|
@@ -66,7 +66,7 @@ class RepositoriesController < ApplicationController
   def update
     @repository = Repository.find(params[:id])
     params[:repository].delete("type")
-    
+
     respond_to do |format|
       if @repository.update_attributes(params[:repository])
         format.html { redirect_to @repository, :notice => 'Graph was successfully updated.' }
@@ -89,7 +89,7 @@ class RepositoriesController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
+
   def extract_schema
     @repository = Repository.find(params[:repository_id])
     begin

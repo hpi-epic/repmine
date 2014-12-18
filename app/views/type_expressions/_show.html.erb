@@ -10,7 +10,7 @@
   </li>
   <% type_expression.children.each do |child| %>
   	<%= render(
-  	  :partial => "type_expressions/show", 
+  	  :partial => "type_expressions/show",
   	  :locals => {:type_expression => child, :type_hierarchy => type_hierarchy, :pattern => pattern, :node => node}) %>
   <% end %>
 </ul>

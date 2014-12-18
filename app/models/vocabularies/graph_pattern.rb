@@ -29,7 +29,7 @@ module Vocabularies
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       :subClassOf => %(graphpattern:PatternElement).freeze,
       type: ["owl:Class".freeze, "rdfs:Class".freeze]
-  
+
     # properties - general
     property :belongsTo,
       comment: %(A pattern element belongs to a pattern.).freeze,
@@ -48,15 +48,15 @@ module Vocabularies
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze,
       "owl:inverseOf" => %(graphpattern:belongsTo).freeze
-      
+
     property :elementType,
       comment: %(The type or complex expression (unionOf, etc.) a pattern element can have.).freeze,
       domain: "graphpattern:PatternElement".freeze,
       label: "element type".freeze,
       range: "owl:ObjectProperty".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:ObjectProperty".freeze    
-  
+      type: "owl:ObjectProperty".freeze
+
     # properties - node
     property :outgoingRelation,
       comment: %(links a node to an outgoing relation.).freeze,
@@ -81,10 +81,10 @@ module Vocabularies
       range: "graphpattern:AttributeConstraint".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze
-    
+
     # properties - relation constraint
     # TODO: all the cardinality stuff
-        
+
     # properties - attribute constraint
     property :attributeOperator,
       comment: %(The comparison operator used in the query.).freeze,
@@ -93,14 +93,14 @@ module Vocabularies
       range: "xsd:string".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:DatatypeProperty".freeze
-    
+
     property :attributeValue,
       comment: %(The literal value to compare with operator used in the query.).freeze,
       domain: "graphpattern:AttributeConstraint".freeze,
       label: "attribute value".freeze,
       range: "xsd:Literal".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:DatatypeProperty".freeze    
-    
-  end        
+      type: "owl:DatatypeProperty".freeze
+
+  end
 end

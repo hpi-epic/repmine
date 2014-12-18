@@ -141,14 +141,14 @@ div.fssyntax pre, div.rdfxml pre, div.owlxml pre, div.turtle pre, div.manchester
 
 .inference {
   background: white;
-  font-weight: bold; 
+  font-weight: bold;
   font-size: large;
 }
 
 /* Explaination shown after push button */
 .explain {
   padding: .2em;
-  display:none; 
+  display:none;
   //background: lightYellow;
   //border:1pt solid red;
   border:1pt dashed black;
@@ -162,7 +162,7 @@ div.fssyntax pre, div.rdfxml pre, div.owlxml pre, div.turtle pre, div.manchester
 }
 
 .button {
-  display:none; 
+  display:none;
 }
 */
 

@@ -1,5 +1,5 @@
 class OntologiesController < ApplicationController
-  
+
   # GET /ontologies
   # GET /ontologies.json
   def index
@@ -81,7 +81,7 @@ class OntologiesController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
+
   def autocomplete_ontology_group
     groups = Ontology.pluck(:group).uniq.compact.select{|gr| gr.downcase.match(params[:term].downcase)}
     render :json => groups.collect{|group| {:value => group, :label => group}}

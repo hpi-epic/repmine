@@ -20,15 +20,14 @@
   <tr>
     <td style="vertical-align:top;">
       <%= link_to "Create Query Pattern", new_pattern_path(), {:class => "btn btn-primary"} %>
-      <%= link_to "Extract Data Schema", repository_extract_schema_path(@repository), {:class => "btn btn-success"} %>      
+      <%= link_to "Extract Data Schema", repository_extract_schema_path(@repository), {:class => "btn btn-success"} %>
       <hr />
     <td>
   </tr>
   <tr>
     <td>
-      <%= label_tag("Statistics")%>            
-      <div id="chart_div" style="width: 700px; height: 400px;"></div> 
+      <%= label_tag("Statistics")%>
+      <div id="chart_div" style="width: 700px; height: 400px;"></div>
     </td>
-  </tr>  
+  </tr>
 </table>
-

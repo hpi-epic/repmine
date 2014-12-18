@@ -1,21 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe OntologyCorrespondence, :type => :model do
-  
+
   def alignment_test_file
     Rails.root.join("spec", "testfiles","test_alignment.rdf").to_s
   end
-  
+
   def alignment_test_output_file
-    Rails.root.join("spec", "testfiles","test_alignment_output.rdf").to_s    
+    Rails.root.join("spec", "testfiles","test_alignment_output.rdf").to_s
   end
-  
+
   it "should create a new correspondence" do
-    OntologyMatcher.any_instance.stub(:alignment_path => alignment_test_output_file)    
+    OntologyMatcher.any_instance.stub(:alignment_path => alignment_test_output_file)
     alignment_graph = RDF::Graph.new
     alignment_graph.load!(alignment_test_file)
-    OntologyMatcher.any_instance.stub(:alignment_graph => alignment_graph)        
-    
+    OntologyMatcher.any_instance.stub(:alignment_graph => alignment_graph)
+
     @pattern = FactoryGirl.create(:pattern)
     @pattern2 = FactoryGirl.create(:node_only_pattern)
     input_elements = [@pattern.nodes.first]
@@ -27,5 +27,5 @@ RSpec.describe OntologyCorrespondence, :type => :model do
     assert_equal 1, subs.size
     assert_equal subs.first, oc
   end
-  
+
 end

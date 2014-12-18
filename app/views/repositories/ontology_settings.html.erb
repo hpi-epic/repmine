@@ -6,7 +6,7 @@
   <tr>
     <td><%= link_to(ed.name, ed) %></td>
     <td><%= link_to("RDF File", ed.target_ontology_url, {:class => "btn"}) %>
-    <%= link_to("Destroy", ed, {:method => :destroy, :confirm => "Really destroy #{ed.name}?", :class => "btn"}) %></td>          
+    <%= link_to("Destroy", ed, {:method => :destroy, :confirm => "Really destroy #{ed.name}?", :class => "btn"}) %></td>
   <tr>
   <% end %>
   <tr>
@@ -18,13 +18,13 @@
       <%= label_tag("Add Class") %>
       <%= text_field_tag("class_name") %>
       Subclass Of: <%= select_tag(
-        "parent_class", 
-        options_for_select(@types.collect{|type, info| [info[:name], type]}), 
-        {:include_blank => true}) 
+        "parent_class",
+        options_for_select(@types.collect{|type, info| [info[:name], type]}),
+        {:include_blank => true})
       %><br />
       <%= submit_tag("Save!") %>
     <% end %>
     </td>
   </tr>
 
-</table>  
+</table>

@@ -6,6 +6,6 @@ class CreatePatterns < ActiveRecord::Migration
       t.integer :ontology_id
       t.timestamps
     end
-    add_index :patterns, :ontology_id    
+    add_index :patterns, :ontology_id
   end
 end

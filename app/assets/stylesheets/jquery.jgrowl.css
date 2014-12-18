@@ -76,8 +76,8 @@
 .jGrowl .jGrowl-notification, .jGrowl .jGrowl-closer {
 	background-color: 		#000;
 	opacity: 				.85;
-	-ms-filter: 			"progid:DXImageTransform.Microsoft.Alpha(Opacity=85)"; 
-	filter: 				progid:DXImageTransform.Microsoft.Alpha(Opacity=85); 
+	-ms-filter: 			"progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+	filter: 				progid:DXImageTransform.Microsoft.Alpha(Opacity=85);
 	zoom: 					1;
 	width: 					235px;
 	padding: 				10px;

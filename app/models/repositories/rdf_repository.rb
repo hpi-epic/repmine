@@ -1,20 +1,20 @@
 class RdfRepository < Repository
 
   attr_accessor :sparql_client
-  
+
   def self.model_name
     return Repository.model_name
   end
-  
+
   def self.default_port
     10035
   end
-  
+
   def sparql_client
     @sparql_client ||= SPARQL::Client.new("http://#{db_username}:#{db_password}@#{host}:#{port}/#{db_name}")
     return @sparql_client
   end
-  
+
   # builds an ontology from a corresponding entry in the dataset
   # TODO: think about knowlegebases with multiple <blub> a owl:Ontology . statements ...
   def build_ontology
@@ -25,12 +25,12 @@ class RdfRepository < Repository
     self.ontology = Ontology.where(:url => url).first_or_create(:group => "Extracted")
     self.save
   end
-  
+
   # as we already build a proper ontology, we don't have to extract one
   def create_ontology!
     return true
   end
-  
+
   def type_statistics
     blacklist = [RDF::RDFS.Class, RDF::OWL.Class]
     statistics = {}

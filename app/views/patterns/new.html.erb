@@ -5,7 +5,7 @@
         <legend>General Information</legend>
         <%= f.label :name %>
         <%= f.text_field(:name) %>
-  
+
         <%= f.label :description %>
         <%= f.text_area(:description, :class => "form-control", :rows => 5) %>
 
@@ -21,8 +21,8 @@
               <%= f.association :ontology, as: :radio_buttons, collection: Ontology.where(:does_exist => true, :group => group), label_method: :short_name, label: false %>
             </fieldset>
             </div>
-          </td>           
+          </td>
       <% end %>
     </tr>
-</table>  
+</table>
 <% end %>

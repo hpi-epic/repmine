@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
     response.headers["X-Message-Type"] = flash_type unless flash_type.nil?
     flash.discard # don't want the flash to appear when you reload page
   end
-  
+
   private
 
   def flash_message
@@ -24,6 +24,6 @@ class ApplicationController < ActionController::Base
     [:error, :warning, :notice].each do |type|
       return type.to_s unless flash[type].blank?
     end
-    return nil    
+    return nil
   end
 end

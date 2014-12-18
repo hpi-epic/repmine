@@ -7,7 +7,7 @@
 
 <% content_for :javascript_includes do %>
   <%= javascript_include_tag "editor.js" %>
-  <%= javascript_include_tag "pattern_editor.js" %>  
+  <%= javascript_include_tag "pattern_editor.js" %>
 <% end %>
 
 
@@ -23,9 +23,9 @@
 <hr />
 
 <div id="drawing_canvas" class="canvas">
-  
+
   <% @pattern.nodes.each do |node| %>
     <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @pattern, :type_hierarchy => @type_hierarchy }%>
   <% end %>
-  
+
 </div>

@@ -8,15 +8,15 @@ RSpec.describe ExtractedOntology, :type => :model do
     owc.add_relation("my_relation", owc)
     expect{s.rdf_graph}.to_not raise_error
   end
-  
-  it "should create valid rdf/xml..." do 
+
+  it "should create valid rdf/xml..." do
     ont = MongoDbRepository.create({:db_name => "sample_db", :name => "sample_db"}).ontology
     owc = OwlClass.new(ont, "MyClass")
     owc.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new("hello world"))
     owc.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new("hello world"))
     expect{RDF::RDFXML::Reader.new(ont.rdf_xml)}.to_not raise_error
   end
-  
+
   it "should raise an error if the graph is not set" do
     ont = ExtractedOntology.new()
     expect{ont.rdf_xml}.to raise_error

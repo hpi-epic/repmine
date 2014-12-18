@@ -2,20 +2,20 @@
   <%= form_for([@pattern, @rc], :html => {:class => "edit_relation_constraint_form static"}) do |f| %>
 
     <%= f.select(:rdf_type, static_select(@rc), {}, {:class => "needs_no_space"}) %><br />
-  
+
     <% if !@rc.min_cardinality.blank? || !@rc.max_cardinality.blank? %>
       <br /><div id="rel_const_cards_<%= @rc.id %>">
         (<%= f.text_field(:min_cardinality, :class => "very_narrow", :disabled => true) %>,
         <%= f.text_field(:max_cardinality, :class => "very_narrow", :disabled => true) %>)
-        </div>      
+        </div>
     <% end %>
-  
+
     <% if !@rc.min_path_length.blank? || !@rc.max_path_length.blank? %>
       <div id="rel_const_length_<%= @rc.id %>">
         [<%= f.text_field(:min_path_length, :class => "very_narrow", :disabled => true) %>,
         <%= f.text_field(:max_path_length, :class => "very_narrow", :disabled => true) %>]
-      </div>      
+      </div>
     <% end %>
-  
+
   <% end %>
 </div>

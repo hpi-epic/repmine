@@ -14,7 +14,7 @@
           "#",
           :onclick => "saveTypeExpressions($('#node_#{node.id}_modal_tree'), '#{pattern_node_fancy_rdf_string_path(pattern, node)}', $('#node_#{node.id}').find('select'), $('#node_#{node.id}_modal'));"
         ) %>
-        <hr />        
+        <hr />
         <%= link_to(
           fa_icon("arrow-circle-o-down", :text => "operator below"),
           "#",
@@ -25,7 +25,7 @@
           "#",
           :onclick => "addTypeExpression('#{pattern_node_type_expression_add_same_level_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
         ) %>
-        <hr />    
+        <hr />
         <%= link_to(
           fa_icon("arrow-circle-down", :text => "type below"),
           "#",
@@ -36,7 +36,7 @@
           "#",
           :onclick => "addTypeExpression('#{pattern_node_type_expression_add_same_level_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
         ) %>
-        <hr />                    
+        <hr />
         <%= link_to(
           fa_icon("times-circle", :text => "delete"),
           "#",

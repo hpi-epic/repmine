@@ -15,9 +15,9 @@
 <% end %>
 
 <div class="translation_controls" style="left: <%= @offset %>px" />
-  <%= form_for(@target_pattern) do |f| %><% end %>  
+  <%= form_for(@target_pattern) do |f| %><% end %>
   <span>Translation to: <strong><%= link_to(@ontology.short_name, @ontology) %></strong></span>&nbsp;|&nbsp;
-  <%= link_to 'New Node', "#", :class => "btn om-control", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>  
+  <%= link_to 'New Node', "#", :class => "btn om-control", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>
   <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success om-control" %>
   <%= link_to 'Save Mapping', "#", :class => "btn btn-info hide om-control", :onclick => "saveCorrespondence();" %>
   <%= link_to 'Next', "#", :class => "btn btn-primary hide om-control", :onclick => "selectNextElement();" %>
@@ -34,7 +34,7 @@
   <% @source_pattern.nodes.each do |node| %>
     <%= render :partial => "nodes/static", :locals => {:node => node, :pattern => @source_pattern}%>
   <% end %>
-  
+
   <% @target_pattern.nodes.each do |node| %>
     <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy }%>
   <% end %>

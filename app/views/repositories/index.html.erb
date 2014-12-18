@@ -5,16 +5,16 @@
       <th>Name</th>
       <th>Actions</th>
     </tr>
-  </thead>  
+  </thead>
   <% @repositories.each_with_index do |repository, i| %>
   <tr>
     <td><%= link_to(repository.name, repository) %></td>
     <td>
       <%= link_to "Show", repository, {:class => "btn btn-success"} %>
-      <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-info"} %>      
+      <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-info"} %>
       <%= link_to "Delete", repository, {:method => :delete, :confirm => "Really?", :class => "btn btn-danger"} %>
     <td>
-  </tr> 
+  </tr>
   <% end %>
 </table>
 <% end %>

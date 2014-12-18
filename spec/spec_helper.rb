@@ -23,13 +23,13 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Ontology.any_instance.stub(
-      :download! => true, 
-      :load_to_dedicated_repository! => true, 
+      :download! => true,
+      :load_to_dedicated_repository! => true,
       :delete_repository! => true,
       :element_class_for_rdf_type => Node
     )
   end
-  
+
 begin
   # These two settings work together to allow you to limit a spec run
   # to individual examples or groups you care about by tagging them with

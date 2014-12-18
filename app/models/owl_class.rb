@@ -1,10 +1,10 @@
 class OwlClass
   attr_accessor :subclasses, :name, :relations, :attributes, :schema, :class_url
-  
+
   SET_OPS = {:sub => "&sub;", :sup => "&sup;", :not => "&not;"}
-  
+
   include RdfSerialization
-  
+
   def initialize(schema, name, url = nil)
     @subclasses = Set.new
     @schema = schema
@@ -14,23 +14,23 @@ class OwlClass
     @class_url = url
     schema.add_class(self) unless schema.nil?
   end
-  
+
   def add_attribute(name, range)
     a = Attribute.new(name, range, self)
     attributes << a
     return a
   end
-  
+
   def add_relation(name, target_class)
     r = Relation.new(name, target_class, self)
     relations << r
     return r
   end
-  
+
   def url
     return class_url || (schema.url + "/" + name)
   end
-  
+
   def rdf_statements
     stmts = [
       [resource, RDF.type, RDF::OWL.Class],
@@ -40,9 +40,9 @@ class OwlClass
     ]
     relations.each{|rel| stmts.concat(rel.rdf)}
     attributes.each{|att| stmts.concat(att.rdf)}
-    return stmts    
+    return stmts
   end
-  
+
   def ==(other_object)
     return self.url == other_object.url
   end

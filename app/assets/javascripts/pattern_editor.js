@@ -1,18 +1,18 @@
 // jsPlumb initializer - creates the drawing canvas and binds the 'connection' event
 jsPlumb.ready(function() {
-  
+
   jsPlumb.importDefaults({
     Container: "drawing_canvas"
-	});	
-	
+	});
+
 	$(".node").each(function(index,node_div){
 	  addNodeToGraph($(node_div));
 	});
-	
+
 	loadExistingConnections(connect_these_nodes, load_their_attribute_constraints);
-	
+
 	jsPlumb.bind("connection", function(info, originalEvent) {
-	  if(info.connection.scope == "relations") {  
+	  if(info.connection.scope == "relations") {
 		  createConnection(info.connection, true);
 	  }
 	});

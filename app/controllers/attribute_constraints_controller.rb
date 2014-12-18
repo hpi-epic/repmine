@@ -1,8 +1,8 @@
 class AttributeConstraintsController < ApplicationController
-  
+
   layout false
   before_filter :get_pattern
-  
+
   def get_pattern
     @pattern = Pattern.find(params[:pattern_id])
   end
@@ -13,12 +13,12 @@ class AttributeConstraintsController < ApplicationController
     @possible_attributes = @ac.possible_attributes(params[:rdf_type])
     render :show
   end
-  
+
   def show
     @ac = AttributeConstraint.find(params[:id])
     @possible_attributes ||= @ac.possible_attributes()
   end
-  
+
   def update
     @ac = AttributeConstraint.find(params[:id])
     respond_to do |format|
@@ -29,7 +29,7 @@ class AttributeConstraintsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @ac = AttributeConstraint.find(params[:id])
     respond_to do |format|
@@ -40,9 +40,9 @@ class AttributeConstraintsController < ApplicationController
       end
     end
   end
-  
+
   def static
     @ac = AttributeConstraint.find(params[:attribute_constraint_id])
   end
-  
+
 end

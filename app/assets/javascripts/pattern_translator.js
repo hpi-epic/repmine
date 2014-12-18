@@ -1,20 +1,20 @@
 // jsPlumb initializer - creates the drawing canvas and binds the 'connection' event
 jsPlumb.ready(function() {
-  
+
   jsPlumb.importDefaults({
     Container: "drawing_canvas"
-	});	
-	
+	});
+
   $(".immutable_node").each(function(index, node_div){
 	  addNodeEndpoints($(node_div).attr("id"));
 	});
-	
+
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
   $.when.apply($, requests).done(function(){
     removeExcessEndpoints();
-    addMatchedClass();	  
+    addMatchedClass();
 	});
-	
+
   loadTranslationPattern();
 });
 
@@ -65,7 +65,7 @@ var toggleOntologyMatchingMode = function(on){
     $("a.om-control").each(function(i,el){$(el).toggle()});
     $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});
     toggleSelectability(on);
-    if(on){selectNextElement()};    
+    if(on){selectNextElement()};
   }
 };
 
@@ -81,7 +81,7 @@ var selectNextElement = function(){
   $(available[next_one]).click();
 }
 
-// makes everything clickable, except the 
+// makes everything clickable, except the
 var toggleSelectability = function(switch_on){
   allUnmatchedElementsOf(allPatternElements()).each(function(i, el){
     if(switch_on){
@@ -89,7 +89,7 @@ var toggleSelectability = function(switch_on){
         $(this).toggleClass("selected");
         var selected_in = $(".selected.static select[id$='rdf_type']");
         var selected_out = $(".selected").not(".static").find("select[id$='rdf_type']");
-        showHelpfulMessage(selected_in, selected_out);        
+        showHelpfulMessage(selected_in, selected_out);
       });
     } else {
       $(el).removeClass("selected");
@@ -147,11 +147,11 @@ var loadTranslationPattern = function(){
   $(".node").not(".immutable_node").each(function(index,node_div){
 	  addNodeToGraph($(node_div));
 	});
-	
+
   loadExistingConnections(connect_these_nodes, load_their_attribute_constraints);
-  
+
 	jsPlumb.bind("connection", function(info, originalEvent) {
-	  if(info.connection.scope == "relations") {  
+	  if(info.connection.scope == "relations") {
 		  createConnection(info.connection, true);
 	  }
 	});
@@ -191,7 +191,7 @@ var saveCorrespondence = function(){
     data : form.serialize(),
     success: function(data, textStatus, jqXHR){
       showGrowlNotification(jqXHR);
-      toggleOntologyMatchingMode(false);      
+      toggleOntologyMatchingMode(false);
       matched_concepts = matched_concepts.concat(data);
       addMatchedClass();
       toggleOntologyMatchingMode(true);
@@ -199,5 +199,5 @@ var saveCorrespondence = function(){
     error: function(jqXHR, textStatus, errorThrown){
       showGrowlNotification(jqXHR);
     }
-  });  
+  });
 };

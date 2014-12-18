@@ -1,24 +1,24 @@
 class NodesController < ApplicationController
-  
+
   # these are always just embedded, no need for a layout
   layout false
   before_filter :get_pattern
-  
+
   def get_pattern
     @pattern = Pattern.find(params[:pattern_id])
   end
-  
+
   def create
     @node = @pattern.create_node!
     @type_hierarchy = @pattern.type_hierarchy
     render :show
   end
-  
+
   def show
     @node = Node.find(params[:id])
     @type_hierarchy = @pattern.type_hierarchy
   end
-  
+
   def update
     @node = Node.find(params[:id])
     respond_to do |format|
@@ -32,13 +32,13 @@ class NodesController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @node = Node.find(params[:id])
     @node.destroy
     render :json => {}
   end
-  
+
   def fancy_rdf_string
     @node = Node.find(params[:node_id])
     @te = @node.type_expression

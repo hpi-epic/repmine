@@ -11,5 +11,5 @@ module Vocabularies
     property :relation
     property :measure
     term :Cell
-  end 
+  end
 end

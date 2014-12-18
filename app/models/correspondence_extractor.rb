@@ -3,40 +3,40 @@ class CorrespondenceExtractor
   C_PROP = "classification"
   M_PROP = "correspondsTo"
   IM_PROP = "inferredCorrespondsTo"
-  
-  
+
+
   # RULE IDENTIFIERS
   SG = "simple_graph"
   N_RC_N = "n-rc-n"
   N_AC = "n-ac"
   N_RC_N_RC_N = "n-rc-n-rc-n"
-  
+
   def classify(pattern)
     c_engine = clean_classification_engine
     pattern.rdf.each{|stmt| c_engine << stmt}
     return c_engine
   end
-  
+
   def detect_missing_correspondences!(input_pattern, output_pattern)
     i_engine = clean_inference_engine
     # load the classified input and output patterns
     [classify(input_pattern), classify(output_pattern)].each{|g| g.each{|stmt| i_engine << stmt}}
-    
+
     # inserts the matching relations into the engine. the already present rules will use them to, e.g., find missing links
     input_pattern.pattern_elements.each do |pe|
       OntologyCorrespondence.includes(:input_elements).where(:pattern_elements => {:id => pe.id}).each do |corr|
         corr.output_elements.each{|oe| i_engine << [pe.resource, M_PROP, oe.resource]}
       end
     end
-    
+
     # finds the newly created correspondences and adds them to our knwoledge base
     i_engine.select(:Input, CorrespondenceExtractor::IM_PROP, :Output).each do |res|
       OntologyCorrespondence.for_elements!([PatternElement.find_by_url(res.subject.to_s)], [PatternElement.find_by_url(res.object.to_s)])
     end
-    
+
     return i_engine
   end
-  
+
   # install the rules to classify the input and output graph
   def clean_classification_engine
     classification_engine = Wongi::Engine.create
@@ -45,7 +45,7 @@ class CorrespondenceExtractor
     end
     return classification_engine
   end
-  
+
   def clean_inference_engine
     inference_engine = Wongi::Engine.create
     self.methods.select{|m| m.to_s.ends_with?("_irule")}.each do |rule_method|
@@ -53,7 +53,7 @@ class CorrespondenceExtractor
     end
     return inference_engine
   end
-  
+
   # figures out that a link is missing and inserts it
   def missing_link_irule()
     rule("missing_link") do
@@ -76,7 +76,7 @@ class CorrespondenceExtractor
       }
     end
   end
-  
+
   # determine whether a graph only has one element
   def simple_graph_crule()
     rule("simple_graph") do
@@ -107,7 +107,7 @@ class CorrespondenceExtractor
       }
     end
   end
-  
+
   def node_attribute_constraint_crule()
     rule(N_AC) do
       forall {
