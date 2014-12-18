@@ -52,6 +52,18 @@
       rdfs:label "taggings_tagger_id" ;
       rdfs:range xsd:integer .
 
+:oracles
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "oracles" .
+
+:oracles_id
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :oracles ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "oracles_id" ;
+      rdfs:range xsd:integer .
+
 :taggings_taggable_type
       a       rdf:Property , owl:DatatypeProperty ;
       rdfs:domain :taggings ;
@@ -180,6 +192,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "ontology_correspondences_input_ontology_id" ;
       rdfs:range xsd:integer .
+
+:oracles_created_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :oracles ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "oracles_created_at" ;
+      rdfs:range xsd:dateTime .
 
 :ontology_correspondences_relation
       a       rdf:Property , owl:DatatypeProperty ;
@@ -348,6 +367,13 @@
       rdfs:domain :ontologies ;
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:oracles_updated_at
+      a       rdf:Property , owl:DatatypeProperty ;
+      rdfs:domain :oracles ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "oracles_updated_at" ;
       rdfs:range xsd:dateTime .
 
 :type_expressions_operator

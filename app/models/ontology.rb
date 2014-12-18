@@ -52,6 +52,10 @@ class Ontology < ActiveRecord::Base
     return id.nil? ? self.short_name : "ontology_#{self.id}"
   end
   
+  def outgoing_relations(domain)
+    return ag_connection.outgoing_relations(domain)
+  end
+  
   def imports()
     imps = Set.new()
     rdf_graph.query(:predicate => RDF::OWL.imports).each do |res|

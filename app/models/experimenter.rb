@@ -11,16 +11,61 @@ class Experimenter
     check_reference_alignment!
   end
   
+  # builds patterns that utilize the range of relations
   def build_range_patterns
-    
+    matched_classes.each do |mc|
+      source_ontology.outgoing_relations(mc).each do |rel_out|
+        Pattern.n_r_n_pattern(source_ontology, mc, rel_out.url, rel_out.range.to_s, "Range Pattern")
+      end
+    end
   end
   
-  def build_only_choice_patterns
-    
-  end
-  
+  # builds patterns that try to utilize the domain of relations
   def build_domain_patterns
-    
+    matched_classes.each do |mc|
+      source_ontology.incoming_relations(mc).each do |rel_in|
+        Pattern.n_r_n_pattern(source_ontology, rel_in.domain.to_s, rel_in.url, mc, "Domain Pattern")
+      end
+    end
+  end
+  
+  # removes all existing patterns
+  def cleanup_patterns!
+    Pattern.all.each{|pattern| pattern.destroy}
+  end
+  
+  # takes the current status quo and let's users provide their input regarding all patterns
+  def match!
+    user_interactions = 0
+    Pattern.each do |pattern|
+      pattern.pattern_elements.each do |pe|
+        know_matches = matcher.substitutes_for([pe])
+        if known_matches.blank?
+          user_matches = reference.substitutes_for([pe])
+          user_interactions += user_matches.size
+          # TODO: add the provided matches to the computed alignment
+        end
+        # TODO: run the inference engine here!
+      end
+    end
+    return user_interactions
+  end
+  
+  def matched_classes
+    matcher.matched_concepts[:source_ontology].to_a & source_ontology.all_concepts[RDF::OWL.Class.to_s].to_a
+  end
+  
+  # ORACLE helpers
+  def do_you_know_more?
+    matcher.matched_concepts[:correspondence_count] < reference.matched_concepts[:correspondence_count]
+  end
+  
+  def do_i_know_more?
+    matcher.matched_concepts[:correspondence_count] > reference.matched_concepts[:correspondence_count]
+  end
+  
+  def call_it_a_tie?
+    matcher.matched_concepts[:correspondence_count] == reference.matched_concepts[:correspondence_count]
   end
     
   def alignment_info
@@ -64,7 +109,6 @@ class Experimenter
   
   def matcher
     if @matcher.nil?
-      puts "=== matching #{source_ontology.very_short_name} with #{target_ontology.very_short_name} ==="
       @matcher = OntologyMatcher.new(@source_ontology, @target_ontology, true)
       @matcher.match!
     end

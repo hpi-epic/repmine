@@ -57,20 +57,33 @@ class AgraphConnection
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
     rels = []
-    
     ([domain] + get_all_superclasses(domain)).each do |ddomain|
       ([range] + get_all_superclasses(range)).each do |rrange|
-        repository.build_query(:infer => true) do |q|  
-          q.pattern([:rel, RDF.type, RDF::OWL.ObjectProperty])
-          q.pattern([:rel, RDF::RDFS.domain, RDF::Resource.new(ddomain)])
-          q.pattern([:rel, RDF::RDFS.range, RDF::Resource.new(rrange)])
-        end.run do |res|
-          rel = Relation.from_url(res.rel.to_s, ddomain, rrange) 
-          rels << rel unless rels.include?(rel)
-        end
+        rels.concat(relations(ddomain, rrange) - rels)
       end
     end
     
+    return rels
+  end
+  
+  def outgoing_relations(domain)
+    relations(domain, nil)
+  end
+  
+  def incoming_relations(range)
+    relations(nil, range)
+  end
+  
+  def relations(domain, range)
+    rels = []
+    repository.build_query(:infer => true) do |q|  
+      q.pattern([:rel, RDF.type, RDF::OWL.ObjectProperty])
+      q.pattern([:rel, RDF::RDFS.domain, domain.nil? ? :domain : RDF::Resource.new(domain)])
+      q.pattern([:rel, RDF::RDFS.range, range.nil? ? :range : RDF::Resource.new(range)])
+    end.run do |res|
+      rel = Relation.from_url(res.rel.to_s, domain || res.domain.to_s, range || res.range.to_s)
+      rels << rel unless rels.include?(rel)
+    end
     return rels
   end
   

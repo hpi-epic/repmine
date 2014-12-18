@@ -26,9 +26,10 @@ namespace :eswc do
   task :create_query_graphs => [:environment] do
     oaei_ontologies.each_with_index do |source_ont, i|
       oaei_ontologies[i+1..-1].each do |target_ont|
-        file_path, switch = reference_alignment_for(source_ont, target_ont)
-        next if file_path.nil?
-        
+        expi = Experimenter.new(source_ont, target_ont)
+        next unless expi.go_on?
+        puts expi.match!
+        expi.cleanup_patterns!
       end
     end
   end

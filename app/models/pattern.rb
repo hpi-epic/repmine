@@ -15,6 +15,19 @@ class Pattern < ActiveRecord::Base
   validates :description, :presence => true
   validates :ontology, :presence => true
   
+  # 'factories' for creating patterns needed for experiments
+  def self.n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
+    p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
+    source_node = p.create_node!
+    source_node.rdf_type = source_class
+    target_node = p.create_node!
+    target_node.rdf_type = target_class
+    relation = RelationConstraint.create(:source_id => source_node.id, :target_id => target_node.id)
+    relation.rdf_type = relation_type
+    return p
+  end
+  
+  # routing through...
   def type_hierarchy()
     ag_connection.type_hierarchy()
   end
@@ -53,6 +66,7 @@ class Pattern < ActiveRecord::Base
     return nodes.collect{|n| n.attribute_constraints.empty? ? n.x : n.x + 280}.max
   end
   
+  # fidelling with concepts
   def concept_count
     concepts_used.size
   end
@@ -88,9 +102,5 @@ class Pattern < ActiveRecord::Base
   
   def rdf_types
     [Vocabularies::GraphPattern.GraphPattern]
-  end
-  
-  def infer_correspondences!
-    return []
   end
 end

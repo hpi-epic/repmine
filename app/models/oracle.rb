@@ -11,15 +11,5 @@ class Oracle
     return @om_reference.substitutes_for(pattern_elements, false)
   end
   
-  def do_you_know_more?
-    om_computed.matched_concepts[:correspondence_count] < om_reference.matched_concepts[:correspondence_count]
-  end
   
-  def do_i_know_more?
-    om_computed.matched_concepts[:correspondence_count] > om_reference.matched_concepts[:correspondence_count]
-  end
-  
-  def call_it_a_tie?
-    om_computed.matched_concepts[:correspondence_count] == om_reference.matched_concepts[:correspondence_count]
-  end
 end

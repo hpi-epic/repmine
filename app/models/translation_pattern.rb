@@ -23,10 +23,6 @@ class TranslationPattern < Pattern
     return Pattern.model_name
   end
   
-  def infer_correspondences!
-    
-  end
-  
   # this loads nodes and relations for concepts we already know are equivalent
   def prepare!
     correspondences = source_pattern.match_concepts(ontology)
