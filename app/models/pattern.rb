@@ -26,6 +26,15 @@ class Pattern < ActiveRecord::Base
     relation.rdf_type = relation_type
     return p
   end
+  
+  def self.n_a_pattern(ontology, attribute_type, source_class, name)
+    p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
+    source_node = p.create_node!
+    source_node.rdf_type = source_class
+    ac = source_node.attribute_constraints.create
+    ac.rdf_type = attribute_type
+    return p
+  end
 
   # routing through...
   def type_hierarchy()
@@ -85,6 +94,15 @@ class Pattern < ActiveRecord::Base
     om = OntologyMatcher.new(ontology, ont)
     om.match!
     return om.get_substitutes_for(pattern_elements)
+  end
+  
+  # some comparison
+  def equal_to?(other)
+    if self == other
+      return true
+    else
+      return self.pattern_elements.find{|pe| other.pattern_elements.select{|ope| pe.equal_to?(ope)}.size != 1}.nil?
+    end
   end
 
   # RDF Serialization

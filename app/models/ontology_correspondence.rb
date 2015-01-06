@@ -43,20 +43,31 @@ class OntologyCorrespondence < ActiveRecord::Base
   end
 
   def entity1
-    return input_elements.size == 1 ? input_elements.first : input_elements
+    return input_elements.first.rdf_type
   end
 
   def entity2
-    return output_elements.size == 1 ? output_elements.first : output_elements
+    return output_elements.first.rdf_type
   end
-
-  def rdf_statements
-    [
-      [alignment, Vocabularies::Alignment.map, resource],
-      [resource, Vocabularies::Alignment.entity1, RDF::Resource.new(input_elements.first.rdf_type)],
-      [resource, Vocabularies::Alignment.entity2, RDF::Resource.new(output_elements.first.rdf_type)],
-      [resource, Vocabularies::Alignment.measure, measure],
-      [resource, Vocabularies::Alignment.relation, relation]
-    ]
+  
+  def equal_to?(other)
+    return entity1 == other.entity1 && entity2 == other.entity2
+  end
+  
+  def xml_node(doc, invert = false)
+    map = Nokogiri::XML::Node.new "map", doc
+    cell = Nokogiri::XML::Node.new("Cell", doc)
+    map << cell
+    e1 = Nokogiri::XML::Node.new("entity1", doc)
+    e1["rdf:resource"] = invert ? self.entity2 : self.entity1
+    e2 = Nokogiri::XML::Node.new("entity2", doc)
+    e2["rdf:resource"] = invert ? self.entity1 : self.entity2
+    m = Nokogiri::XML::Node.new("measure", doc)
+    m["rdf:datatype"] = RDF::XSD.float.to_s
+    m.content = self.measure
+    r = Nokogiri::XML::Node.new("relation", doc)
+    r.content = self.relation
+    cell << e1 << e2 << m << r
+    return map
   end
 end

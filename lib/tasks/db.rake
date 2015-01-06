@@ -18,18 +18,13 @@ namespace :db do
   
   desc "clear all downloaded ontologies, created alignments, etc"
   task :clear_tmp_folders do
-    remove_all_files_from("public/ontologies/tmp", ["owl", "rdf", "n3", "ttl"])
-    remove_all_files_from("public/ontologies/extracted", ["owl", "rdf", "n3", "ttl"])    
-    remove_all_files_from("public/ontologies/alignments", ["rdf"])    
+    remove_all_files_from("public/ontologies/tmp")
+    remove_all_files_from("public/ontologies/extracted")    
+    remove_all_files_from("public/ontologies/alignments")    
   end
   
-  def remove_all_files_from(folder_name, endings = [])
-    Dir.open(folder_name).each do |file|
-      regexp = Regexp.compile("\\.(#{endings.join("|")})")
-      unless file.match(regexp).nil?
-        puts "deleting #{folder_name}/#{file}"
-        File.delete(folder_name + "/" + file)
-      end
-    end
+  def remove_all_files_from(folder_name)
+    puts "= clearing #{folder_name} ="
+    FileUtils.rm_rf("#{folder_name}/.", secure: true)
   end
 end

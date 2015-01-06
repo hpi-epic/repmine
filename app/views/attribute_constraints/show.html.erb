@@ -1,9 +1,9 @@
 <% div_id = "node_#{@ac.node.id}_attributes_#{@ac.id}" %>
 <div id="<%= div_id %>" class="attribute_constraint" data-id="<%= @ac.id %>">
   <%= form_for([@pattern,@ac], :html => {:class => "needs_no_space edit_attribute_constraint"}) do |f| %>
-    <%= f.select(:rdf_type, attrib_selector(@possible_attributes), {}, {:class => "just_right"})%>
-    <%= f.select(:operator, operator_selector(), {}, {:class => "very_narrow"})%>
-    <%= f.text_field(:value, {:class => "just_right"})%>
+    <%= f.select(:rdf_type, attrib_selector(@possible_attributes), {}, {:class => "just_right"}) %>
+    <%= f.select(:operator, operator_selector(), {}, {:class => "very_narrow"}) %>
+    <%= f.text_field(:value, {:class => "just_right"}) %>
     <%= link_to(fa_icon("times-circle"), "#", :onclick => "removeAttributeConstraint('#{pattern_attribute_constraint_path(@pattern, @ac)}', '#{div_id}');") %>
   <% end %>
 </div>

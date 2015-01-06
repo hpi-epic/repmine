@@ -55,6 +55,22 @@ class Ontology < ActiveRecord::Base
   def outgoing_relations(domain)
     return ag_connection.outgoing_relations(domain)
   end
+  
+  def incoming_relations(range)
+    return ag_connection.incoming_relations(range)
+  end
+  
+  def relation_information(rel)
+    return ag_connection.relation_information(rel)    
+  end
+  
+  def domain_for_attribute(attrib)
+    return ag_connection.domain_for_attribute(attrib)
+  end
+  
+  def attributes_of(domain)
+    return ag_connection.attributes_of(domain)
+  end
 
   def imports()
     imps = Set.new()

@@ -66,6 +66,24 @@ RSpec.describe Pattern, :type => :model do
     assert_equal 2, @pattern.unmatched_concepts(Ontology.first).size
     assert_not_include @pattern.unmatched_concepts(Ontology.first), @pattern.nodes.first.rdf_type + "_matched"
   end
+  
+  it "should determine equality of very simple patterns" do
+    p1 = FactoryGirl.create(:empty_pattern)
+    p2 = FactoryGirl.create(:empty_pattern)
+    assert p1.equal_to?(p2)
+  end
+  
+  it "should determine similar n_r_n patterns" do
+    p1 = Pattern.n_r_n_pattern(FactoryGirl.create(:ontology), "http://example.org/n1", "http://example.org/r1", "http://example.org/n2")
+    p2 = Pattern.n_r_n_pattern(FactoryGirl.create(:ontology), "http://example.org/n1", "http://example.org/r1", "http://example.org/n2")
+    assert p1.equal_to?(p2)
+  end
+  
+  it "should determine missing links" do
+    p1 = FactoryGirl.create(:pattern)
+    p1.relation_constraints.first.destroy
+    assert !p1.equal_to?(FactoryGirl.create(:pattern))
+  end
 
   def query_graph_for_type(graph, rdf_type)
     results = []

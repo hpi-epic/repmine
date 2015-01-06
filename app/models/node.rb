@@ -40,4 +40,24 @@ class Node < PatternElement
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.Node]
   end
+  
+  def equal_to?(other)
+    if super
+      # check cardinalities of all the relations
+      return check_ac_and_rc_similarity(other) && other.check_ac_and_rc_similarity(self)
+    else
+      return false
+    end
+  end
+  
+  def check_ac_and_rc_similarity(other)
+    equal = source_relation_constraints.size == other.source_relation_constraints.size
+    equal &&= target_relation_constraints.size == other.target_relation_constraints.size
+    equal &&= attribute_constraints.size == other.attribute_constraints.size
+    # then check if each rc and ac has exactly one twin
+    equal &&= source_relation_constraints.find{|src| other.source_relation_constraints.select{|osrc| src.equal_to?(osrc)}.size != 1}.nil?
+    equal &&= target_relation_constraints.find{|trc| other.target_relation_constraints.select{|otrc| trc.equal_to?(otrc)}.size != 1}.nil?      
+    equal &&= attribute_constraints.find{|ac| other.attribute_constraints.select{|oac| ac.equal_to?(oac)}.size != 1}.nil?
+    return equal
+  end
 end

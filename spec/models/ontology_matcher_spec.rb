@@ -65,7 +65,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.match!
     subs = @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
     assert_equal 1, subs.size
-    assert_equal "http://ekaw/#Paper_Author", subs.first.entity2.rdf_type
+    assert_equal "http://ekaw/#Paper_Author", subs.first.entity2
     subs = @om.get_substitutes_for([PatternElement.for_rdf_type("http://crs_dr/#author_not_present_in_this_ontology")])
     assert_empty subs
   end
@@ -75,7 +75,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.match!
     subs = @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
     assert_equal 1, subs.size
-    assert_equal "http://ekaw/#Paper_Author", subs.first.entity2.rdf_type
+    assert_equal "http://ekaw/#Paper_Author", subs.first.entity2
     subs = @om.get_substitutes_for([PatternElement.for_rdf_type(not_present)])
     assert_empty subs
   end
@@ -112,28 +112,12 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert subs.first.output_elements.first.is_a?(AttributeConstraint)
   end
 
-  it "should survive an rdf import/export cycle" do
-    @om.add_to_alignment_graph!(alignment_test_file)
-    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
-    File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
-    @om.write_alignment_graph!(alignment_test_output_file)
-    @om.reset!
-    @om.add_to_alignment_graph!(alignment_test_output_file)
-    assert_not_empty @om.get_substitutes_for([PatternElement.for_rdf_type(author)])
-  end
-
   it "should properly export a new mapping once we've added that to the alignment graph" do
     # create the alignment graph
-    @om.add_to_alignment_graph!(alignment_test_file)
     correspondence = FactoryGirl.create(:ontology_correspondence)
-    File.delete(alignment_test_output_file) if File.exists?(alignment_test_output_file)
+    FileUtils.cp(alignment_test_file, alignment_test_output_file)
     @om.stub(:alignment_path => alignment_test_output_file)
     @om.add_correspondence!(correspondence)
-    assert_equal true, File.exists?(alignment_test_output_file)
-    assert_not_empty @om.get_substitutes_for(correspondence.input_elements)
-    # here, we check whether a newly created matcher can work with that
-    @om.reset!
-    @om.add_to_alignment_graph!(alignment_test_output_file)
     assert_not_empty @om.get_substitutes_for(correspondence.input_elements)
   end
 
@@ -163,5 +147,17 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal 1, subs.size
     assert_equal oc, subs.first
     assert_equal count_before, OntologyCorrespondence.count
+  end
+  
+  it "should remove correspondences properly" do
+    # create the alignment graph
+    FileUtils.cp(alignment_test_file, alignment_test_output_file)
+    @om.stub(:alignment_path => alignment_test_output_file)
+    pe = FactoryGirl.create(:pattern_element)
+    pe.rdf_type = "http://crs_dr/#abstract"
+    correspondences = @om.get_substitutes_for([pe])
+    assert_not_empty correspondences
+    @om.remove_correspondence!(correspondences.first)
+    assert_empty @om.get_substitutes_for([pe])
   end
 end

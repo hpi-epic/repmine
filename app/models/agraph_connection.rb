@@ -41,16 +41,20 @@ class AgraphConnection
 
   # gets all classes, object properties, and datatype properties
   def all_concepts()
-    stats = {RDF::OWL.Class.to_s => Set.new, RDF::OWL.ObjectProperty.to_s => Set.new, RDF::OWL.DatatypeProperty.to_s => Set.new}
-    stats.keys.each do |concept|
+    keys = [RDF::OWL.Class.to_s, RDF::OWL.ObjectProperty.to_s, RDF::OWL.DatatypeProperty.to_s]
+    stats = Hash[ *keys.collect { |v| [ v, Set.new ] }.flatten ]
+    stats[:all] = Set.new
+    
+    keys.each do |concept|
       repository.build_query(:infer => true) do |q|
         q.pattern([:concept, RDF.type, RDF::Resource.new(concept)])
       end.run do |res|
-        stats[concept.to_s] << res.concept.to_s unless res.concept.anonymous?
+        unless res.concept.anonymous?
+          stats[concept.to_s] << res.concept.to_s
+          stats[:all] << res.concept.to_s
+        end
       end
     end
-
-    stats[:all] = repository.subjects
     return stats
   end
 
@@ -72,6 +76,25 @@ class AgraphConnection
 
   def incoming_relations(range)
     relations(nil, range)
+  end
+  
+  def relation_information(rel)
+    rel_res = RDF::Resource.new(rel)
+    repository.build_query() do |q|
+      q.pattern([rel_res, RDF::RDFS.domain, :domain])
+      q.pattern([rel_res, RDF::RDFS.range, :range])
+    end.run do |res|
+      return [res.domain.to_s, res.range.to_s]
+    end
+  end
+  
+  def domain_for_attribute(attrib)
+    a_res = RDF::Resource.new(attrib)
+    repository.build_query() do |q|
+      q.pattern([a_res, RDF::RDFS.domain, :domain])
+    end.run do |res|
+      return res.domain.to_s
+    end
   end
 
   def relations(domain, range)
@@ -104,6 +127,19 @@ class AgraphConnection
     end
 
     return attribs
+  end
+  
+  def attributes_of(domain)
+    attribs = Set.new()
+
+    repository.build_query(:infer => true) do |qq|
+      qq.pattern([:attrib, RDF.type, RDF::OWL.DatatypeProperty])
+      qq.pattern([:attrib, RDF::RDFS.domain, RDF::Resource.new(domain)])
+    end.run do |res|
+      attribs << res.attrib.to_s
+    end
+
+    return attribs.to_a
   end
 
   def get_all_superclasses(rdf_class)

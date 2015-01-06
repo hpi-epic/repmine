@@ -21,6 +21,10 @@ class PatternElement < ActiveRecord::Base
   def self.find_by_url(url)
     return self.find(url.split("/").last.to_i)
   end
+  
+  def ontology
+    pattern.nil? ? nil : pattern.ontology 
+  end
 
   def url
     return pattern.url + "/#{self.class.name.underscore.pluralize}/#{id}"
@@ -57,5 +61,10 @@ class PatternElement < ActiveRecord::Base
 
   def query_variable()
     "#{self.class.name.underscore}_#{self.id}"
+  end
+  
+  def equal_to?(other)
+    raise "operation not permitted on elements of the same pattern" if self.pattern == other.pattern
+    return self.class == other.class && self.rdf_type == other.rdf_type
   end
 end

@@ -28,5 +28,17 @@ RSpec.describe PatternElement, :type => :model do
     assert AttributeConstraint.for_rdf_type("http://example.org/fancy_type").is_a?(AttributeConstraint)
     assert RelationConstraint.for_rdf_type("http://example.org/fancy_type").is_a?(RelationConstraint)
   end
-
+  
+  it "should properly detect equality of two generic pattern elements" do
+    pe1 = FactoryGirl.create(:pattern_element, :pattern => FactoryGirl.create(:empty_pattern))    
+    pe2 = FactoryGirl.create(:pattern_element, :pattern => FactoryGirl.create(:empty_pattern))        
+    assert pe1.equal_to?(pe2)
+  end
+  
+  it "should raise an exception when comparing two elements of the same pattern" do
+    pattern = FactoryGirl.create(:empty_pattern)
+    pe1 = FactoryGirl.create(:pattern_element, :pattern => pattern)    
+    pe2 = FactoryGirl.create(:pattern_element, :pattern => pattern)    
+    expect{pe1.equal_to?(pe2)}.to raise_error
+  end
 end

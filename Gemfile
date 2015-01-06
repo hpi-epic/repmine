@@ -2,9 +2,6 @@ source 'https://rubygems.org'
 ruby '2.1.2'
 
 gem 'rails', '~> 3.2.19' # MIT
-
-gem 'pg'
-gem "therubyracer"
 gem 'jquery-rails'
 
 # little helpers
@@ -24,9 +21,10 @@ gem "sparql-client"
 # ontology work with allegrograph
 gem "rdf-agraph"
 gem "rest-client"
-gem "equivalent-xml"
 gem "rdf-xsd"
+gem "equivalent-xml"
 gem "linkeddata"
+gem 'nokogiri'
 
 # rule engine for translations
 gem 'wongi-engine'
@@ -36,7 +34,6 @@ group :development, :test do
   gem "rspec-rails"
   gem 'factory_girl_rails'
   gem 'simplecov'
-  gem 'nokogiri'
 end
 
 gem 'autotest-rails'
@@ -52,7 +49,6 @@ end
 # repository specific stuff
 gem 'neography'
 gem 'mongo'
-gem 'bson_ext'
 
 # visualization
 gem "googlecharts"
@@ -81,4 +77,9 @@ gem "logging"
 gem 'sql-maker'
 
 # general convenience
-gem "thin"
+platforms :ruby do
+  gem 'thin'
+  gem "therubyracer"  
+  gem 'pg'  
+  gem 'bson_ext'  
+end
