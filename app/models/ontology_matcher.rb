@@ -2,7 +2,7 @@ require 'open3'
 
 class OntologyMatcher
 
-  attr_accessor :target_ontology, :source_ontology, :alignment_graph, :alignment_path, :speaking_names
+  attr_accessor :target_ontology, :source_ontology, :alignment_graph, :alignment_path, :speaking_names, :onto2
 
   class MatchingError < StandardError;end
 
@@ -18,9 +18,24 @@ class OntologyMatcher
     call_matcher! unless already_matched?
     add_to_alignment_graph!(alignment_path)
   end
+  
+  def set_ontos!
+    q = RDF::Query.new{
+      pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])
+      pattern([:alignment, Vocabularies::Alignment.onto2, :onto2])
+    }
+    alignment_graph.query(q) do |res|
+      @onto2 = res[:onto2].to_s
+    end
+  end
+  
+  def onto2
+    set_ontos! if @onto2.nil?
+    @onto2
+  end
 
   def alignment_graph
-    add_to_alignment_graph!(alignment_path) if @alignment_graph.empty?
+    add_to_alignment_graph!(alignment_path) if @alignment_graph.empty?    
     return @alignment_graph
   end
 
@@ -30,12 +45,11 @@ class OntologyMatcher
 
   def add_correspondence!(correspondence)
     doc = Nokogiri::XML(File.open(alignment_path)){|doc| doc.noblanks}
-    invert = correspondence.input_elements.first.ontology == target_ontology
-    map = correspondence.xml_node(doc, invert)
+    map = correspondence.xml_node(doc)
     doc.css("Alignment").first.add_child(map)
     File.open(alignment_path, "wb"){|f| f.puts doc.to_xml}
     reload!
-    return invert ? correspondences.output_elements.first : correspondence.input_elements.first
+    return correspondence.entity2
   end
   
   def remove_correspondence!(correspondence)
@@ -43,11 +57,13 @@ class OntologyMatcher
     doc.css("Alignment map").each do |map|
       e1 = map.css("entity1").first["rdf:resource"]
       e2 = map.css("entity2").first["rdf:resource"]
-      map.remove if (e1 == correspondence.entity1 && e2 == correspondence.entity2) || (e1 == correspondence.entity2 && e2 == correspondence.entity1)
+      if (e1 == correspondence.entity1 && e2 == correspondence.entity2) || (e1 == correspondence.entity2 && e2 == correspondence.entity1)
+        map.remove
+      end
     end
     File.open(alignment_path, "wb"){|f| f.puts doc.to_xml}
     reload!
-    correspondence.destroy
+    #correspondence.destroy
   end
   
   def reload!
@@ -57,6 +73,11 @@ class OntologyMatcher
 
   def reset!
     @alignment_graph = RDF::Graph.new()
+  end
+  
+  def delete_alignment!
+    FileUtils.rm(alignment_path) if File.exist?(alignment_path)    
+    reset!
   end
 
   def call_matcher!
@@ -90,6 +111,7 @@ class OntologyMatcher
     else
       if File.exist?(alignment_path_for(target_ontology, source_ontology))
         @alignment_path = alignment_path_for(target_ontology, source_ontology)
+        invert!
         return true
       end
     end
@@ -97,48 +119,33 @@ class OntologyMatcher
   end
 
   # this is where the magic happens. We search the alignment graph for matches regarding the provided pattern element
-  def get_substitutes_for(pattern_elements, use_existing = true)
+  def get_substitutes_for(pattern_elements)
     correspondences = []
     pattern_elements.each do |pattern_element|
-      correspondences.concat(get_simple_correspondences(pattern_element, use_existing))
+      correspondences.concat(get_simple_correspondences(pattern_element))
     end
-    # TODO: perform searches using multiple elements at once, i.e., complex correspondences
     return correspondences
   end
     
-  def get_simple_correspondences(pattern_element, use_existing = true)
+  def get_simple_correspondences(concept)
     correspondences = []
-    # source_ontology is either the one of the pattern element or our source...
-    source_ont = pattern_element.ontology || source_ontology
-    target_ont = pattern_element.ontology == target_ontology ? source_ontology : target_ontology
-        
-    # if we already have a correspondence -> no need to query the alignment graph
-    if use_existing
-      existing_correspondences = pattern_element.ontology_correspondences.where(:output_ontology_id => target_ont)
-      return existing_correspondences unless existing_correspondences.empty?
-    end
-
-    alignment_graph.query(correspondence_query(pattern_element)) do |res|
-      oc = OntologyCorrespondence.create(
-        :input_ontology => source_ont, 
-        :output_ontology => target_ont, 
-        :measure => res[:measure].to_s, 
-        :relation => res[:relation].to_s
+    invert = concept.start_with?(onto2)
+    alignment_graph.query(correspondence_query(concept, invert)) do |res|
+      correspondences << OntologyCorrespondence.new(
+        res[:measure].to_s,
+        res[:relation].to_s,
+        invert ? res[:target].to_s : concept,
+        invert ? concept : res[:target].to_s
       )
-      # add the input and output elements
-      oc.input_elements << pattern_element
-      oc.output_elements << target_ont.element_class_for_rdf_type(res[:target].to_s).for_rdf_type(res[:target].to_s)
-      correspondences << oc
     end
     return correspondences
   end
   
-  def correspondence_query(pattern_element)
-    invert = pattern_element.ontology == target_ontology
+  def correspondence_query(concept, invert)
     return RDF::Query.new{
       pattern([:alignment, Vocabularies::Alignment.map, :cell])
-      pattern([:cell, Vocabularies::Alignment.entity1, invert ? :target : RDF::Resource.new(pattern_element.rdf_type)])
-      pattern([:cell, Vocabularies::Alignment.entity2, invert ? RDF::Resource.new(pattern_element.rdf_type) : :target])
+      pattern([:cell, Vocabularies::Alignment.entity1, invert ? :target : RDF::Resource.new(concept)])
+      pattern([:cell, Vocabularies::Alignment.entity2, invert ? RDF::Resource.new(concept) : :target])
       pattern([:cell, Vocabularies::Alignment.relation, :relation])
       pattern([:cell, Vocabularies::Alignment.measure, :measure])
     }
@@ -153,29 +160,33 @@ class OntologyMatcher
     }
     correspondences = []
     alignment_graph.query(q) do |res|    
-      correspondences << {:s => res[:source].to_s, :t => res[:target].to_s, :r => res[:relation].to_s}
+      correspondences << {:source => res[:source].to_s, :target => res[:target].to_s, :r => res[:relation].to_s}
     end
     return correspondences
   end
 
   def matched_concepts()
-    matched_concepts = {:source_ontology => [], :target_ontology => [], :correspondence_count => 0}
+    matched_concepts = {:source => [], :target => [], :correspondence_count => 0}
     q = RDF::Query.new{
       pattern([:alignment, Vocabularies::Alignment.map, :cell])
       pattern([:cell, Vocabularies::Alignment.entity1, :source])
       pattern([:cell, Vocabularies::Alignment.entity2, :target])
     }
     alignment_graph.query(q).each do |res|
-      matched_concepts[:source_ontology] << res[:source].to_s
-      matched_concepts[:target_ontology] << res[:target].to_s
+      matched_concepts[:source] << res[:source].to_s
+      matched_concepts[:target] << res[:target].to_s
       matched_concepts[:correspondence_count] += 1
     end
     return matched_concepts
   end
+  
+  # switches source and target ontology...
+  def invert!
+    @source_ontology, @target_ontology = @target_ontology, @source_ontology    
+  end
 
   def prepare_matching!
     target_ontology.download!
-    target_ontology.load_to_dedicated_repository!
     source_ontology.download!
   end
 
@@ -185,7 +196,7 @@ class OntologyMatcher
 
   def alignment_path_for(source_ont, target_ont)
     fn = if speaking_names
-      "#{source_ont.very_short_name}-#{target_ont.very_short_name}.rdf"
+      "#{source_ont.very_short_name}_#{target_ont.very_short_name}.rdf"
     else
       "ont_#{source_ont.id}_ont_#{target_ont.id}.rdf"
     end
