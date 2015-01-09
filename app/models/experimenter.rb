@@ -1,7 +1,7 @@
 class Experimenter
   # the basics
   attr_accessor :source_ontology, :target_ontology, :reference_exists, :matcher, :reference, :reference_path, :invert
-  attr_accessor :matched_concepts, :visited_concepts, :logging_enabled, :to_test, :unseen_concepts
+  attr_accessor :matched_concepts, :visited_concepts, :to_test, :unseen_concepts
 
   def self.run_experiment(source_ontology, target_ontology, experiment)
     expi1 = self.new(source_ontology, target_ontology)
@@ -25,6 +25,9 @@ class Experimenter
     stats3 = expi3.run!(experiment, true)
     row3 = expi3.csv_for_stats(stats3)
     puts "==== results: #{row3} #{stats3} ===="
+    File.open("eswc_2015/missing_alignments/#{expi3.matcher.alignment_path.split("/").last}", "w+") do |f|
+      expi3.missing_correspondences.each{|mc| f.puts mc}
+    end
     
     if experiment.nil?
       FileUtils.mv(expi3.matcher.alignment_path, Rails.root.join("eswc_2015", "computed_alignments", expi3.matcher.alignment_path.split("/").last), :force => true)
@@ -50,13 +53,11 @@ class Experimenter
     initialize_experiment!(use_both)
     
     # save missing as it naturally changes during matching...
-    missing = matched_concepts.keys.collect{|ontology| missing_concept_count(key_for_ontology(ontology))}.max()
-    open = matched_concepts.keys.collect{|ontology| open_concept_count(ontology, key_for_ontology(ontology))}.min()
+    all_concepts = matched_concepts.keys.collect{|ontology| ontology.all_concepts[:all].size}.min()
     # build the initial stats
     stats = {
       :missing_correspondences => missing_correspondences.size.to_i, 
-      :excess_correspondences => excess_correspondences.size.to_i,
-      :unmatched_concepts => missing.to_i,
+      :excess_correspondences => excess_correspondences.size.to_i
     }
     
     i = 1
@@ -70,15 +71,16 @@ class Experimenter
       stats.merge!(match!){|key,val1,val2| val1+val2}
       break unless more_concepts_available?
     end
-    
-    #stats[:baseline] = ((stats[:matches] + stats[:removals]) * (open + 1) / (missing + 1)).round
-    
-    stats[:interactions] = visited_concepts.size
+        
+    stats[:test_selection] = visited_concepts.size
+    found_correspondences = stats[:matches] + stats[:removals]
+    stats[:interaction_expectancy] = (found_correspondences * (stats[:test_selection].to_f + 1) / (found_correspondences.to_f + 1)).round
+    stats[:baseline] = (found_correspondences * (all_concepts.to_f + 1) / (stats[:missing_correspondences].to_f + 1)).round
     return stats
   end
   
   def initialize_experiment!(use_both)
-    log "To recreate e = Experimenter.new(Ontology.find(#{source_ontology.id}), Ontology.find(#{target_ontology.id}), #{use_both})"
+    log "To recreate e = Experimenter.new(Ontology.find(#{source_ontology.id}), Ontology.find(#{target_ontology.id}))"
     @to_test = Set.new()
     @visited_concepts = {}
     @unseen_concepts = Set.new
@@ -180,14 +182,6 @@ class Experimenter
   def excess_correspondences
     matcher.all_correspondences - reference.all_correspondences
   end
-  
-  def open_concept_count(ontology, key)
-    ontology.all_concepts[:all].size.to_f - missing_concept_count(key)
-  end
-  
-  def missing_concept_count(key)
-    missing_correspondences.collect{|oa| oa[key]}.uniq.size.to_f
-  end
     
   def add_new_correspondence!(concept)
     matched_concepts.keys.each do |ontology|
@@ -267,9 +261,14 @@ class Experimenter
   def add_test!(concept)
     to_test << concept
     matched_concepts.each_pair do |ontology, concept_hash|
+      clazz = ontology.classes.find{|cla| cla.class_url == concept}
+      unless clazz.nil?
+        clazz.superclasses.each{|sc| to_test << sc.class_url}
+        clazz.subclasses.each{|sc| to_test << sc.class_url}
+      end
       return if !concept_hash.find{|key, concepts| concepts.include?(concept)}.nil?
     end
-    unseen_concepts << concept    
+    unseen_concepts << concept
   end
 
   def alignment_info
@@ -303,10 +302,12 @@ class Experimenter
 
   def matching_stats
     [
-      matcher.matched_concepts[source_key].size,
-      matcher.matched_concepts[target_key].size,
-      reference.matched_concepts[source_key].size,
-      reference.matched_concepts[target_key].size,
+      matcher.matched_concepts[key_for_ontology(source_ontology)].size,
+      matcher.matched_concepts[key_for_ontology(target_ontology)].size,
+      reference.matched_concepts[key_for_ontology(source_ontology)].size,
+      reference.matched_concepts[key_for_ontology(target_ontology)].size,
+      missing_correspondences.size.to_i,
+      excess_correspondences.size.to_i
     ]
   end
 
@@ -354,8 +355,9 @@ class Experimenter
   
   def csv_for_stats(stats)
     return [
-      stats[:missing_correspondences] + stats[:excess_correspondences],
-      stats[:interactions],
+      stats[:matches] + stats[:removals],
+      stats[:test_selection],
+      stats[:interaction_expectancy],
       stats[:baseline],
       stats[:matches],
       stats[:removals]
@@ -365,10 +367,10 @@ class Experimenter
   def self.experiment_header
     return ["_L", "_R", ""].collect{|suf|
       [
-        "#Missing#{suf}",
-        "#Interactions#{suf}",
-        "Baseline#{suf}",
-        #"Expectancy#{suf}",
+        "#Found#{suf}",
+        "Sample_Size",
+        "Expectancy#{suf}",
+        "Baseline",
         "#Additions#{suf}",
         "#Removals#{suf}",
         "Precision_new#{suf}",
@@ -387,6 +389,8 @@ class Experimenter
       "#Corr_O2",
       "#Ref_Corr_O1",
       "#Ref_Corr_O2",
+      "#Missing_Corr",
+      "#False_Corr",
       "Precision",
       "Recall",
       "F-Measure"

@@ -57,6 +57,16 @@ class AgraphConnection
     end
     return stats
   end
+  
+  def inverse_concepts(concept)
+    inverse_concepts = Set.new
+    repository.build_query(:infer => true) do |q|
+      q.pattern([:concept, RDF::OWL.inverseOf, RDF::Resource.new(concept)])
+    end.run do |res|
+      inverse_concepts << res.concept.to_s unless res.concept.anonymous?
+    end
+    return inverse_concepts
+  end
 
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
@@ -171,7 +181,7 @@ class AgraphConnection
   end
 
   # gets the entire type hierarchy from an ontology. ditches anonymous classes (e.g., owl:unions as the users should provide them)
-  def type_hierarchy
+  def type_hierarchy(ontology = nil)
     classes = {}
     subclasses = Set.new
 
@@ -182,10 +192,10 @@ class AgraphConnection
     end.run do |stmt|
       cname = stmt.clazz.to_s.split("/").last
       next if cname.starts_with?("_:")
-      clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(nil, cname, stmt.clazz.to_s)
+      clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(ontology, cname, stmt.clazz.to_s)
       if stmt.bound?(:sub_clazz)
-        sub_clazz = classes[stmt.sub_clazz.to_s] ||= OwlClass.new(nil, stmt.sub_clazz.to_s.split("/").last, stmt.sub_clazz.to_s)
-        clazz.subclasses << sub_clazz
+        sub_clazz = classes[stmt.sub_clazz.to_s] ||= OwlClass.new(ontology, stmt.sub_clazz.to_s.split("/").last, stmt.sub_clazz.to_s)
+        clazz.add_subclass(sub_clazz)
         subclasses << stmt.sub_clazz.to_s
       end
     end

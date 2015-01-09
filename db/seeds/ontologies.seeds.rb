@@ -1,9 +1,9 @@
-puts "Creating SEON ontology"
-Ontology.where(
-  url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl",
-  short_name: "Seon#seon.owl",
-  group: "Software Repositories"
-).first_or_create
+#puts "Creating SEON ontology"
+#Ontology.where(
+#  url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl",
+#  short_name: "Seon#seon.owl",
+#  group: "Software Repositories"
+#).first_or_create
 
 # Conference Ontologies (OAEI)
 [
@@ -29,5 +29,18 @@ Ontology.where(
     url: ontology_url,
     short_name: "Conference##{ontology_url.split("/").last}",
     group: "OAEI Conference"
+  ).first_or_create
+end
+
+# Anatomy Ontologies (OAEI)
+[
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/human.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/mouse.owl"
+].each do |ontology_url|
+  puts "Creating #{ontology_url}"
+  Ontology.where(
+    url: ontology_url,
+    short_name: "Anatomy##{ontology_url.split("/").last}",
+    group: "OAEI Anatomy"
   ).first_or_create
 end

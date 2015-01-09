@@ -2,24 +2,10 @@ require 'vocabularies/schema_extraction.rb'
 
 class ExtractedOntology < Ontology
 
-  attr_accessor :classes
   include RdfSerialization
 
   def self.model_name
     return Ontology.model_name
-  end
-
-  def add_class(klazz)
-    classes << klazz
-  end
-
-  def classes
-    @classes ||= Set.new()
-    return @classes
-  end
-
-  def clear!
-    @classes = Set.new()
   end
 
   def rdf_statements

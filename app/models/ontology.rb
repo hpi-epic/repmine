@@ -2,7 +2,7 @@ require 'rdf/turtle'
 
 class Ontology < ActiveRecord::Base
   attr_accessible :url, :description, :short_name, :does_exist, :group
-  attr_accessor :ag_connection, :rdf_graph
+  attr_accessor :ag_connection, :rdf_graph, :type_hierarchy, :classes
 
   validates_url :url
 
@@ -44,9 +44,25 @@ class Ontology < ActiveRecord::Base
     ag_connection.all_concepts()
   end
 
-  def type_hierarchy
-    return ag_connection.type_hierarchy
+  def type_hierarchy()
+    @type_hierarchy ||= ag_connection.type_hierarchy(self)
   end
+  
+  def add_class(klazz)
+    classes << klazz
+  end
+
+  def classes
+    if @classes.nil? 
+      @classes = Set.new()
+      type_hierarchy
+    end
+    return @classes
+  end
+
+  def clear!
+    @classes = Set.new()
+  end  
 
   def repository_name
     return id.nil? ? self.short_name : "ontology_#{self.id}"
@@ -70,6 +86,10 @@ class Ontology < ActiveRecord::Base
   
   def attributes_of(domain)
     return ag_connection.attributes_of(domain)
+  end
+  
+  def inverse_concepts(concept)
+    return ag_connection.inverse_concepts(concept)
   end
 
   def imports()

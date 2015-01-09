@@ -1,5 +1,5 @@
 class OwlClass
-  attr_accessor :subclasses, :name, :relations, :attributes, :schema, :class_url
+  attr_accessor :subclasses, :name, :relations, :attributes, :schema, :class_url, :superclasses
 
   SET_OPS = {:sub => "&sub;", :sup => "&sup;", :not => "&not;"}
 
@@ -7,12 +7,18 @@ class OwlClass
 
   def initialize(schema, name, url = nil)
     @subclasses = Set.new
+    @superclasses = Set.new    
     @schema = schema
     @name = name
     @relations = Set.new
     @attributes = Set.new
     @class_url = url
     schema.add_class(self) unless schema.nil?
+  end
+  
+  def add_subclass(owl_class)
+    @subclasses << owl_class
+    owl_class.superclasses << self
   end
 
   def add_attribute(name, range)
