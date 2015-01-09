@@ -53,7 +53,11 @@ class Experimenter
     missing = matched_concepts.keys.collect{|ontology| missing_concept_count(key_for_ontology(ontology))}.max()
     open = matched_concepts.keys.collect{|ontology| open_concept_count(ontology, key_for_ontology(ontology))}.min()
     # build the initial stats
-    stats = {:missing => missing.to_i}
+    stats = {
+      :missing_correspondences => missing_correspondences.size.to_i, 
+      :excess_correspondences => excess_correspondences.size.to_i,
+      :unmatched_concepts => missing.to_i,
+    }
     
     i = 1
     loop do
@@ -67,7 +71,9 @@ class Experimenter
       break unless more_concepts_available?
     end
     
-    stats[:baseline] = (stats[:matches] * (open + 1) / (missing + 1)).round
+    #stats[:baseline] = ((stats[:matches] + stats[:removals]) * (open + 1) / (missing + 1)).round
+    
+    stats[:interactions] = visited_concepts.size
     return stats
   end
   
@@ -166,9 +172,13 @@ class Experimenter
     matched_concepts.collect{|ont, hash| hash.values.all?{|concepts| !concepts.empty?}}.any?{|val| val == true}
   end
   
-  # we count a) all correspondences the matcher doesn't know, yet
+  # we count a) all correspondences the matcher doesn't know, yet, and b) the ones that are exc
   def missing_correspondences
     reference.all_correspondences - matcher.all_correspondences
+  end
+  
+  def excess_correspondences
+    matcher.all_correspondences - reference.all_correspondences
   end
   
   def open_concept_count(ontology, key)
@@ -344,8 +354,8 @@ class Experimenter
   
   def csv_for_stats(stats)
     return [
-      stats[:missing],
-      stats[:matches] + stats[:no_idea],
+      stats[:missing_correspondences] + stats[:excess_correspondences],
+      stats[:interactions],
       stats[:baseline],
       stats[:matches],
       stats[:removals]
