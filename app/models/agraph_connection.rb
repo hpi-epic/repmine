@@ -94,7 +94,9 @@ class AgraphConnection
       q.pattern([rel_res, RDF::RDFS.domain, :domain])
       q.pattern([rel_res, RDF::RDFS.range, :range])
     end.run do |res|
-      return [res.domain.to_s, res.range.to_s]
+      ranges = res.range.anonymous? ? decipher_union(res.range) : [res.range.to_s]
+      domains = res.domain.anonymous? ? decipher_union(res.domain) : [res.domain.to_s]
+      return [domains, ranges]
     end
   end
   
@@ -191,16 +193,31 @@ class AgraphConnection
       q.pattern([:sub_clazz, RDF::RDFS.subClassOf, :clazz], :optional => true)
     end.run do |stmt|
       cname = stmt.clazz.to_s.split("/").last
-      next if cname.starts_with?("_:")
+      next if stmt.clazz.anonymous?
       clazz = classes[stmt.clazz.to_s] ||= OwlClass.new(ontology, cname, stmt.clazz.to_s)
       if stmt.bound?(:sub_clazz)
-        sub_clazz = classes[stmt.sub_clazz.to_s] ||= OwlClass.new(ontology, stmt.sub_clazz.to_s.split("/").last, stmt.sub_clazz.to_s)
-        clazz.add_subclass(sub_clazz)
-        subclasses << stmt.sub_clazz.to_s
+        scs = stmt.sub_clazz.anonymous? ? decipher_union(stmt.sub_clazz) : [stmt.sub_clazz.to_s]
+        scs.each do |sub_class|
+          sub_clazz = classes[sub_class] ||= OwlClass.new(ontology, sub_class.split("/").last, sub_class)
+          clazz.add_subclass(sub_clazz)
+          subclasses << sub_class
+        end
       end
     end
 
     subclasses.each{|sc| classes.delete(sc)}
     return classes.values
+  end
+  
+  def deciper_union(union_node)
+    classes = []
+    repository.build_query() do |q|
+      q.pattern([union_node, RDF::OWL.unionOf, :union])
+      q.pattern([:union, RDF.first, :fn])
+      q.pattern([:union, RDF.rest, :rest])
+    end.run do |res|
+      classes << res.fn.to_s
+    end
+    return 
   end
 end

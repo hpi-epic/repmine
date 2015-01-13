@@ -21,8 +21,10 @@ namespace :eswc do
                 expi = Experimenter.new(source_ont, target_ont)
                 if expi.go_on?
                   expi.matcher.match!
-                  puts "== Getting stats for #{source_ont.very_short_name}-#{target_ont.very_short_name}"          
+                  puts "== Getting stats for #{source_ont.very_short_name}-#{target_ont.very_short_name}"
+                  puts "e = Experimenter.new(Ontology.find(#{source_ont.id}), Ontology.find(#{target_ont.id}))"
                   csv << expi.alignment_info
+                  expi.reference_properties
                 end
               end
             end
@@ -39,15 +41,19 @@ namespace :eswc do
   task :run_experiment => [:environment, "eswc:clear_stats", "db:clear_tmp_folders", "eswc:initial_statistics"] do    
     ontology_packages.each do |ontologies|
       group = ontologies.first.group
-      Experimenter.experiments.each_with_index do |experiment, i|   
-        old_csv = CSV.open(initial_stat_file(group), "r").each
-        CSV.open(stat_file(i, group), "w+") do |csv|
-          csv << old_csv.next.concat(Experimenter.experiment_header)
-          ontologies.each_with_index do |source_ont, i|
-            ontologies[i+1..-1].each do |target_ont|
-              result = Experimenter.run_experiment(source_ont, target_ont, experiment)
-              csv << old_csv.next.concat(result) unless result.nil?
+      Experimenter.experiments.each_with_index do |experiment, i|
+        Experimenter.modifier_combinations.each do |modifier|
+          old_csv = CSV.open(initial_stat_file(group), "r").each
+          CSV.open(stat_file(i, group), "a") do |csv|
+            csv << [experiment || "complete", modifier]
+            csv << old_csv.next.concat(Experimenter.experiment_header)
+            ontologies.each_with_index do |source_ont, i|
+              ontologies[i+1..-1].each do |target_ont|
+                result = Experimenter.run_experiment(source_ont, target_ont, experiment, modifier)
+                csv << old_csv.next.concat(result) unless result.nil?
+              end
             end
+            csv << []
           end
         end
       end
@@ -76,6 +82,7 @@ namespace :eswc do
   
   def ontology_packages
     [oaei_ontologies]
+    #[anatomy_ontologies]
   end
   
   def oaei_ontologies

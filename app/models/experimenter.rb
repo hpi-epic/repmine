@@ -1,56 +1,133 @@
 class Experimenter
   # the basics
   attr_accessor :source_ontology, :target_ontology, :reference_exists, :matcher, :reference, :reference_path, :invert
-  attr_accessor :matched_concepts, :visited_concepts, :to_test, :unseen_concepts
+  attr_accessor :matched_concepts, :visited_concepts, :to_test, :unseen_concepts, :use_class_relationships, :use_attributes
 
-  def self.run_experiment(source_ontology, target_ontology, experiment)
+  def self.run_experiment(source_ontology, target_ontology, experiment, modifiers)
     expi1 = self.new(source_ontology, target_ontology)
     return nil unless expi1.go_on?
     expi2 = self.new(target_ontology, source_ontology)
 
     puts ""
+    # experiment one: source-target using only concepts from source
     puts "**** Starting Experiment: #{expi1.ont_field}, #{experiment || 'complete'} ****"
-    stats1 = expi1.run!(experiment)
+    stats1 = expi1.run!(experiment, modifiers)
     row1 = expi1.csv_for_stats(stats1)
     puts "==== results: #{row1} #{stats1} ===="
     expi1.matcher.delete_alignment!
+
+    # experiment two: target-source using only concepts from target
     puts "**** Starting Experiment: #{expi2.ont_field}, #{experiment || 'complete'} ****"
-    stats2 = expi2.run!(experiment)
+    stats2 = expi2.run!(experiment, modifiers)
     row2 = expi2.csv_for_stats(stats2)
     puts "==== results: #{row2} #{stats2} ===="
     expi2.matcher.delete_alignment!  
     
+    # experiment three: source-target using concepts from both ontologies
     expi3 = self.new(source_ontology, target_ontology)
     puts "**** rerunning experiment: #{expi3.ont_field}, #{experiment || 'complete'} ****"    
-    stats3 = expi3.run!(experiment, true)
+    stats3 = expi3.run!(experiment, modifiers, true)
     row3 = expi3.csv_for_stats(stats3)
     puts "==== results: #{row3} #{stats3} ===="
-    File.open("eswc_2015/missing_alignments/#{expi3.matcher.alignment_path.split("/").last}", "w+") do |f|
-      expi3.missing_correspondences.each{|mc| f.puts mc}
-    end
+
     
-    if experiment.nil?
-      FileUtils.mv(expi3.matcher.alignment_path, Rails.root.join("eswc_2015", "computed_alignments", expi3.matcher.alignment_path.split("/").last), :force => true)
+    # only keep the maximum expansion of the computed alignment and the minimum of missing alignments 
+    if experiment.nil? && modifiers.all?{|m,k| k == true}
+      target_path = Rails.root.join("eswc_2015", "computed_alignments", expi3.matcher.alignment_path.split("/").last)
+      FileUtils.mv(expi3.matcher.alignment_path, target_path, :force => true)
+      File.open("eswc_2015/missing_alignments/#{expi3.matcher.alignment_path.split("/").last}", "w+") do |f|
+        expi3.missing_correspondences.each{|mc| f.puts mc}
+      end      
     else
       expi3.matcher.delete_alignment!
     end
     
+    # return all three 'rows', which are actually combinations of columns
     return row1 + row2 + row3
   end
 
   def initialize(source, target)
     @source_ontology = source
     @target_ontology = target
+    @use_class_relationships = false
+    @use_attributes = false
     @invert = false
     check_reference_alignment!
   end
   
   def self.experiments
-    return [nil, :build_range_patterns!, :build_domain_patterns!, :build_relation_patterns!, :build_attribute_patterns!]
+    return [
+      :include_superclasses!,
+      :include_subclasses!,
+      :include_siblings!,
+      :go_really_deep!,
+      :build_range_patterns!,
+      :build_domain_patterns!,
+      :build_relation_patterns!,
+      :build_attribute_patterns!,
+      :build_classes!
+    ]
   end
   
-  def run!(experiment, use_both = false)
-    initialize_experiment!(use_both)
+  def reference_properties
+    stats = {}
+    [source_ontology, target_ontology].each do |ont|
+      key = key_for_ontology(ont)
+      mc = reference.matched_concepts[key] & ont.all_concepts[RDF::OWL.Class.to_s].to_a
+      mr = reference.matched_concepts[key] & ont.all_concepts[RDF::OWL.ObjectProperty.to_s].to_a
+      ma = reference.matched_concepts[key] & ont.all_concepts[RDF::OWL.DatatypeProperty.to_s].to_a
+      
+      stats[ont.url] = {
+        :classes => mc.size, 
+        :relations => mr.size, 
+        :attributes => ma.size, 
+        :connections => {}
+      }
+      
+      mc.each do |matched_class|
+        stats[ont.url][:connections][matched_class] = {
+          :class_rels => Set.new, :rels => Set.new, :attribs => Set.new, :one_hops => Set.new
+        }
+        stat = stats[ont.url][:connections][matched_class]
+        
+        ont_class = ont.classes.find{|cla| cla.class_url == matched_class}
+        # all sub and superclass relations
+        stat[:class_rels] = mc.select{|mmc| ont_class.has_class_relation_with?(mmc)}
+        # all incmoing and outgoing relations
+        incoming_relations = ont.incoming_relations(matched_class).select{|mcr| mr.include?(mcr.relation_url)}
+        outgoing_relations = ont.outgoing_relations(matched_class).select{|mcr| mr.include?(mcr.relation_url)}
+        (incoming_relations + outgoing_relations).each do |rel|
+          stat[:rels] << rel.relation_url
+          stats[ont.url][:connections][rel.relation_url] = {:rels => [matched_class]}
+        end
+        # all one hop connection
+        domains = ont.incoming_relations(matched_class).select{|ir| mc.include?(ir.domain)}
+        ranges = ont.outgoing_relations(matched_class).select{|orr| mc.include?(orr.range)}
+        stat[:one_hops].merge(domains).merge(ranges)
+        # all_attributes
+        attribs = ont.attributes_of(matched_class).select{|mca| ma.include?(mca)}
+        stat[:attribs] = attribs
+        attribs.each{|attrib| stats[ont.url][:connections][attrib] = {:attribs => [matched_class]}}
+      end
+      
+      stats[ont.url][:connections].select{|k,v| v.all?{|kk,vv| vv.empty?}}.each do |k,v|
+        puts "no connection found for #{k}"
+      end
+    end
+    return stats
+  end
+  
+  #def self.modifier_combinations
+  #  [
+  #    {:@use_attributes => true, :@use_class_relationships => true},      
+  #    {:@use_attributes => true, :@use_class_relationships => false},      
+  #    {:@use_attributes => false, :@use_class_relationships => true},
+  #    {:@use_attributes => false, :@use_class_relationships => false}
+  #  ]
+  #end
+  
+  def run!(experiment, modifiers, use_both = false)
+    initialize_experiment!(use_both, modifiers)
     
     # save missing as it naturally changes during matching...
     all_concepts = matched_concepts.keys.collect{|ontology| ontology.all_concepts[:all].size}.min()
@@ -79,13 +156,15 @@ class Experimenter
     return stats
   end
   
-  def initialize_experiment!(use_both)
+  def initialize_experiment!(use_both, modifiers)
     log "To recreate e = Experimenter.new(Ontology.find(#{source_ontology.id}), Ontology.find(#{target_ontology.id}))"
     @to_test = Set.new()
     @visited_concepts = {}
     @unseen_concepts = Set.new
+    modifiers.each_pair{|m, v| self.instance_variable_set(m, v)}
     matcher.match!
     log "Matcher Config: #{matcher.source_ontology.very_short_name} - #{matcher.target_ontology.very_short_name}, invert: #{invert}"    
+    log "modifiers: #{modifiers}"
     use_them_to_create_patterns = use_both ? [source_ontology, target_ontology] : [source_ontology]
     prepare_matched_concepts!(use_them_to_create_patterns)
   end
@@ -203,53 +282,56 @@ class Experimenter
   
   def build_range_patterns!(ontology)
     # all outgoing relations
-    puts "collecting test cases for #{matched_concepts[ontology][:classes].size} classes based on range"
     matched_concepts[ontology][:classes].each do |mc|
       add_test!(mc)
       ontology.outgoing_relations(mc).each do |rel_out|
         add_test!(rel_out.url)
-        add_test!(rel_out.range)
+        add_test!(rel_out.domain)
         add_attributes_for_class!(mc, ontology)
-        add_attributes_for_class!(rel_out.range, ontology)
+        add_attributes_for_class!(rel_out.domain, ontology)
       end
     end
   end
   
   def build_domain_patterns!(ontology)
     # and all incoming ones
-    puts "collecting test cases for #{matched_concepts[ontology][:classes].size} classes based on domain"    
     matched_concepts[ontology][:classes].each do |mc| 
       add_test!(mc)
       ontology.incoming_relations(mc).each do |rel_in|
         add_test!(rel_in.url)
-        add_test!(rel_in.domain)
+        add_test!(rel_in.range)
         add_attributes_for_class!(mc, ontology)
-        add_attributes_for_class!(rel_in.domain, ontology)
+        add_attributes_for_class!(rel_in.range, ontology)
       end
     end
   end
   
   def add_attributes_for_class!(mc, ontology)
+    return unless use_attributes
     ontology.attributes_of(mc).each do |attrib|
       add_test!(attrib)
     end
   end
   
   def build_relation_patterns!(ontology)
-    puts "collecting test cases for #{matched_concepts[ontology][:relations].size} relations"
     matched_concepts[ontology][:relations].each do |rel|
       add_test!(rel)
-      domain, range = ontology.relation_information(rel)
-      add_test!(domain)
-      add_test!(range)
+      domains, ranges = ontology.relation_information(rel)
+      domains.each{|domain| add_test!(domain)}
+      ranges.each{|range| add_test!(range)}
     end
   end
   
   def build_attribute_patterns!(ontology)
-    puts "collecting test cases for #{matched_concepts[ontology][:attributes].size} attributes"
     matched_concepts[ontology][:attributes].each do |ma|
       add_test!(ontology.domain_for_attribute(ma))
       add_test!(ma)
+    end
+  end
+  
+  def build_classes!(ontology)
+    matched_concepts[ontology][:classes].each do |mc|
+      add_test!(mc)
     end
   end
   
@@ -259,16 +341,23 @@ class Experimenter
   end
   
   def add_test!(concept)
+    return if concept.start_with?("_:")
     to_test << concept
     matched_concepts.each_pair do |ontology, concept_hash|
-      clazz = ontology.classes.find{|cla| cla.class_url == concept}
-      unless clazz.nil?
-        clazz.superclasses.each{|sc| to_test << sc.class_url}
-        clazz.subclasses.each{|sc| to_test << sc.class_url}
-      end
+      add_sub_and_superclass_tests!(ontology, concept)
       return if !concept_hash.find{|key, concepts| concepts.include?(concept)}.nil?
     end
     unseen_concepts << concept
+  end
+  
+  def add_sub_and_superclass_tests!(ontology, concept)
+    return unless use_class_relationships
+    clazz = ontology.classes.find{|cla| cla.class_url == concept}
+    unless clazz.nil?
+      to_test.merge(clazz.all_superclasses) #.each{|sc|  << sc.class_url}
+      to_test.merge(clazz.all_subclasses) #.each{|sc| to_test << sc.class_url}
+      to_test.merge(clazz.all_siblings)
+    end
   end
 
   def alignment_info
