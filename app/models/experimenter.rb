@@ -63,6 +63,7 @@ class Experimenter
     check_reference_alignment!
   end
   
+  # somehow this has still some problems. make sure to manually review the created clusters in eswc_2015/clusters
   def reference_properties
     stats = {}
     [source_ontology, target_ontology].each do |ont|

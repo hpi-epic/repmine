@@ -14,8 +14,8 @@ namespace :eswc do
         puts "== Using existing base stat file. Delete #{initial_stat_file(group)} to trigger new run."
       else
         begin
-          #csv2 = CSV.open(concept_cluster_file(group), "wb")
-          #csv2 << ["onts", "#C_L", "#CL_L", "#ISO_L", "Concepts_L", "#C_R", "#CL_R", "#ISO_R", "Concepts_R"]
+          csv2 = CSV.open(concept_cluster_file(group), "wb")
+          csv2 << ["onts", "#C_L", "#CL_L", "#ISO_L", "Concepts_L", "#C_R", "#CL_R", "#ISO_R", "Concepts_R"]
           CSV.open(initial_stat_file(group), "wb") do |csv|
             csv << Experimenter.csv_header
             ontologies.each_with_index do |source_ont, i| 
@@ -26,21 +26,21 @@ namespace :eswc do
                   puts "== Getting stats for #{source_ont.very_short_name}-#{target_ont.very_short_name}"
                   puts "e = Experimenter.new(Ontology.find(#{source_ont.id}), Ontology.find(#{target_ont.id}))"
                   csv << expi.alignment_info
-                  #rr = [expi.ont_field]
-                  #expi.reference_properties.each_pair do |ont_very_short, c_stat|
-                  #  rr.concat([
-                  #    c_stat[:classes] + c_stat[:relations] + c_stat[:attributes],
-                  #    c_stat[:isolated].size,
-                  #    c_stat[:cluster_count],
-                  #    c_stat[:isolated].collect{|iso| iso.to_a}.flatten.join(", ")
-                  #  ])
-                  #end
-                  #csv2 << rr
+                  rr = [expi.ont_field]
+                  expi.reference_properties.each_pair do |ont_very_short, c_stat|
+                    rr.concat([
+                      c_stat[:classes] + c_stat[:relations] + c_stat[:attributes],
+                      c_stat[:isolated].size,
+                      c_stat[:cluster_count],
+                      c_stat[:isolated].collect{|iso| iso.to_a}.flatten.join(", ")
+                    ])
+                  end
+                  csv2 << rr
                 end
               end
             end
           end
-          #csv2.close
+          csv2.close
         rescue Exception => e
           csv2.close
           FileUtils.rm(concept_cluster_file(group))          
