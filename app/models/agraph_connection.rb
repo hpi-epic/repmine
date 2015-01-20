@@ -1,5 +1,6 @@
 class AgraphConnection
 
+  require 'rdf/reasoner'
   attr_accessor :repository, :repository_name
 
   def config
@@ -67,6 +68,38 @@ class AgraphConnection
     end
     return inverse_concepts
   end
+  
+  def equivalent_classes(concept)
+    equiv = Set.new
+    repository.build_query(:infer => true) do |q|
+      q.pattern([:concept, RDF::OWL.equivalentClass, RDF::Resource.new(concept)])
+    end.run do |res|
+      equiv.concat(res.concept.anonymous? ? decipher_union(union_node) : [res.concept.to_s])
+    end
+    return equiv
+  end
+  
+  def equivalent_properties(concept)
+    equiv = Set.new
+    repository.build_query(:infer => true) do |q|
+      q.pattern([:concept, RDF::OWL.equivalentProperty, RDF::Resource.new(concept)])
+    end.run do |res|
+      equiv.concat(res.concept.anonymous? ? decipher_union(union_node) : [res.concept.to_s])
+    end
+    return equiv
+  end  
+  
+  def sub_properties_of(concept)
+    sub_props = Set.new
+    repository.build_query(:infer => true) do |q|
+      q.pattern([:child_concept, RDF::RDFS.subPropertyOf, RDF::Resource.new(concept)], :optional => true)
+      q.pattern([RDF::Resource.new(concept), RDF::RDFS.subPropertyOf, :parent_concept], :optional => true)
+    end.run do |res|
+      sub_props << res.child_concept.to_s if res.bound?(:child_concept)
+      sub_props << res.parent_concept.to_s if res.bound?(:parent_concept)      
+    end
+    return sub_props
+  end
 
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
@@ -76,7 +109,6 @@ class AgraphConnection
         rels.concat(relations(ddomain, rrange) - rels)
       end
     end
-
     return rels
   end
 
@@ -92,12 +124,15 @@ class AgraphConnection
     rel_res = RDF::Resource.new(rel)
     repository.build_query() do |q|
       q.pattern([rel_res, RDF::RDFS.domain, :domain])
+      q.pattern([:domain, RDF::OWL.unionOf, :listd], :optional => true)      
       q.pattern([rel_res, RDF::RDFS.range, :range])
+      q.pattern([:range, RDF::OWL.unionOf, :listr], :optional => true)      
     end.run do |res|
-      ranges = res.range.anonymous? ? decipher_union(res.range) : [res.range.to_s]
-      domains = res.domain.anonymous? ? decipher_union(res.domain) : [res.domain.to_s]
+      ranges = res.bound?(:listr) ? decipher_union(res.listr) : [res.range.to_s]
+      domains = res.bound?(:listd) ? decipher_union(res.listd) : [res.domain.to_s]
       return [domains, ranges]
     end
+    return [[], []]
   end
   
   def domain_for_attribute(attrib)
@@ -115,8 +150,13 @@ class AgraphConnection
       q.pattern([:rel, RDF.type, RDF::OWL.ObjectProperty])
       q.pattern([:rel, RDF::RDFS.domain, domain.nil? ? :domain : RDF::Resource.new(domain)])
       q.pattern([:rel, RDF::RDFS.range, range.nil? ? :range : RDF::Resource.new(range)])
+      q.pattern([:range, RDF::OWL.unionOf, :list], :optional => true)
     end.run do |res|
-      rel = Relation.from_url(res.rel.to_s, domain || res.domain.to_s, range || res.range.to_s)
+      rel = Relation.from_url(
+        res.rel.to_s, 
+        domain.nil? ? res.domain : domain, 
+        range.nil? ? (res.bound?(:list) ? decipher_union(res.list) : [res.range]) : [range]
+      )
       rels << rel unless rels.include?(rel)
     end
     return rels
@@ -168,17 +208,16 @@ class AgraphConnection
     repository.build_query(:infer => true) do |q|
       q.pattern([RDF::Resource.new(rdf_type), RDF.type, :clazz])
     end.run do |res|
-      case res[:clazz]
-      when RDF::OWL.Class
-        return Node
-      when RDF::RDFS.Class
-        return Node
-      when RDF::OWL.DatatypeProperty
-        return AttributeConstraint
-      when RDF::OWL.ObjectProperty
-        return RelationConstraint
+      clazz = case res[:clazz]
+        when RDF::OWL.Class then Node
+        when RDF::RDFS.Class then Node
+        when RDF::OWL.DatatypeProperty then AttributeConstraint
+        when RDF::OWL.ObjectProperty then RelationConstraint
+        else PatternElement
       end
+      return clazz
     end
+    
     return PatternElement
   end
 
@@ -209,15 +248,15 @@ class AgraphConnection
     return classes.values
   end
   
-  def deciper_union(union_node)
+  def decipher_union(union_node)
     classes = []
-    repository.build_query() do |q|
-      q.pattern([union_node, RDF::OWL.unionOf, :union])
-      q.pattern([:union, RDF.first, :fn])
-      q.pattern([:union, RDF.rest, :rest])
-    end.run do |res|
-      classes << res.fn.to_s
+    un = union_node
+    while(un != RDF.nil.to_s)
+      stmts = repository.statements.select{|stmt| stmt.subject == un}
+      break if stmts.find{|stmt| stmt.predicate == RDF.first}.nil?
+      classes << stmts.find{|stmt| stmt.predicate == RDF.first}.object.to_s
+      un = stmts.find{|stmt| stmt.predicate == RDF.rest}.object
     end
-    return 
+    return classes
   end
 end

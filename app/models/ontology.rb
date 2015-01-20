@@ -91,6 +91,18 @@ class Ontology < ActiveRecord::Base
   def inverse_concepts(concept)
     return ag_connection.inverse_concepts(concept)
   end
+  
+  def equivalent_classes(concept)
+    return ag_connection.equivalent_classes(concept)
+  end
+  
+  def equivalent_properties(concept)
+    return ag_connection.equivalent_properties(concept)
+  end
+  
+  def sub_properties_of(concept)
+    return ag_connection.sub_properties_of(concept)
+  end
 
   def imports()
     imps = Set.new()

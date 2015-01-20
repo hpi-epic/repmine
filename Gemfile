@@ -22,6 +22,7 @@ gem "sparql-client"
 gem "rdf-agraph"
 gem "rest-client"
 gem "rdf-xsd"
+gem "rdf-reasoner"
 gem "equivalent-xml"
 gem "linkeddata"
 gem 'nokogiri'

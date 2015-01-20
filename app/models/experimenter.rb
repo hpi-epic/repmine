@@ -1,49 +1,57 @@
 class Experimenter
   # the basics
   attr_accessor :source_ontology, :target_ontology, :reference_exists, :matcher, :reference, :reference_path, :invert
-  attr_accessor :matched_concepts, :visited_concepts, :to_test, :unseen_concepts, :use_class_relationships, :use_attributes
+  attr_accessor :matched_concepts, :visited_concepts, :to_test, :new_tests, :hit_concepts, :method_stats
 
-  def self.run_experiment(source_ontology, target_ontology, experiment, modifiers)
+  def self.run_experiment(source_ontology, target_ontology, experiment)
     expi1 = self.new(source_ontology, target_ontology)
     return nil unless expi1.go_on?
     expi2 = self.new(target_ontology, source_ontology)
 
     puts ""
     # experiment one: source-target using only concepts from source
-    puts "**** Starting Experiment: #{expi1.ont_field}, #{experiment || 'complete'} ****"
-    stats1 = expi1.run!(experiment, modifiers)
+    puts "**** Starting Experiment: #{expi1.ont_field}, #{experiment} ****"
+    stats1, m1_stats = expi1.run!(experiment)
     row1 = expi1.csv_for_stats(stats1)
     puts "==== results: #{row1} #{stats1} ===="
-    expi1.matcher.delete_alignment!
+    store_alignment!(expi1, experiment)
 
     # experiment two: target-source using only concepts from target
-    puts "**** Starting Experiment: #{expi2.ont_field}, #{experiment || 'complete'} ****"
-    stats2 = expi2.run!(experiment, modifiers)
+    puts "**** Starting Experiment: #{expi2.ont_field}, #{experiment} ****"
+    stats2, m2_stats = expi2.run!(experiment)
     row2 = expi2.csv_for_stats(stats2)
     puts "==== results: #{row2} #{stats2} ===="
-    expi2.matcher.delete_alignment!  
-    
-    # experiment three: source-target using concepts from both ontologies
-    expi3 = self.new(source_ontology, target_ontology)
-    puts "**** rerunning experiment: #{expi3.ont_field}, #{experiment || 'complete'} ****"    
-    stats3 = expi3.run!(experiment, modifiers, true)
-    row3 = expi3.csv_for_stats(stats3)
-    puts "==== results: #{row3} #{stats3} ===="
+    store_alignment!(expi2, experiment)
 
-    
     # only keep the maximum expansion of the computed alignment and the minimum of missing alignments 
-    if experiment.nil? && modifiers.all?{|m,k| k == true}
-      target_path = Rails.root.join("eswc_2015", "computed_alignments", expi3.matcher.alignment_path.split("/").last)
-      FileUtils.mv(expi3.matcher.alignment_path, target_path, :force => true)
-      File.open("eswc_2015/missing_alignments/#{expi3.matcher.alignment_path.split("/").last}", "w+") do |f|
-        expi3.missing_correspondences.each{|mc| f.puts mc}
-      end      
-    else
-      expi3.matcher.delete_alignment!
+    if experiment.size == self.experiments.size
+      File.open("eswc_2015/methods/#{expi1.ont_field}.yml", "w+"){|f|
+        f.puts m1_stats.to_yaml
+        f.puts m2_stats.to_yaml
+      }
     end
     
+    min_stats = [m1_stats[:min_costs], numberize(m1_stats[:min_paths]), m2_stats[:min_costs], numberize(m2_stats[:min_paths])]
+    
     # return all three 'rows', which are actually combinations of columns
-    return row1 + row2 + row3
+    return row1 + row2 + min_stats, m1_stats, m2_stats
+  end
+  
+  def self.numberize(paths)
+    return "" if paths.empty?
+    return paths.collect{|path| path.collect{|pe| experiments.index(pe) + 1}.sort.join(",")}.collect{|thing| "[#{thing}]"}.join(";")
+  end
+  
+  def self.store_alignment!(expi, experiment)
+    if experiment.size != experiments.size
+      expi.matcher.delete_alignment!
+    else
+      target_path = Rails.root.join("eswc_2015", "computed_alignments", expi.ont_field + ".rdf")
+      FileUtils.mv(expi.matcher.alignment_path, target_path, :force => true)
+      File.open("eswc_2015/missing_alignments/#{expi.ont_field}.txt", "w+") do |f|
+        expi.missing_correspondences.each{|mc| f.puts mc}
+      end
+    end    
   end
 
   def initialize(source, target)
@@ -51,22 +59,8 @@ class Experimenter
     @target_ontology = target
     @use_class_relationships = false
     @use_attributes = false
-    @invert = false
+    @invert = false    
     check_reference_alignment!
-  end
-  
-  def self.experiments
-    return [
-      :include_superclasses!,
-      :include_subclasses!,
-      :include_siblings!,
-      :go_really_deep!,
-      :build_range_patterns!,
-      :build_domain_patterns!,
-      :build_relation_patterns!,
-      :build_attribute_patterns!,
-      :build_classes!
-    ]
   end
   
   def reference_properties
@@ -76,61 +70,84 @@ class Experimenter
       mc = reference.matched_concepts[key] & ont.all_concepts[RDF::OWL.Class.to_s].to_a
       mr = reference.matched_concepts[key] & ont.all_concepts[RDF::OWL.ObjectProperty.to_s].to_a
       ma = reference.matched_concepts[key] & ont.all_concepts[RDF::OWL.DatatypeProperty.to_s].to_a
+      all_matched_concepts = mc + mr + ma
       
-      stats[ont.url] = {
+      stats[ont.very_short_name] = {
         :classes => mc.size, 
         :relations => mr.size, 
         :attributes => ma.size, 
-        :connections => {}
+        :clusters => []
       }
       
-      mc.each do |matched_class|
-        stats[ont.url][:connections][matched_class] = {
-          :class_rels => Set.new, :rels => Set.new, :attribs => Set.new, :one_hops => Set.new
-        }
-        stat = stats[ont.url][:connections][matched_class]
+      mc.each_with_index do |matched_class, i|
+        cluster = stats[ont.very_short_name][:clusters].find{|c| c.include?(matched_class)}
+        if cluster.nil?
+          cluster = Set.new([matched_class])
+          stats[ont.very_short_name][:clusters] << cluster
+        end
         
         ont_class = ont.classes.find{|cla| cla.class_url == matched_class}
-        # all sub and superclass relations
-        stat[:class_rels] = mc.select{|mmc| ont_class.has_class_relation_with?(mmc)}
-        # all incmoing and outgoing relations
-        incoming_relations = ont.incoming_relations(matched_class).select{|mcr| mr.include?(mcr.relation_url)}
-        outgoing_relations = ont.outgoing_relations(matched_class).select{|mcr| mr.include?(mcr.relation_url)}
-        (incoming_relations + outgoing_relations).each do |rel|
-          stat[:rels] << rel.relation_url
-          stats[ont.url][:connections][rel.relation_url] = {:rels => [matched_class]}
+        outgoing_relations = ont.outgoing_relations(matched_class)
+        
+        mc.each do |compare_class|
+          cluster << compare_class if ont_class.has_class_relation_with?(compare_class)
+          cluster << compare_class if outgoing_relations.any?{|ir| ir.range.include?(compare_class)}
         end
-        # all one hop connection
-        domains = ont.incoming_relations(matched_class).select{|ir| mc.include?(ir.domain)}
-        ranges = ont.outgoing_relations(matched_class).select{|orr| mc.include?(orr.range)}
-        stat[:one_hops].merge(domains).merge(ranges)
-        # all_attributes
-        attribs = ont.attributes_of(matched_class).select{|mca| ma.include?(mca)}
-        stat[:attribs] = attribs
-        attribs.each{|attrib| stats[ont.url][:connections][attrib] = {:attribs => [matched_class]}}
+        
+        ma.each do |matched_attribute|
+          cluster << matched_attribute if ont.domain_for_attribute(matched_attribute) == matched_class
+        end
+        
+        mr.each do |matched_relation|
+          ranges, domains = ont.relation_information(matched_relation)
+          cluster << matched_relation if ranges.include?(matched_class) || domains.include?(matched_class)
+        end
       end
       
-      stats[ont.url][:connections].select{|k,v| v.all?{|kk,vv| vv.empty?}}.each do |k,v|
-        puts "no connection found for #{k}"
+      (mr + ma).each do |mc|
+        cluster = stats[ont.very_short_name][:clusters].find{|c| c.include?(mc)}
+        if cluster.nil?
+          cluster = Set.new([mc])
+          stats[ont.very_short_name][:clusters] << cluster
+        end
+        ont.inverse_concepts(mc).each do |inv_concept|
+          cluster << inv_concept if all_matched_concepts.include?(inv_concept)
+        end
       end
+
+      isolated = stats[ont.very_short_name][:clusters].select{|c| c.size == 1}
+      clustered_concepts = stats[ont.very_short_name][:clusters].collect{|c| c.to_a}.flatten
+      
+      all_concepts_matched = all_matched_concepts.size == clustered_concepts.uniq.size
+      forgotten_concepts = all_matched_concepts - clustered_concepts
+      excess_concepts = clustered_concepts - all_matched_concepts
+      dupes = clustered_concepts.select{|e| clustered_concepts.count(e) > 1 }
+      
+      raise "odd matching numbers, #{stats[ont.very_short_name][:clusters]}" unless all_concepts_matched
+      raise "forgotten the following concepts: #{forgotten_concepts}" unless forgotten_concepts.empty?
+      raise "identified too many concepts: #{excess_concepts}" unless excess_concepts.empty?
+      stats[ont.very_short_name][:isolated] = isolated
+      stats[ont.very_short_name][:cluster_count] = stats[ont.very_short_name][:clusters].size
     end
+    File.open("eswc_2015/clusters/#{ont_field}_clusters.yaml", "w+"){|f| f.puts stats.to_yaml}
     return stats
   end
   
-  #def self.modifier_combinations
-  #  [
-  #    {:@use_attributes => true, :@use_class_relationships => true},      
-  #    {:@use_attributes => true, :@use_class_relationships => false},      
-  #    {:@use_attributes => false, :@use_class_relationships => true},
-  #    {:@use_attributes => false, :@use_class_relationships => false}
-  #  ]
-  #end
-  
-  def run!(experiment, modifiers, use_both = false)
-    initialize_experiment!(use_both, modifiers)
+  def run!(experiment, use_both = false)
+    initialize_experiment!(use_both)
     
     # save missing as it naturally changes during matching...
+    matched_concept_count = matched_concepts[source_ontology].values.inject(0){|sum, vals| sum += vals.size}
+    puts "we're starting with #{matched_concept_count} concepts, come what may..."
     all_concepts = matched_concepts.keys.collect{|ontology| ontology.all_concepts[:all].size}.min()
+    
+    those_should_be_hit = matched_concepts.keys.collect{|ontology|
+      (missing_correspondences + excess_correspondences).collect{|c| c[key_for_ontology(ontology)]}  
+    }.uniq
+    
+    baseline_concepts = those_should_be_hit.sort_by{|x| x.size}.first
+    
+    puts "baseline concepts #{baseline_concepts.size}"
     # build the initial stats
     stats = {
       :missing_correspondences => missing_correspondences.size.to_i, 
@@ -139,44 +156,78 @@ class Experimenter
     
     i = 1
     loop do
-      matched_concepts.each_pair do |ontology, concepts_hash|
-        log "building patterns with #{ontology.very_short_name}: #{concepts_hash}"
-      end
       build_patterns!(experiment)
-      log "unseen concepts (#{unseen_concepts.size}): #{unseen_concepts.to_a}"      
       clear_matched_concepts!
       stats.merge!(match!){|key,val1,val2| val1+val2}
       break unless more_concepts_available?
+      puts "-- starting round #{i+=1}"
     end
-        
-    stats[:test_selection] = visited_concepts.size
-    found_correspondences = stats[:matches] + stats[:removals]
-    stats[:interaction_expectancy] = (found_correspondences * (stats[:test_selection].to_f + 1) / (found_correspondences.to_f + 1)).round
-    stats[:baseline] = (found_correspondences * (all_concepts.to_f + 1) / (stats[:missing_correspondences].to_f + 1)).round
-    return stats
-  end
-  
-  def initialize_experiment!(use_both, modifiers)
-    log "To recreate e = Experimenter.new(Ontology.find(#{source_ontology.id}), Ontology.find(#{target_ontology.id}))"
-    @to_test = Set.new()
-    @visited_concepts = {}
-    @unseen_concepts = Set.new
-    modifiers.each_pair{|m, v| self.instance_variable_set(m, v)}
-    matcher.match!
-    log "Matcher Config: #{matcher.source_ontology.very_short_name} - #{matcher.target_ontology.very_short_name}, invert: #{invert}"    
-    log "modifiers: #{modifiers}"
-    use_them_to_create_patterns = use_both ? [source_ontology, target_ontology] : [source_ontology]
-    prepare_matched_concepts!(use_them_to_create_patterns)
-  end
-  
-  def build_patterns!(method)
-    matched_concepts.keys.each do |ontology|
-      if method.nil?
-        self.class.experiments.compact.each{|exp| self.send(exp, ontology)}
-      else
-        self.send(method, ontology)
+    
+    puts "got hits on #{hit_concepts.size} concepts"
+    
+    clusterfuck = {}
+    method_stats.each_pair do |meth, meth_stats|
+      meth_stats[:added_concepts] = meth_stats[:added_concepts].to_a
+      meth_stats[:hits] = (baseline_concepts & meth_stats[:added_concepts])
+      meth_stats[:hits].each do |hit|
+        clusterfuck[hit] ||= Set.new
+        clusterfuck[hit] << meth
       end
     end
+    
+    costs, min_paths = determine_minimal_set(method_stats, clusterfuck)
+    method_stats[:min_costs] = costs + matched_concept_count
+    method_stats[:min_paths] = min_paths
+    puts "found #{min_paths.size} minimal paths. min_cost: #{method_stats[:min_costs]}, #{min_paths}, #{clusterfuck}"
+
+    stats[:test_selection] = visited_concepts.size
+    found_correspondences = stats[:matches] + stats[:removals]
+    stats[:interaction_expectancy] = (hit_concepts.size * (stats[:test_selection].to_f + 1) / (hit_concepts.size.to_f + 1)).round
+    stats[:baseline] = (hit_concepts.size * (all_concepts.to_f + 1) / (baseline_concepts.size + 1)).round
+    return stats, method_stats
+  end
+  
+  def baseline_concepts(ontology)
+    return (missing_correspondences + excess_correspondences).collect{|c| c[key_for_ontology(ontology)]}.uniq
+  end
+  
+  def determine_minimal_set(method_stats, clusterfuck)
+    paths = Set.new()
+    
+    unique_methods = clusterfuck.values.collect{|val| val.to_a}.flatten.uniq
+    unique_methods.each do |meth|
+      paths.merge(create_valid_paths([meth], unique_methods, clusterfuck))
+    end
+    
+    puts "found #{paths.size} paths, now determining ones with lowest costs"
+    paths = paths.to_a.uniq
+    costs = paths.collect{|combi| combi.inject(0){|sum, method| sum += method_stats[method][:added_concepts].size}}
+    minimal_paths = costs.each.with_index.find_all{ |a,i| a == costs.min }.map{ |a,b| paths[b].uniq }.uniq
+    return costs.min || 0, minimal_paths
+  end
+  
+  def create_valid_paths(path_so_far, methods, cluster)
+    paths = Set.new()
+    if cluster.any?{|concept, meths| (meths & path_so_far).empty?}
+      (methods - path_so_far).each do |next_method|
+        paths.merge(create_valid_paths(path_so_far + [next_method], methods, cluster))
+      end
+    else
+      paths << path_so_far.sort
+    end
+    return paths
+  end
+  
+  def initialize_experiment!(use_both)
+    log "To recreate e = Experimenter.new(Ontology.find(#{source_ontology.id}), Ontology.find(#{target_ontology.id}))"
+    @to_test = Set.new
+    @visited_concepts = {}
+    @hit_concepts = Set.new
+    @method_stats = {}
+    matcher.match!
+    log "Matcher Config: #{matcher.source_ontology.very_short_name} - #{matcher.target_ontology.very_short_name}, invert: #{invert}"    
+    use_them_to_create_patterns = use_both ? [source_ontology, target_ontology] : [source_ontology]
+    prepare_matched_concepts!(use_them_to_create_patterns)
   end
 
   # takes the current status quo and let's users provide their input regarding all patterns
@@ -205,7 +256,9 @@ class Experimenter
     # all that are not already in the known matches will be added
     new_ones = user_matches.select{|um| known_matches.find{|km| km.equal_to?(um)}.nil?}
     new_ones.each{|no|
-      add_new_correspondence!(matcher.add_correspondence!(no))
+      matcher.add_correspondence!(no)
+      add_new_correspondence!(no.entity1)
+      add_new_correspondence!(no.entity2)
       log "!! found new user match: #{no.entity1}-#{no.entity2} !!"
       interactions[:matches] += 1
     }
@@ -219,6 +272,7 @@ class Experimenter
     }
     
     interactions[:no_idea] += 1 if false_positives.empty? && new_ones.empty? && known_matches.empty?
+    hit_concepts << concept if !false_positives.empty? || !new_ones.empty?
     return interactions
   end  
   
@@ -250,7 +304,7 @@ class Experimenter
   end  
   
   def more_concepts_available?
-    matched_concepts.collect{|ont, hash| hash.values.all?{|concepts| !concepts.empty?}}.any?{|val| val == true}
+    matched_concepts.collect{|ont, hash| hash.values.any?{|concepts| !concepts.empty?}}.any?{|val| val == true}
   end
   
   # we count a) all correspondences the matcher doesn't know, yet, and b) the ones that are exc
@@ -264,20 +318,89 @@ class Experimenter
     
   def add_new_correspondence!(concept)
     matched_concepts.keys.each do |ontology|
-      pe = ontology.element_class_for_rdf_type(concept).class
+      pe = ontology.element_class_for_rdf_type(concept).name
+      
       key = case pe
-        when Node.class then :classes
-        when AttributeConstraint.class then :attributes
-        when RelationConstraint.class then :relations
+        when "Node" then :classes
+        when "AttributeConstraint" then :attributes
+        when "RelationConstraint" then :relations
       end
       
       unless key.nil?
-        "added new #{key} #{concept} for #{ontology.very_short_name}"
+        #puts "adding new #{key} #{concept}"
         matched_concepts[ontology][key] << concept
         return
       end
     end
-    raise "Could not find #{concept} in either ontology"
+  end
+  
+  def build_patterns!(methods)
+    matched_concepts.keys.each do |ontology|
+      blank!(ontology)
+      methods.each do |meth|
+        @new_tests = Set.new
+        self.send(meth, ontology)
+        puts "#{meth} added #{new_tests.size} new concepts"
+        to_test.merge(new_tests)
+        method_stats[meth] ||= {:added_concepts => Set.new}
+        method_stats[meth][:added_concepts].merge(new_tests)
+      end
+    end
+  end
+  
+  def self.experiments
+    return [
+      :include_superclasses!,
+      :include_subclasses!,
+      :include_siblings!,
+      :go_really_deep!,
+      :include_attributes!,
+      :build_range_patterns!,
+      :build_domain_patterns!,
+      :build_relation_patterns!,
+      :build_attribute_patterns!,
+      :include_inverse_properties!,
+      :include_subproperties!,
+      :include_equivalent_to!
+    ]
+  end  
+  
+  def blank!(ontology)
+    matched_concepts[ontology].each_pair do |key, concepts|
+      concepts.each{|concept| to_test << concept}
+    end
+  end
+  
+  def include_superclasses!(ontology)
+    matched_concepts[ontology][:classes].each do |mc|
+      owl_class_for_concept(mc, ontology).superclasses.collect{|c| c.class_url}.each{|sc| add_test!(sc)}
+    end
+  end
+  
+  def include_subclasses!(ontology)
+    matched_concepts[ontology][:classes].each do |mc|
+      owl_class_for_concept(mc, ontology).subclasses.collect{|c| c.class_url}.each{|sc| add_test!(sc)}
+    end
+  end
+  
+  def include_siblings!(ontology)
+    matched_concepts[ontology][:classes].each do |mc|
+      owl_class_for_concept(mc, ontology).all_siblings.each{|sc| add_test!(sc)}
+    end
+  end
+  
+  def go_really_deep!(ontology)
+    matched_concepts[ontology][:classes].each do |mc|
+      clazz = owl_class_for_concept(mc, ontology)
+      base = clazz.subclasses.collect{|c| c.class_url} + clazz.superclasses.collect{|c| c.class_url} + clazz.all_siblings
+      base.each{|b| to_test << b}
+      additions = Set.new(clazz.all_superclasses + clazz.all_subclasses + clazz.all_siblings).to_a - base
+      additions.each{|nc| add_test!(nc)}
+    end
+  end
+  
+  def owl_class_for_concept(concept_url, ontology)
+    ontology.classes.find{|c| c.class_url == concept_url}
   end
   
   def build_range_patterns!(ontology)
@@ -285,10 +408,9 @@ class Experimenter
     matched_concepts[ontology][:classes].each do |mc|
       add_test!(mc)
       ontology.outgoing_relations(mc).each do |rel_out|
+        domains, ranges = ontology.relation_information(rel_out.url)
+        domains.each{|domain| add_test!(domain)}
         add_test!(rel_out.url)
-        add_test!(rel_out.domain)
-        add_attributes_for_class!(mc, ontology)
-        add_attributes_for_class!(rel_out.domain, ontology)
       end
     end
   end
@@ -298,18 +420,18 @@ class Experimenter
     matched_concepts[ontology][:classes].each do |mc| 
       add_test!(mc)
       ontology.incoming_relations(mc).each do |rel_in|
+        domains, ranges = ontology.relation_information(rel_in.url)        
         add_test!(rel_in.url)
-        add_test!(rel_in.range)
-        add_attributes_for_class!(mc, ontology)
-        add_attributes_for_class!(rel_in.range, ontology)
+        ranges.each{|range| add_test!(range)}
       end
     end
   end
   
-  def add_attributes_for_class!(mc, ontology)
-    return unless use_attributes
-    ontology.attributes_of(mc).each do |attrib|
-      add_test!(attrib)
+  def include_attributes!(ontology)
+    matched_concepts[ontology][:classes].each do |mc|    
+      ontology.attributes_of(mc).each do |attrib|
+        add_test!(attrib)
+      end
     end
   end
   
@@ -329,9 +451,32 @@ class Experimenter
     end
   end
   
-  def build_classes!(ontology)
+  def include_inverse_properties!(ontology)
+    matched_concepts[ontology][:relations].each do |mr|
+      ontology.inverse_concepts(mr).each do |inv_concept|
+        add_test!(inv_concept)
+      end
+    end
+  end
+  
+  def include_equivalent_to!(ontology)
     matched_concepts[ontology][:classes].each do |mc|
-      add_test!(mc)
+      ontology.equivalent_classes(mc).each do |equiv_concept|
+        add_test!(equiv_concept)
+      end
+    end
+    (matched_concepts[ontology][:attributes] + matched_concepts[ontology][:relations]).each do |mc|
+      ontology.equivalent_properties(mc).each do |equiv_concept|
+        add_test!(equiv_concept)
+      end
+    end
+  end
+  
+  def include_subproperties!(ontology)
+    matched_concepts[ontology][:relations].each do |mr|
+      ontology.sub_properties_of(mr).each do |subprop|
+        add_test!(subprop)
+      end
     end
   end
   
@@ -341,23 +486,8 @@ class Experimenter
   end
   
   def add_test!(concept)
-    return if concept.start_with?("_:")
-    to_test << concept
-    matched_concepts.each_pair do |ontology, concept_hash|
-      add_sub_and_superclass_tests!(ontology, concept)
-      return if !concept_hash.find{|key, concepts| concepts.include?(concept)}.nil?
-    end
-    unseen_concepts << concept
-  end
-  
-  def add_sub_and_superclass_tests!(ontology, concept)
-    return unless use_class_relationships
-    clazz = ontology.classes.find{|cla| cla.class_url == concept}
-    unless clazz.nil?
-      to_test.merge(clazz.all_superclasses) #.each{|sc|  << sc.class_url}
-      to_test.merge(clazz.all_subclasses) #.each{|sc| to_test << sc.class_url}
-      to_test.merge(clazz.all_siblings)
-    end
+    raise if concept.start_with?("_:")
+    new_tests << concept #unless to_test.include?(concept)
   end
 
   def alignment_info
@@ -394,9 +524,10 @@ class Experimenter
       matcher.matched_concepts[key_for_ontology(source_ontology)].size,
       matcher.matched_concepts[key_for_ontology(target_ontology)].size,
       reference.matched_concepts[key_for_ontology(source_ontology)].size,
-      reference.matched_concepts[key_for_ontology(target_ontology)].size,
       missing_correspondences.size.to_i,
-      excess_correspondences.size.to_i
+      excess_correspondences.size.to_i,
+      baseline_concepts(source_ontology).size.to_i,
+      baseline_concepts(target_ontology).size.to_i,
     ]
   end
 
@@ -448,18 +579,20 @@ class Experimenter
       stats[:test_selection],
       stats[:interaction_expectancy],
       stats[:baseline],
+      stats[:baseline] == 0 ? 0 : (stats[:interaction_expectancy].to_f / stats[:baseline].to_f).round(2),
       stats[:matches],
       stats[:removals]
     ].concat(alignment_stats)
   end
   
   def self.experiment_header
-    return ["_L", "_R", ""].collect{|suf|
+    return ["_L", "_R"].collect{|suf|
       [
         "#Found#{suf}",
         "Sample_Size",
         "Expectancy#{suf}",
         "Baseline",
+        "Saving",
         "#Additions#{suf}",
         "#Removals#{suf}",
         "Precision_new#{suf}",
@@ -477,9 +610,10 @@ class Experimenter
       "#Corr_O1",
       "#Corr_O2",
       "#Ref_Corr_O1",
-      "#Ref_Corr_O2",
       "#Missing_Corr",
       "#False_Corr",
+      "#BaselineConcepts_O1",
+      "#BaselineConcepts_O2",      
       "Precision",
       "Recall",
       "F-Measure"
