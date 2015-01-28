@@ -16,7 +16,6 @@
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*neo*/*
-externals/aml/store/*log*
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
@@ -25,16 +24,12 @@ externals/aml/store/*log*
 /data/*.json
 /data/samples/*.json
 /config/*.yml
-*.html
-*.zip
+
 /public/ontologies/extracted
 /public/ontologies/tmp
 /public/ontologies/alignments
 /public/assets
 /coverage
-.DS_Store
-/externals/aml/store/error.log
-/eswc_2015
 
 spec/testfiles/test_me.rdf
 spec/testfiles/test_alignment_output.rdf
