@@ -26,7 +26,7 @@ class AttributeConstraint < PatternElement
   end
 
   def possible_attributes(rdf_type = nil)
-    return pattern.possible_attributes_for(rdf_type || node.rdf_type)
+    return pattern.ontology.attributes_for(rdf_type || node.rdf_type)
   end
 
   def refers_to_variable?

@@ -4,22 +4,17 @@ class Ontology < ActiveRecord::Base
   attr_accessible :url, :description, :short_name, :does_exist, :group
   attr_accessor :ag_connection, :rdf_graph, :type_hierarchy, :classes
 
-  validates_url :url
-
-  validates :url, :uniqueness => true
+  validates :url, :uniqueness => true, :presence => true
 
   has_many :patterns
-  belongs_to :repository
-  before_validation :set_ontology_url! ,:set_short_name_if_empty!
+  has_one :repository  
+
+  before_validation :set_short_name_if_empty!
   after_create :load_to_dedicated_repository!
   before_destroy :delete_repository!
 
   def set_short_name_if_empty!
     self.short_name = url.split("/").last.split("\.").first if short_name.blank?
-  end
-
-  def set_ontology_url!
-    self.url = ont_url if url.blank?
   end
 
   def load_to_repository!(repo_name)
@@ -40,10 +35,6 @@ class Ontology < ActiveRecord::Base
     load_to_repository!(repository_name)
   end
 
-  def all_concepts()
-    ag_connection.all_concepts()
-  end
-
   def type_hierarchy()
     @type_hierarchy ||= ag_connection.type_hierarchy(self)
   end
@@ -53,10 +44,7 @@ class Ontology < ActiveRecord::Base
   end
 
   def classes
-    if @classes.nil? 
-      @classes = Set.new()
-      type_hierarchy
-    end
+    @classes ||= Set.new()
     return @classes
   end
 
@@ -67,41 +55,11 @@ class Ontology < ActiveRecord::Base
   def repository_name
     return id.nil? ? self.short_name : "ontology_#{self.id}"
   end
-
-  def outgoing_relations(domain)
-    return ag_connection.outgoing_relations(domain)
-  end
   
-  def incoming_relations(range)
-    return ag_connection.incoming_relations(range)
-  end
-  
-  def relation_information(rel)
-    return ag_connection.relation_information(rel)    
-  end
-  
-  def domain_for_attribute(attrib)
-    return ag_connection.domain_for_attribute(attrib)
-  end
-  
-  def attributes_of(domain)
-    return ag_connection.attributes_of(domain)
-  end
-  
-  def inverse_concepts(concept)
-    return ag_connection.inverse_concepts(concept)
-  end
-  
-  def equivalent_classes(concept)
-    return ag_connection.equivalent_classes(concept)
-  end
-  
-  def equivalent_properties(concept)
-    return ag_connection.equivalent_properties(concept)
-  end
-  
-  def sub_properties_of(concept)
-    return ag_connection.sub_properties_of(concept)
+  # expose the agraph_connection interface to ontology users
+  def method_missing(sym, *args, &block)
+    return ag_connection.send(sym, *args, &block) if ag_connection.respond_to?(sym)
+    super(sym, *args, &block)  
   end
 
   def imports()
@@ -113,21 +71,9 @@ class Ontology < ActiveRecord::Base
     return imps
   end
 
-  def vocabulary_class_name
-    return short_name.gsub("#", "_").gsub("-", "_").gsub(".owl", "").gsub(".rdf", "").camelcase
-  end
-
   # loads an ontology from a url
   def rdf_graph
     RDF::Graph.load(self.url)
-  end
-
-  def get_url
-    return url
-  end
-
-  def ont_url
-    return url
   end
 
   def very_short_name
@@ -161,9 +107,5 @@ class Ontology < ActiveRecord::Base
 
   def rdf_xml
     RestClient.get(self.url).body
-  end
-
-  def element_class_for_rdf_type(rdf_type)
-    ag_connection.element_class_for_rdf_type(rdf_type)
   end
 end

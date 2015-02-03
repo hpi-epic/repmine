@@ -1,4 +1,4 @@
-class SparqlQueryCreator < QueryCreator
+class SparqlQueryCreator < Struct.new(:pattern)
 
   attr_accessor :filter, :where, :variables
 

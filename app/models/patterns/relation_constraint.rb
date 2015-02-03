@@ -22,6 +22,6 @@ class RelationConstraint < PatternElement
   end
 
   def possible_relations(source_type = nil, target_type = nil)
-    return pattern.possible_relations_from_to(source_type || source.rdf_type, target_type || target.rdf_type)
+    return pattern.ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
   end
 end

@@ -1,3 +1,0 @@
-class SqlQueryCreator < QueryCreator
-
-end

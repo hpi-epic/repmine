@@ -1,6 +1,5 @@
 class AgraphConnection
 
-  require 'rdf/reasoner'
   attr_accessor :repository, :repository_name
 
   def config
@@ -248,6 +247,7 @@ class AgraphConnection
     return classes.values
   end
   
+  # this is slow as hell ... TODO: figure out how to get the entire collection through agraph
   def decipher_union(union_node)
     classes = []
     un = union_node
@@ -258,5 +258,13 @@ class AgraphConnection
       un = stmts.find{|stmt| stmt.predicate == RDF.rest}.object
     end
     return classes
+  end
+  
+  def real_ontology_url()
+    repository.build_query() do |q|
+      q.pattern([:ont, RDF.type, RDF::OWL.Ontology])
+    end.run do |res|
+      return res.ont.to_s
+    end
   end
 end

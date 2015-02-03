@@ -25,9 +25,10 @@ RSpec.configure do |config|
     Ontology.any_instance.stub(
       :download! => true,
       :load_to_dedicated_repository! => true,
-      :delete_repository! => true,
-      :element_class_for_rdf_type => Node
+      :delete_repository! => true
     )
+    OntologyMatcher.any_instance.stub(:repo_name => "XXX_alignment_test_repo")
+    
   end
 
 begin

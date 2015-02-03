@@ -4,7 +4,6 @@ class PatternElement < ActiveRecord::Base
 
   belongs_to :pattern
   has_one :type_expression, :dependent => :destroy
-  has_and_belongs_to_many :ontology_correspondences, :foreign_key => "input_element_id"
 
   after_create :build_type_expression!
 

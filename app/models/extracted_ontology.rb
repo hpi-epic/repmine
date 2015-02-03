@@ -12,7 +12,7 @@ class ExtractedOntology < Ontology
     # we describe an ontology
     stmts = []
     repository.imports.each{|vocab| stmts << [resource, RDF::OWL.imports, vocab]}
-    stmts << [resource, RDF::DC.title, repository.name]
+    stmts << [resource, RDF::DC.title, self.short_name]
     stmts << [resource, RDF::DC.creator, RDF::Literal.new("Repmine Schema Extractor")]
     stmts << [resource, Vocabularies::SchemaExtraction.repository_database, RDF::Literal.new(repository.database_type)]
     stmts << [resource, Vocabularies::SchemaExtraction.repository_database_version, RDF::Literal.new(repository.database_version)]
@@ -33,22 +33,8 @@ class ExtractedOntology < Ontology
     }
   end
 
-  def get_url
-    return "ontologies/extracted/#{name_url_safe}.#{file_format}"
-  end
-
-  def ont_url
-    return ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
-  end
-
   def local_file_path
-    return Rails.root.join("public", "ontologies", "extracted", name_url_safe + ".#{file_format}")
-  end
-
-  def name_url_safe
-    url_safe_name = short_name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_')
-    url_safe_name += "_#{repository.id}" unless repository.nil?
-    return url_safe_name
+    return Rails.root.join("public", "ontologies", "extracted", short_name + ".#{file_format}")
   end
 
   def file_format

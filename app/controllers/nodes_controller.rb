@@ -10,13 +10,13 @@ class NodesController < ApplicationController
 
   def create
     @node = @pattern.create_node!
-    @type_hierarchy = @pattern.type_hierarchy
+    @type_hierarchy = @pattern.ontology.type_hierarchy
     render :show
   end
 
   def show
     @node = Node.find(params[:id])
-    @type_hierarchy = @pattern.type_hierarchy
+    @type_hierarchy = @pattern.ontology.type_hierarchy
   end
 
   def update

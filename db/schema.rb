@@ -11,49 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141105144229) do
-
-  create_table "delayed_jobs", :force => true do |t|
-    t.integer  "priority",   :default => 0, :null => false
-    t.integer  "attempts",   :default => 0, :null => false
-    t.text     "handler",                   :null => false
-    t.text     "last_error"
-    t.datetime "run_at"
-    t.datetime "locked_at"
-    t.datetime "failed_at"
-    t.string   "locked_by"
-    t.string   "queue"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
-  end
-
-  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+ActiveRecord::Schema.define(:version => 20141022161434) do
 
   create_table "ontologies", :force => true do |t|
     t.string   "url"
     t.text     "description"
     t.string   "short_name"
     t.string   "group"
-    t.boolean  "does_exist",    :default => true
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
-    t.string   "type"
-    t.integer  "repository_id"
-  end
-
-  create_table "ontology_correspondences", :force => true do |t|
-    t.float    "measure"
-    t.string   "relation"
-    t.integer  "input_ontology_id"
-    t.integer  "output_ontology_id"
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
-  end
-
-  create_table "ontology_correspondences_pattern_elements", :force => true do |t|
-    t.integer "ontology_correspondence_id"
-    t.integer "input_element_id"
-    t.integer "output_element_id"
+    t.boolean  "does_exist",  :default => true
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
   end
 
   create_table "pattern_elements", :force => true do |t|
@@ -79,10 +46,10 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
     t.string   "name"
     t.text     "description"
     t.integer  "ontology_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
     t.string   "type"
     t.integer  "pattern_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   add_index "patterns", ["ontology_id"], :name => "index_patterns_on_ontology_id"
@@ -96,9 +63,12 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
     t.string  "host"
     t.integer "port"
     t.text    "description"
+    t.integer "ontology_id"
     t.string  "type"
     t.integer "rdbms_type_cd"
   end
+
+  add_index "repositories", ["ontology_id"], :name => "index_repositories_on_ontology_id"
 
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
@@ -133,9 +103,9 @@ ActiveRecord::Schema.define(:version => 20141105144229) do
     t.string   "operator"
     t.string   "rdf_type"
     t.integer  "pattern_element_id"
+    t.string   "ancestry"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
-    t.string   "ancestry"
   end
 
   add_index "type_expressions", ["ancestry"], :name => "index_type_expressions_on_ancestry"

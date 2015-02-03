@@ -1,7 +1,6 @@
 class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
-  has_one :ontology
-
+  belongs_to :ontology
   validates :name, :presence => true
 
   TYPES = ["MongoDbRepository", "RdfRepository", "RdbmsRepository"]
@@ -32,8 +31,13 @@ class Repository < ActiveRecord::Base
   end
 
   def build_ontology
-    self.ontology = ExtractedOntology.new(:short_name => self.name, :does_exist => false, :group => "Extracted")
+    ont_url = ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
+    self.ontology = ExtractedOntology.new(:short_name => self.name, :does_exist => false, :group => "Extracted", :url => ont_url)
     self.save
+  end
+  
+  def name_url_safe
+    return name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_') + "_#{self.id}"
   end
 
   def extract_ontology!

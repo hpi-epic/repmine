@@ -16,19 +16,16 @@ gem "rdf"
 gem "rdf-raptor"
 gem "rdf-turtle"
 gem "rdf-rdfxml"
+gem "rdf-xsd"
 gem "sparql-client"
 
 # ontology work with allegrograph
 gem "rdf-agraph"
 gem "rest-client"
-gem "rdf-xsd"
 gem "rdf-reasoner"
 gem "equivalent-xml"
 gem "linkeddata"
 gem 'nokogiri'
-
-# rule engine for translations
-gem 'wongi-engine'
 
 group :development, :test do
   gem "rspec"
@@ -65,11 +62,6 @@ gem "validate_url"
 # fancy ui
 gem "twitter-bootstrap-rails"
 gem "font-awesome-rails"
-
-# background work
-gem 'delayed_job_active_record'
-gem "delayed_job_web"
-gem 'daemons'
 
 # logging...
 gem "logging"

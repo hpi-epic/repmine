@@ -27,7 +27,6 @@ class TypeExpression < ActiveRecord::Base
   end
 
   def resource
-    # TODO: create OWL Union and so on...
     return RDF::Resource.new(self.fancy_string)
   end
 

@@ -1,9 +1,9 @@
-#puts "Creating SEON ontology"
-#Ontology.where(
-#  url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl",
-#  short_name: "Seon#seon.owl",
-#  group: "Software Repositories"
-#).first_or_create
+puts "Creating SEON ontology"
+Ontology.where(
+  url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl",
+  short_name: "Seon#seon.owl",
+  group: "Software Repositories"
+).first_or_create
 
 # Conference Ontologies (OAEI)
 [

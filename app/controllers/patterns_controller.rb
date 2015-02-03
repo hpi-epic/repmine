@@ -9,7 +9,7 @@ class PatternsController < ApplicationController
   def show
     @pattern = Pattern.find(params[:id])
     # little performance tweak, only load the hierarchy, if we have nodes that go with it
-    @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.type_hierarchy
+    @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.ontology.type_hierarchy
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
   end
 
@@ -20,8 +20,9 @@ class PatternsController < ApplicationController
 
     @ontology = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @ontology)
-    @matched_concepts = @source_pattern.match_concepts(@ontology).collect{|oc| oc.input_elements.collect{|pe| pe.rdf_type}}.flatten
-    @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.type_hierarchy
+    
+    @matched_concepts = @source_pattern.matched_concepts(@ontology)
+    @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.ontology.type_hierarchy
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
   end
 
@@ -72,7 +73,7 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
     @ontology = Ontology.find(params[:ontology_id])
     @matching_error = nil
-    @concept_count = @pattern.concepts_used.size
+    @concept_count = @pattern.concept_count
 
     # do not match when using the same ontology...
     if @pattern.ontology == @ontology
@@ -92,7 +93,7 @@ class PatternsController < ApplicationController
   def query
     @pattern = Pattern.find(params[:pattern_id])
     @repository = @pattern.ontology.repository || RdfRepository.new
-    @query = @repository.query_creator(@pattern).query_string
+    @query = SparqlQueryCreator.new(@pattern).query_string
   end
 
   def save_correspondence
