@@ -66,7 +66,7 @@ class OntologyMatcher
   
   # return correspondences for a given pattern
   def correspondences_for_pattern(pattern)
-
+    
   end
   
   def all_correspondences()
@@ -91,6 +91,10 @@ class OntologyMatcher
     else
       create_simple_correspondence(result)
     end
+  end
+  
+  def create_complex_correspondence(result)
+    
   end
   
   def create_simple_correspondence(result)

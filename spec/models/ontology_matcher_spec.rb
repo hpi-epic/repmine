@@ -132,7 +132,6 @@ RSpec.describe OntologyMatcher, :type => :model do
   end  
   
   it "should remove correspondences properly" do
-    # create the alignment graph
     FileUtils.cp(alignment_test_file, alignment_test_output_file)
     @om.stub(:alignment_path => alignment_test_output_file)
     @om.match!

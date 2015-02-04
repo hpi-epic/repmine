@@ -7,10 +7,6 @@ class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2,
     [Vocabularies::Alignment.Cell]
   end
   
-  def equal_to?(other)
-    return entity1 == other.entity1 && entity2 == other.entity2 && relation == other.relation
-  end
-  
   def resource
     @resource ||= RDF::Node.new
   end
