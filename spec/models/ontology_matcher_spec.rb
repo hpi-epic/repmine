@@ -58,7 +58,8 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should find substitutes within the rdf files in both directions" do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
-    corrs = @om.correspondences_for_concept("http://ekaw/#Paper_Author", true)
+    @om.inverted = true
+    corrs = @om.correspondences_for_concept("http://ekaw/#Paper_Author")
     assert_equal 1, corrs.size
     assert_equal author, corrs.first.entity2
   end
@@ -82,6 +83,14 @@ RSpec.describe OntologyMatcher, :type => :model do
       assert_equal true, res[:ent1].to_s.starts_with?("http://crs_dr/")
       assert_equal true, res[:ent2].to_s.starts_with?("http://ekaw/")
     end
+  end
+  
+  it "should switch ontologies, if needed" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    assert o1.id < o2.id
+    assert !OntologyMatcher.new(o1,o2).inverted
+    assert OntologyMatcher.new(o2,o1).inverted
   end
   
   it "should properly insert a new correspondence" do
@@ -131,6 +140,6 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal 1, correspondences.size
     assert_not_nil @om.find_correspondence_node(correspondences.first)
     @om.remove_correspondence!(correspondences.first)
-    assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract", true)
+    assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract")
   end
 end

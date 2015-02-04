@@ -7,16 +7,8 @@ class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2,
     [Vocabularies::Alignment.Cell]
   end
   
-  def url
-    nil
-  end
-  
   def equal_to?(other)
     return entity1 == other.entity1 && entity2 == other.entity2 && relation == other.relation
-  end
-  
-  def output_element
-    return onto2.element_class_for_rdf_type(entity2)
   end
   
   def resource

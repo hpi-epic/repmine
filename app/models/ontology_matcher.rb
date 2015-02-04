@@ -2,18 +2,18 @@ require 'open3'
 
 class OntologyMatcher
 
-  attr_accessor :target_ontology, :source_ontology, :alignment_repo
+  attr_accessor :target_ontology, :source_ontology, :alignment_repo, :inverted
 
   class MatchingError < StandardError;end
 
   def initialize(source_ontology, target_ontology, use_speaking_names = false)
-    @source_ontology = source_ontology
-    @target_ontology = target_ontology
+    @source_ontology, @target_ontology = [source_ontology, target_ontology].sort{|a,b| a.id <=> b.id}
+    @inverted = @source_ontology != source_ontology
     @alignment_repo = AgraphConnection.new(repo_name)
   end
   
   def repo_name
-    "alignment_" + [@source_ontology, @target_ontology].sort{|a,b| a.id <=> b.id}.collect{|o| o.id.to_s}.join("_")
+    "alignment_" + [source_ontology, target_ontology].collect{|o| o.id.to_s}.join("_")
   end
 
   def match!()
@@ -55,32 +55,53 @@ class OntologyMatcher
   end
 
   # gets correspondences for a single ontology element (class, attribute, relation)
-  def correspondences_for_concept(concept, invert = false)
+  # if called with nil as a concept, all correspondences will be returned
+  def correspondences_for_concept(concept)
     correspondences = []
-    alignment_graph.query(correspondence_query(concept, invert)) do |res|
-      correspondences << SimpleCorrespondence.new(
-        res[:measure].to_f,
-        res[:relation].to_s,
-        concept,
-        res[:target].to_s,
-        invert ? target_ontology : source_ontology,
-        invert ? source_ontology : target_ontology
-      )
+    alignment_graph.query(correspondence_query(concept)) do |result|
+      correspondences << create_correspondence(result)
     end
     return correspondences
   end
   
+  # return correspondences for a given pattern
   def correspondences_for_pattern(pattern)
-    
+
   end
   
-  def correspondence_query(concept, invert)
-    return RDF::Query.new{
-      pattern([:cell, Vocabularies::Alignment.entity1, invert ? :target : RDF::Resource.new(concept)])
-      pattern([:cell, Vocabularies::Alignment.entity2, invert ? RDF::Resource.new(concept) : :target])
-      pattern([:cell, Vocabularies::Alignment.relation, :relation])
-      pattern([:cell, Vocabularies::Alignment.measure, :measure])
-    }
+  def all_correspondences()
+    correspondences_for_concept(nil)
+  end
+  
+  def correspondence_query(concept)
+    concept_resource = concept.nil? ? :source : RDF::Resource.new(concept)
+    patterns = [
+      [:cell, Vocabularies::Alignment.entity1, inverted ? :target : concept_resource],
+      [:cell, Vocabularies::Alignment.entity2, inverted ? concept_resource : :target],
+      [:cell, inverted ? Vocabularies::Alignment.entity2 : Vocabularies::Alignment.entity1, :source],
+      [:cell, Vocabularies::Alignment.relation, :relation],
+      [:cell, Vocabularies::Alignment.measure, :measure]
+    ]
+    return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
+  end
+  
+  def create_correspondence(result)
+    if result[:target].anonymous?
+      create_complex_correspondence(result)
+    else
+      create_simple_correspondence(result)
+    end
+  end
+  
+  def create_simple_correspondence(result)
+    return SimpleCorrespondence.new(
+      result[:measure].to_f,
+      result[:relation].to_s,
+      result[:source].to_s,
+      result[:target].to_s,
+      source_ontology,
+      target_ontology
+    )
   end
   
   def alignment_graph
@@ -112,9 +133,7 @@ class OntologyMatcher
   end
   
   def find_correspondence_node(correspondence)
-    q = RDF::Query.new()
-    correspondence.query_patterns.each{|qp| q << qp}
-    alignment_graph.query(q) do |res|
+    alignment_graph.query(RDF::Query.new(*correspondence.query_patterns)) do |res|
       return res[:cell]
     end
     return nil
