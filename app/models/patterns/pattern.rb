@@ -54,6 +54,10 @@ class Pattern < ActiveRecord::Base
     ontology_matcher(ont).matched_concepts
   end
   
+  def ontology_matcher(ont)
+    return OntologyMatcher.new(self.ontology, ont)
+  end
+  
   # some comparison
   def equal_to?(other)
     if self == other

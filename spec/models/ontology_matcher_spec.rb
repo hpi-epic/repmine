@@ -84,10 +84,11 @@ RSpec.describe OntologyMatcher, :type => :model do
     end
   end
   
-  it "should properly export a new mapping once we've added that to the alignment graph" do
+  it "should properly insert a new correspondence" do
     correspondence = FactoryGirl.build(:simple_correspondence)
     assert_empty @om.correspondences_for_concept(correspondence.entity1)
     @om.add_correspondence!(correspondence)
+    assert_not_nil @om.find_correspondence_node(correspondence)
     assert_not_empty @om.correspondences_for_concept(correspondence.entity1)
   end
   
@@ -104,14 +105,32 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal true, File.exists?(aml_test_file)
   end
   
+  it "should find an existing correspondence within the graph" do
+    correspondence = FactoryGirl.build(:simple_correspondence)
+    assert_empty @om.alignment_graph
+    @om.add_correspondence!(correspondence)
+    assert_not_empty @om.alignment_graph
+    assert_not_nil @om.find_correspondence_node(correspondence)
+  end
+  
+  it "should remove an existing correspondence from the graph" do
+    correspondence = FactoryGirl.build(:simple_correspondence)
+    assert_empty @om.alignment_graph
+    @om.add_correspondence!(correspondence)
+    assert_not_empty @om.alignment_graph
+    rdf_node = @om.remove_correspondence!(correspondence)
+    assert_empty @om.alignment_graph
+  end  
+  
   it "should remove correspondences properly" do
     # create the alignment graph
     FileUtils.cp(alignment_test_file, alignment_test_output_file)
     @om.stub(:alignment_path => alignment_test_output_file)
     @om.match!
     correspondences = @om.correspondences_for_concept("http://crs_dr/#abstract")
-    assert_not_empty correspondences
+    assert_equal 1, correspondences.size
+    assert_not_nil @om.find_correspondence_node(correspondences.first)
     @om.remove_correspondence!(correspondences.first)
-    assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract")
+    assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract", true)
   end
 end

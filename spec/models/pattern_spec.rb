@@ -54,7 +54,7 @@ RSpec.describe Pattern, :type => :model do
     @pattern = FactoryGirl.create(:pattern)
     # should be http://example.org/node|relation|attribute
     assert_equal 3, @pattern.concept_count
-    OntologyMatcher.any_instance.stub(:match! => true, :get_substitutes_for => [])
+    OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [], :correspondences_for_pattern => [])
     assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
     # create the correspondence
     correspondence = FactoryGirl.create(:ontology_correspondence)

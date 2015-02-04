@@ -59,7 +59,7 @@ class OntologyMatcher
     correspondences = []
     alignment_graph.query(correspondence_query(concept, invert)) do |res|
       correspondences << SimpleCorrespondence.new(
-        res[:measure].to_s,
+        res[:measure].to_f,
         res[:relation].to_s,
         concept,
         res[:target].to_s,
@@ -106,6 +106,17 @@ class OntologyMatcher
   end
   
   def remove_correspondence!(correspondence)
-    
+    c_node = find_correspondence_node(correspondence)
+    return if c_node.nil?
+    alignment_graph.delete([c_node])
+  end
+  
+  def find_correspondence_node(correspondence)
+    q = RDF::Query.new()
+    correspondence.query_patterns.each{|qp| q << qp}
+    alignment_graph.query(q) do |res|
+      return res[:cell]
+    end
+    return nil
   end
 end
