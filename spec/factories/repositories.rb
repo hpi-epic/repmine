@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: repositories
+#
+#  id            :integer          not null, primary key
+#  name          :string(255)
+#  db_name       :string(255)
+#  db_username   :string(255)
+#  db_password   :string(255)
+#  host          :string(255)
+#  port          :integer
+#  description   :text
+#  ontology_id   :integer
+#  type          :string(255)
+#  rdbms_type_cd :integer
+#
+
 FactoryGirl.define do
   factory :repository do
     name "sample_repo"

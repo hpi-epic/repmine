@@ -36,6 +36,9 @@ GEM
       transport (~> 1.0.5)
     ancestry (2.1.0)
       activerecord (>= 3.0.0)
+    annotate (2.6.5)
+      activerecord (>= 2.3.0)
+      rake (>= 0.8.7)
     arel (3.0.3)
     autotest-rails (4.2.1)
       ZenTest (~> 4.5)
@@ -297,6 +300,7 @@ PLATFORMS
 DEPENDENCIES
   acts-as-taggable-on
   ancestry
+  annotate (~> 2.6.5)
   autotest-rails
   bson_ext
   coffee-rails (~> 3.2.1)

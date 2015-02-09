@@ -35,6 +35,7 @@ group :development, :test do
 end
 
 gem 'autotest-rails'
+gem 'annotate', '~> 2.6.5'
 
 # Gems used only for assets and not required
 # in production environments by default.
