@@ -18,7 +18,7 @@ class RelationConstraint < PatternElement
   end
 
   def rdf_types
-    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.RelationConstraint]
+    [Vocabularies::GraphPattern.RelationConstraint]
   end
 
   def possible_relations(source_type = nil, target_type = nil)

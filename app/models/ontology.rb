@@ -18,8 +18,10 @@ class Ontology < ActiveRecord::Base
   end
 
   def load_to_repository!(repo_name)
-    download!
-    ag_connection(repo_name).insert_file!(local_file_path)
+    if does_exist
+      download!
+      ag_connection(repo_name).insert_file!(local_file_path)
+    end
   end
 
   def ag_connection(repo_name = nil)

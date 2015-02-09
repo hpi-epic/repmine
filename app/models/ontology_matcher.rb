@@ -59,7 +59,7 @@ class OntologyMatcher
   def correspondences_for_concept(concept)
     correspondences = []
     alignment_graph.query(correspondence_query(concept)) do |result|
-      correspondences << create_correspondence(result)
+      correspondences << create_correspondence(result, concept)
     end
     return correspondences
   end
@@ -78,30 +78,51 @@ class OntologyMatcher
     patterns = [
       [:cell, Vocabularies::Alignment.entity1, inverted ? :target : concept_resource],
       [:cell, Vocabularies::Alignment.entity2, inverted ? concept_resource : :target],
-      [:cell, inverted ? Vocabularies::Alignment.entity2 : Vocabularies::Alignment.entity1, :source],
       [:cell, Vocabularies::Alignment.relation, :relation],
       [:cell, Vocabularies::Alignment.measure, :measure]
     ]
     return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
   end
   
-  def create_correspondence(result)
+  def create_correspondence(result, concept)
     if result[:target].anonymous?
-      create_complex_correspondence(result)
+      create_complex_correspondence(result, concept)
     else
-      create_simple_correspondence(result)
+      create_simple_correspondence(result, concept)
     end
   end
   
-  def create_complex_correspondence(result)
-    
+  def create_complex_correspondence(result, concept)
+    return ComplexCorrespondence.new(
+      result[:measure].to_f,
+      result[:relation].to_s,
+      concept,
+      create_pattern(result[:target]),
+      source_ontology,
+      target_ontology
+    )
   end
   
-  def create_simple_correspondence(result)
+  # TODO: also recreate the connections between pattern elements...
+  def create_pattern(res)
+    pattern = Pattern.new()
+    alignment_graph.build_query do |q|
+      q.pattern([:element, Vocabularies::GraphPattern.belongsTo, res])
+      q.pattern([:element, RDF.type, :type])
+      q.pattern([:element, Vocabularies::GraphPattern.elementType, :element_type], :optional => true)      
+    end.run do |res|
+      pattern_element = Kernel.const_get(res[:type].to_s.split("/").last).new
+      pattern_element.rdf_type = res[:element_type].to_s if res.bound?(:element_type)
+      pattern.pattern_elements << pattern_element
+    end
+    return pattern
+  end
+  
+  def create_simple_correspondence(result, concept)
     return SimpleCorrespondence.new(
       result[:measure].to_f,
       result[:relation].to_s,
-      result[:source].to_s,
+      concept,
       result[:target].to_s,
       source_ontology,
       target_ontology

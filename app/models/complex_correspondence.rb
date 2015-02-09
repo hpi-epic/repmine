@@ -12,11 +12,20 @@ class ComplexCorrespondence < SimpleCorrespondence
   end
   
   def process_entity(entity)
-    if entity.is_a?(Pattern) 
-      return [entity.resource(true), entity.rdf_statements(true)]
+    if entity.is_a?(Pattern)
+      return self.class.clean_rdf_statements(entity.rdf, entity.resource)
     else
       return [RDF::Resource.new(entity), []]
     end
+  end
+  
+  def self.clean_rdf_statements(stmts, resource)
+    entity_cache = {}
+    stmts.each do |stmt|
+      entity_cache[stmt[0]] ||= RDF::Node.new
+    end
+    anonymized_stmts = stmts.collect{|stmt| stmt.map!{|el| entity_cache[el] || el}}
+    return [entity_cache[resource], anonymized_stmts]
   end
   
 end

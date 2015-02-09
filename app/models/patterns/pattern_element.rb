@@ -39,13 +39,17 @@ class PatternElement < ActiveRecord::Base
 
   # this method allows overwriting an existing type expression with a SIMPLE rdf type
   def rdf_type=(str)
-    # we only need to overwrite if the strings differ...
-    if type_expression.fancy_string != str
-      if type_expression.is_simple?
-        type_expression.children.first.update_attributes(:rdf_type => str)
-      else
-        type_expression.destroy
-        self.type_expression = TypeExpression.for_rdf_type(self, str)
+    if type_expression.nil?
+      self.type_expression = TypeExpression.for_rdf_type(self, str)
+    else
+      # we only need to overwrite if the strings differ...
+      if type_expression.fancy_string != str
+        if type_expression.is_simple?
+          type_expression.children.first.update_attributes(:rdf_type => str)
+        else
+          type_expression.destroy
+          self.type_expression = TypeExpression.for_rdf_type(self, str)
+        end
       end
     end
   end

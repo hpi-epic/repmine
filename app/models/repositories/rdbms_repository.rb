@@ -14,7 +14,7 @@ class RdbmsRepository < Repository
     return Repository.model_name
   end
 
-  def create_ontology!()
+  def create_ontology!
     cmd = Rails.root.join("externals", "d2rq", "generate-mapping").to_s
     options = ["-v", "-u #{db_username} -p #{db_password}", "-o #{ontology.local_file_path}", "#{connection_string}"]
     errors = ""
@@ -22,11 +22,8 @@ class RdbmsRepository < Repository
     Open3.popen3(cmd + " #{options.join(" ")}") do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
     end
-
-    unless errors.empty?
-      errors << "\n Errors are in fact warnings. File created successfully!" if File.exist?(ontology.local_file_path)
-      raise OntologyExtractionError, errors
-    end
+    
+    return File.exist?(ontology.local_file_path)
   end
 
   def connection_string

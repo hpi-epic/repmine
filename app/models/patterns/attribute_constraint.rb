@@ -42,6 +42,6 @@ class AttributeConstraint < PatternElement
   end
 
   def rdf_types
-    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.AttributeConstraint]
+    [Vocabularies::GraphPattern.AttributeConstraint]
   end
 end

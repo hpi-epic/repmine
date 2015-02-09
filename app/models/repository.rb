@@ -41,9 +41,8 @@ class Repository < ActiveRecord::Base
   end
 
   def extract_ontology!
-    create_ontology!
+    ontology.update_attributes({:does_exist => create_ontology!})
     ontology.load_to_dedicated_repository!
-    ontology.update_attributes({:does_exist => true})
   end
 
   def create_ontology!

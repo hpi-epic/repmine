@@ -38,7 +38,7 @@ class Node < PatternElement
   end
 
   def rdf_types
-    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.Node]
+    [Vocabularies::GraphPattern.Node]
   end
   
   def equal_to?(other)
