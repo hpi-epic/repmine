@@ -97,25 +97,4 @@ class Pattern < ActiveRecord::Base
   def rdf_types
     [Vocabularies::GraphPattern.GraphPattern]
   end
-  
-  # 'factories' for creating patterns needed for experiments
-  def self.n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
-    p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
-    source_node = p.create_node!
-    source_node.rdf_type = source_class
-    target_node = p.create_node!
-    target_node.rdf_type = target_class
-    relation = RelationConstraint.create(:source_id => source_node.id, :target_id => target_node.id)
-    relation.rdf_type = relation_type
-    return p
-  end
-  
-  def self.n_a_pattern(ontology, attribute_type, source_class, name)
-    p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
-    source_node = p.create_node!
-    source_node.rdf_type = source_class
-    ac = source_node.attribute_constraints.create
-    ac.rdf_type = attribute_type
-    return p
-  end
 end

@@ -29,6 +29,8 @@ class PatternElement < ActiveRecord::Base
   has_one :type_expression, :dependent => :destroy
 
   after_create :build_type_expression!
+  
+  include RdfSerialization
 
   def build_type_expression!()
     TypeExpression.for_rdf_type(self, "")
@@ -87,6 +89,10 @@ class PatternElement < ActiveRecord::Base
 
   def query_variable()
     "#{self.class.name.underscore}_#{self.id}"
+  end
+  
+  def rdf_types
+    [Vocabularies::GraphPattern.PatternElement]
   end
   
   def equal_to?(other)

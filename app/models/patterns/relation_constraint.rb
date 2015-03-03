@@ -28,8 +28,6 @@ class RelationConstraint < PatternElement
 
   before_save :assign_to_pattern!
 
-  include RdfSerialization
-
   def rdf_statements
     return [
       [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]
@@ -41,7 +39,7 @@ class RelationConstraint < PatternElement
   end
 
   def rdf_types
-    [Vocabularies::GraphPattern.RelationConstraint]
+    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.RelationConstraint]
   end
 
   def possible_relations(source_type = nil, target_type = nil)

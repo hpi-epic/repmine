@@ -27,8 +27,6 @@ class AttributeConstraint < PatternElement
 
   before_save :assign_to_pattern!
 
-  include RdfSerialization
-
   OPERATORS = {
     :var => "?",
     :regex => "~=",
@@ -65,6 +63,6 @@ class AttributeConstraint < PatternElement
   end
 
   def rdf_types
-    [Vocabularies::GraphPattern.AttributeConstraint]
+    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.AttributeConstraint]
   end
 end

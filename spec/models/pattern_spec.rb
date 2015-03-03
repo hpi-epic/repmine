@@ -43,7 +43,7 @@ RSpec.describe Pattern, :type => :model do
     res = query(@graph, {nodes.first => {Vocabularies::GraphPattern.incomingRelation => :irc}})
     assert_equal 1, res.size
     assert_equal @pattern.nodes.first.target_relation_constraints.first.url, res.first[:irc]
-
+    
     ac_count = @pattern.nodes.inject(0){|x,node| x += node.attribute_constraints.size}
     assert_equal ac_count, query_graph_for_type(@graph, Vocabularies::GraphPattern.AttributeConstraint).size
     rc_count = @pattern.nodes.inject(0){|x,node| x += node.source_relation_constraints.size}
@@ -70,15 +70,10 @@ RSpec.describe Pattern, :type => :model do
     assert_equal 3, @pattern.concept_count
     OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [], :correspondences_for_pattern => [])
     assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
-    # create the correspondence
-    correspondence = FactoryGirl.create(:ontology_correspondence)
-    correspondence.input_elements = [@pattern.nodes.first]
-    correspondence.output_elements = [PatternElement.for_rdf_type(@pattern.nodes.first.rdf_type + "_matched")]
-    correspondence.save
     # now only return this one correspondence, which should eliminate http://example.org/node from the unmatched list
-    OntologyMatcher.any_instance.stub(:match! => true, :get_substitutes_for => [correspondence])
-    assert_equal 2, @pattern.unmatched_concepts(Ontology.first).size
-    assert_not_include @pattern.unmatched_concepts(Ontology.first), @pattern.nodes.first.rdf_type + "_matched"
+    correspondence = FactoryGirl.build(:simple_correspondence)
+    OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [correspondence])
+    assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
   end
   
   it "should determine equality of very simple patterns" do
@@ -88,8 +83,8 @@ RSpec.describe Pattern, :type => :model do
   end
   
   it "should determine similar n_r_n patterns" do
-    p1 = Pattern.n_r_n_pattern(FactoryGirl.create(:ontology), "http://example.org/n1", "http://example.org/r1", "http://example.org/n2")
-    p2 = Pattern.n_r_n_pattern(FactoryGirl.create(:ontology), "http://example.org/n1", "http://example.org/r1", "http://example.org/n2")
+    p1 = n_r_n_pattern(FactoryGirl.create(:ontology), "http://example.org/n1", "http://example.org/r1", "http://example.org/n2")
+    p2 = n_r_n_pattern(FactoryGirl.create(:ontology), "http://example.org/n1", "http://example.org/r1", "http://example.org/n2")
     assert p1.equal_to?(p2)
   end
   
@@ -97,6 +92,26 @@ RSpec.describe Pattern, :type => :model do
     p1 = FactoryGirl.create(:pattern)
     p1.relation_constraints.first.destroy
     assert !p1.equal_to?(FactoryGirl.create(:pattern))
+  end
+  
+  def n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
+    p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
+    source_node = p.create_node!
+    source_node.rdf_type = source_class
+    target_node = p.create_node!
+    target_node.rdf_type = target_class
+    relation = RelationConstraint.create(:source_id => source_node.id, :target_id => target_node.id)
+    relation.rdf_type = relation_type
+    return p
+  end
+  
+  def n_a_pattern(ontology, attribute_type, source_class, name)
+    p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
+    source_node = p.create_node!
+    source_node.rdf_type = source_class
+    ac = source_node.attribute_constraints.create
+    ac.rdf_type = attribute_type
+    return p
   end
 
   def query_graph_for_type(graph, rdf_type)

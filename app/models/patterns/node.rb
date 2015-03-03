@@ -30,8 +30,6 @@ class Node < PatternElement
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy
   has_many :attribute_constraints, :dependent => :destroy
 
-  include RdfSerialization
-
   def query_variable()
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
@@ -61,7 +59,7 @@ class Node < PatternElement
   end
 
   def rdf_types
-    [Vocabularies::GraphPattern.Node]
+    [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.Node]
   end
   
   def equal_to?(other)
