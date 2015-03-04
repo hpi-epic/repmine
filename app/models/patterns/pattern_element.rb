@@ -116,26 +116,24 @@ class PatternElement < ActiveRecord::Base
     {}
   end
   
-  def rebuild!(graph)
-    rebuild_element_type!(graph, self.rdf_node)
-    rebuild_element_properties!(graph, self.rdf_node)
+  def rebuild!(queryable)
+    rebuild_element_type!(queryable, self.rdf_node)
+    rebuild_element_properties!(queryable, self.rdf_node)
   end
   
   # TODO: also become able to rebuild complex expressions (universal, someOf, and schmutz like that)  
   # P.S.: that is also why this is currently a separate method...
-  def rebuild_element_type!(graph, node)
-    RDF::Query.execute(graph) do
-      pattern [node, Vocabularies::GraphPattern.elementType, :element_type]
-    end.each do |res|
+  def rebuild_element_type!(queryable, node)
+    query = RDF::Query.new{pattern([node, Vocabularies::GraphPattern.elementType, :element_type])}
+    queryable.query(query) do |res|
       self.rdf_type = res[:element_type].to_s
     end
   end
   
-  def rebuild_element_properties!(graph, node)
+  def rebuild_element_properties!(queryable, node)
     rdf_mappings.each_pair do |property, mapping|
-      RDF::Query.execute(graph) do
-        pattern([node, property, :prop])
-      end.each do |res|
+      query = RDF::Query.new{pattern([node, property, :prop])}        
+      queryable.query(query) do |res|
         if mapping[:collection]
           connected_element = pattern.pattern_elements.find{|el| el.rdf_node == res[:prop]}
           self.send(mapping[:property]).send(:<< , connected_element) unless connected_element.nil?
