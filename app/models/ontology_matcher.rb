@@ -20,7 +20,7 @@ class OntologyMatcher
     prepare_matching!
     unless already_matched?
       call_matcher!
-      alignment_repo.insert_file!(alignment_path)
+      insert_statements!
     end
   end
   
@@ -36,7 +36,12 @@ class OntologyMatcher
   def reset!()
     call_matcher!
     alignment_repo.clear!
-    alignment_repo.insert_file!(alignment_path)
+    insert_statements! 
+  end
+  
+  def insert_statements!
+    alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
+    alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
   end
 
   def call_matcher!
@@ -97,25 +102,10 @@ class OntologyMatcher
       result[:measure].to_f,
       result[:relation].to_s,
       concept,
-      create_pattern(result[:target]),
+      Pattern.from_graph(alignment_graph, result[:target]),
       source_ontology,
       target_ontology
     )
-  end
-  
-  # TODO: also recreate the connections between pattern elements...
-  def create_pattern(res)
-    pattern = Pattern.new()
-    alignment_graph.build_query do |q|
-      q.pattern([:element, Vocabularies::GraphPattern.belongsTo, res])
-      q.pattern([:element, RDF.type, :type])
-      q.pattern([:element, Vocabularies::GraphPattern.elementType, :element_type], :optional => true)      
-    end.run do |res|
-      pattern_element = Kernel.const_get(res[:type].to_s.split("/").last).new
-      pattern_element.rdf_type = res[:element_type].to_s if res.bound?(:element_type)
-      pattern.pattern_elements << pattern_element
-    end
-    return pattern
   end
   
   def create_simple_correspondence(result, concept)
