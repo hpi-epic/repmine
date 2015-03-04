@@ -163,7 +163,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal correspondence.entity2.pattern_elements.size, corr.entity2.pattern_elements.size
     
     correspondence.entity2.pattern_elements.each do |pe|
-      assert corr.entity2.pattern_elements.any?{|pee| pee.equal_to?(pe)}, "no match found for #{pe.class.name} #{pe.rdf_type}"
+      assert corr.entity2.pattern_elements.any?{|pee| pe.equal_to?(pee)}, "no match found for #{pe.class} - #{pe.rdf_type}"
     end
   end
 end

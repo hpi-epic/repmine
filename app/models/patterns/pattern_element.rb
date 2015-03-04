@@ -124,21 +124,19 @@ class PatternElement < ActiveRecord::Base
   # TODO: also become able to rebuild complex expressions (universal, someOf, and schmutz like that)  
   # P.S.: that is also why this is currently a separate method...
   def rebuild_element_type!(queryable, node)
-    query = RDF::Query.new{pattern([node, Vocabularies::GraphPattern.elementType, :element_type])}
-    queryable.query(query) do |res|
-      self.rdf_type = res[:element_type].to_s
+    queryable.query(:subject => node, :predicate => Vocabularies::GraphPattern.elementType) do |res|
+      self.rdf_type = res.object.to_s
     end
   end
   
   def rebuild_element_properties!(queryable, node)
     rdf_mappings.each_pair do |property, mapping|
-      query = RDF::Query.new{pattern([node, property, :prop])}        
-      queryable.query(query) do |res|
+      queryable.query(:subject => node, :predicate => property) do |res|
         if mapping[:collection]
-          connected_element = pattern.pattern_elements.find{|el| el.rdf_node == res[:prop]}
+          connected_element = pattern.pattern_elements.find{|el| el.rdf_node == res.object}
           self.send(mapping[:property]).send(:<< , connected_element) unless connected_element.nil?
         else
-          value = mapping[:literal] ? res[:prop].object : pattern.pattern_elements.find{|pe| pe.rdf_node == res[:prop]}
+          value = mapping[:literal] ? res.object.object : pattern.pattern_elements.find{|pe| pe.rdf_node == res.object}
           self.send("#{mapping[:property]}=".to_sym, value) unless value.nil?
         end
       end

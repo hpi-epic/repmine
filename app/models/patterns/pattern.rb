@@ -105,7 +105,7 @@ class Pattern < ActiveRecord::Base
       pattern.pattern_elements << pattern_element
     end
     
-    pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}    
+    pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}
     return pattern
   end
 
