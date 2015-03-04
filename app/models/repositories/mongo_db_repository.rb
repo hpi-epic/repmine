@@ -52,6 +52,7 @@ class MongoDbRepository < Repository
     end
     ontology.remove_local_copy!
     ontology.download!
+    return true
   end
 
   # gets the schema for an entire class. This is done using the variety.js project to extract mongoDB 'schemas'

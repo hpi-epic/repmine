@@ -5,6 +5,7 @@ class CreateOntologies < ActiveRecord::Migration
       t.text :description
       t.string :short_name
       t.string :group
+      t.string :type
       t.boolean :does_exist, :default => true
       t.timestamps
     end

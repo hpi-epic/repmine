@@ -47,10 +47,13 @@ class Repository < ActiveRecord::Base
     return self.class.accessible_attributes.select{|at| !at.blank?}
   end
 
+  # too bad Rails 3 does not handle inheritance and associations well...
+  # just not way of saying self.create_extracted_ontology or self.create_ontology(type: "Extracted")
   def build_ontology
     ont_url = ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
-    self.ontology = ExtractedOntology.new(:short_name => self.name, :does_exist => false, :group => "Extracted", :url => ont_url)
-    self.save
+    self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => "Extracted", :url => ont_url)
+    self.ontology.repository = self
+    self.ontology.save
   end
   
   def name_url_safe

@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
     t.text     "description"
     t.string   "short_name"
     t.string   "group"
+    t.string   "type"
     t.boolean  "does_exist",  :default => true
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
