@@ -64,16 +64,14 @@ module Vocabularies
       label: "outgoing relation".freeze,
       range: "graphpattern:RelationConstraint".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:ObjectProperty".freeze,
-      "owl:inverseOf" => %(graphpattern:incomingRelation).freeze
+      type: "owl:ObjectProperty".freeze
     property :incomingRelation,
       comment: %(links a node to an incoming relation.).freeze,
       domain: "graphpattern:Node".freeze,
       label: "incoming relation".freeze,
       range: "graphpattern:RelationConstraint".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
-      type: "owl:ObjectProperty".freeze,
-      "owl:inverseOf" => %(graphpattern:outgoingRelation).freeze
+      type: "owl:ObjectProperty".freeze
     property :attributeConstraint,
       comment: %(links a node to a datatype attribute constraint.).freeze,
       domain: "graphpattern:Node".freeze,
@@ -83,7 +81,51 @@ module Vocabularies
       type: "owl:ObjectProperty".freeze
 
     # properties - relation constraint
-    # TODO: all the cardinality stuff
+    property :min_cardinality,
+      comment: %(minimum cardinality of a relation.).freeze,
+      domain: "graphpattern:RelationConstraint".freeze,
+      label: "min_cardinality".freeze,
+      range: "xsd:NonNegativeInteger".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:DatatypeProperty".freeze
+    property :max_cardinality,
+      comment: %(maximum cardinality of a relation.).freeze,
+      domain: "graphpattern:RelationConstraint".freeze,
+      label: "max_cardinality".freeze,
+      range: "xsd:NonNegativeInteger".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:DatatypeProperty".freeze
+    property :min_path_length,
+      comment: %(minimum length of a relation constraint.).freeze,
+      domain: "graphpattern:RelationConstraint".freeze,
+      label: "min_path_length".freeze,
+      range: "xsd:NonNegativeInteger".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:DatatypeProperty".freeze
+    property :max_path_length,
+      comment: %(maximum length of a relation constraint.).freeze,
+      domain: "graphpattern:RelationConstraint".freeze,
+      label: "max_path_length".freeze,
+      range: "xsd:NonNegativeInteger".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:DatatypeProperty".freeze
+    property :sourceNode,
+      comment: %(determines the origin of a relation.).freeze,
+      domain: "graphpattern:RelationConstraint".freeze,
+      label: "sourceNode".freeze,
+      range: "graphpattern:Node".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:ObjectProperty".freeze,
+      "owl:inverseOf" => %(graphpattern:outgoingRelation).freeze
+    property :targetNode,
+      comment: %(determines the target of a relation.).freeze,
+      domain: "graphpattern:RelationConstraint".freeze,
+      label: "targeteNode".freeze,
+      range: "graphpattern:Node".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:ObjectProperty".freeze,
+      "owl:inverseOf" => %(graphpattern:incomingRelation).freeze      
+
 
     # properties - attribute constraint
     property :attributeOperator,
@@ -101,6 +143,5 @@ module Vocabularies
       range: "xsd:Literal".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:DatatypeProperty".freeze
-
   end
 end

@@ -65,7 +65,7 @@ class Pattern < ActiveRecord::Base
   end
 
   def matched_concepts(ont)
-    ontology_matcher(ont).matched_concepts
+    [] #ontology_matcher(ont).matched_concepts
   end
   
   def ontology_matcher(ont)
@@ -88,6 +88,25 @@ class Pattern < ActiveRecord::Base
 
   def custom_prefixes()
     return {ontology.short_prefix => ont.url}
+  end
+  
+  # RDF deserialization
+  def self.from_graph(graph, pattern_node)
+    pattern = Pattern.new()
+    
+    graph.build_query do |q|
+      q.pattern([:element, Vocabularies::GraphPattern.belongsTo, pattern_node])
+      q.pattern([:element, RDF.type, :type])
+      q.pattern([:type, RDF::RDFS.subClassOf, Vocabularies::GraphPattern.PatternElement])
+    end.run do |res|
+      pattern_element = Kernel.const_get(res[:type].to_s.split("/").last).new
+      pattern_element.rdf_node = res[:element]
+      pattern_element.pattern = pattern
+      pattern.pattern_elements << pattern_element
+    end
+    
+    pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}    
+    return pattern
   end
 
   def url

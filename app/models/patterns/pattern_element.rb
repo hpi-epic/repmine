@@ -24,6 +24,9 @@
 class PatternElement < ActiveRecord::Base
   # explicitly allows setting the rdf type of a node
   attr_accessible :rdf_type
+  
+  # allows to access the rdf node, in case this pattern stems from an rdf graph
+  attr_accessor :rdf_node
 
   belongs_to :pattern
   has_one :type_expression, :dependent => :destroy
@@ -82,7 +85,13 @@ class PatternElement < ActiveRecord::Base
   def used_concepts
     return type_expression.used_concepts
   end
+  
+  def equal_to?(other)
+    raise "operation not permitted on elements of the same pattern" if self.pattern == other.pattern
+    return self.class == other.class && self.rdf_type == other.rdf_type
+  end
 
+  # Query stuff
   def contains_variable?(str)
     return !str.match(/\?([A-Za-z0-9\-_]+)/).nil?
   end
@@ -91,12 +100,50 @@ class PatternElement < ActiveRecord::Base
     "#{self.class.name.underscore}_#{self.id}"
   end
   
+  # RDF Serialization
+  def rdf_statements
+    return [
+      [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource],
+      [resource, Vocabularies::GraphPattern.elementType, type_expression.resource]
+    ]
+  end
+  
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement]
   end
   
-  def equal_to?(other)
-    raise "operation not permitted on elements of the same pattern" if self.pattern == other.pattern
-    return self.class == other.class && self.rdf_type == other.rdf_type
+  def rdf_mappings
+    {}
   end
+  
+  def rebuild!(graph)
+    rebuild_element_type!(graph, self.rdf_node)
+    rebuild_element_properties!(graph, self.rdf_node)
+  end
+  
+  # TODO: also become able to rebuild complex expressions (universal, someOf, and schmutz like that)  
+  # P.S.: that is also why this is currently a separate method...
+  def rebuild_element_type!(graph, node)
+    RDF::Query.execute(graph) do
+      pattern [node, Vocabularies::GraphPattern.elementType, :element_type]
+    end.each do |res|
+      self.rdf_type = res[:element_type].to_s
+    end
+  end
+  
+  def rebuild_element_properties!(graph, node)
+    rdf_mappings.each_pair do |property, mapping|
+      RDF::Query.execute(graph) do
+        pattern([node, property, :prop])
+      end.each do |res|
+        if mapping[:collection]
+          connected_element = pattern.pattern_elements.find{|el| el.rdf_node == res[:prop]}
+          self.send(mapping[:property]).send(:<< , connected_element) unless connected_element.nil?
+        else
+          value = mapping[:literal] ? res[:prop].object : pattern.pattern_elements.find{|pe| pe.rdf_node == res[:prop]}
+          self.send("#{mapping[:property]}=".to_sym, value) unless value.nil?
+        end
+      end
+    end
+  end  
 end

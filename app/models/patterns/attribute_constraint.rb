@@ -35,11 +35,11 @@ class AttributeConstraint < PatternElement
     :greater_than => ">",
     :not => "!"
   }
-
-  def rdf_statements
-    return [
-      [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]
-    ]
+  
+  def rdf_mappings
+    super.merge({
+      Vocabularies::GraphPattern.attributeValue => {:property => :value, :literal => true}
+    })
   end
 
   def assign_to_pattern!

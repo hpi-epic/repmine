@@ -28,10 +28,15 @@ class RelationConstraint < PatternElement
 
   before_save :assign_to_pattern!
 
-  def rdf_statements
-    return [
-      [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]
-    ]
+  def rdf_mappings
+    super.merge({
+      Vocabularies::GraphPattern.sourceNode => {:property => :source},
+      Vocabularies::GraphPattern.targetNode => {:property => :target},
+      Vocabularies::GraphPattern.min_cardinality => {:property => :max_cardinality, :literal => true},
+      Vocabularies::GraphPattern.max_cardinality => {:property => :min_cardinality, :literal => true},
+      Vocabularies::GraphPattern.min_path_length => {:property => :min_path_length, :literal => true},
+      Vocabularies::GraphPattern.max_path_length => {:property => :max_path_length, :literal => true}
+    })
   end
 
   def assign_to_pattern!

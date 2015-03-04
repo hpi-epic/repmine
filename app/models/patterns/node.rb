@@ -30,6 +30,14 @@ class Node < PatternElement
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy
   has_many :attribute_constraints, :dependent => :destroy
 
+  def rdf_mappings
+    super.merge({
+      Vocabularies::GraphPattern.attributeConstraint => {:property => :attribute_constraints, :collection => true},
+      Vocabularies::GraphPattern.outgoingRelation => {:property => :source_relation_constraints, :collection => true},
+      Vocabularies::GraphPattern.incomingRelation => {:property => :target_relation_constraints, :collection => true}
+    })
+  end
+
   def query_variable()
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
@@ -39,11 +47,8 @@ class Node < PatternElement
   end
 
   def rdf_statements
-    stmts = [
-      [resource, Vocabularies::GraphPattern.elementType, type_expression.resource],
-      [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource]
-    ]
-
+    stmts = super
+    
     attribute_constraints.each do |ac|
       stmts << [resource, Vocabularies::GraphPattern.attributeConstraint, ac.resource]
       stmts.concat(ac.rdf)

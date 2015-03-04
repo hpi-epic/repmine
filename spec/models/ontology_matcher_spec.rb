@@ -145,6 +145,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should properly add a complex correspondence" do
     correspondence = FactoryGirl.build(:complex_correspondence)
     assert_empty @om.alignment_graph
+    assert_empty @om.correspondences_for_concept(correspondence.entity1)
     @om.add_correspondence!(correspondence)
     assert_not_empty @om.alignment_graph
     corrs = @om.correspondences_for_concept(correspondence.entity1)    
@@ -153,13 +154,15 @@ RSpec.describe OntologyMatcher, :type => :model do
   
   it "should be able to build complex correspondences" do
     correspondence = FactoryGirl.build(:complex_correspondence)
+    @om.insert_statements!
     @om.add_correspondence!(correspondence)
     corr = @om.correspondences_for_concept(correspondence.entity1).first
     assert_not_nil corr
     assert corr.is_a?(ComplexCorrespondence)
     assert corr.entity2.is_a?(Pattern)
     assert_equal correspondence.entity2.pattern_elements.size, corr.entity2.pattern_elements.size
-    correspondence.entity2.pattern_elements.each do |pe| 
+    
+    correspondence.entity2.pattern_elements.each do |pe|
       assert corr.entity2.pattern_elements.any?{|pee| pee.equal_to?(pe)}, "no match found for #{pe.class.name} #{pe.rdf_type}"
     end
   end

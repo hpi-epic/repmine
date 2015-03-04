@@ -64,4 +64,67 @@ RSpec.describe PatternElement, :type => :model do
     pe2 = FactoryGirl.create(:pattern_element, :pattern => pattern)    
     expect{pe1.equal_to?(pe2)}.to raise_error
   end
+  
+  it "should rebuild a pattern element's element type from a graph" do
+    g = RDF::Graph.new
+    n = RDF::Node.new
+    g << [n, Vocabularies::GraphPattern.elementType, "http://example.org/node"]
+    g << [RDF::Node.new, Vocabularies::GraphPattern.elementType, "http://example.org/not_a_node"]
+    node = Node.new()
+    node.rdf_node = n
+    node.rebuild!(g)
+    assert_equal "http://example.org/node", node.rdf_type
+  end
+  
+  it "should rebuild a pattern elements's literal values from a graph" do
+    g = RDF::Graph.new
+    n = RDF::Node.new
+    g << [n, Vocabularies::GraphPattern.attributeValue, RDF::Literal.new(5)]
+    rel_const = AttributeConstraint.new()
+    rel_const.rdf_node = n
+    rel_const.rebuild!(g)
+    assert_equal 5, rel_const.value
+  end
+  
+  it "should rebuild a pattern element's connection to element collections" do
+    n1 = RDF::Node.new
+    n2 = RDF::Node.new
+    n3 = RDF::Node.new
+    p = Pattern.new
+    g = RDF::Graph.new
+    g << [n1, Vocabularies::GraphPattern.attributeConstraint, n2]
+    g << [n1, Vocabularies::GraphPattern.attributeConstraint, n3]
+    ac = AttributeConstraint.new()
+    ac.rdf_node = n2
+    ac.pattern = p
+    ac2 = AttributeConstraint.new()
+    ac2.rdf_node = n3
+    ac2.pattern = p  
+    node = Node.new
+    node.rdf_node = n1
+    node.pattern = p
+    p.pattern_elements = [node, ac, ac2]
+    
+    node.rebuild!(g)
+    assert_equal 2, node.attribute_constraints.size
+    assert_include node.attribute_constraints, ac
+    assert_include node.attribute_constraints, ac2    
+  end
+  
+  it "should also rebuild single connections" do 
+    g = RDF::Graph.new
+    n1 = RDF::Node.new
+    n2 = RDF::Node.new
+    p = Pattern.new
+    g << [n2, Vocabularies::GraphPattern.sourceNode, n1]
+    node = Node.new
+    node.rdf_node = n1
+    node.pattern = p
+    rc = RelationConstraint.new
+    rc.rdf_node = n2
+    rc.pattern = p
+    p.pattern_elements = [node, rc]    
+    rc.rebuild!(g)
+    assert_equal node, rc.source
+  end
 end
