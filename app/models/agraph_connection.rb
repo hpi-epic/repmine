@@ -38,68 +38,7 @@ class AgraphConnection
   def clear!
     repository().clear
   end
-
-  # gets all classes, object properties, and datatype properties
-  def all_concepts()
-    keys = [RDF::OWL.Class.to_s, RDF::OWL.ObjectProperty.to_s, RDF::OWL.DatatypeProperty.to_s]
-    stats = Hash[ *keys.collect { |v| [ v, Set.new ] }.flatten ]
-    stats[:all] = Set.new
-    
-    keys.each do |concept|
-      repository.build_query(:infer => true) do |q|
-        q.pattern([:concept, RDF.type, RDF::Resource.new(concept)])
-      end.run do |res|
-        unless res.concept.anonymous?
-          stats[concept.to_s] << res.concept.to_s
-          stats[:all] << res.concept.to_s
-        end
-      end
-    end
-    return stats
-  end
   
-  def inverse_concepts(concept)
-    inverse_concepts = Set.new
-    repository.build_query(:infer => true) do |q|
-      q.pattern([:concept, RDF::OWL.inverseOf, RDF::Resource.new(concept)])
-    end.run do |res|
-      inverse_concepts << res.concept.to_s unless res.concept.anonymous?
-    end
-    return inverse_concepts
-  end
-  
-  def equivalent_classes(concept)
-    equiv = Set.new
-    repository.build_query(:infer => true) do |q|
-      q.pattern([:concept, RDF::OWL.equivalentClass, RDF::Resource.new(concept)])
-    end.run do |res|
-      equiv.concat(res.concept.anonymous? ? decipher_union(union_node) : [res.concept.to_s])
-    end
-    return equiv
-  end
-  
-  def equivalent_properties(concept)
-    equiv = Set.new
-    repository.build_query(:infer => true) do |q|
-      q.pattern([:concept, RDF::OWL.equivalentProperty, RDF::Resource.new(concept)])
-    end.run do |res|
-      equiv.concat(res.concept.anonymous? ? decipher_union(union_node) : [res.concept.to_s])
-    end
-    return equiv
-  end  
-  
-  def sub_properties_of(concept)
-    sub_props = Set.new
-    repository.build_query(:infer => true) do |q|
-      q.pattern([:child_concept, RDF::RDFS.subPropertyOf, RDF::Resource.new(concept)], :optional => true)
-      q.pattern([RDF::Resource.new(concept), RDF::RDFS.subPropertyOf, :parent_concept], :optional => true)
-    end.run do |res|
-      sub_props << res.child_concept.to_s if res.bound?(:child_concept)
-      sub_props << res.parent_concept.to_s if res.bound?(:parent_concept)      
-    end
-    return sub_props
-  end
-
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
     rels = []
@@ -119,30 +58,6 @@ class AgraphConnection
     relations(nil, range)
   end
   
-  def relation_information(rel)
-    rel_res = RDF::Resource.new(rel)
-    repository.build_query() do |q|
-      q.pattern([rel_res, RDF::RDFS.domain, :domain])
-      q.pattern([:domain, RDF::OWL.unionOf, :listd], :optional => true)      
-      q.pattern([rel_res, RDF::RDFS.range, :range])
-      q.pattern([:range, RDF::OWL.unionOf, :listr], :optional => true)      
-    end.run do |res|
-      ranges = res.bound?(:listr) ? decipher_union(res.listr) : [res.range.to_s]
-      domains = res.bound?(:listd) ? decipher_union(res.listd) : [res.domain.to_s]
-      return [domains, ranges]
-    end
-    return [[], []]
-  end
-  
-  def domain_for_attribute(attrib)
-    a_res = RDF::Resource.new(attrib)
-    repository.build_query() do |q|
-      q.pattern([a_res, RDF::RDFS.domain, :domain])
-    end.run do |res|
-      return res.domain.to_s
-    end
-  end
-
   def relations(domain, range)
     rels = []
     repository.build_query(:infer => true) do |q|
@@ -178,19 +93,6 @@ class AgraphConnection
     end
 
     return attribs
-  end
-  
-  def attributes_of(domain)
-    attribs = Set.new()
-
-    repository.build_query(:infer => true) do |qq|
-      qq.pattern([:attrib, RDF.type, RDF::OWL.DatatypeProperty])
-      qq.pattern([:attrib, RDF::RDFS.domain, RDF::Resource.new(domain)])
-    end.run do |res|
-      attribs << res.attrib.to_s
-    end
-
-    return attribs.to_a
   end
 
   def get_all_superclasses(rdf_class)
@@ -258,13 +160,5 @@ class AgraphConnection
       un = stmts.find{|stmt| stmt.predicate == RDF.rest}.object
     end
     return classes
-  end
-  
-  def real_ontology_url()
-    repository.build_query() do |q|
-      q.pattern([:ont, RDF.type, RDF::OWL.Ontology])
-    end.run do |res|
-      return res.ont.to_s
-    end
   end
 end
