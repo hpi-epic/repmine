@@ -152,6 +152,14 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_not_empty corrs
   end
   
+  it "should find a complex correspondence based on provided elements" do
+    correspondence = FactoryGirl.build(:hardway_complex)
+    @om.add_correspondence!(correspondence)
+    pattern = FactoryGirl.create(:pattern)
+    corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements)
+    assert_not_empty corrs
+  end
+  
   it "should be able to build complex correspondences" do
     correspondence = FactoryGirl.build(:complex_correspondence)
     @om.insert_statements!

@@ -63,7 +63,7 @@ class OntologyMatcher
   # if called with nil as a concept, all correspondences will be returned
   def correspondences_for_concept(concept)
     correspondences = []
-    alignment_graph.query(correspondence_query(concept)) do |result|
+    alignment_graph.query(simple_correspondence_query(concept)) do |result|
       correspondences << create_correspondence(result, concept)
     end
     return correspondences
@@ -71,52 +71,110 @@ class OntologyMatcher
   
   # return correspondences for a given pattern
   def correspondences_for_pattern(pattern)
+    correspondences = []
+    retries = []
+    # first try the elements one by one
+    pattern.pattern_elements.each do |pe|
+      element_correspondences = correspondences_for_concept(pe.rdf_type)
+      retries << pe if element_correspondences.empty?
+      correspondences.concat(element_correspondences)
+    end
     
+    # let's construct all possbile combinations of the remaining, unmapped elements
+    (2..retries.size).flat_map{|size| retries.combination(size).to_a}.each do |elements|
+      element_correspondences = correspondences_for_pattern_elements(elements)
+      correspondences.concat(element_correspondences)
+      retries = retries - elements
+      break if retries.empty?
+    end
+
+    return correspondences
   end
   
-  def all_correspondences()
-    correspondences_for_concept(nil)
+  # gets a bunch of pattern elements (=< the entire pattern) and returns correspondences for that
+  # 1. create a query that looks for patterns as entity1, which contain all the given elements
+  # 2. execute that query
+  # 3. return the correspondence  
+  def correspondences_for_pattern_elements(elements)
+    correspondences = []
+    alignment_graph.query(complex_correspondence_query(elements)) do |result|
+      puts "-- got result: #{result}"
+      correspondences << create_correspondence(result, elements)
+    end
+    return correspondences
   end
   
-  def correspondence_query(concept)
-    concept_resource = concept.nil? ? :source : RDF::Resource.new(concept)
+  def simple_correspondence_query(concept)
+    e1, e2 = entities_in_order()
     patterns = [
-      [:cell, Vocabularies::Alignment.entity1, inverted ? :target : concept_resource],
-      [:cell, Vocabularies::Alignment.entity2, inverted ? concept_resource : :target],
+      [:cell, e1, RDF::Resource.new(concept)],
+      [:cell, e2, :target],
       [:cell, Vocabularies::Alignment.relation, :relation],
       [:cell, Vocabularies::Alignment.measure, :measure]
     ]
     return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
   end
   
-  def create_correspondence(result, concept)
+  def complex_correspondence_query(pattern_elements)
+    e1,e2 = entities_in_order
+    
+    patterns = [
+      [:cell, e1, :pattern],
+      [:cell, e2, :target],
+      [:cell, Vocabularies::Alignment.relation, :relation],
+      [:cell, Vocabularies::Alignment.measure, :measure]
+    ]
+    pattern_elements.each_with_index do |pe, i|
+      qv = "pe#{i}".to_sym
+      patterns << [qv, Vocabularies::GraphPattern.belongsTo, :pattern]
+      patterns << [qv, Vocabularies::GraphPattern.elementType, pe.type_expression.resource]
+    end
+    #puts patterns
+    #print_alignment_graph!
+    return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
+  end
+  
+  def entities_in_order
+    e1 = inverted ? Vocabularies::Alignment.entity2 : Vocabularies::Alignment.entity1
+    e2 = inverted ? Vocabularies::Alignment.entity1 : Vocabularies::Alignment.entity2
+    return [e1,e2]    
+  end
+  
+  def create_correspondence(result, entity1)
     if result[:target].anonymous?
-      create_complex_correspondence(result, concept)
+      create_complex_correspondence(result, entity1)
     else
-      create_simple_correspondence(result, concept)
+      create_simple_correspondence(result, entity1)
     end
   end
   
-  def create_complex_correspondence(result, concept)
+  def create_complex_correspondence(result, entity1)
     return ComplexCorrespondence.new(
       result[:measure].to_f,
       result[:relation].to_s,
-      concept,
+      entity1,
       Pattern.from_graph(alignment_graph, result[:target]),
       source_ontology,
       target_ontology
     )
   end
   
-  def create_simple_correspondence(result, concept)
+  def create_simple_correspondence(result, entity1)
     return SimpleCorrespondence.new(
       result[:measure].to_f,
       result[:relation].to_s,
-      concept,
+      entity1,
       result[:target].to_s,
       source_ontology,
       target_ontology
     )
+  end
+  
+  def print_alignment_graph!
+    puts "+++ current alignment graph +++"
+    alignment_graph.each_statement do |stmt|
+      puts "s: #{stmt[0]}, p: #{stmt[1]}, o: #{stmt[2]}"
+    end
   end
   
   def alignment_graph
