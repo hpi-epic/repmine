@@ -82,7 +82,12 @@ class OntologyMatcher
     
     # let's construct all possbile combinations of the remaining, unmapped elements
     (2..retries.size).flat_map{|size| retries.combination(size).to_a}.each do |elements|
-      element_correspondences = correspondences_for_pattern_elements(elements)
+      element_correspondences = if elements.size == 1
+        correspondences_for_concept(elements.first.rdf_type)
+      else
+        correspondences_for_pattern_elements(elements)
+      end
+      
       correspondences.concat(element_correspondences)
       retries = retries - elements
       break if retries.empty?
@@ -98,8 +103,10 @@ class OntologyMatcher
   def correspondences_for_pattern_elements(elements)
     correspondences = []
     alignment_graph.query(complex_correspondence_query(elements)) do |result|
-      puts "-- got result: #{result}"
-      correspondences << create_correspondence(result, elements)
+      matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern])
+      if matching_pattern.pattern_elements.all?{|pe| elements.any?{|el| el.equal_to?(pe)}}
+        correspondences << create_correspondence(result, elements)
+      end
     end
     return correspondences
   end
@@ -124,13 +131,13 @@ class OntologyMatcher
       [:cell, Vocabularies::Alignment.relation, :relation],
       [:cell, Vocabularies::Alignment.measure, :measure]
     ]
+    
     pattern_elements.each_with_index do |pe, i|
       qv = "pe#{i}".to_sym
       patterns << [qv, Vocabularies::GraphPattern.belongsTo, :pattern]
       patterns << [qv, Vocabularies::GraphPattern.elementType, pe.type_expression.resource]
     end
-    #puts patterns
-    #print_alignment_graph!
+    
     return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
   end
   
@@ -141,7 +148,7 @@ class OntologyMatcher
   end
   
   def create_correspondence(result, entity1)
-    if result[:target].anonymous?
+    if result[:target].anonymous? || entity1.is_a?(Pattern)
       create_complex_correspondence(result, entity1)
     else
       create_simple_correspondence(result, entity1)

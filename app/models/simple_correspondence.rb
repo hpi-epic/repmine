@@ -27,4 +27,10 @@ class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2,
       RDF::Query::Pattern.new(*qp.map!{|x| x == resource ? :cell : x })
     }
   end
+  
+  def pattern_elements
+    pe = onto2.element_class_for_rdf_type(entity2).new
+    pe.rdf_type = entity2
+    return [pe]
+  end
 end

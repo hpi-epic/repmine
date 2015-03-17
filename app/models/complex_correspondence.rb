@@ -28,4 +28,8 @@ class ComplexCorrespondence < SimpleCorrespondence
     return [entity_cache[resource], anonymized_stmts]
   end
   
+  def pattern_elements
+    return entity2.pattern_elements
+  end
+  
 end

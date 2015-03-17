@@ -153,11 +153,29 @@ RSpec.describe OntologyMatcher, :type => :model do
   end
   
   it "should find a complex correspondence based on provided elements" do
-    correspondence = FactoryGirl.build(:hardway_complex)
-    @om.add_correspondence!(correspondence)
+    correspondence = FactoryGirl.build(:hardway_complex)    
     pattern = FactoryGirl.create(:pattern)
+    assert_empty @om.correspondences_for_pattern_elements(pattern.pattern_elements)
+    @om.add_correspondence!(correspondence)
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements)
-    assert_not_empty corrs
+  end
+  
+  it "should not return correspondences where the input graph only matches a real subgraph of entity1" do
+    correspondence = FactoryGirl.build(:hardway_complex)
+    @om.insert_statements!    
+    pattern = FactoryGirl.create(:pattern)
+    assert_empty @om.correspondences_for_pattern_elements(pattern.pattern_elements)
+    @om.add_correspondence!(correspondence)
+    corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements[0..-2])
+    assert_empty corrs
+  end
+  
+  it "should return simple correspondences only when both elements are concepts, not patterns" do
+    Pattern.stub(:from_graph => nil)
+    assert @om.create_correspondence({:target => RDF::Resource.new("entity2")}, "entity1").is_a?(SimpleCorrespondence)
+    assert @om.create_correspondence({:target => RDF::Resource.new("entity2")}, Pattern.new).is_a?(ComplexCorrespondence)
+    assert @om.create_correspondence({:target => RDF::Node.new}, Pattern.new).is_a?(ComplexCorrespondence)
+    assert @om.create_correspondence({:target => RDF::Node.new}, "entity1").is_a?(ComplexCorrespondence)
   end
   
   it "should be able to build complex correspondences" do
