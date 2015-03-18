@@ -20,7 +20,7 @@ class Repository < ActiveRecord::Base
   belongs_to :ontology
   validates :name, :presence => true
 
-  TYPES = ["MongoDbRepository", "RdfRepository", "RdbmsRepository"]
+  TYPES = ["RdfRepository", "RdbmsRepository", "Neo4jRepository"]
 
   # custom error class for ontology extraction
   class OntologyExtractionError < StandardError

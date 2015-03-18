@@ -47,7 +47,6 @@ end
 
 # repository specific stuff
 gem 'neography'
-gem 'mongo'
 
 # visualization
 gem "googlecharts"
