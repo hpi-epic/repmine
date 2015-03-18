@@ -24,7 +24,7 @@ RSpec.describe ExtractedOntology, :type => :model do
   end
 
   it "should create valid rdf/xml..." do
-    ont = MongoDbRepository.create({:db_name => "sample_db", :name => "sample_db"}).ontology
+    ont = FactoryGirl.create(:extracted_ontology)
     owc = OwlClass.new(ont, "MyClass")
     owc.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_navigation_path, RDF::Literal.new("hello world"))
     owc.add_custom_property(Vocabularies::SchemaExtraction.mongo_db_collection_name, RDF::Literal.new("hello world"))
