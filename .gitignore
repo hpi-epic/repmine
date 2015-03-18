@@ -10,6 +10,9 @@
 # rubymine
 /.idea
 
+# ignore local neo4j dbs
+/neo4j
+
 # my idealog
 /misc/*.*
 
