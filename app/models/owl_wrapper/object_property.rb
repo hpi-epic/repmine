@@ -1,4 +1,4 @@
-class Relation
+class ObjectProperty
   attr_accessor :domain, :range, :name, :relation_url
 
   include RdfSerialization

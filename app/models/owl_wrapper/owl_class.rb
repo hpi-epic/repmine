@@ -4,8 +4,13 @@ class OwlClass
   SET_OPS = {:sub => "&sub;", :sup => "&sup;", :not => "&not;"}
 
   include RdfSerialization
-
-  def initialize(ontology, name, url = nil)
+  
+  # will return the same instance for the given parameters
+  def self.find_or_create(ontology, name, url)
+    (@instances ||= Hash.new)[[ontology, name, url]] ||= self.new(ontology, name, url)
+  end
+  
+  def initialize(ontology, name, url)
     @subclasses = Set.new
     @superclasses = Set.new    
     @ontology = ontology
@@ -51,14 +56,14 @@ class OwlClass
     owl_class.superclasses << self
   end
 
-  def add_attribute(name, range)
-    a = Attribute.new(name, range, self)
+  def add_attribute(name, sample_value)
+    a = DatatypeProperty.from_sample(name, ontology, sample_value)
     attributes << a
     return a
   end
 
   def add_relation(name, target_class)
-    r = Relation.new(name, target_class, self)
+    r = ObjectProperty.new(name, target_class, self)
     relations << r
     return r
   end

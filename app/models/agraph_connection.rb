@@ -66,7 +66,7 @@ class AgraphConnection
       q.pattern([:rel, RDF::RDFS.range, range.nil? ? :range : RDF::Resource.new(range)])
       q.pattern([:range, RDF::OWL.unionOf, :list], :optional => true)
     end.run do |res|
-      rel = Relation.from_url(
+      rel = ObjectProperty.from_url(
         res.rel.to_s, 
         domain.nil? ? res.domain : domain, 
         range.nil? ? (res.bound?(:list) ? decipher_union(res.list) : [res.range]) : [range]
@@ -87,7 +87,7 @@ class AgraphConnection
         qq.pattern([:attrib, RDF::RDFS.domain, RDF::Resource.new(clazz)])
         qq.pattern([:attrib, RDF::RDFS.range, :range], :optional => true)
       end.run do |res|
-        attrib = Attribute.from_url(res.attrib.to_s, res.bound?(:range) ? res.range : nil, domain)
+        attrib = DatatypeProperty.from_url(res.attrib.to_s, res.bound?(:range) ? res.range : nil, domain)
         attribs << attrib unless attribs.include?(attrib)
       end
     end

@@ -1,4 +1,4 @@
-class Attribute
+class DatatypeProperty
   # domain is an owl_class object, range an RDF::Resource
   attr_accessor :name, :range, :domain, :attribute_url
 
@@ -9,12 +9,16 @@ class Attribute
     @range = range.is_a?(RDF::Resource) ? range : RDF::Resource.new(range)
     @domain = domain
   end
-
+  
+  def self.from_sample(name, domain, sample)
+    return self.new(name, RDF::Literal.new(sample).datatype, domain)
+  end
+  
   def self.from_url(url, range, domain)
-    name = url.gsub(domain.url.to_s + "/", "").split("#").last
-    attrib = self.new(name, range, domain)
-    attrib.attribute_url = url
-    return attrib
+    name = url.split("/").last.split("#").last
+    prop = self.new(name, range, domain)
+    prop.attribute_url = url
+    return prop
   end
 
   def url
