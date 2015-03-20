@@ -17,13 +17,9 @@ class Neo4jRepository < Repository
   # 2. get all relations between different node types
   # 3. raise errors if we cannot reliably determine a "schema"  
   def create_ontology!
-    labels = Hash[ *type_statistics.collect { |v| [ v[0], v[1] ] }.flatten ]
-
     properties = {}
-    labels.each_pair do |label, count|
-      properties[label] = get_properties(label, count)
-    end
-    build_owl(labels, properties, get_relationships())
+    labels_and_counts.each_pair{|label, count| properties[label] = get_properties(label, count)}
+    populate_ontology!(properties, get_relationships())
     return true
   end
     
@@ -49,12 +45,37 @@ class Neo4jRepository < Repository
   end
   
   # Constructs an OWL ontology...
-  def build_owl(labels, properties, relationships)
+  def populate_ontology!(properties, relationships)
+    properties.each_pair do |label, property_hash|
+      owl_class = OwlClass.find_or_create(ontology, label, nil)
+      property_hash.each_pair do |property_key, property_sample_value|
+        owl_class.add_attribute(property_key, property_sample_value)
+      end
+    end
     
+    # comes in arrays: 0: source, 1: name, 2: target, 3: count
+    relationships.each do |relationship|
+      domain = OwlClass.find_or_create(ontology, relationship[0], nil)
+      range = OwlClass.find_or_create(ontology, relationship[2], nil)
+      domain.add_relation(relationship[1], range)
+    end
+  end
+  
+  def labels_and_counts
+    stats = Hash.new(0)
+    res = query_result("START n=node(*) RETURN distinct labels(n), count(*)")
+    res.each do |labels, count|
+      if labels.is_a?(Array)
+        labels.each{|label| stats[label] += count}
+      else
+        stats[labels] += count
+      end
+    end
+    return stats    
   end
 
   def type_statistics
-    return query_result("START n=node(*) RETURN distinct labels(n), count(*)")
+    return labels_and_counts.to_a
   end
   
   def query_result(query)

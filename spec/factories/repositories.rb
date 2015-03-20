@@ -24,6 +24,10 @@ FactoryGirl.define do
       type "RdfRepository"
     end
 
+    factory :neo4j_repository, class: Neo4jRepository, parent: :repository do |u|
+      type "Neo4jRepository"
+    end
+
   end
 
 
