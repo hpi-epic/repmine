@@ -20,6 +20,8 @@ RSpec.describe Neo4jRepository, :type => :model do
     assert_not_nil am2
     assert_equal 3, am.attributes.size
     assert_equal 4, am2.attributes.size
+    assert am.attributes.all?{|attrib| attrib.domain == am}
+    assert am2.attributes.all?{|attrib| attrib.domain == am2}    
   end
   
 end
