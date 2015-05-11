@@ -166,14 +166,14 @@ RSpec.describe OntologyMatcher, :type => :model do
   
   it "should not return correspondences where the input graph only matches a real subgraph of entity1" do
     correspondence = FactoryGirl.build(:hardway_complex)
-    @om.insert_statements!    
+    @om.insert_statements!
     pattern = FactoryGirl.create(:pattern)
     assert_empty @om.correspondences_for_pattern_elements(pattern.pattern_elements)
     @om.add_correspondence!(correspondence)
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements[0..-2])
     assert_empty corrs
   end
-  
+    
   it "should return simple correspondences only when both elements are concepts, not patterns" do
     Pattern.stub(:from_graph => nil)
     assert @om.create_correspondence({:target => RDF::Resource.new("entity2")}, "entity1").is_a?(SimpleCorrespondence)

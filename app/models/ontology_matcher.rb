@@ -69,33 +69,6 @@ class OntologyMatcher
     return correspondences
   end
   
-  # return correspondences for a given pattern
-  def correspondences_for_pattern(pattern)
-    correspondences = []
-    retries = []
-    # first try the elements one by one
-    pattern.pattern_elements.each do |pe|
-      element_correspondences = correspondences_for_concept(pe.rdf_type)
-      retries << pe if element_correspondences.empty?
-      correspondences.concat(element_correspondences)
-    end
-    
-    # let's construct all possbile combinations of the remaining, unmapped elements
-    (2..retries.size).flat_map{|size| retries.combination(size).to_a}.each do |elements|
-      element_correspondences = if elements.size == 1
-        correspondences_for_concept(elements.first.rdf_type)
-      else
-        correspondences_for_pattern_elements(elements)
-      end
-      
-      correspondences.concat(element_correspondences)
-      retries = retries - elements
-      break if retries.empty?
-    end
-
-    return correspondences
-  end
-  
   # gets a bunch of pattern elements (=< the entire pattern) and returns correspondences for that
   # 1. create a query that looks for patterns as entity1, which contain all the given elements
   # 2. execute that query
@@ -162,7 +135,7 @@ class OntologyMatcher
       result[:measure].to_f,
       result[:relation].to_s,
       entity1,
-      Pattern.from_graph(alignment_graph, result[:target]),
+      result[:target].anonymous? ? Pattern.from_graph(alignment_graph, result[:target]) : result[:target].to_s,
       source_ontology,
       target_ontology
     )

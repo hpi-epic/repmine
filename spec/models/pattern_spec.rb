@@ -68,7 +68,7 @@ RSpec.describe Pattern, :type => :model do
     @pattern = FactoryGirl.create(:pattern)
     # should be http://example.org/node|relation|attribute
     assert_equal 3, @pattern.concept_count
-    OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [], :correspondences_for_pattern => [])
+    OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [])
     assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
     # now only return this one correspondence, which should eliminate http://example.org/node from the unmatched list
     correspondence = FactoryGirl.build(:simple_correspondence)

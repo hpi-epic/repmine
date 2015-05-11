@@ -4,8 +4,8 @@ FactoryGirl.define do
     entity2 {FactoryGirl.create(:pattern)}
     measure "1.0"
     relation "="
-    onto1 {FactoryGirl.create(:ontology, :url => "http://example.org/ontology5")}
-    onto2 {FactoryGirl.create(:ontology, :url => "http://example.org/ontology6")}
+    onto1 {FactoryGirl.create(:ontology)}
+    onto2 {FactoryGirl.create(:ontology)}
   end
   
   factory :hardway_complex, :class => "ComplexCorrespondence" do
@@ -13,7 +13,7 @@ FactoryGirl.define do
     entity1 {FactoryGirl.create(:pattern)}
     measure "1.0"
     relation "="
-    onto1 {FactoryGirl.create(:ontology, :url => "http://example.org/ontology5")}
-    onto2 {FactoryGirl.create(:ontology, :url => "http://example.org/ontology6")}
+    onto1 {FactoryGirl.create(:ontology)}
+    onto2 {FactoryGirl.create(:ontology)}
   end  
 end
