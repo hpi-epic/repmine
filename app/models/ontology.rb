@@ -124,4 +124,8 @@ class Ontology < ActiveRecord::Base
   def rdf_xml
     RestClient.get(self.url).body
   end
+  
+  def download_url
+    return url
+  end
 end

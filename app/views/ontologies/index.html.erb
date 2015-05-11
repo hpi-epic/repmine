@@ -10,7 +10,7 @@
   <tbody>
 <% @ontologies.each do |ontology| %>
   <tr>
-    <td><%= ontology.does_exist ? link_to(ontology.short_name, ontology.get_url) : ontology.short_name %></td>
+    <td><%= ontology.does_exist ? link_to(ontology.short_name, ontology.download_url) : ontology.short_name %></td>
     <td><%= ontology.description%></td>
     <td>
       <%= link_to 'Delete', ontology, method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger" %>

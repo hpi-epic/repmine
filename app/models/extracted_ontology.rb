@@ -54,5 +54,9 @@ class ExtractedOntology < Ontology
   def file_format
     return repository.nil? ? "owl" : repository.class.rdf_format
   end
+  
+  def download_url
+    return ["ontologies", "extracted", short_name + ".#{file_format}"].join("/")
+  end
 
 end
