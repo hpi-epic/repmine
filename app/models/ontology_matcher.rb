@@ -148,7 +148,9 @@ class OntologyMatcher
   end
   
   def create_correspondence(result, entity1)
-    if result[:target].anonymous? || entity1.is_a?(Pattern)
+    # anonymous target -> input maps to pattern
+    # array as entity1 -> input was a list of pattern elements
+    if result[:target].anonymous? || entity1.is_a?(Array)
       create_complex_correspondence(result, entity1)
     else
       create_simple_correspondence(result, entity1)
