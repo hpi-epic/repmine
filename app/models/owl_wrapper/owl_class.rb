@@ -57,7 +57,7 @@ class OwlClass
   end
 
   def add_attribute(name, sample_value)
-    a = DatatypeProperty.from_sample(name, ontology, sample_value)
+    a = DatatypeProperty.from_sample(name, self, sample_value)
     attributes << a
     return a
   end
