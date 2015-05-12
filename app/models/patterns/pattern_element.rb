@@ -29,6 +29,12 @@ class PatternElement < ActiveRecord::Base
   attr_accessor :rdf_node
 
   belongs_to :pattern
+  
+  has_many :matches, :foreign_key => :matched_element_id, :class_name => "PatternElementMatch", :dependent => :destroy
+  has_many :matchings, :foreign_key => :matching_element_id, :class_name => "PatternElementMatch", :dependent => :destroy
+  has_many :matched_elements, :through => :matches, :dependent => :destroy
+  has_many :matching_elements, :through => :matchings, :dependent => :destroy
+  
   has_one :type_expression, :dependent => :destroy
 
   after_create :build_type_expression!

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141022161434) do
+ActiveRecord::Schema.define(:version => 20150512112041) do
 
   create_table "ontologies", :force => true do |t|
     t.string   "url"
@@ -23,6 +23,16 @@ ActiveRecord::Schema.define(:version => 20141022161434) do
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
   end
+
+  create_table "pattern_element_matches", :force => true do |t|
+    t.integer  "matched_element_id"
+    t.integer  "matching_element_id"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+  end
+
+  add_index "pattern_element_matches", ["matched_element_id"], :name => "index_pattern_element_matches_on_matched_element_id"
+  add_index "pattern_element_matches", ["matching_element_id"], :name => "index_pattern_element_matches_on_matching_element_id"
 
   create_table "pattern_elements", :force => true do |t|
     t.string   "type"
