@@ -23,6 +23,7 @@ class Pattern < ActiveRecord::Base
 
   belongs_to :ontology
   has_many :pattern_elements, :dependent => :destroy
+  has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
 
   # validations
   validates :name, :presence => true
@@ -60,12 +61,16 @@ class Pattern < ActiveRecord::Base
     Set.new(nodes.collect{|n| n.used_concepts}.flatten)
   end
 
-  def unmatched_concepts(ont)
-    used_concepts - matched_concepts(ont)
+  def matched_elements(ont)
+    return pattern_elements.select{|pe| not pe.matching_elements.where(:pattern_id => target_pattern(ont)).empty?}
   end
-
-  def matched_concepts(ont)
-    [] #ontology_matcher(ont).matched_concepts
+  
+  def unmatched_elements(ont)
+    return pattern_elements.select{|pe| pe.matching_elements.where(:pattern_id => target_pattern(ont)).empty?}
+  end
+  
+  def target_pattern(ont)
+    Pattern.where(:ontology_id => ont.id, :pattern_id => self).first
   end
   
   def ontology_matcher(ont)
@@ -88,6 +93,11 @@ class Pattern < ActiveRecord::Base
 
   def custom_prefixes()
     return {ontology.short_prefix => ont.url}
+  end
+  
+  def print!
+    puts "Pattern: #{self.name}"
+    puts "Pattern Elements: #{pattern_elements.collect{|pe| pe.rdf_type}}"
   end
   
   # RDF deserialization

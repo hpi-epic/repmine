@@ -87,12 +87,26 @@
       rdfs:label "ontologies_updated_at" ;
       rdfs:range xsd:dateTime .
 
+:pattern_element_matches_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_element_matches ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches_created_at" ;
+      rdfs:range xsd:dateTime .
+
 :repositories_name
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_name" ;
       rdfs:range xsd:string .
+
+:pattern_element_matches_matching_element_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_element_matches ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches_matching_element_id" ;
+      rdfs:range xsd:integer .
 
 :sessions_data
       a       owl:DatatypeProperty , rdf:Property ;
@@ -361,6 +375,11 @@
       rdfs:label "patterns_description" ;
       rdfs:range xsd:string .
 
+:pattern_element_matches
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches" .
+
 :repositories_host
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
@@ -485,6 +504,27 @@
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
       rdfs:label "repositories" .
+
+:pattern_element_matches_updated_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_element_matches ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches_updated_at" ;
+      rdfs:range xsd:dateTime .
+
+:pattern_element_matches_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_element_matches ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches_id" ;
+      rdfs:range xsd:integer .
+
+:pattern_element_matches_matched_element_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_element_matches ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches_matched_element_id" ;
+      rdfs:range xsd:integer .
 
 :patterns_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
