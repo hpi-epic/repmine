@@ -152,10 +152,16 @@ class OntologyMatcher
     )
   end
   
-  def print_alignment_graph!
+  def print_alignment_graph!(ignore_gp = true)
     puts "+++ current alignment graph +++"
+    contains_gp_stuff = false
     alignment_graph.each_statement do |stmt|
-      puts "s: #{stmt[0]}, p: #{stmt[1]}, o: #{stmt[2]}"
+      if stmt[0].to_s.start_with?(Vocabularies::GraphPattern.to_s)
+        contains_gp_stuff = true
+        puts "s: #{stmt[0]}, p: #{stmt[1]}, o: #{stmt[2]}" unless ignore_gp
+      else
+        puts "s: #{stmt[0]}, p: #{stmt[1]}, o: #{stmt[2]}"
+      end
     end
   end
   
