@@ -7,6 +7,9 @@ gem 'jquery-rails'
 # little helpers
 gem 'simple_enum', '~> 1.6'
 gem "seedbank"
+gem 'progress_job'
+gem 'delayed_job_active_record'
+gem "daemons"
 
 # trees for complex class expressions
 gem 'ancestry'
@@ -72,7 +75,6 @@ gem 'sql-maker'
 # general convenience
 platforms :ruby do
   gem 'thin'
-  gem "therubyracer"  
-  gem 'pg'  
+  gem 'sqlite3'
   gem 'bson_ext'  
 end

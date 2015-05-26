@@ -27,7 +27,7 @@ class PatternElement < ActiveRecord::Base
   
   # allows to access the rdf node, in case this pattern stems from an rdf graph
   attr_accessor :rdf_node
-
+  
   belongs_to :pattern
   
   has_many :matches, :foreign_key => :matched_element_id, :class_name => "PatternElementMatch", :dependent => :destroy

@@ -36,7 +36,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     qs = qc.query_string
     nv = qc.pe_variable(pattern.nodes.first)
     acv = qc.pe_variable(regex_ac)
-    expected = "SELECT ?#{nv} WHERE { ?#{nv} a <http://example.org/node> . ?#{nv} <#{regex_ac.rdf_type}> ?#{acv} . FILTER(regex(?#{acv}, 'hello world')) }"
+    expected = "SELECT ?#{nv} WHERE { ?#{nv} a <http://example.org/node> . ?#{nv} <#{regex_ac.rdf_type}> ?#{acv} . FILTER(regex(?#{acv}, \"hello world\")) }"
     assert_equal expected, qs
   end
 

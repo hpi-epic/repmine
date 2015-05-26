@@ -29,7 +29,7 @@ class AttributeConstraint < PatternElement
 
   OPERATORS = {
     :var => "?",
-    :regex => "~=",
+    :regex => "=~",
     :equals => "=",
     :less_than => "<",
     :greater_than => ">",

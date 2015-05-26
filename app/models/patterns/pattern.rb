@@ -52,15 +52,6 @@ class Pattern < ActiveRecord::Base
     return nodes.collect{|n| n.attribute_constraints.empty? ? n.x : n.x + 280}.max
   end
 
-  # fidelling with concepts
-  def concept_count
-    used_concepts.size
-  end
-
-  def used_concepts
-    Set.new(nodes.collect{|n| n.used_concepts}.flatten)
-  end
-
   def matched_elements(ont)
     return pattern_elements.select{|pe| not pe.matching_elements.where(:pattern_id => target_pattern(ont)).empty?}
   end

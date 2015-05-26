@@ -57,23 +57,11 @@ RSpec.describe Pattern, :type => :model do
   end
 
   it "should properly link all elements to the pattern for simple patterns" do
-     @pattern = FactoryGirl.create(:pattern)
-     assert_not_nil Node.all.find{|n| n.pattern == @pattern}
-     assert_not_nil AttributeConstraint.all.find{|n| n.pattern == @pattern}
-     assert_not_nil RelationConstraint.all.find{|n| n.pattern == @pattern}
-     assert_equal 3, @pattern.pattern_elements.size
-   end
-
-  it "should properly return all unmatched concepts" do
     @pattern = FactoryGirl.create(:pattern)
-    # should be http://example.org/node|relation|attribute
-    assert_equal 3, @pattern.concept_count
-    OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [])
-    assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
-    # now only return this one correspondence, which should eliminate http://example.org/node from the unmatched list
-    correspondence = FactoryGirl.build(:simple_correspondence)
-    OntologyMatcher.any_instance.stub(:match! => true, :correspondences_for_concept => [correspondence])
-    assert_equal 3, @pattern.unmatched_concepts(Ontology.first).size
+    assert_not_nil Node.all.find{|n| n.pattern == @pattern}
+    assert_not_nil AttributeConstraint.all.find{|n| n.pattern == @pattern}
+    assert_not_nil RelationConstraint.all.find{|n| n.pattern == @pattern}
+    assert_equal 3, @pattern.pattern_elements.size
   end
   
   it "should determine equality of very simple patterns" do

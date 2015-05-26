@@ -14,6 +14,32 @@
   }
 </script>
 
+<% unless @job.nil? %>
+  <% content_for :javascript_includes do %>
+    <%= javascript_include_tag "repository_overview.js" %>
+  <% end %>
+  <script type="text/javascript">
+    var job_id = <%= @job.id %>;
+  </script>
+
+  <div class="well">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="progress-status text-primary"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="progress progress-striped active">
+          <div class="bar">
+            <div class="text-primary">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <table style="width:40%">
   <tr>
     <td><h4><%= @repository.name %></h4></td></tr>

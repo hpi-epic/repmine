@@ -59,10 +59,23 @@ class Repository < ActiveRecord::Base
   def name_url_safe
     return name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_') + "_#{self.id}"
   end
+  
+  def ontology_creation_job
+    Delayed::Job.find_by_queue(ont_creation_queue)
+  end
+  
+  def ont_creation_queue
+    "ont_creation_#{self.id}"
+  end
 
   def extract_ontology!
-    ontology.update_attributes({:does_exist => create_ontology!})
-    ontology.load_to_dedicated_repository!
+    if create_ontology!
+      ontology.update_attributes({:does_exist => true})
+      ontology.load_to_dedicated_repository!
+      return true
+    else
+      return false
+    end
   end
 
   def create_ontology!

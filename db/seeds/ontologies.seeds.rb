@@ -25,11 +25,11 @@ Ontology.where(
   #"http://oaei.ontologymatching.org/2014/conference/data/linklings.owl"
 ].each do |ontology_url|
   puts "Creating #{ontology_url}"
-  #Ontology.where(
-  #  url: ontology_url,
-  #  short_name: "Conference##{ontology_url.split("/").last}",
-  #  group: "OAEI Conference"
-  #).first_or_create
+  Ontology.where(
+    url: ontology_url,
+    short_name: "Conference##{ontology_url.split("/").last}",
+    group: "OAEI Conference"
+  ).first_or_create
 end
 
 # Anatomy Ontologies (OAEI)

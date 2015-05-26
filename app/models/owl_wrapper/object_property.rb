@@ -24,7 +24,8 @@ class ObjectProperty
     stmts = [
       [resource, RDF.type, RDF::OWL.ObjectProperty],
       [resource, RDF::RDFS.domain, domain.resource],
-      [resource, RDF::RDFS.range, range.resource]
+      [resource, RDF::RDFS.range, range.resource],
+      [resource, RDF::RDFS.label, RDF::Literal.new(name)]      
     ]
   end
 

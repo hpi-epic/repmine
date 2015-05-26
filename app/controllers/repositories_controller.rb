@@ -17,6 +17,7 @@ class RepositoriesController < ApplicationController
     @repository = Repository.find(params[:id])
     @stats = [["Item Type", "Occurrences in Repository"]]
     @stats.concat(@repository.type_statistics)
+    @job = @repository.ontology_creation_job
 
     respond_to do |format|
       format.html # show.html.erb
@@ -93,13 +94,14 @@ class RepositoriesController < ApplicationController
   def extract_schema
     @repository = Repository.find(params[:repository_id])
     begin
-      @repository.extract_ontology!
       respond_to do |format|
-        format.html { redirect_to @repository, :notice => "Successfully extracted ontology from repository!" }
-      end
-    rescue Repository::OntologyExtractionError => oee
-      respond_to do |format|
-        format.html { redirect_to @repository, :flash => {:error => oee.message}}
+        format.html do 
+          if @repository.extract_ontology!
+            redirect_to @repository, :notice => "Successfully extracted ontology from the repository!"
+          else
+            redirect_to @repository, :notice => "Started analyzing the repository in a background thread."            
+          end
+        end
       end
     rescue Exception => e
       respond_to do |format|

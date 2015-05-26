@@ -1,4 +1,4 @@
-class SparqlQueryCreator < Struct.new(:pattern)
+class SparqlQueryCreator < QueryCreator
 
   attr_accessor :filter, :where, :variables
 
@@ -9,7 +9,7 @@ class SparqlQueryCreator < Struct.new(:pattern)
     super
   end
 
-  def query_string
+  def build_query!
     @sparql = SPARQL::Client.new(RDF::Repository.new())
     fill_variables!
     fill_where_clause!
@@ -37,10 +37,6 @@ class SparqlQueryCreator < Struct.new(:pattern)
     @variables = pattern.nodes.collect{|n| pe_variable(n)}
   end
 
-  def pe_variable(pe)
-    return "#{pe.class.name.underscore}_#{pe.id}".to_sym
-  end
-
   def pattern_for_ac_equals(node, ac)
     if ac.refers_to_variable?
       where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
@@ -51,7 +47,7 @@ class SparqlQueryCreator < Struct.new(:pattern)
   end
 
   def pattern_for_ac_regex(node, ac)
-    filter << "regex(?#{pe_variable(ac)}, '#{ac.value}')"
+    filter << "regex(?#{pe_variable(ac)}, #{ac.value.gsub("\/", "")})"
     where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
   end
 

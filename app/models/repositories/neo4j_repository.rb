@@ -15,37 +15,57 @@ class Neo4jRepository < Repository
   def self.default_port
     7474
   end
+  
+  class OntExtractionJob < ProgressJob::Base
+
+    def perform
+      @repository = Repository.find(@repository_id)
+      properties = {}
+      update_stage("Getting properties per label")
+      @repository.labels_and_counts.each_pair{|label, count| 
+        properties[label] = @repository.get_properties(label, count, self)
+        update_stage_progress("Finished '#{label}'", step: 1)
+      }
+      update_stage("Getting relationships per label")
+      @repository.populate_ontology!(properties, @repository.get_relationships())
+      update_stage_progress("Finished analyzing the ontology!", step: 1)
+      @repository.ontology.update_attributes({:does_exist => true})
+      @repository.ontology.load_to_dedicated_repository!
+    end
+
+  end
 
   # queries the graph in order to create an ontology that describes it...
   # 1. Get all nodes with certain labels and determine their properties + value types
   # 2. get all relations between different node types
-  # 3. raise errors if we cannot reliably determine a "schema"  
   def create_ontology!
-    properties = {}
-    labels_and_counts.each_pair{|label, count| properties[label] = get_properties(label, count)}
-    populate_ontology!(properties, get_relationships())
-    return true
-  end
-    
-  def get_relationships()
-    return query_result("MATCH (a)-[r]->(b) RETURN labels(a)[0] AS This, type(r) as To, labels(b)[0] AS That, count(*) AS Count")
+    if ontology_creation_job.nil?
+      lc = labels_and_counts      
+      j = OntExtractionJob.new(progress_max: lc.size + 1)
+      j.instance_variable_set("@repository_id", self.id)
+      Delayed::Job.enqueue(j, :queue => ont_creation_queue)
+    end
+    return false
   end
   
   # yeah, sue me ... this is slow as f**k, but it does the job ^^
-  def get_properties(label, count)
+  def get_properties(label, count, job = nil)
     offset = sensible_offset(label)
     rounds = (count / offset).to_i
     rounds += 1 if offset.modulo(count) != 0 || count < offset
+    job.update_stage("Getting samples for '#{label}' in #{rounds} rounds.") unless job.nil?
     node_properties = {}
     rounds.times do |i|
+      job.update_stage("Collecting samples for '#{label}',round #{i+1} of #{rounds}") unless job.nil?
       nodes = query_result("MATCH (n:`#{label}`) RETURN n SKIP #{offset * i} LIMIT #{offset}")
       nodes.collect{|node| node.first["data"]}.each{|bh| node_properties.merge!(bh.reject{|k,v| v.nil?})}
     end
     return node_properties
   end
-  
+
+  # we use a sample object to determine how many we should get at once
   def sensible_offset(label)
-    (10000000 / ObjectSpace.memsize_of(query_result("MATCH (n:`#{label}`) RETURN n LIMIT 1").first.first)).to_i
+    (1000000 / ObjectSpace.memsize_of(query_result("MATCH (n:`#{label}`) RETURN n LIMIT 1").first.first)).to_i
   end
   
   # Constructs an OWL ontology...
@@ -63,6 +83,10 @@ class Neo4jRepository < Repository
       range = OwlClass.find_or_create(ontology, relationship[2], nil)
       domain.add_relation(relationship[1], range)
     end
+  end
+  
+  def get_relationships()
+    return query_result("MATCH (a)-[r]->(b) RETURN labels(a)[0] AS This, type(r) as To, labels(b)[0] AS That, count(*) AS Count")
   end
   
   def labels_and_counts
@@ -86,7 +110,6 @@ class Neo4jRepository < Repository
     return neo.execute_query(query)["data"]
   end
   
-  # TODO: make more flexible... (https, security, all this stuf goes here ^^)
   def neo
     @neo ||= Neography::Rest.new("http://#{host}:#{port}")
   end

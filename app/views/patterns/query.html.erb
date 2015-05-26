@@ -1,4 +1,7 @@
 <div class="center_everything">
-<%= text_area_tag(:query_string, @query, :class => "form-control full_page", :rows => 10)%><br />
-<%= link_to("Back to Overview", patterns_path(), :class => "btn")%>
+  <% @queries.each_pair do |language, query| %>
+    <h3><%= language %></h3>
+    <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%><br />
+    <%= link_to("Back to Overview", patterns_path(), :class => "btn")%>  
+  <% end %>
 </div>

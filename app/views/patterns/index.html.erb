@@ -10,7 +10,7 @@
     <tr>
       <th>Name</th>
       <th style="width: 40%;">Description</th>
-      <th>Concepts</th>
+      <th>Elements</th>
       <th>Ontologies</th>
       <th>Actions</th>
     </tr>
@@ -20,7 +20,7 @@
     <tr>
       <td><%= radio_button_tag(:pattern_id, pattern.id)%>&nbsp;<%= link_to(pattern.name, pattern_path(pattern)) %></td>
       <td><%= pattern.description %></td>
-      <td><%= pattern.concept_count %></td>
+      <td><%= pattern.pattern_elements.size %></td>
       <td><%= pattern.ontology.short_name %>
       <td>
         <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-xs") %><br />

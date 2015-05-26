@@ -1,6 +1,0 @@
-<div id="toggleAttributes<%=id%>"><a href="#" onclick="$('#toggleAttributes<%=id%>').toggle();$('#attribsToogle<%=id%>').toggle()">+filter</a></div>
-<div id="attribsToogle<%=id%>" style="display:none;">
-<%= select_tag("attributes#{id}", options_for_select(attributes.collect{|key, value| [key, key]}), :class => "just_right") %>
-<%= select_tag("operatorAttribute#{id}", options_for_select(["=", ">", "<", "=~"]), :class => "very_narrow")%>
-<%= text_field_tag("valueAttribute#{id}", "" , :class => "narrow")%>
-</div>

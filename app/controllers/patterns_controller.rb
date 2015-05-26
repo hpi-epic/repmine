@@ -73,27 +73,16 @@ class PatternsController < ApplicationController
     @pattern = Pattern.find(params[:pattern_id])
     @ontology = Ontology.find(params[:ontology_id])
     @matching_error = nil
-    @concept_count = @pattern.concept_count
-
-    # do not match when using the same ontology...
-    if @pattern.ontology == @ontology
-      @mc = []
-    else
-      @mc = begin
-        @pattern.unmatched_concepts(@ontology)
-      rescue OntologyMatcher::MatchingError => e
-        @matching_error = e.message
-        nil
-      end
-    end
-
     render :layout => false
   end
 
   def query
     @pattern = Pattern.find(params[:pattern_id])
     @repository = @pattern.ontology.repository || RdfRepository.new
-    @query = SparqlQueryCreator.new(@pattern).query_string
+    @queries = {
+      "Cypher" => CypherQueryCreator.new(@pattern).query_string,
+      "Sparql" => SparqlQueryCreator.new(@pattern).query_string
+    }
   end
 
   def save_correspondence

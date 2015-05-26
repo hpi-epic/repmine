@@ -29,7 +29,8 @@ class DatatypeProperty
     stmts = [
       [resource, RDF.type, RDF::OWL.DatatypeProperty],
       [resource, RDF::RDFS.domain, domain.resource],
-      [resource, RDF::RDFS.range, range]
+      [resource, RDF::RDFS.range, range],
+      [resource, RDF::RDFS.label, RDF::Literal.new(name)]
     ]
   end
 
