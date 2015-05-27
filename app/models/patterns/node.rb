@@ -42,10 +42,6 @@ class Node < PatternElement
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
 
-  def used_concepts
-    return type_expression.used_concepts + source_relation_constraints.collect{|src| src.used_concepts} + attribute_constraints.collect{|src| src.used_concepts}
-  end
-
   def rdf_statements
     stmts = super
     

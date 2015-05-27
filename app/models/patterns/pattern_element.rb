@@ -87,10 +87,6 @@ class PatternElement < ActiveRecord::Base
       end
     end
   end
-
-  def used_concepts
-    return type_expression.used_concepts
-  end
   
   def equal_to?(other)
     raise "operation not permitted on elements of the same pattern" if self.pattern == other.pattern

@@ -58,10 +58,6 @@ class AttributeConstraint < PatternElement
     value.start_with?("?") ? value[1..-1] : value
   end
 
-  def used_concepts
-    return [rdf_type]
-  end
-
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.AttributeConstraint]
   end
