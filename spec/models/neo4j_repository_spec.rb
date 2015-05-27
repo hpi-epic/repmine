@@ -22,6 +22,9 @@ RSpec.describe Neo4jRepository, :type => :model do
     assert_equal 4, am2.attributes.size
     assert am.attributes.all?{|attrib| attrib.domain == am}
     assert am2.attributes.all?{|attrib| attrib.domain == am2}    
+    assert_equal 1, am.relations.size
+    assert_equal "KNOWS", am.relations.first.name
+    assert_equal am, am.relations.first.domain
   end
   
 end

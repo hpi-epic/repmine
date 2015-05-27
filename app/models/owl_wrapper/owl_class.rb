@@ -63,7 +63,7 @@ class OwlClass
   end
 
   def add_relation(name, target_class)
-    r = ObjectProperty.new(name, target_class, self)
+    r = ObjectProperty.new(name, self, target_class)
     relations << r
     return r
   end

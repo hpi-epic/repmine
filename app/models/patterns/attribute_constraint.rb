@@ -24,7 +24,6 @@
 class AttributeConstraint < PatternElement
   attr_accessible :value, :operator, :node
   belongs_to :node, :class_name => "PatternElement"
-
   before_save :assign_to_pattern!
 
   OPERATORS = {
@@ -37,9 +36,11 @@ class AttributeConstraint < PatternElement
   }
   
   def rdf_mappings
-    super.merge({
-      Vocabularies::GraphPattern.attributeValue => {:property => :value, :literal => true}
-    })
+    super.merge({Vocabularies::GraphPattern.attributeValue => {:property => :value, :literal => true}})
+  end
+  
+  def value_type
+    ontology.attribute_range(rdf_type)
   end
 
   def assign_to_pattern!
