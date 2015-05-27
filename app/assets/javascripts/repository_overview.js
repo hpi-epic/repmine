@@ -1,5 +1,4 @@
 var interval;
-$('.hermes-import .well').show();
 interval = setInterval(function(){
   $.ajax({
     url: '/progress-job/' + job_id,
