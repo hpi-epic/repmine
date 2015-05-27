@@ -43,8 +43,17 @@ RSpec.describe RdbmsRepository, :type => :model do
       :host => config["host"],
       :port => config["port"],
       :name => "testdatabase",
-      :rdbms_type => 2
+      :rdbms_type => db_type(config)
     )
+  end
+  
+  def db_type(config)
+    return case config["adapter"]
+      when "sqlite3" then 3
+      when "mysql" then 1
+      when "postgres" then 2
+      else nil
+    end
   end
 
   def testfile

@@ -20,12 +20,11 @@ require 'open3'
 class RdbmsRepository < Repository
 
   attr_accessible :rdbms_type
-  as_enum :rdbms_type, mysql: 1, postgresql: 2
+  as_enum :rdbms_type, mysql: 1, postgresql: 2, sqlite: 3
 
   validates :rdbms_type, :presence => true
   validates :db_name, :presence => true
-  validates :host, :presence => true
-  validates :port, :presence => true
+  validates :port, numericality: true, allow_blank: true
 
   def self.model_name
     return Repository.model_name
@@ -33,18 +32,29 @@ class RdbmsRepository < Repository
 
   def create_ontology!
     cmd = Rails.root.join("externals", "d2rq", "generate-mapping").to_s
-    options = ["-v", "-u #{db_username} -p #{db_password}", "-o #{ontology.local_file_path}", "#{connection_string}"]
+    options = ["-v", "-o #{ontology.local_file_path}"]
+    options += ["-u #{db_username}"] unless db_username.nil?
+    options += ["-p #{db_password}"] unless db_username.nil?
+    options += ["-d org.sqlite.JDBC"] if rdbms_type == :sqlite
+    options << connection_string
     errors = ""
 
     Open3.popen3(cmd + " #{options.join(" ")}") do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
     end
     
+    # these errors are mainly warnings telling you that certain fields are ambiguous or so
+    raise OntologyExtractionError.new(errors) unless errors.nil?  
     return File.exist?(ontology.local_file_path)
   end
 
   def connection_string
-    return "jdbc:#{rdbms_type}://#{host}:#{port}/#{db_name}"
+    str = if rdbms_type == :sqlite && host.nil?
+      "jdbc:#{rdbms_type}://#{Rails.root.join(db_name).to_s}"
+    else
+      "jdbc:#{rdbms_type}://#{host}:#{port}/#{db_name}"
+    end
+    return str
   end
 
   def type_statistics
