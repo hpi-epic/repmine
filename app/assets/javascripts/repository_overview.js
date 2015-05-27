@@ -25,7 +25,7 @@ interval = setInterval(function(){
 
       // In job stage
       if (progress !== 0){
-        $('.progress-bar').css('width', progress + '%').text(progress + '%');
+        $('.progress-bar').css('width', progress + '%').text(Number((progress).toFixed(2)) + '%');
       }
 
       $('.progress-status').text(stage);

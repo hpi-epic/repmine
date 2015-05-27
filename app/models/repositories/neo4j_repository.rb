@@ -20,19 +20,31 @@ class Neo4jRepository < Repository
 
     def perform
       @repository = Repository.find(@repository_id)
-      properties = {}
-      update_stage("Getting properties per label")
-      @repository.labels_and_counts.each_pair{|label, count| 
-        properties[label] = @repository.get_properties(label, count, self)
-        update_stage_progress("Finished '#{label}'", step: 1)
-      }
-      update_stage("Getting relationships per label")
-      @repository.populate_ontology!(properties, @repository.get_relationships())
-      update_stage_progress("Finished analyzing the ontology!", step: 1)
-      @repository.ontology.update_attributes({:does_exist => true})
-      @repository.ontology.load_to_dedicated_repository!
+      @repository.analyze_neo4j_repository!(self)
     end
 
+  end
+  
+  def analyze_neo4j_repository!(job = nil)
+    properties = {}
+    log_msg("Getting properties per label", job)
+    labels_and_counts.each_pair{|label, count| 
+      properties[label] = get_properties(label, count, job)
+      log_status("Finished '#{label}'", 1, job)
+    }
+    log_msg("Getting relationships per label", job)
+    populate_ontology!(properties, get_relationships())
+    log_status("Finished analyzing the ontology!", 1, job)
+    ontology.update_attributes({:does_exist => true})
+    ontology.load_to_dedicated_repository!
+  end
+  
+  def log_status(msg, step, job)
+    job.nil? ? puts(msg) : job.update_stage_progress(msg, :step => step)
+  end
+  
+  def log_msg(msg, job)
+    job.nil? ? puts(msg) : job.update_stage(msg)
   end
 
   # queries the graph in order to create an ontology that describes it...
@@ -53,10 +65,10 @@ class Neo4jRepository < Repository
     offset = sensible_offset(label)
     rounds = (count / offset).to_i
     rounds += 1 if offset.modulo(count) != 0 || count < offset
-    job.update_stage("Getting samples for '#{label}' in #{rounds} rounds.") unless job.nil?
+    log_msg("Getting samples for '#{label}' in #{rounds} rounds.", job)
     node_properties = {}
     rounds.times do |i|
-      job.update_stage("Collecting samples for '#{label}',round #{i+1} of #{rounds}") unless job.nil?
+      log_msg("Collecting samples for '#{label}'. Round #{i+1} of #{rounds}" ,job)
       nodes = query_result("MATCH (n:`#{label}`) RETURN n SKIP #{offset * i} LIMIT #{offset}")
       nodes.collect{|node| node.first["data"]}.each{|bh| node_properties.merge!(bh.reject{|k,v| v.nil?})}
     end

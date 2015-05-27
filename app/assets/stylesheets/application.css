@@ -17,3 +17,7 @@
 .needs_no_space {
  margin: 0 0 0 0;
 }
+
+select {
+  width: 150px;
+}

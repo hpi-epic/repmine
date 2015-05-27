@@ -48,7 +48,7 @@ class ExtractedOntology < Ontology
   end
 
   def local_file_path
-    return Rails.root.join("public", "ontologies", "extracted", short_name + ".#{file_format}")
+    return Rails.root.join("public", "ontologies", "extracted", short_name.squish.downcase.tr(" ","_") + ".#{file_format}").to_s
   end
 
   def file_format
@@ -56,7 +56,7 @@ class ExtractedOntology < Ontology
   end
   
   def download_url
-    return ["ontologies", "extracted", short_name + ".#{file_format}"].join("/")
+    return ["ontologies", "extracted", short_name.squish.downcase.tr(" ","_") + ".#{file_format}"].join("/")
   end
 
 end
