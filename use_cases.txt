@@ -1,0 +1,37 @@
+Query Translation:
+- Add both repositories
+- Create a query on one repository
+- Run automatic matching
+- Create the initial translation graph
+- Add missing transformations
+- Execute the query
+
+Test Case A (Same syntax, different semantics):
+Data A - Neo4j Github Data, HPI SWT2
+Data B - Neo4j Github Data, SAP Enterprise Github
+
+Test Case B (Different Syntax, same semantics):
+Data A - Neo4j Github Data
+Data B - SEON Github Data
+
+Test Case C (Different Syntax, different semantics):
+Data A - Neo4j Github Data -> HPI SWT2
+Data B - Redmine Data -> TODO: get sample project
+
+================
+Value computation:
+- Add repositories
+- Create Query
+- Automatic Matching
+- Translation Graph
+- Add computation
+- Perform computation
+
+Test Case A (Value creation):
+Data A - Neo4j Github Data w/ explicitly stored complexity values
+Data B - Neo4j Github Data w/o data
+Calculate complexity for query B by running shell script and adding the value
+
+Test Case B (Value computation):
+Data A - N4jGD w/ owner
+Data B - 
