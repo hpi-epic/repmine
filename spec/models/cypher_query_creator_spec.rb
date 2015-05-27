@@ -2,6 +2,11 @@ require 'rails_helper'
 
 RSpec.describe CypherQueryCreator, :type => :model do
 
+  before :each do
+    AttributeConstraint.any_instance.stub(:value_type => RDF::XSD.string)
+    AgraphConnection.any_instance.stub(:label_for_resource){|arg1, arg2| arg2.split("/").last}
+  end
+
   it "should create a simple one node query" do
     pattern = FactoryGirl.create(:node_only_pattern)
     qc = CypherQueryCreator.new(pattern)
@@ -48,15 +53,27 @@ RSpec.describe CypherQueryCreator, :type => :model do
     assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]}, #{qv["nr1"]}-#{qv["rel2"]}->#{qv["nr3"]} RETURN #{qv["nv1"]}, #{qv["nv2"]}, #{qv["nv3"]}", qs
   end
   
-  it "should create properly create queries for the different operators on attribute constraints" do
+  it "should properly create regex queries" do
     pattern = FactoryGirl.create(:empty_pattern)
     pattern.create_node!
     regex_ac = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:regex], :node => pattern.nodes.first, :value => "/hello world/")
     qc = CypherQueryCreator.new(pattern)
     qs = qc.query_string
     qv = query_variables(pattern, qc)
-    assert_equal "MATCH #{qv["nr1"]} WHERE #{qv["att1"]} =~ #{regex_ac.value} RETURN #{qv["nv1"]}", qs
-  end  
+    assert_equal "MATCH #{qv["nr1"]} WHERE #{qv["att1"]} #{AttributeConstraint::OPERATORS[:regex]} 'hello world' RETURN #{qv["nv1"]}", qs
+  end
+  
+  it "should incorporate self-introduced variables" do
+    pattern = FactoryGirl.create(:empty_pattern)
+    pattern.pattern_elements << FactoryGirl.create(:plain_node, :pattern => pattern)
+    var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "?name")
+    var_ac2 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:equals], :node => pattern.nodes.first, :value => "?name")
+    qc = CypherQueryCreator.new(pattern)
+    qs = qc.query_string
+    qv = query_variables(pattern, qc)
+    expected = "MATCH #{qv["nr1"]} WHERE #{qv["att1"]} = #{qv["att2"]} RETURN #{qv["nv1"]}"
+    assert_equal expected, qs
+  end
   
   def query_variables(pattern, qc)
     qv = {}
@@ -68,23 +85,9 @@ RSpec.describe CypherQueryCreator, :type => :model do
       qv["rel#{i+1}"] = qc.relation_reference(rc)
     end
     pattern.attribute_constraints.each_with_index do |ac, i|
-      qv["att#{i+1}"] = qc.pe_variable(ac.node).to_s + "." + ac.rdf_type
+      qv["att#{i+1}"] = qc.attribute_reference(ac)
     end
     return qv
-  end
-
-  it "should incorporate self-introduced variables" do
-    pattern = FactoryGirl.create(:empty_pattern)
-    pattern.pattern_elements << FactoryGirl.create(:plain_node, :pattern => pattern)
-    var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "?name")
-    var_ac2 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:equals], :node => pattern.nodes.first, :value => "?name")
-    qc = CypherQueryCreator.new(pattern)
-    qs = qc.query_string
-    nv = qc.pe_variable(pattern.nodes.first)
-    ac1v = qc.pe_variable(var_ac1)
-    ac2v = qc.pe_variable(var_ac2)
-    expected = "SELECT ?#{nv} WHERE { ?#{nv} a <http://example.org/node> . ?#{nv} <#{var_ac1.rdf_type}> ?name . ?#{nv} <#{var_ac2.rdf_type}> ?#{ac2v} . FILTER(?#{ac2v} = ?name) }"
-  #  assert_equal expected, qs
   end
 
 end

@@ -22,11 +22,15 @@ class CypherQueryCreator < QueryCreator
   end
   
   def node_reference(node)
-    "(#{pe_variable(node)}:`#{node.rdf_type}`)"
+    "(#{pe_variable(node)}:`#{node.label_for_type}`)"
   end
   
   def relation_reference(rel)
-    "[:`#{rel.rdf_type}`]"
+    "[:`#{rel.label_for_type}`]"
+  end
+  
+  def attribute_reference(ac)
+    "#{pe_variable(ac.node)}.#{ac.label_for_type}"
   end
   
   def return_values
@@ -35,9 +39,35 @@ class CypherQueryCreator < QueryCreator
   
   def parameters
     str = pattern.attribute_constraints.collect do |ac|
-      "#{pe_variable(ac.node)}.#{ac.rdf_type} #{ac.operator} #{ac.value}"
-    end.join(" AND ")
+      unless ac.operator == AttributeConstraint::OPERATORS[:var]
+        "#{attribute_reference(ac)} #{cypher_operator(ac.operator)} #{escaped_value(ac)}"
+      end
+    end.compact.join(" AND ")
     return str.empty? ? "" : "WHERE #{str}"
+  end
+  
+  # we mainly use the sames ones as cypher...
+  def cypher_operator(our_operator)
+    return our_operator
+  end
+  
+  def escaped_value(ac)
+    if ac.refers_to_variable?
+      aac = pattern.attribute_constraints.find{|aac| aac.value == ac.value}
+      return aac.nil? ? ac.value : attribute_reference(aac)
+    elsif ac.value_type == RDF::XSD.string
+      return "'#{clean_value(ac)}'"
+    else
+      return ac.value
+    end
+  end
+  
+  def clean_value(ac)
+    if ac.operator == AttributeConstraint::OPERATORS[:regex]
+      return "#{ac.value.scan(/^\/(.*)\//).flatten.first || ac.value}"
+    else
+      return ac.value
+    end
   end
   
   # order by, limit, etc.

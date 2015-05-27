@@ -118,6 +118,10 @@ class PatternElement < ActiveRecord::Base
     {}
   end
   
+  def label_for_type
+    ontology.label_for_resource(rdf_type)
+  end
+  
   def rebuild!(queryable)
     rebuild_element_type!(queryable, self.rdf_node)
     rebuild_element_properties!(queryable, self.rdf_node)
@@ -143,5 +147,5 @@ class PatternElement < ActiveRecord::Base
         end
       end
     end
-  end  
+  end
 end

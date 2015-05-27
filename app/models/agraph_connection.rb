@@ -49,6 +49,24 @@ class AgraphConnection
     end
     return rels
   end
+  
+  def attribute_range(attrib)
+    repository.build_query() do |q|
+      q.pattern([RDF::Resource.new(attrib), RDF::RDFS.range, :range])
+    end.run do |res|
+      return res[:range].to_s
+    end
+    return nil
+  end
+  
+  def label_for_resource(res)
+    repository.build_query() do |q|
+      q.pattern([RDF::Resource.new(res), RDF::RDFS.label, :label])
+    end.run do |res|
+      return res[:label].to_s
+    end
+    return nil
+  end
 
   def outgoing_relations(domain)
     relations(domain, nil)

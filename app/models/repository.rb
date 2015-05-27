@@ -69,6 +69,7 @@ class Repository < ActiveRecord::Base
   end
 
   def extract_ontology!
+    ontology.remove_local_copy!
     if create_ontology!
       ontology.update_attributes({:does_exist => true})
       ontology.load_to_dedicated_repository!
