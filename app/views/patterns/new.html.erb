@@ -17,7 +17,8 @@
       <% Ontology.pluck(:group).uniq.each do |group| %>
         <td style="padding-left: 50px; vertical-align: top;">
           <div class="control-group">
-            <fieldset class="fieldset"><legend><%= group %></legend>
+            <legend><%= group %></legend>
+            <fieldset class="fieldset">
               <%= f.association :ontology, as: :radio_buttons, collection: Ontology.where(:does_exist => true, :group => group), label_method: :short_name, label: false %>
             </fieldset>
             </div>
