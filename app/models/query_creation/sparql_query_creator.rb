@@ -47,7 +47,7 @@ class SparqlQueryCreator < QueryCreator
   end
 
   def pattern_for_ac_regex(node, ac)
-    filter << "regex(?#{pe_variable(ac)}, #{ac.value.gsub("\/", "")})"
+    filter << "regex(?#{pe_variable(ac)}, \"#{ac.value.gsub("\/", "")}\")"
     where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
   end
 
