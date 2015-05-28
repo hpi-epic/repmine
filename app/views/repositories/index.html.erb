@@ -11,7 +11,8 @@
     <td><%= link_to(repository.name, repository) %></td>
     <td>
       <%= link_to "Show", repository, {:class => "btn btn-success"} %>
-      <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-info"} %>
+      <%= link_to "Extract Data Schema", repository_extract_schema_path(repository), {:class => "btn btn-info"} %>            
+      <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-warning"} %>
       <%= link_to "Delete", repository, {:method => :delete, :confirm => "Really?", :class => "btn btn-danger"} %>
     <td>
   </tr>

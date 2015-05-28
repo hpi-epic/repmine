@@ -19,10 +19,14 @@
           <div class="control-group">
             <legend><%= group %></legend>
             <fieldset class="fieldset">
-              <%= f.association :ontology, as: :radio_buttons, collection: Ontology.where(:does_exist => true, :group => group), label_method: :short_name, label: false %>
+              <%= f.association(
+                    :ontology, as: :radio_buttons, 
+                    collection: Ontology.where(:does_exist => true, :group => group), 
+                    label_method: :short_name, label: false
+              ) %>
             </fieldset>
-            </div>
-          </td>
+          </div>
+        </td>
       <% end %>
     </tr>
 </table>
