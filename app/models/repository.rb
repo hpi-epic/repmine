@@ -70,13 +70,15 @@ class Repository < ActiveRecord::Base
 
   def extract_ontology!
     ontology.remove_local_copy!
-    if create_ontology!
+    ontology.update_attributes({:does_exist => false})
+    errors = create_ontology!
+
+    if File.exist?(ontology.local_file_path)
       ontology.update_attributes({:does_exist => true})
       ontology.load_to_dedicated_repository!
-      return true
-    else
-      return false
     end
+    
+    return errors
   end
 
   def create_ontology!

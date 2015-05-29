@@ -57,7 +57,7 @@ class Neo4jRepository < Repository
       j.instance_variable_set("@repository_id", self.id)
       Delayed::Job.enqueue(j, :queue => ont_creation_queue)
     end
-    return false
+    return nil
   end
   
   # yeah, sue me ... this is slow as f**k, but it does the job ^^
