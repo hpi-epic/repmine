@@ -1,8 +1,11 @@
-RepMine::Application.routes.draw do  resources :patterns do
-
-    get "/translate/:ontology_id", :to => "patterns#translate", :as => :translate_to_ontology
-    get "/query", :to => "patterns#query", :as => :query
-    post "/run_on_repository/:repository_id", :to => "patterns#run_on_repository", :as => :run_on_repository
+RepMine::Application.routes.draw do  
+  
+  resources :patterns do
+    post :combine, :on => :collection
+    get :query
+    get "translate/:ontology_id", :as => :translate, :to => "patterns#translate"
+    post :process_patterns, :on => :collection
+    get :combine, :on => :collection
     post "/save_correspondence/:output_pattern_id", :to => "patterns#save_correspondence", :as => :save_correspondence
 
     resources :nodes do

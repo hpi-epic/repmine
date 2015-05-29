@@ -1,58 +1,52 @@
-<% content_for :javascript_includes do %>
-  <%= javascript_include_tag "pattern_overview.js" %>
-<% end %>
+<%= form_tag(process_patterns_patterns_path) do %>
 
-<h3>Existing Graph Patterns</h3>
-<%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
-<br />
-<table class="table table-striped" style="width: 73%; float:left;">
+<div class="btn-toolbar">
+  <div class="btn-group">
+    <%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
+    <%= button_tag("Combine Selected", :class => "btn btn-success", :name => "combine") %>
+    <%= button_tag("Translate Selected to:", :class => "btn btn-info", :name => "translate") %>
+    <%= select_tag(:ontology_id, grouped_options_for_select(@ontology_groups), :class => "needs_no_space") %>
+  </div>
+</div>
+
+<table class="table table-striped table-bordered">
   <thead>
     <tr>
       <th>Name</th>
-      <th style="width: 40%;">Description</th>
+      <th>Description</th>      
       <th>Elements</th>
-      <th>Ontologies</th>
+      <th>Ontology</th>
       <th>Actions</th>
     </tr>
   </thead>
+  
   <tbody>
-  <% @patterns.each_with_index do |pattern, i| %>
-    <tr>
-      <td><%= radio_button_tag(:pattern_id, pattern.id)%>&nbsp;<%= link_to(pattern.name, pattern_path(pattern)) %></td>
-      <td><%= pattern.description %></td>
-      <td><%= pattern.pattern_elements.size %></td>
-      <td><%= pattern.ontology.short_name %>
-      <td>
-        <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-xs") %><br />
-        <%= link_to("Delete", pattern_path(pattern), :method => :delete, :class => "btn btn-danger btn-xs", :confirm => "Really delete #{pattern.name}?") %>
 
-      </td>
+  <% @pattern_groups.each_pair do |tag, patterns| %>
+    <tr class="info">
+      <td colspan="5"><strong><%= tag %></strong> (<%= patterns.size%>)</td>
     </tr>
+    <% patterns.each do |pattern|%>
+      <tr>
+        <td>
+          <label class="checkbox"><%= check_box_tag("patterns[]", pattern.id)%><%= pattern.name %></label>
+        </td>
+        <td class="span8"><%= pattern.description %></td>
+        <td><%= pattern.pattern_elements.size %></td>
+        <td><%= pattern.ontology.short_name %>
+        <td>
+          <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-mini") %>
+          <%= link_to(
+            "Delete", 
+            pattern_path(pattern), 
+            :method => :delete, 
+            :class => "btn btn-danger btn-mini", 
+            :confirm => "Really delete #{pattern.name}?") 
+          %>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
   </tbody>
 </table>
-
-<table class="table table-bordered" style="width: 25%; float:left; margin-left: 15px;">
-  <tbody>
-  <tr>
-    <td>
-      <%= button_tag(
-        "Check Matching",
-        :remote => true,
-        :onclick => "checkExecutionStatus('pattern_id', '#{missing_concepts_patterns_path()}', 'ontology_id', $('#matching_status'));",
-        :class => "btn"
-        )
-      %>
-      <span id="matching_status"></span>
-      <% Ontology.pluck(:group).uniq.each do |group| %>
-        <hr />
-        <% Ontology.where(:does_exist => true, :group => group).each do |ont| %>
-          <%= radio_button_tag("ontology_id", ont.id) %> <%= ont.short_name %>
-          <br />
-        <% end %>
-        </fieldset>
-      <% end %>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<% end %>

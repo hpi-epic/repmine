@@ -12,7 +12,7 @@ class PatternsController < ApplicationController
     @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.ontology.type_hierarchy
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
   end
-
+  
   def translate
     @source_pattern = Pattern.find(params[:pattern_id])
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
@@ -21,7 +21,6 @@ class PatternsController < ApplicationController
     @ontology = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @ontology)
     
-    @matched_concepts = @source_pattern.matched_concepts(@ontology)
     @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.ontology.type_hierarchy
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
   end
@@ -45,7 +44,17 @@ class PatternsController < ApplicationController
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
     else
-      @repositories = Repository.all_that_have_an_ontology
+      @pattern_groups = {"Uncategorized" => []}
+      @patterns.each do |pattern| 
+        pattern.tag_list.each do |tag|
+          @pattern_groups[tag] ||= []
+          @pattern_groups[tag] << pattern
+        end
+        @pattern_groups["Uncategorized"] << pattern if pattern.tag_list.empty?
+      end
+      @ontology_groups = Ontology.pluck(:group).uniq.map do |group| 
+        [group, Ontology.where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
+      end
     end
   end
 
@@ -68,11 +77,33 @@ class PatternsController < ApplicationController
     flash[:notice] = "Destroyed Pattern '#{qn}'"
     redirect_to patterns_path
   end
+  
+  def process_patterns
+    if !params[:patterns]
+      redirect_to patterns_path, :alert => "Please pick at least one target pattern!"
+    else
+      if params[:translate]
+        if params[:patterns].size > 1
+          redirect_to patterns_path, :alert => "You can only translate one pattern at a time!"
+        else          
+          redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_id]))
+        end
+      elsif params[:combine]
+        redirect_to combine_patterns_path({:patterns => params[:patterns]}) 
+      else
+        redirect_to patterns_path
+      end
+    end
+  end
+  
+  def combine
+    @patterns = params[:patterns].collect{|p_id| Pattern.find(p_id)}
+    redirect_to patterns_path, :notice => "Cannot yet combine patterns: #{@patterns.collect{|p| p.name}.join(", ")}"
+  end
 
   def missing_concepts
     @pattern = Pattern.find(params[:pattern_id])
     @ontology = Ontology.find(params[:ontology_id])
-    @matching_error = nil
     render :layout => false
   end
 
