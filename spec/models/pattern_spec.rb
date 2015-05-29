@@ -82,6 +82,12 @@ RSpec.describe Pattern, :type => :model do
     assert !p1.equal_to?(FactoryGirl.create(:pattern))
   end
   
+  it "should return a proper layout for the pattern using graphviz" do
+    p1 = FactoryGirl.create(:pattern)
+    graph = p1.auto_layout!
+    graph.output(:png => Rails.root.join("spec/testfiles/pattern_graph.png"))
+  end
+  
   def n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
     p = Pattern.create(ontology_id: ontology.id, name: name, description: "Generic")
     source_node = p.create_node!

@@ -50,4 +50,10 @@ class RelationConstraint < PatternElement
   def possible_relations(source_type = nil, target_type = nil)
     return pattern.ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
   end
+  
+  def pretty_print
+    str = " #{type_expression.fancy_string(true)}"
+    str += " (#{min_cardinality.blank? ? 0 : min_cardinality},#{max_cardinality.blank? ? '*' : max_cardinality})"
+    str += "[#{min_path_length.blank? ? 1 : min_path_length},#{max_path_length.blank? ? 1 : max_path_length}] "
+  end
 end

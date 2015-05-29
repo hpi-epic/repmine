@@ -109,6 +109,22 @@ class Pattern < ActiveRecord::Base
     pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}
     return pattern
   end
+  
+  def auto_layout!
+    g = GraphViz.new( :G, :type => :digraph )
+    node_cache = {}
+    nodes.each do |node| 
+      node_cache[node] = g.add_node(node.id.to_s, {:label => node.pretty_print})
+      node.attribute_constraints.each do |ac| 
+        ac_node = g.add_node(ac.id.to_s, {:shape => "box", :label => ac.pretty_print})
+        g.add_edge(node_cache[node], ac_node)
+      end
+    end
+    relation_constraints.each do |rc|
+      g.add_edge(node_cache[rc.source], node_cache[rc.target], {:label => rc.pretty_print})
+    end
+    return g
+  end
 
   def url
     ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:patterns_path] + id.to_s

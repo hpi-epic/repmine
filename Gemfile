@@ -53,6 +53,7 @@ gem 'neography'
 
 # visualization
 gem "googlecharts"
+gem "ruby-graphviz"
 
 # tagging queries
 gem 'acts-as-taggable-on'

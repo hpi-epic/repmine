@@ -255,6 +255,7 @@ GEM
       rspec-mocks (~> 3.2.0)
       rspec-support (~> 3.2.0)
     rspec-support (3.2.2)
+    ruby-graphviz (1.2.2)
     rubyzip (1.1.7)
     sass (3.4.14)
     sass-rails (3.2.6)
@@ -353,6 +354,7 @@ DEPENDENCIES
   rest-client
   rspec
   rspec-rails
+  ruby-graphviz
   sass-rails (~> 3.2.3)
   seedbank
   simple_enum (~> 1.6)

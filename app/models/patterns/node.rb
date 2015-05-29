@@ -41,6 +41,10 @@ class Node < PatternElement
   def query_variable()
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
+  
+  def pretty_print
+    "#{type_expression.fancy_string(true)}"
+  end
 
   def rdf_statements
     stmts = super

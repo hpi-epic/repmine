@@ -62,4 +62,8 @@ class AttributeConstraint < PatternElement
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.AttributeConstraint]
   end
+  
+  def pretty_print
+    "#{type_expression.fancy_string(true)} #{operator} #{value}"
+  end
 end
