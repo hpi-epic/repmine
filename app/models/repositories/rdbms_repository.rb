@@ -33,8 +33,8 @@ class RdbmsRepository < Repository
   def create_ontology!
     cmd = Rails.root.join("externals", "d2rq", "generate-mapping").to_s
     options = ["-v", "-o #{ontology.local_file_path}"]
-    options += ["-u #{db_username}"] unless db_username.nil?
-    options += ["-p #{db_password}"] unless db_username.nil?
+    options += ["-u #{db_username}"] unless db_username.blank?
+    options += ["-p #{db_password}"] unless db_password.blank?
     options += ["-d org.sqlite.JDBC"] if rdbms_type == :sqlite
     options << connection_string
     errors = ""
@@ -44,8 +44,19 @@ class RdbmsRepository < Repository
     end
     
     # these errors are mainly warnings telling you that certain fields are ambiguous or so
-    raise OntologyExtractionError.new(errors) unless errors.nil?  
-    return File.exist?(ontology.local_file_path)
+    # if there are none, just return nil...
+    add_ontology_namespace! if File.exists?(ontology.local_file_path)
+    return errors
+  end
+  
+  def add_ontology_namespace!
+    File.open(ontology.local_file_path + ".new", "w+") do |f2|
+      f2.puts("@prefix :\t<#{ontology.url + (ontology.url.end_with?("/") ? "" : "/")}> .")
+      File.readlines(ontology.local_file_path).each_with_index do |line, i|
+        f2.puts line unless i == 0
+      end
+    end
+    FileUtils.mv(ontology.local_file_path + ".new", ontology.local_file_path)
   end
 
   def connection_string
