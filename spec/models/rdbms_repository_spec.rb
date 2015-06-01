@@ -23,11 +23,8 @@ RSpec.describe RdbmsRepository, :type => :model do
     repo = test_repository
     assert_not_nil repo.ontology
     repo.ontology.stub(:local_file_path => testfile)
-    begin
-      repo.extract_ontology!
-    rescue Repository::OntologyExtractionError => e
-      # can happen, but does not really mean anything...
-    end
+    errors = repo.extract_ontology!
+    puts "Errors during exceution: #{errors || "none"}"
     assert File.exists?(testfile)
     graph = RDF::Graph.load(testfile)
     assert_not_empty graph
@@ -39,7 +36,7 @@ RSpec.describe RdbmsRepository, :type => :model do
     return RdbmsRepository.create!(
       :db_username => config["username"],
       :db_password => config["password"],
-      :db_name => config["database"],
+      :db_name => db_type(config) == 3 ? Rails.root.join(config["database"]).to_s : config["database"],
       :host => config["host"],
       :port => config["port"],
       :name => "testdatabase",

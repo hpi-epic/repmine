@@ -60,8 +60,8 @@ class RdbmsRepository < Repository
   end
 
   def connection_string
-    str = if rdbms_type == :sqlite && host.nil?
-      "jdbc:#{rdbms_type}://#{Rails.root.join(db_name).to_s}"
+    str = if rdbms_type == :sqlite && host.blank?
+      "jdbc:#{rdbms_type}://#{db_name.to_s}"
     else
       "jdbc:#{rdbms_type}://#{host}:#{port}/#{db_name}"
     end
