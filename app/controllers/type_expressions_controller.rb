@@ -22,7 +22,7 @@ class TypeExpressionsController < ApplicationController
   end
 
   def get_locals()
-    {:type_expression => @node.type_expression, :type_hierarchy => @pattern.type_hierarchy, :pattern => @pattern, :node => @node}
+    {:type_expression => @node.type_expression, :type_hierarchy => @pattern.ontology.type_hierarchy, :pattern => @pattern, :node => @node}
   end
 
   def update
