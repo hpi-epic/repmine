@@ -8,4 +8,12 @@ module AttributeConstraintsHelper
     options_for_select(opts)
   end
 
+  def ac_position(ac)
+    if ac.y == 0 && ac.x == 0
+      return ""
+    else
+      return "top: #{ac.y}px;left: #{ac.x == 0 ? 20 : ac.x}px;"
+    end
+  end
+
 end

@@ -1,13 +1,9 @@
 // jsPlumb initializer - creates the drawing canvas and binds the 'connection' event
 jsPlumb.ready(function() {
 
-  jsPlumb.importDefaults({
-    Container: "drawing_canvas"
-	});
+  jsPlumb.importDefaults({Container: "drawing_canvas"});
 
-  $(".immutable_node").each(function(index, node_div){
-	  addNodeEndpoints($(node_div).attr("id"));
-	});
+  $(".immutable_node").each(function(index, node_div){addNodeEndpoints($(node_div).attr("id"));});
 
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
   $.when.apply($, requests).done(function(){
@@ -31,7 +27,7 @@ var newTranslationNode = function(url){
 // adds the css class 'matched' to all elements we already know have a mactching concept
 var addMatchedClass = function(){
   $("div.static").each(function(i, el){
-    if(matched_concepts.indexOf($(el).find("select[id$='rdf_type']").val()) > -1){
+    if(matched_elements.indexOf($(el).attr("data-id")) > -1){
       $(el).addClass("matched")
     }
   })
@@ -158,7 +154,7 @@ var loadTranslationPattern = function(){
 };
 
 var saveTranslation = function(hide_growl){
-  var requests = saveNodes().concat(saveConstraints());
+  var requests = saveForm("form.edit_node").concat(saveForm("form[class*=edit_][class*=_constraint]"));
   $.when.apply($, requests).done(function(final_request){
     submitTranslationPattern(hide_growl);
   });
@@ -192,7 +188,7 @@ var saveCorrespondence = function(){
     success: function(data, textStatus, jqXHR){
       showGrowlNotification(jqXHR);
       toggleOntologyMatchingMode(false);
-      matched_concepts = matched_concepts.concat(data);
+      matched_elements = matched_elements.concat(data);
       addMatchedClass();
       toggleOntologyMatchingMode(true);
     },

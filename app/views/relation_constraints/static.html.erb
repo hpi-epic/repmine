@@ -1,4 +1,4 @@
-<div class="relation static" data-id="<%= @rc.id %>">
+<div class="relation static graph_element" data-id="<%= @rc.id %>">
   <%= form_for([@pattern, @rc], :html => {:class => "edit_relation_constraint_form static"}) do |f| %>
 
     <%= f.select(:rdf_type, static_select(@rc), {}, {:class => "needs_no_space"}) %><br />

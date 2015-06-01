@@ -1,4 +1,4 @@
-<div class="relation" data-id="<%= @rc.id %>">
+<div class="relation graph_element" data-id="<%= @rc.id %>">
   <%= form_for([@pattern, @rc]) do |f| %>
 
     <%= f.select(:rdf_type, options_from_collection_for_select(@possible_relations, "relation_url", "name", @rc.rdf_type), {}, {:class => "needs_no_space"}) %><br />
@@ -7,7 +7,7 @@
       <a href="#" onclick="$('#rel_const_cards_<%= @rc.id %>').show(); $(this).hide();">+ cardinalities</a><br />
       <div id="rel_const_cards_<%= @rc.id %>" style="display:none;">
     <% else %>
-      <br /><div id="rel_const_cards_<%= @rc.id %>">
+      <div id="rel_const_cards_<%= @rc.id %>"><br />
     <% end %>
 
     (<%= f.text_field(:min_cardinality, :class => "very_narrow") %>,

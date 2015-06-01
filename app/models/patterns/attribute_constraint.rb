@@ -22,7 +22,7 @@
 #
 
 class AttributeConstraint < PatternElement
-  attr_accessible :value, :operator, :node
+  attr_accessible :value, :operator, :node, :x, :y
   belongs_to :node, :class_name => "PatternElement"
   before_save :assign_to_pattern!
 

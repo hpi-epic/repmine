@@ -23,6 +23,7 @@ class PatternsController < ApplicationController
     
     @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.ontology.type_hierarchy
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
+    @matched_elements = @source_pattern.matched_elements(@ontology).collect{|me| me.id.to_s}
   end
 
   def create
@@ -126,13 +127,13 @@ class PatternsController < ApplicationController
     else
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
-      @oc = OntologyCorrespondence.for_elements!(input_elements, output_elements)
+      @oc = ""#OntologyCorrespondence.for_elements!(input_elements, output_elements)
       if @oc.nil?
         flash[:error] = "Could not save correspondence! Contact your administrator"
         []
       else
         flash[:notice] = "Thanks for the correspondence!"
-        @oc.input_elements.collect{|pe| pe.rdf_type}
+        params[:source_element_ids].collect{|id| id.to_s}
       end
     end
     render :json => matched_concepts

@@ -9,33 +9,19 @@ var addNodeToGraph = function(node){
 
   // bind the doubleclick to the attribute filter opening button
   endpoints[endpoints.length - 1].bind("dblclick", function(endpoint) {
-    // only perform actions, when there is no filter present
-    if(endpoint.connections.length == 0) {
-      addAttributeFilter(node_id, createNodeAttributeFilter(endpoint, node_id));
-    }
+    addAttributeFilter(node_id);
   });
 
   // insert an onchange handler for the node's type selector
   node.find("#node_rdf_type").change(function(event){
     updateConnectionsAndAttributes($(this).closest("div"));
   });
-
-  var div = "<span><select><option></option><option>Group By</option><option>Count</option><option>Sum</option><option>Ignore</option><select>";
-  div += ":&nbsp;<input type='text' value='" + node_html_id + "' class='narrow' disabled></input>, </span>";
-  div = $(div);
-  div.click(function(e){
-    $("#" + node_html_id).addClass("briefly_highlighted");
-    setTimeout(function() {
-      $("#" + node_html_id).removeClass("briefly_highlighted");
-    }, 2000);
-  });
-  $("#editor_controls").append(div);
 };
 
 // adds only the endpoints to a given node without making it draggable or registering callbacks
 var addNodeEndpoints = function(node_html_id){
   var endpoints = []
-  endpoints.push(jsPlumb.addEndpoint(node_html_id, { anchor:[ "Perimeter", { shape:"Circle"}], deleteEndpointsOnDetach:true }, connectionEndpoint()));
+  endpoints.push(jsPlumb.addEndpoint(node_html_id, connectionEndpoint()));
   endpoints.push(jsPlumb.addEndpoint(node_html_id, attributeEndpoint()));
   return endpoints;
 };
@@ -52,9 +38,8 @@ var loadExistingConnections = function(connect_them, load_attributes, make_stati
 
 	for (var node_id in load_attributes){
     var endpoint = jsPlumb.getEndpoints("node_" + node_id)[1];
-    var more_link = createNodeAttributeFilter(endpoint, node_id, make_static);
     for (var i in load_attributes[node_id]){
-      requests.push(addAttributeFilter(node_id, more_link, load_attributes[node_id][i]));
+      requests.push(addAttributeFilter(node_id, load_attributes[node_id][i]));
     }
   }
   return requests;
@@ -62,41 +47,26 @@ var loadExistingConnections = function(connect_them, load_attributes, make_stati
 
 // handler for the 'save' button. basically submits all forms
 var savePattern = function(){
-  var requests = saveNodes().concat(saveConstraints());
+  var requests = saveForm("form.edit_node").concat(saveForm("form[class*=edit_][class*=_constraint]"));
   $.when.apply($, requests).done(function(){
     submitAndHighlight($("form.edit_pattern"));
   });
 };
 
-// all forms that edit_*_constraints (you get the hint) are submitted
-var saveConstraints = function(){
-  var requests = [];
-  $("form[class*=edit_][class*=_constraint]").not(".static").each(function(index){
+// takes a form, submits it, and stores all the requests so we can wait for ... it
+var saveForm = function(form_finder){
+  var requests = [];  
+  $(form_finder).not(".static").each(function(index){
     requests.push(submitAndHighlight($(this)));
   });
   return requests;
-};
-
-// sets position variables for each node and submits the form
-var saveNodes = function(){
-  var requests = [];
-  $("form.edit_node").not(".static").each(function(index){
-    var position = $(this).parent().position()
-    $(this).find("input[id=node_x]").val(position.left);
-    $(this).find("input[id=node_y]").val(position.top);
-    requests.push(submitAndHighlight($(this)));
-  });
-  return requests;
-};
+}
 
 var removeAttributeConstraint = function(url, div_id){
-  $.ajax({
-    url: url,
-    method: 'DELETE',
-    success: function(data, textStatus, jqXHR){
-      $("#" + div_id).remove();
-    }
-  })
+  jsPlumb.select({target:div_id}).each(function(conn){
+    jsPlumb.detach(conn);
+  });
+  jsPlumb.remove(div_id);
 };
 
 var openComplexDialog = function(url, modal_tree, modal){
@@ -111,6 +81,7 @@ var openComplexDialog = function(url, modal_tree, modal){
 
 // submits the form and highlights possible errors
 var submitAndHighlight = function(form){
+  updatePositionInformation(form);
   return $.ajax({
     url : form.attr("action"),
     type: "POST",
@@ -123,6 +94,12 @@ var submitAndHighlight = function(form){
     }
   });
 };
+
+var updatePositionInformation = function(form){
+  var position = $(form).parent().position();
+  $(form).find("input[id$=_x]").val(position.left);
+  $(form).find("input[id$=_y]").val(position.top);
+}
 
 // updates all connections of a node upon change of the node class
 var updateConnectionsAndAttributes = function(node){
@@ -141,17 +118,15 @@ var updateConnectionsAndAttributes = function(node){
 var createConnection = function(connection, reinstall_endpoints, url) {
   // reinstall the endpoints
   if(reinstall_endpoints){
-    jsPlumb.addEndpoint(connection.source, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
-    jsPlumb.addEndpoint(connection.target, { anchor:[ "Perimeter", { shape:"Circle"}] }, connectionEndpoint());
+    jsPlumb.addEndpoint(connection.source, connectionEndpoint());
+    jsPlumb.addEndpoint(connection.target, connectionEndpoint());
   }
 
   var overlay = $(connection.getOverlay("customOverlay").getElement())
 
   // get the available relations from the server oder simply load the existing one
   if(url){
-    return $.ajax({url: url, success: function(data){
-      overlay.html(data)}
-    });
+    return $.ajax({url: url, success: function(data){overlay.html(data)}});
   } else {
     return createNewConnection(connection, overlay)
   }
@@ -187,53 +162,34 @@ jsPlumb.bind("connectionDetached", function(info, originalEvent){
   }
 });
 
-// creates the box-nodes for attribute filtering
-var createNodeAttributeFilter = function(endpoint, node_id, make_static) {
-  // build the div
-  var node_html_id = "node_" + node_id + "_attributes";
-  var node_class = "attribute_constraints";
-  if(make_static == true){
-    node_class += " static";
+var insertAttributeConstraint = function(node_id, data){
+  var ac = $(data)
+  if(0 === ac.attr("style").length){
+    var node_position = $("#node_" + node_id).position()
+    ac.css({left: node_position.left - 100, top: node_position.top - 150})
   }
-  var attributeFilter = "<div id='" + node_html_id  + "' class='" + node_class + "' style='left: ";
-  attributeFilter += (endpoint.canvas.offsetLeft + 3) + "px; top: " + (endpoint.canvas.offsetTop - 120) + "px;'></div>";
-
-  // make the div draggable and connect it to the node
-  $("#drawing_canvas").append(attributeFilter);
-
-  var ae = jsPlumb.addEndpoint(node_html_id, { anchor:[ "BottomLeft"] }, attributeEndpoint());
-  jsPlumb.connect({source: endpoint, target: ae, deleteEndpointsOnDetach:true});
-
-  // create the '+ add filter' link at the bottom of the div
-  var more_link;
-
-  if(make_static != true){
-    jsPlumb.draggable(node_html_id);
-    more_link = jQuery('<a/>',{
-      id: "append_attribute_filter_" + node_id,
-      href: "#",
-      text: "+ add filter"
-    });
-    more_link.click(function(){addAttributeFilter(node_id, more_link)});
-  } else {
-    more_link = jQuery("<span></span>");
-  };
-
-  more_link.appendTo($("#" + node_html_id));
-  return more_link;
+  $("#drawing_canvas").append(ac);
+  jsPlumb.draggable(ac);
+  var ae = jsPlumb.addEndpoint(ac, { anchor:[ "BottomCenter"], deleteEndpointsOnDetach:true }, attributeEndpoint());  
+  jsPlumb.connect({source: jsPlumb.getEndpoints("node_" + node_id)[1], target: ae});
 };
 
 // call the backend and retrieve the next attribute filter line
-var addAttributeFilter = function(node_id, bottom, url) {
+var addAttributeFilter = function(node_id, url) {
   if(url){
-    return $.ajax({url: url, success: function(data) {$(data).insertBefore(bottom)}})
+    return $.ajax({
+      url: url, 
+      success: function(data) {
+        insertAttributeConstraint(node_id, data)
+      }
+    })
   } else {
     return $.ajax({
       url: new_attribute_constraint_path,
       type: "POST",
       data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
       success: function(data) {
-        $(data).insertBefore(bottom);
+        insertAttributeConstraint(node_id, data)
       }
     });
   }
@@ -258,13 +214,13 @@ var deleteNode = function(node){
     if(connection.sourceId == node_id){
       var target = $(connection.target);
       jsPlumb.detach(connection);
-      target.remove();
+      jsPlumb.remove(target);
     }
   });
 
   $.ajax({url: delete_url, method: "DELETE", success: function(data){
     $(jsPlumb.getEndpoints(node_id)).each(function(i, endpoint){jsPlumb.deleteEndpoint(endpoint)});
-    node.remove();
+    jsPlumb.remove(node);
   }});
 };
 
@@ -359,6 +315,7 @@ var connectionEndpoint = function() {
 		endpoint:["Dot", {radius:4} ],
 		paintStyle:{ fillStyle:"#ffa500", opacity:0.5 },
 		isSource: true,
+    anchor:[ "Perimeter", { shape:"Square", rotation: 180}],
     deleteEndpointsOnDetach:true,
 		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
@@ -370,7 +327,7 @@ var connectionEndpoint = function() {
         location:0.5,
         id:"customOverlay"
       }],
-		  ["Arrow",{ width:10, location:1, length:20, id:"arrow" }]
+		  ["Arrow",{ width:8, location:1, length:15, id:"arrow" }]
 		],
 		connector : "Straight",
 		isTarget:true,
@@ -385,11 +342,13 @@ var connectionEndpoint = function() {
 // same for the attribute endpoints
 var attributeEndpoint = function() {
   return {
-		endpoint:["Rectangle", {width:6, height:6} ],
+		endpoint:["Rectangle", {width:5, height:5} ],
 		anchor: ["Top"],
+    deleteEndpointsOnDetach:false,
 		paintStyle:{ fillStyle:"#0087CF", opacity:0.5 },
 		scope: "attributes",
-		connectorStyle:{ strokeStyle:"#0087CF", lineWidth:3 },
+    maxConnections: -1,
+		connectorStyle:{ strokeStyle:"#0087CF", lineWidth:2 },
 		connector : "Straight"
 	};
 };
