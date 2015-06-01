@@ -29,6 +29,12 @@ div.node select{
   height: 2em;
 }
 
+div.node.static{
+  font-size: 0.75em;
+  width: auto;
+  min-width: 8em;  
+}
+
 div.node form{
   margin-top: 0.3em;
 }
