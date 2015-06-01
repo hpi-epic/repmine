@@ -77,3 +77,11 @@ div.center_everything {
   border: 3px solid #17B3E3;
   color: #000;
 }
+
+._jsPlumb_endpoint { 
+  z-index:60; 
+}
+
+.graph_element {
+  z-index: 59;
+}
