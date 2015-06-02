@@ -26,11 +26,12 @@ module NodesHelper
     return options
   end
 
-  def node_position(node)
-    if node.y == 0
-      return "top: 10em;left: #{node.x == 0 ? 20 : node.x}px;"
+  def node_position(node, relayout = false)
+    x,y = relayout ? node.pattern.position_for_element(node) : [node.x, node.y]
+    if y == 0
+      return "top: 10em;left: #{x == 0 ? 20 : x}px;"
     else
-      return "top: #{node.y}px;left: #{node.x == 0 ? 20 : node.x}px;"
+      return "top: #{y}px;left: #{x == 0 ? 20 : x}px;"
     end
   end
 end

@@ -8,21 +8,21 @@ div.relation {
   background: rgba(255,255,255,0.0);
 }
 
-div.relation select{
-  font-size: 1em;
-  width: 10em;
+div.relation.static{
+  background-color: white;
 }
 
-div.relation input{
+form.edit_relation_constraint select{
+  height: 1.5em;
+  width: 8em;
+}
+
+form.edit_relation_constraint input{
   width: 2em;
   height: 1em;
-  font-size: 1em;
+  font-size: 0.75em;
 }
 
 form.edit_relation_constraint {
   padding: 5px;
-}
-
-div.relation.static{
-  background-color: white;
 }

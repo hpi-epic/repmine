@@ -15,6 +15,7 @@ class PatternsController < ApplicationController
   
   def translate
     @source_pattern = Pattern.find(params[:pattern_id])
+    @source_pattern.auto_layout!
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
     @offset = @source_pattern.node_offset
 
@@ -98,8 +99,11 @@ class PatternsController < ApplicationController
   end
   
   def combine
-    @patterns = params[:patterns].collect{|p_id| Pattern.find(p_id)}
-    redirect_to patterns_path, :notice => "Cannot yet combine patterns: #{@patterns.collect{|p| p.name}.join(", ")}"
+    if params[:patterns].size != 2
+      redirect_to patterns_path, :alert => "You can only combine exactly two patterns at a time!"
+    else
+      redirect_to patterns_path, :notice => "We're working on it..."
+    end
   end
 
   def missing_concepts
@@ -143,22 +147,22 @@ class PatternsController < ApplicationController
 
   def load_attributes_and_constraints!(pattern, static = false)
     # load existing relation constraints
-    relations = pattern.nodes.collect do |node|
-      node.source_relation_constraints.collect do |src|
-        {:source => node.id, :target => src.target_id, :url => static ? pattern_relation_constraint_static_path(pattern, src) : pattern_relation_constraint_path(pattern, src)}
-      end
-    end.flatten
+    relations = pattern.relation_constraints.collect do |rc|
+      {
+        :source => rc.source.id, 
+        :target => rc.target.id, 
+        :url => static ? pattern_relation_constraint_static_path(pattern, rc) : pattern_relation_constraint_path(pattern, rc)
+      }
+    end
 
     # and attribute constraints, as well
     attributes = {}
-    pattern.nodes.each do |node|
-      node.attribute_constraints.each do |nac|
-        attributes[node.id] ||= []
-        attributes[node.id] << if static
-          pattern_attribute_constraint_static_path(pattern, nac)
-        else
-          pattern_attribute_constraint_path(pattern, nac)
-        end
+    pattern.attribute_constraints.each do |ac|
+      attributes[ac.node.id] ||= []
+      attributes[ac.node.id] << if static
+        pattern_attribute_constraint_static_path(pattern, ac)
+      else
+        pattern_attribute_constraint_path(pattern, ac)
       end
     end
     return attributes, relations

@@ -30,10 +30,7 @@ var addNodeEndpoints = function(node_html_id){
 var loadExistingConnections = function(connect_them, load_attributes, make_static){
   requests = []
   $(connect_them).each(function(index, el){
-	  var free_source = freeRelationEndpointOn("node_" + el.source);
-	  var free_target = freeRelationEndpointOn("node_" + el.target);
-	  var connection = jsPlumb.connect({source: free_source, target: free_target, deleteEndpointsOnDetach:true});
-	  requests.push(createConnection(connection, true, el.url));
+	  requests.push(createConnection(el.source, el.target, true, el.url));
 	});
 
 	for (var node_id in load_attributes){
@@ -115,38 +112,53 @@ var updateConnectionsAndAttributes = function(node){
 };
 
 // creates a connection between two endpoints
-var createConnection = function(connection, reinstall_endpoints, url) {
+var createConnection = function(source_id, target_id, reinstall_endpoints, url) {
+  // get the available relations from the server oder simply load the existing one
+  if(url){
+    return $.ajax({url: url, success: function(data){
+      buildConnection(source_id, target_id, reinstall_endpoints, $(data));
+    }});
+  } else {
+    return $.ajax({
+      url: new_relation_constraint_path,
+      type: "POST",
+      data: {
+        source_id: source_id,
+        target_id: target_id,
+        source_type: rdfTypeForHTMLNode("node_" + source_id),
+        target_type: rdfTypeForHTMLNode("node_" + target_id),
+      },
+      success: function(data) {
+        buildConnection(source, target, reinstall_endpoints, $(data));
+      }
+    })
+  }
+};
+
+var buildConnection = function(source_id, target_id, reinstall_endpoints, overlay){
+  var free_source = freeRelationEndpointOn("node_" + source_id);
+  var free_target = freeRelationEndpointOn("node_" + target_id);
+  var connection = jsPlumb.connect({
+    source: free_source, 
+    target: free_target, 
+    deleteEndpointsOnDetach:true,
+		overlays:[
+      ["Custom", {
+        create: function(component) {return overlay;},
+        location: 0.4,
+        id:"customOverlay"
+      }],
+		  ["Arrow",{ width:8, location:1, length:15, id:"arrow" }]
+		],
+  });
+  
   // reinstall the endpoints
   if(reinstall_endpoints){
     jsPlumb.addEndpoint(connection.source, connectionEndpoint());
     jsPlumb.addEndpoint(connection.target, connectionEndpoint());
   }
-
-  var overlay = $(connection.getOverlay("customOverlay").getElement())
-
-  // get the available relations from the server oder simply load the existing one
-  if(url){
-    return $.ajax({url: url, success: function(data){overlay.html(data)}});
-  } else {
-    return createNewConnection(connection, overlay)
-  }
-};
-
-var createNewConnection = function(connection, overlay){
-  return $.ajax({
-    url: new_relation_constraint_path,
-    type: "POST",
-    data: {
-      source_id: $(connection.source).attr("data-id"),
-      target_id: $(connection.target).attr("data-id"),
-      source_type: rdfTypeForHTMLNode(connection.sourceId),
-      target_type: rdfTypeForHTMLNode(connection.targetId),
-    },
-    success: function(data) {
-      overlay.html(data);
-    }
-  });
-};
+  
+}
 
 // handler for detaching connections
 jsPlumb.bind("connectionDetached", function(info, originalEvent){
@@ -319,16 +331,6 @@ var connectionEndpoint = function() {
     deleteEndpointsOnDetach:true,
 		scope: "relations",
 		connectorStyle:{ strokeStyle:"#ffa500", lineWidth:3 },
-		connectorOverlays:[
-      ["Custom", {
-        create: function(component) {
-          return $("<div><select></select></div>");
-        },
-        location:0.5,
-        id:"customOverlay"
-      }],
-		  ["Arrow",{ width:8, location:1, length:15, id:"arrow" }]
-		],
 		connector : "Straight",
 		isTarget:true,
     dropOptions : {
