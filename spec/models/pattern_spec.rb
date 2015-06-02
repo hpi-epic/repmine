@@ -84,7 +84,7 @@ RSpec.describe Pattern, :type => :model do
   
   it "should return a proper layout for the pattern using graphviz" do
     p1 = FactoryGirl.create(:pattern)
-    graph = p1.auto_layout!
+    graph = p1.graphviz_graph
     graph.output(:png => Rails.root.join("spec/testfiles/pattern_graph.png"))
   end
   
