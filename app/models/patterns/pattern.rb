@@ -17,7 +17,7 @@ class Pattern < ActiveRecord::Base
   include RdfSerialization
 
   attr_accessible :name, :description, :tag_list, :ontology_id
-  attr_accessor :ag_connection
+  attr_accessor :ag_connection, :layouted_graph
 
   acts_as_taggable_on :tags
 
@@ -46,10 +46,6 @@ class Pattern < ActiveRecord::Base
   def create_node!
     node = self.nodes.create!
     return node.becomes(Node)
-  end
-
-  def node_offset
-    return nodes.collect{|n| n.attribute_constraints.empty? ? n.x : n.x + 280}.max
   end
 
   def matched_elements(ont)
@@ -110,8 +106,8 @@ class Pattern < ActiveRecord::Base
     return pattern
   end
   
-  def auto_layout!
-    g = GraphViz.new( :G, :type => :digraph )
+  def graphviz_graph
+    g = GraphViz.new("#{id}", {:type => :digraph, :splines => true})
     node_cache = {}
     nodes.each do |node| 
       node_cache[node] = g.add_node(node.id.to_s, {:label => node.pretty_print})
@@ -121,9 +117,33 @@ class Pattern < ActiveRecord::Base
       end
     end
     relation_constraints.each do |rc|
-      g.add_edge(node_cache[rc.source], node_cache[rc.target], {:label => rc.pretty_print})
+      g.add_edge(node_cache[rc.source], node_cache[rc.target], {:label => rc.pretty_print, :labeldistance => 10.0, :labelfloat => false})
     end
     return g
+  end
+  
+  def auto_layout!()
+    graphviz_graph.output(:dot => Rails.root.join("tmp", "pattern_layouts", "#{id}.dot"))
+    graphviz_graph.output(:png => Rails.root.join("tmp", "pattern_layouts", "#{id}.png"))    
+    @layouted_graph = GraphViz.parse(Rails.root.join("tmp", "pattern_layouts", "#{id}.dot").to_s)
+  end
+  
+  def position_for_element(element)
+    point = layouted_graph.get_node(element.id.to_s)["pos"].point
+    point[1] += 40
+    point[1] *= 1.2
+    point[0] *= 1.4
+    point[0] -= 100
+    return point
+  end
+  
+  def node_offset
+    furthest = (nodes + attribute_constraints).sort_by{|pe| position_for_element(pe)[0]}.last
+    return position_for_element(furthest)[0]
+  end
+  
+  def layouted_graph
+    @layouted_graph || auto_layout!
   end
 
   def url
