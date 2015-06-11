@@ -16,7 +16,7 @@
 #
 
 class Repository < ActiveRecord::Base
-  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
+  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password, :group
   belongs_to :ontology
   validates :name, :presence => true
 
@@ -51,11 +51,11 @@ class Repository < ActiveRecord::Base
   # just not way of saying self.create_extracted_ontology or self.create_ontology(type: "Extracted")
   def build_ontology
     ont_url = ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
-    self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => "Extracted", :url => ont_url)
+    self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => group || "Misc", :url => ont_url)
     self.ontology.repository = self
     self.ontology.save
   end
-  
+    
   def name_url_safe
     return name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_') + "_#{self.id}"
   end
@@ -103,10 +103,6 @@ class Repository < ActiveRecord::Base
 
   def self.query_creator_class
     SparqlQueryCreator
-  end
-
-  def type_hierarchy
-    return ontology.type_hierarchy
   end
 
   def imports
