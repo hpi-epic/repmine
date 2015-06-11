@@ -23,6 +23,11 @@ div.double-border {
   padding: 1px;
 }
 
+div.double-border.selected{
+  border: 6px double #B22222;
+  padding: 1px;
+}
+
 div.node select{
   font-size: 0.75em;
   width: 10em;
