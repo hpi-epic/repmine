@@ -1,8 +1,6 @@
 // jsPlumb initializer - creates the drawing canvas and binds the 'connection' event
 jsPlumb.ready(function() {
-
   jsPlumb.importDefaults({Container: "drawing_canvas"});
-
   $(".immutable_node").each(function(index, node_div){addNodeEndpoints($(node_div).attr("id"));});
 
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
@@ -11,18 +9,8 @@ jsPlumb.ready(function() {
     addMatchedClass();
 	});
 
-  loadTranslationPattern();
+	loadNodesAndConnections();
 });
-
-// function called when the "new Node" button is being clicked
-var newTranslationNode = function(url){
-  $.post(url, function(data, textStatus, jqXHR){
-    var node = $(data);
-    node.appendTo($("#drawing_canvas"));
-    addNodeToGraph(node);
-    showGrowlNotification(jqXHR);
-  });
-};
 
 // adds the css class 'matched' to all elements we already know have a mactching concept
 var addMatchedClass = function(){
@@ -31,17 +19,6 @@ var addMatchedClass = function(){
       $(el).addClass("matched")
     }
   })
-};
-
-// removes all unconnected Endpoints so users cannot somehow create new connections
-var removeExcessEndpoints = function(){
-  $("div.immutable_node").each(function(i,node){
-    $(jsPlumb.getEndpoints($(node).attr("id"))).each(function(ii,endpoint){
-      if(endpoint.connections.length == 0){
-        jsPlumb.deleteEndpoint(endpoint);
-      }
-    });
-  });
 };
 
 // returns the selections, except for the exceptions
@@ -83,7 +60,7 @@ var toggleSelectability = function(switch_on){
     if(switch_on){
       $(el).on("click", function(){
         $(this).toggleClass("selected");
-        var selected_in = $(".selected.static select[id$='rdf_type']");
+        var selected_in = $(".selected.static");
         var selected_out = $(".selected").not(".static").find("select[id$='rdf_type']");
         showHelpfulMessage(selected_in, selected_out);
       });
@@ -114,7 +91,7 @@ var showHelpfulMessage = function(selected_in, selected_out){
       msg += "<b>Please select an <u>input</u> element!</b>";
       break;
     case 1:
-      msg += "Input: <b>" + $(selected_in[0]).val() +"</b>";
+      msg += "Input: <b>" + $(selected_in[0]).attr("data-rdf-type") +"</b>";
       break;
     default:
       msg += "Input: <b>" + selected_in.size() +" concepts</b>";
@@ -137,47 +114,11 @@ var showHelpfulMessage = function(selected_in, selected_out){
     msg += "Press <i><u>Save Mapping</u></i> when ready!"
   }
   $.jGrowl(msg, {theme: 'info'});
-}
-
-var loadTranslationPattern = function(){
-  $(".node").not(".immutable_node").each(function(index,node_div){
-	  addNodeToGraph($(node_div));
-	});
-
-  loadExistingConnections(connect_these_nodes, load_their_attribute_constraints);
-
-	jsPlumb.bind("connection", function(info, originalEvent) {
-	  if(info.connection.scope == "relations") {
-		  createConnection(info.connection, true);
-	  }
-	});
-};
-
-var saveTranslation = function(hide_growl){
-  var requests = saveForm("form.edit_node").concat(saveForm("form[class*=edit_][class*=_constraint]"));
-  $.when.apply($, requests).done(function(final_request){
-    submitTranslationPattern(hide_growl);
-  });
-};
-
-var submitTranslationPattern = function(hide_growl){
-  var form = $("form.edit_pattern");
-  return $.ajax({
-    url : form.attr("action"),
-    type: "POST",
-    data : form.serialize(),
-    success: function(data, textStatus, jqXHR){
-      if(!hide_growl){showGrowlNotification(jqXHR)};
-    },
-    error: function(jqXHR, textStatus, errorThrown){
-      showGrowlNotification(jqXHR);
-    }
-  });
 };
 
 // submits the correspondence selected by the user...
 var saveCorrespondence = function(){
-  saveTranslation(true);
+  savePattern();
   var form = $("#save_correspondence_form");
   form.find("#source_element_ids_").val(getSelectedElements(".static.selected"));
   form.find("#target_element_ids_").val(getSelectedElements(".selected", ".static"));

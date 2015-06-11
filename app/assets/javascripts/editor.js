@@ -18,6 +18,27 @@ var addNodeToGraph = function(node){
   });
 };
 
+// handler for pressing the 'create node' button
+$("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
+  var node = $(xhr.responseText);
+  node.appendTo($("#drawing_canvas"));
+  addNodeToGraph(node);
+});
+
+var loadNodesAndConnections = function(){
+	$(".node").not(".immutable_node").each(function(index,node_div){
+	  addNodeToGraph($(node_div));
+	});
+
+	loadExistingConnections(connect_these_nodes, load_their_attribute_constraints);
+
+	jsPlumb.bind("connection", function(info, originalEvent) {
+	  if(info.connection.scope == "relations") {
+		  buildDraggedConnection(info.connection, true);
+	  }
+	});
+}
+
 // adds only the endpoints to a given node without making it draggable or registering callbacks
 var addNodeEndpoints = function(node_html_id){
   var endpoints = []
@@ -111,6 +132,13 @@ var updateConnectionsAndAttributes = function(node){
   })
 };
 
+var buildDraggedConnection = function(connection, rebuild_endpoints){
+  var source_id = $(connection.source).attr("data-id");
+  var target_id = $(connection.target).attr("data-id");
+  jsPlumb.detach(connection, {fireEvent:false});
+  createConnection(source_id, target_id, rebuild_endpoints);
+};
+
 // creates a connection between two endpoints
 var createConnection = function(source_id, target_id, reinstall_endpoints, url) {
   // get the available relations from the server oder simply load the existing one
@@ -126,10 +154,10 @@ var createConnection = function(source_id, target_id, reinstall_endpoints, url) 
         source_id: source_id,
         target_id: target_id,
         source_type: rdfTypeForHTMLNode("node_" + source_id),
-        target_type: rdfTypeForHTMLNode("node_" + target_id),
+        target_type: rdfTypeForHTMLNode("node_" + target_id)
       },
       success: function(data) {
-        buildConnection(source, target, reinstall_endpoints, $(data));
+        buildConnection(source_id, target_id, reinstall_endpoints, $(data));
       }
     })
   }
@@ -150,6 +178,7 @@ var buildConnection = function(source_id, target_id, reinstall_endpoints, overla
       }],
 		  ["Arrow",{ width:8, location:1, length:15, id:"arrow" }]
 		],
+    fireEvent:false
   });
   
   // reinstall the endpoints
@@ -157,7 +186,6 @@ var buildConnection = function(source_id, target_id, reinstall_endpoints, overla
     jsPlumb.addEndpoint(connection.source, connectionEndpoint());
     jsPlumb.addEndpoint(connection.target, connectionEndpoint());
   }
-  
 }
 
 // handler for detaching connections
@@ -239,6 +267,17 @@ var deleteNode = function(node){
 // returns the rdf type value for a node
 var rdfTypeForNode = function(node_id) {
   return $("#node_" + node_id).find("select").val();
+};
+
+// removes all unconnected Endpoints so users cannot somehow create new connections
+var removeExcessEndpoints = function(){
+  $("div.immutable_node").each(function(i,node){
+    $(jsPlumb.getEndpoints($(node).attr("id"))).each(function(ii,endpoint){
+      if(endpoint.connections.length == 0){
+        jsPlumb.deleteEndpoint(endpoint);
+      }
+    });
+  });
 };
 
 var rdfTypeForHTMLNode = function(node_html_id){
