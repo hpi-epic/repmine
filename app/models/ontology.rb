@@ -93,12 +93,11 @@ class Ontology < ActiveRecord::Base
   end
 
   def very_short_name
-    # removes prefixes and file endings...
-    return short_name.split("#").last.split(".").first.camelize(:lower)
+    return short_name.split("#").last.split(".").first.underscore
   end
 
   def local_file_path
-    return Rails.root.join("public", "ontologies", "tmp", url.split("/").last)
+    return Rails.root.join("public", "ontologies", "tmp", url.split("/").last).to_s
   end
 
   def download!()
