@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150610093615) do
+ActiveRecord::Schema.define(:version => 20150602142533) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",         :default => 0, :null => false
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(:version => 20150610093615) do
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
     t.integer  "ontology_id"
+    t.integer  "pattern_id"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"
@@ -79,14 +80,6 @@ ActiveRecord::Schema.define(:version => 20150610093615) do
     t.integer  "y",               :default => 0
     t.boolean  "is_group",        :default => false
   end
-
-  create_table "pattern_elements_patterns", :force => true do |t|
-    t.integer "pattern_id"
-    t.integer "pattern_element_id"
-  end
-
-  add_index "pattern_elements_patterns", ["pattern_element_id"], :name => "index_pattern_elements_patterns_on_pattern_element_id"
-  add_index "pattern_elements_patterns", ["pattern_id"], :name => "index_pattern_elements_patterns_on_pattern_id"
 
   create_table "patterns", :force => true do |t|
     t.string   "name"

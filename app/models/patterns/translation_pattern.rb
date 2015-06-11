@@ -27,11 +27,6 @@ class TranslationPattern < Pattern
     tp.save
     return tp
   end
-  
-  # legacy support
-  def self.for_pattern_and_ontology(pattern, ontology)
-    return self.for_pattern_and_ontologies(pattern, [ontology])
-  end
 
   def self.pattern_name(pattern, ontologies)
     return "translation of '#{pattern.name}' to '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"

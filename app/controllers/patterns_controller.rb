@@ -19,7 +19,7 @@ class PatternsController < ApplicationController
     @offset = @source_pattern.node_offset
 
     @target_ontologies = Ontology.find(params[:ontology_id])
-    @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @target_ontologies)
+    @target_pattern = TranslationPattern.for_pattern_and_ontologies(@source_pattern, [@target_ontologies])
     
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
     @matched_elements = @source_pattern.matched_elements(@target_ontologies).collect{|me| me.id.to_s}

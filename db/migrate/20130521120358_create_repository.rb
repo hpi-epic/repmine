@@ -8,6 +8,7 @@ class CreateRepository < ActiveRecord::Migration
       t.string :host
       t.integer :port
       t.text :description
+      t.string :group
       t.integer :ontology_id
       t.string :type
       t.integer :rdbms_type_cd

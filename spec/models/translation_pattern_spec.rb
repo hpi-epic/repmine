@@ -24,7 +24,7 @@ RSpec.describe TranslationPattern, :type => :model do
 
   it "should create an empty pattern if no correspondences exist" do
     om = ontology_matcher([])    
-    @tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    @tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     assert_empty @tp.nodes
     assert_empty @tp.pattern_elements
   end
@@ -35,7 +35,7 @@ RSpec.describe TranslationPattern, :type => :model do
     om = ontology_matcher([correspondence])
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}
     @pattern.nodes.first.rdf_type = correspondence.entity1
-    @tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    @tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     assert_equal 1, @tp.pattern_elements.size
     assert_equal correspondence.entity2, @tp.pattern_elements.first.rdf_type
   end
@@ -45,7 +45,7 @@ RSpec.describe TranslationPattern, :type => :model do
     om = ontology_matcher([correspondence])
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}    
     @pattern.nodes.first.rdf_type = correspondence.entity1
-    @tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    @tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     assert @tp.equal_to?(correspondence.entity2)
     # rspec seems to not properly reload has_many relations so we have to do that manually...
     @tp.pattern_elements.reload
@@ -58,7 +58,7 @@ RSpec.describe TranslationPattern, :type => :model do
     @pattern.pattern_elements.first.rdf_type = correspondence1.entity1
     om = ontology_matcher([correspondence1, correspondence2])
     assert_equal 2, om.correspondences_for_concept(correspondence1.entity1).size
-    expect{TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)}.to raise_error(TranslationPattern::AmbiguousTranslation)
+    expect{TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])}.to raise_error(TranslationPattern::AmbiguousTranslation)
   end
   
   it "should determine whether a requested translation already exists and return that instead of a new one" do
@@ -87,7 +87,7 @@ RSpec.describe TranslationPattern, :type => :model do
     matchable_nodes = @pattern.pattern_elements.select{|pe| pe.rdf_type == correspondence1.entity1}
     correspondence2 = FactoryGirl.build(:hardway_complex)
     om = ontology_matcher([correspondence1, correspondence2])
-    tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     
     assert_equal matchable_nodes.size, tp.nodes.size
     assert_equal matchable_nodes, @pattern.matched_elements(@ontology)
@@ -99,7 +99,7 @@ RSpec.describe TranslationPattern, :type => :model do
     om = ontology_matcher([correspondence1, correspondence2])
     new_node = @pattern.create_node!(@pattern.ontologies.first)
     new_node.rdf_type = correspondence1.entity1
-    tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     # there should be one node comming from the simple correspondence and one from the hardway
     assert_equal 2, tp.pattern_elements.size
   end
@@ -107,7 +107,7 @@ RSpec.describe TranslationPattern, :type => :model do
   it "should properly attach elements to the translation pattern" do
     correspondence = FactoryGirl.build(:hardway_complex)
     om = ontology_matcher([correspondence])
-    tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     assert_equal tp, tp.pattern_elements.first.pattern
   end
   
@@ -115,7 +115,7 @@ RSpec.describe TranslationPattern, :type => :model do
     correspondence = FactoryGirl.build(:hardway_complex)
     om = ontology_matcher([correspondence])
     new_node = @pattern.create_node!(@pattern.ontologies.first)
-    tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     assert_equal 3, @pattern.matched_elements([@ontology]).size
   end
   
@@ -124,7 +124,7 @@ RSpec.describe TranslationPattern, :type => :model do
     om = ontology_matcher([correspondence1])
     new_node = @pattern.create_node!(@pattern.ontologies.first)
     new_node.rdf_type = correspondence1.entity1
-    tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@ontology])
     assert_equal new_node, @pattern.unmatched_elements(@ontology).first
     assert_equal 1, tp.pattern_elements.size
     assert_equal 1, @pattern.unmatched_elements([@ontology]).size

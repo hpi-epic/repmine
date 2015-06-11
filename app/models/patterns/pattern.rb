@@ -22,7 +22,7 @@ class Pattern < ActiveRecord::Base
   acts_as_taggable_on :tags
 
   has_and_belongs_to_many :ontologies
-  has_and_belongs_to_many :pattern_elements
+  has_many :pattern_elements
   has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
 
   # validations
@@ -45,7 +45,6 @@ class Pattern < ActiveRecord::Base
   
   def create_node!(ontology)
     node = self.nodes.create!(:ontology_id => ontology.id)
-    node.pattern = self
     return node.becomes(Node)
   end
 

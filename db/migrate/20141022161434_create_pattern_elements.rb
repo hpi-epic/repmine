@@ -5,6 +5,7 @@ class CreatePatternElements < ActiveRecord::Migration
       t.string :type
       t.timestamps
       t.references :ontology
+      t.references :pattern
       # attribute constraint
       t.references :node
       t.string :value

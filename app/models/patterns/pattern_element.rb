@@ -28,7 +28,7 @@ class PatternElement < ActiveRecord::Base
   # allows to access the rdf node, in case this pattern stems from an rdf graph
   attr_accessor :rdf_node
   
-  has_and_belongs_to_many :patterns
+  belongs_to :pattern
   belongs_to :ontology
   
   has_many :matches, :foreign_key => :matched_element_id, :class_name => "PatternElementMatch", :dependent => :destroy
@@ -44,15 +44,6 @@ class PatternElement < ActiveRecord::Base
 
   def build_type_expression!()
     TypeExpression.for_rdf_type(self, "")
-  end
-  
-  # old style accessor to not having to change so much code...
-  def pattern=(pattern)
-    self.patterns << pattern if !pattern.nil? and !patterns.include?(pattern)
-  end
-  
-  def pattern
-    return patterns.first
   end
 
   def url
