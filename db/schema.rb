@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150522125653) do
+ActiveRecord::Schema.define(:version => 20150610093615) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",         :default => 0, :null => false
@@ -43,6 +43,14 @@ ActiveRecord::Schema.define(:version => 20150522125653) do
     t.datetime "updated_at",                    :null => false
   end
 
+  create_table "ontologies_patterns", :force => true do |t|
+    t.integer "ontology_id"
+    t.integer "pattern_id"
+  end
+
+  add_index "ontologies_patterns", ["ontology_id"], :name => "index_ontologies_patterns_on_ontology_id"
+  add_index "ontologies_patterns", ["pattern_id"], :name => "index_ontologies_patterns_on_pattern_id"
+
   create_table "pattern_element_matches", :force => true do |t|
     t.integer  "matched_element_id"
     t.integer  "matching_element_id"
@@ -57,7 +65,7 @@ ActiveRecord::Schema.define(:version => 20150522125653) do
     t.string   "type"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
-    t.integer  "pattern_id"
+    t.integer  "ontology_id"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"
@@ -72,17 +80,23 @@ ActiveRecord::Schema.define(:version => 20150522125653) do
     t.boolean  "is_group",        :default => false
   end
 
+  create_table "pattern_elements_patterns", :force => true do |t|
+    t.integer "pattern_id"
+    t.integer "pattern_element_id"
+  end
+
+  add_index "pattern_elements_patterns", ["pattern_element_id"], :name => "index_pattern_elements_patterns_on_pattern_element_id"
+  add_index "pattern_elements_patterns", ["pattern_id"], :name => "index_pattern_elements_patterns_on_pattern_id"
+
   create_table "patterns", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.integer  "ontology_id"
     t.string   "type"
     t.integer  "pattern_id"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
 
-  add_index "patterns", ["ontology_id"], :name => "index_patterns_on_ontology_id"
   add_index "patterns", ["pattern_id"], :name => "index_patterns_on_pattern_id"
 
   create_table "repositories", :force => true do |t|
@@ -93,6 +107,7 @@ ActiveRecord::Schema.define(:version => 20150522125653) do
     t.string  "host"
     t.integer "port"
     t.text    "description"
+    t.string  "group"
     t.integer "ontology_id"
     t.string  "type"
     t.integer "rdbms_type_cd"

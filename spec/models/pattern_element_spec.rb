@@ -40,17 +40,6 @@ RSpec.describe PatternElement, :type => :model do
     @pe.rdf_type = "http://example.org/MyType2"
     assert_equal "http://example.org/MyType2", @pe.rdf_type
   end
-
-  it "should create a proper element for a given rdf type" do
-    @pe = PatternElement.for_rdf_type("http://example.org/fancy_type")
-    assert_equal "http://example.org/fancy_type", @pe.rdf_type
-  end
-
-  it "should create just what you want it to be" do
-    assert Node.for_rdf_type("http://example.org/fancy_type").is_a?(Node)
-    assert AttributeConstraint.for_rdf_type("http://example.org/fancy_type").is_a?(AttributeConstraint)
-    assert RelationConstraint.for_rdf_type("http://example.org/fancy_type").is_a?(RelationConstraint)
-  end
   
   it "should properly detect equality of two generic pattern elements" do
     pe1 = FactoryGirl.create(:pattern_element, :pattern => FactoryGirl.create(:empty_pattern))    

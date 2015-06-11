@@ -21,14 +21,14 @@ class Pattern < ActiveRecord::Base
 
   acts_as_taggable_on :tags
 
-  belongs_to :ontology
-  has_many :pattern_elements, :dependent => :destroy
+  has_and_belongs_to_many :ontologies
+  has_and_belongs_to_many :pattern_elements
   has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
 
   # validations
   validates :name, :presence => true
   validates :description, :presence => true
-  validates :ontology, :presence => true
+  validates :ontologies, :length => {:minimum => 1, :message=>"At least one ontology is required!" }
 
   # polymorphic finders....
   def nodes
@@ -43,25 +43,18 @@ class Pattern < ActiveRecord::Base
     pattern_elements.where(:type => "RelationConstraint")
   end
   
-  def create_node!
-    node = self.nodes.create!
+  def create_node!(ontology)
+    node = self.nodes.create!(:ontology_id => ontology.id)
+    node.pattern = self
     return node.becomes(Node)
   end
 
-  def matched_elements(ont)
-    return pattern_elements.select{|pe| not pe.matching_elements.where(:pattern_id => target_pattern(ont)).empty?}
+  def matched_elements(onts)
+    return pattern_elements.select{|pe| not pe.matching_elements.where(:ontology_id => onts).empty?}
   end
   
-  def unmatched_elements(ont)
-    return pattern_elements.select{|pe| pe.matching_elements.where(:pattern_id => target_pattern(ont)).empty?}
-  end
-  
-  def target_pattern(ont)
-    Pattern.where(:ontology_id => ont.id, :pattern_id => self).first
-  end
-  
-  def ontology_matcher(ont)
-    return OntologyMatcher.new(self.ontology, ont)
+  def unmatched_elements(onts)
+    return pattern_elements.select{|pe| pe.matching_elements.where(:ontology_id => onts).empty?}
   end
   
   # some comparison
@@ -79,7 +72,9 @@ class Pattern < ActiveRecord::Base
   end
 
   def custom_prefixes()
-    return {ontology.short_prefix => ont.url}
+    prefixes = {}
+    ontologies.each{|ontology| prefixes[ontology.short_prefix] = ont.url}
+    return prefixes
   end
   
   def print!
@@ -88,7 +83,7 @@ class Pattern < ActiveRecord::Base
   end
   
   # RDF deserialization
-  def self.from_graph(graph, pattern_node)
+  def self.from_graph(graph, pattern_node, ont)
     pattern = Pattern.new()
     
     graph.build_query do |q|
@@ -99,25 +94,26 @@ class Pattern < ActiveRecord::Base
       pattern_element = Kernel.const_get(res[:type].to_s.split("/").last).new
       pattern_element.rdf_node = res[:element]
       pattern_element.pattern = pattern
+      pattern_element.ontology = ont
       pattern.pattern_elements << pattern_element
     end
     
     pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}
     return pattern
   end
-  
+    
   def graphviz_graph
     g = GraphViz.new("#{id}", {:type => :digraph, :splines => true})
     node_cache = {}
     nodes.each do |node| 
-      node_cache[node] = g.add_node(node.id.to_s, {:label => node.pretty_print})
+      node_cache[node] = g.add_node(node.id.to_s, {:label => node.pretty_string})
       node.attribute_constraints.each do |ac| 
-        ac_node = g.add_node(ac.id.to_s, {:shape => "box", :label => ac.pretty_print})
+        ac_node = g.add_node(ac.id.to_s, {:shape => "box", :label => ac.pretty_string})
         g.add_edge(node_cache[node], ac_node)
       end
     end
     relation_constraints.each do |rc|
-      g.add_edge(node_cache[rc.source], node_cache[rc.target], {:label => rc.pretty_print, :labeldistance => 10.0, :labelfloat => false})
+      g.add_edge(node_cache[rc.source], node_cache[rc.target], {:label => rc.pretty_string, :labeldistance => 10.0, :labelfloat => false})
     end
     return g
   end
@@ -130,10 +126,9 @@ class Pattern < ActiveRecord::Base
   
   def position_for_element(element)
     point = layouted_graph.get_node(element.id.to_s)["pos"].point
-    point[1] += 40
+    point[1] += 90
     point[1] *= 1.2
     point[0] *= 1.4
-    point[0] -= 100
     return point
   end
   

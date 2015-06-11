@@ -36,7 +36,7 @@ RSpec.describe TranslationPattern, :type => :model do
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}
     @pattern.nodes.first.rdf_type = correspondence.entity1
     @tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
-    assert_equal 1, @tp.pattern_elements.size    
+    assert_equal 1, @tp.pattern_elements.size
     assert_equal correspondence.entity2, @tp.pattern_elements.first.rdf_type
   end
   
@@ -61,6 +61,25 @@ RSpec.describe TranslationPattern, :type => :model do
     expect{TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)}.to raise_error(TranslationPattern::AmbiguousTranslation)
   end
   
+  it "should determine whether a requested translation already exists and return that instead of a new one" do
+    p1 = FactoryGirl.create(:pattern)
+    tp1 = TranslationPattern.new(:name => "translation", :description => "just that", :pattern_id => p1.id)
+    tp1.ontologies << FactoryGirl.create(:ontology)
+    tp1.save
+    
+    # simple case - equal ontologies, go for it
+    assert_equal tp1, TranslationPattern.for_pattern_and_ontologies(p1, tp1.ontologies)
+    # more tricky - the new target is a superset. In that case, the old pattern suffices but should get the new ontology in addition
+    o1 = FactoryGirl.create(:ontology)
+    tp2 = TranslationPattern.for_pattern_and_ontologies(p1, tp1.ontologies + [o1])
+    assert_equal tp1, tp2
+    assert_equal tp1.ontologies + [o1], tp2.ontologies
+    # finally, we need a new pattern at some point...
+    o3 = FactoryGirl.create(:ontology)
+    tp3 = TranslationPattern.for_pattern_and_ontologies(p1, [o3])
+    assert_not_equal tp3, tp1
+  end
+  
   it "should give simple correspondences precedence over complex ones" do
     correspondence1 = FactoryGirl.build(:simple_correspondence)
     # this guarantees that a node with type http://example.org/node is matched standalone and as part of the pattern
@@ -78,7 +97,7 @@ RSpec.describe TranslationPattern, :type => :model do
     correspondence1 = FactoryGirl.build(:simple_correspondence)
     correspondence2 = FactoryGirl.build(:hardway_complex)
     om = ontology_matcher([correspondence1, correspondence2])
-    new_node = @pattern.create_node!
+    new_node = @pattern.create_node!(@pattern.ontologies.first)
     new_node.rdf_type = correspondence1.entity1
     tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
     # there should be one node comming from the simple correspondence and one from the hardway
@@ -95,31 +114,30 @@ RSpec.describe TranslationPattern, :type => :model do
   it "should properly set that elements have already been matched" do
     correspondence = FactoryGirl.build(:hardway_complex)
     om = ontology_matcher([correspondence])
-    new_node = @pattern.create_node!
+    new_node = @pattern.create_node!(@pattern.ontologies.first)
     tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
-    assert_equal 1, tp.pattern_elements.size
-    assert_equal 3, @pattern.matched_elements(@ontology).size
+    assert_equal 3, @pattern.matched_elements([@ontology]).size
   end
   
   it "should be able to adapt a translation pattern if we suddenly know of a new correspondence" do
     correspondence1 = FactoryGirl.build(:hardway_complex)
     om = ontology_matcher([correspondence1])
-    new_node = @pattern.create_node!
+    new_node = @pattern.create_node!(@pattern.ontologies.first)
     new_node.rdf_type = correspondence1.entity1
     tp = TranslationPattern.for_pattern_and_ontology(@pattern, @ontology)
     assert_equal new_node, @pattern.unmatched_elements(@ontology).first
     assert_equal 1, tp.pattern_elements.size
-    assert_equal 1, @pattern.unmatched_elements(@ontology).size
+    assert_equal 1, @pattern.unmatched_elements([@ontology]).size
     corr2 = FactoryGirl.build(:simple_correspondence)
     om.add_correspondence!(corr2)
     @pattern.unmatched_elements(@ontology).first.rdf_type = corr2.entity1
     tp.prepare!()
-    assert_empty @pattern.unmatched_elements(@ontology)
+    assert_empty @pattern.unmatched_elements([@ontology])
     assert_equal 2, tp.pattern_elements.size
   end
   
   def ontology_matcher(correspondences)
-    om = OntologyMatcher.new(@pattern.ontology, @ontology)
+    om = OntologyMatcher.new(@pattern.ontologies.first, @ontology)
     om.alignment_repo.clear!
     om.insert_statements!
     correspondences.each{|c| om.add_correspondence!(c)}

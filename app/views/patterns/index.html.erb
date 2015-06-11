@@ -5,7 +5,7 @@
     <%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
     <%= button_tag("Combine Selected", :class => "btn btn-success", :name => "combine") %>
     <%= button_tag("Translate Selected to:", :class => "btn btn-info", :name => "translate") %>
-    <%= select_tag(:ontology_id, grouped_options_for_select(@ontology_groups), :class => "needs_no_space") %>
+    <%= select_tag(:ontology_ids, grouped_options_for_select(@ontology_groups), {:class => "needs_no_space"}) %>
   </div>
 </div>
 
@@ -33,7 +33,7 @@
         </td>
         <td class="span8"><%= pattern.description %></td>
         <td><%= pattern.pattern_elements.size %></td>
-        <td><%= pattern.ontology.short_name %>
+        <td><%= pattern.ontologies.collect{|ont| ont.short_name}.join(", ") %>
         <td>
           <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-mini") %>
           <%= link_to(

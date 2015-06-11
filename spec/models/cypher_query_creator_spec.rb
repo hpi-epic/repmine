@@ -17,7 +17,7 @@ RSpec.describe CypherQueryCreator, :type => :model do
   
   it "should create simple multi node queries" do
     pattern = FactoryGirl.create(:node_only_pattern)
-    pattern.create_node!
+    pattern.create_node!(pattern.ontologies.first)
     qc = CypherQueryCreator.new(pattern)
     qs = qc.query_string
     qv = query_variables(pattern, qc)    
@@ -43,10 +43,10 @@ RSpec.describe CypherQueryCreator, :type => :model do
   
   it "should concat multiple connection through commas" do
     pattern = FactoryGirl.create(:n_r_n_pattern)
-    new_node = pattern.create_node!
-    new_rc = RelationConstraint.create(:source_id => pattern.nodes.first.id, :target_id => new_node.id)
+    new_node = pattern.create_node!(pattern.ontologies.first)
+    new_rc = FactoryGirl.create(:relation_constraint, :source_id => pattern.nodes.first.id, :target_id => new_node.id)
     new_rc.rdf_type = "fancy_new_connection"
-    
+    pattern.pattern_elements.reload    
     qc = CypherQueryCreator.new(pattern)
     qs = qc.query_string
     qv = query_variables(pattern, qc)
@@ -55,7 +55,7 @@ RSpec.describe CypherQueryCreator, :type => :model do
   
   it "should properly create regex queries" do
     pattern = FactoryGirl.create(:empty_pattern)
-    pattern.create_node!
+    pattern.create_node!(pattern.ontologies.first)
     regex_ac = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:regex], :node => pattern.nodes.first, :value => "/hello world/")
     qc = CypherQueryCreator.new(pattern)
     qs = qc.query_string
@@ -65,7 +65,7 @@ RSpec.describe CypherQueryCreator, :type => :model do
   
   it "should incorporate self-introduced variables" do
     pattern = FactoryGirl.create(:empty_pattern)
-    pattern.pattern_elements << FactoryGirl.create(:plain_node, :pattern => pattern)
+    pattern.pattern_elements << FactoryGirl.create(:plain_node)
     var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "?name")
     var_ac2 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:equals], :node => pattern.nodes.first, :value => "?name")
     qc = CypherQueryCreator.new(pattern)

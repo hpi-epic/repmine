@@ -1,0 +1,33 @@
+<%= javascript_tag do %>
+  var connect_these_static_nodes = <%= @relations.to_json.html_safe %>;
+  var load_static_attribute_constraints = <%= @attributes.to_json.html_safe %>
+<% end %>
+
+<% content_for :javascript_includes do %>
+  <%= javascript_include_tag "editor.js" %>
+  <%= javascript_include_tag "pattern_combinator.js" %>
+<% end %>
+
+<%= form_tag(combine_patterns_path) do %>
+
+<div class="input-append">
+    <%= text_field_tag(:new_name, "", {:class => "needs_no_space", :placeholder => "Name of combined Pattern..."}) %>
+    <%= select_tag(:combination_operator, options_for_select(["AND", "OR", "XOR"]), :class => "needs_no_space just_right") %>    
+    <%= button_tag("Combine!", :class => "btn btn-success", :name => "combine") %>
+    <% @patterns.each do |pattern| %>
+      <%= hidden_field_tag "patterns[]", pattern.id %>
+    <% end %>
+</div>
+
+<div id="drawing_canvas" class="canvas">
+  <% @patterns.first.nodes.each do |node| %>
+    <%= render(:partial => "nodes/static", :locals => {:node => node, :pattern => @patterns.first, :offset => 0}) %>
+  <% end %>
+  <%= hidden_field_tag("selected_node_#{@patterns.first.id}")%>
+
+  <% @patterns.last.nodes.each do |node| %>
+    <%= render(:partial => "nodes/static", :locals => {:node => node, :pattern => @patterns.last, :offset => @second_pattern_offset}) %>
+  <% end %>
+  <%= hidden_field_tag("selected_node_#{@patterns.last.id}")%>
+</div>
+<% end %>

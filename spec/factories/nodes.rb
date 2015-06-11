@@ -4,6 +4,7 @@ FactoryGirl.define do
   factory :node do
     transient {ac_count 1}
     transient {rc_count 1}
+    ontology
     association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/node"
 
     after(:create) do |node, evaluator|
@@ -14,5 +15,6 @@ FactoryGirl.define do
 
   factory :plain_node, :class => Node do
     association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/node"
+    ontology
   end
 end

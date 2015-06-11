@@ -9,7 +9,6 @@ class PatternsController < ApplicationController
   def show
     @pattern = Pattern.find(params[:id])
     # little performance tweak, only load the hierarchy, if we have nodes that go with it
-    @type_hierarchy = @pattern.nodes.empty? ? nil : @pattern.ontology.type_hierarchy
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
   end
   
@@ -19,16 +18,18 @@ class PatternsController < ApplicationController
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
     @offset = @source_pattern.node_offset
 
-    @ontology = Ontology.find(params[:ontology_id])
-    @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @ontology)
+    @target_ontologies = Ontology.find(params[:ontology_id])
+    @target_pattern = TranslationPattern.for_pattern_and_ontology(@source_pattern, @target_ontologies)
     
-    @type_hierarchy = @target_pattern.nodes.empty? ? nil : @target_pattern.ontology.type_hierarchy
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
-    @matched_elements = @source_pattern.matched_elements(@ontology).collect{|me| me.id.to_s}
+    @matched_elements = @source_pattern.matched_elements(@target_ontologies).collect{|me| me.id.to_s}
   end
 
   def create
+    ontologies = Ontology.find(params[:pattern].delete(:ontology_ids).reject{|oid| oid.blank?})
     @pattern = Pattern.new(params[:pattern])
+    
+    @pattern.ontologies = ontologies
     respond_to do |format|
       if @pattern.save
         flash[:notice] = 'Pattern was successfully created.'
@@ -88,21 +89,46 @@ class PatternsController < ApplicationController
         if params[:patterns].size > 1
           redirect_to patterns_path, :alert => "You can only translate one pattern at a time!"
         else          
-          redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_id]))
+          redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
         end
       elsif params[:combine]
-        redirect_to combine_patterns_path({:patterns => params[:patterns]}) 
+        redirect_to select_combination_nodes_patterns_path({:patterns => params[:patterns]}) 
       else
-        redirect_to patterns_path
+        redirect_to patterns_path, :alert => "How did you get here, anyway?"
       end
     end
   end
   
-  def combine
+  def select_combination_nodes
     if params[:patterns].size != 2
       redirect_to patterns_path, :alert => "You can only combine exactly two patterns at a time!"
     else
-      redirect_to patterns_path, :notice => "We're working on it..."
+      @patterns = Pattern.find(params[:patterns])
+      unless @patterns.first.ontologies.any?{|ont| @patterns.last.ontologies.include?(ont)}
+        redirect_to patterns_path, :alert => "At least one ontology needs to be shared between combined patterns"
+      end
+      a1, r1 = load_attributes_and_constraints!(@patterns.first, true)
+      a2, r2 = load_attributes_and_constraints!(@patterns.last, true)
+      @attribute = a1.merge(a2)
+      @relations = r1 + r2
+      @second_pattern_offset = @patterns.first.node_offset + 200
+    end
+  end
+  
+  def combine
+    @patterns = Pattern.find(params[:patterns])
+    
+    @nodes = begin
+      Node.find(@patterns.collect{|pattern| params["selected_node_#{pattern.id}"].to_sym})
+    rescue ActiveRecord::RecordNotFound => error
+      []
+    end
+    
+    if @nodes.size != 2
+      redirect_to select_combination_nodes_patterns_path({:patterns => params[:patterns]})
+    else
+      @combination = Pattern.combine!(@patterns, @nodes, params[:combination_operator], params[:new_name])
+      redirect_to patterns_path, :notice => "Combined '#{@patterns.first.name}' and '#{@patterns.last.name}' to '#{@combination.name}'"
     end
   end
 

@@ -29,7 +29,7 @@ class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2,
   end
   
   def pattern_elements
-    pe = onto2.element_class_for_rdf_type(entity2).new
+    pe = onto2.element_class_for_rdf_type(entity2).new(:ontology_id => onto2.id)
     pe.rdf_type = entity2
     return [pe]
   end

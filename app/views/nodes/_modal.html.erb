@@ -5,7 +5,7 @@
         <div id="node_<%= node.id%>_modal_tree">
         <%= render(
           :partial => "type_expressions/show",
-          :locals => {:type_expression => node.type_expression, :type_hierarchy => type_hierarchy, :pattern => pattern, :node => node}) %>
+          :locals => {:type_expression => node.type_expression, :type_hierarchy => node.type_hierarchy, :pattern => pattern, :node => node}) %>
         </div>
       </td>
       <td style="width: 100px; text-align: left">

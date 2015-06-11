@@ -29,6 +29,7 @@ class Node < PatternElement
   has_many :source_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "source_id", :dependent => :destroy
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy
   has_many :attribute_constraints, :dependent => :destroy
+  validates :ontology, :presence => true
 
   def rdf_mappings
     super.merge({
@@ -42,7 +43,7 @@ class Node < PatternElement
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
   
-  def pretty_print
+  def pretty_string
     "#{type_expression.fancy_string(true)}"
   end
 
@@ -65,6 +66,10 @@ class Node < PatternElement
 
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.Node]
+  end
+  
+  def type_hierarchy
+    return ontology.type_hierarchy
   end
   
   def equal_to?(other)

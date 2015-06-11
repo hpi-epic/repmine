@@ -5,5 +5,6 @@ FactoryGirl.define do
     association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/attribute"
     operator AttributeConstraint::OPERATORS[:equals]
     value "hello world"
+    ontology    
   end
 end

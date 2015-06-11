@@ -39,7 +39,7 @@ RSpec.describe Node, :type => :model do
   
   it "should check too many relations" do
     p1 = FactoryGirl.create(:pattern)
-    n1 = p1.nodes.first    
+    n1 = p1.nodes.first
     n2 = FactoryGirl.create(:pattern).nodes.first
     rc = RelationConstraint.create(:source_id => p1.nodes.last.id, :target_id => n1.id)
     assert !n1.equal_to?(n2)
@@ -48,7 +48,7 @@ RSpec.describe Node, :type => :model do
   it "should tell the difference between incoming and outgoing" do
     n1 = FactoryGirl.create(:pattern).nodes.first
     n2 = FactoryGirl.create(:pattern).nodes.last
-    n3 = n1.pattern.create_node!
+    n3 = n1.pattern.create_node!(n1.pattern.ontologies.first)
     rc = RelationConstraint.create(:source_id => n3.id, :target_id => n1.id)
     assert !n1.equal_to?(n2)
   end

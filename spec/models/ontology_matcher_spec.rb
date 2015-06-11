@@ -33,7 +33,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   before(:each) do
     @pattern = FactoryGirl.create(:pattern)
     @ontology = FactoryGirl.create(:ontology)
-    @om = OntologyMatcher.new(@pattern.ontology, @ontology)
+    @om = OntologyMatcher.new(@pattern.ontologies.first, @ontology)
     @om.alignment_repo.clear!
   end
 

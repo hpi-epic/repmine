@@ -26,8 +26,9 @@ module NodesHelper
     return options
   end
 
-  def node_position(node, relayout = false)
+  def node_position(node, relayout = false, offset = 0)
     x,y = relayout ? node.pattern.position_for_element(node) : [node.x, node.y]
+    x += offset
     if y == 0
       return "top: 10em;left: #{x == 0 ? 20 : x}px;"
     else

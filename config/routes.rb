@@ -1,11 +1,11 @@
 RepMine::Application.routes.draw do  
   
   resources :patterns do
-    post :combine, :on => :collection
     get :query
     get "translate/:ontology_id", :as => :translate, :to => "patterns#translate"
     post :process_patterns, :on => :collection
-    get :combine, :on => :collection
+    post :combine, :on => :collection
+    get :select_combination_nodes, :on => :collection
     post "/save_correspondence/:output_pattern_id", :to => "patterns#save_correspondence", :as => :save_correspondence
 
     resources :nodes do

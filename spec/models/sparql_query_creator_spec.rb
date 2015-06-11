@@ -30,7 +30,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
 
   it "should create properly create queries for the different operators on attribute constraints" do
     pattern = FactoryGirl.create(:empty_pattern)
-    pattern.pattern_elements << FactoryGirl.create(:plain_node, :pattern => pattern)
+    pattern.pattern_elements << FactoryGirl.create(:plain_node)
     regex_ac = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:regex], :node => pattern.nodes.first)
     qc = SparqlQueryCreator.new(pattern)
     qs = qc.query_string
@@ -42,7 +42,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
 
   it "should incorporate self-introduced variables" do
     pattern = FactoryGirl.create(:empty_pattern)
-    pattern.pattern_elements << FactoryGirl.create(:plain_node, :pattern => pattern)
+    pattern.pattern_elements << FactoryGirl.create(:plain_node)
     var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "?name")
     var_ac2 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:equals], :node => pattern.nodes.first, :value => "?name")
     qc = SparqlQueryCreator.new(pattern)

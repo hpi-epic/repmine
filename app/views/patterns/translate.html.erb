@@ -14,16 +14,22 @@
   <%= javascript_include_tag "pattern_translator.js" %>
 <% end %>
 
-<div class="translation_controls" style="left: <%= @offset %>px" />
-  <%= form_for(@target_pattern) do |f| %><% end %>
-  <span>Translation to: <strong><%= link_to(@ontology.short_name, @ontology) %></strong></span>&nbsp;|&nbsp;
-  <%= link_to 'New Node', "#", :class => "btn om-control", :onclick => "newTranslationNode('#{pattern_nodes_path(@target_pattern)}');", :id => 'new_node_button'%>
-  <%= link_to 'Save', "#", :onclick => "saveTranslation();",  :class => "btn btn-success om-control" %>
+<%= form_tag(pattern_nodes_path(@target_pattern), :remote => true, :id => "new_pattern_node") do %>
+  <div class="translation_controls" style="left: <%= @offset %>px" />
+    <div class="btn-group">
+      <%= button_tag 'Create Node', :class => "btn" %>
+      <%= select_tag(:ontology_id, options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space") %>
+    </div>
+
+  <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success om-control" %>
   <%= link_to 'Save Mapping', "#", :class => "btn btn-info hide om-control", :onclick => "saveCorrespondence();" %>
   <%= link_to 'Next', "#", :class => "btn btn-primary hide om-control", :onclick => "selectNextElement();" %>
   <%= link_to 'Match Concepts', "#", :class => "btn btn-danger om-control", :onclick => "toggleOntologyMatchingMode(true);" %>
   <%= link_to 'Stop Matching', "#", :class => "btn btn-danger om-control hide", :onclick => "toggleOntologyMatchingMode(false);" %>
-</div>
+  </div>
+<% end %>
+
+<%= form_for(@target_pattern) do |f| %><% end %>
 
 <%= form_tag(pattern_save_correspondence_path(@source_pattern, @target_pattern), :id => "save_correspondence_form") do %>
   <%= hidden_field_tag "source_element_ids[]" %>
@@ -32,10 +38,10 @@
 
 <div id="drawing_canvas" class="canvas">
   <% @source_pattern.nodes.each do |node| %>
-    <%= render :partial => "nodes/static", :locals => {:node => node, :pattern => @source_pattern}%>
+    <%= render :partial => "nodes/static", :locals => {:node => node, :pattern => @source_pattern, :offset => 0}%>
   <% end %>
 
   <% @target_pattern.nodes.each do |node| %>
-    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy }%>
+    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy, :offset => @offset    }%>
   <% end %>
 </div>

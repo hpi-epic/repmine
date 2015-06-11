@@ -4,7 +4,7 @@ class CreatePatternElements < ActiveRecord::Migration
       # general properties and foreign keys
       t.string :type
       t.timestamps
-      t.references :pattern
+      t.references :ontology
       # attribute constraint
       t.references :node
       t.string :value

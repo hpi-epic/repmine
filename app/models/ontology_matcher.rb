@@ -76,7 +76,7 @@ class OntologyMatcher
   def correspondences_for_pattern_elements(elements)
     correspondences = []
     alignment_graph.query(complex_correspondence_query(elements)) do |result|
-      matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern])
+      matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)
       if matching_pattern.pattern_elements.all?{|pe| elements.any?{|el| el.equal_to?(pe)}}
         correspondences << create_correspondence(result, elements)
       end
@@ -123,7 +123,7 @@ class OntologyMatcher
   def create_correspondence(result, entity1)
     # anonymous target -> input maps to pattern
     # array as entity1 -> input was a list of pattern elements
-    if result[:target].anonymous? || entity1.is_a?(Array)
+    if result[:target].anonymous? || entity1.is_a?(Array)      
       create_complex_correspondence(result, entity1)
     else
       create_simple_correspondence(result, entity1)
@@ -135,7 +135,7 @@ class OntologyMatcher
       result[:measure].to_f,
       result[:relation].to_s,
       entity1,
-      result[:target].anonymous? ? Pattern.from_graph(alignment_graph, result[:target]) : result[:target].to_s,
+      result[:target].anonymous? ? Pattern.from_graph(alignment_graph, result[:target], target_ontology) : result[:target].to_s,
       source_ontology,
       target_ontology
     )

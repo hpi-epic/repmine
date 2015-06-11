@@ -22,13 +22,14 @@
 #
 
 class PatternElement < ActiveRecord::Base
-  # explicitly allows setting the rdf type of a node
-  attr_accessible :rdf_type
+  # explicitly allows setting the rdf type of an element and the ontology
+  attr_accessible :rdf_type, :ontology_id
   
   # allows to access the rdf node, in case this pattern stems from an rdf graph
   attr_accessor :rdf_node
   
-  belongs_to :pattern
+  has_and_belongs_to_many :patterns
+  belongs_to :ontology
   
   has_many :matches, :foreign_key => :matched_element_id, :class_name => "PatternElementMatch", :dependent => :destroy
   has_many :matchings, :foreign_key => :matching_element_id, :class_name => "PatternElementMatch", :dependent => :destroy
@@ -44,19 +45,14 @@ class PatternElement < ActiveRecord::Base
   def build_type_expression!()
     TypeExpression.for_rdf_type(self, "")
   end
-
-  def self.for_rdf_type(rdf_type)
-    pe = self.create!()
-    pe.rdf_type = rdf_type
-    return pe
-  end
-
-  def self.find_by_url(url)
-    return self.find(url.split("/").last.to_i)
+  
+  # old style accessor to not having to change so much code...
+  def pattern=(pattern)
+    self.patterns << pattern if !pattern.nil? and !patterns.include?(pattern)
   end
   
-  def ontology
-    pattern.nil? ? nil : pattern.ontology 
+  def pattern
+    return patterns.first
   end
 
   def url
@@ -120,6 +116,10 @@ class PatternElement < ActiveRecord::Base
   
   def label_for_type
     ontology.label_for_resource(rdf_type)
+  end
+  
+  def correspondences_to(ont)
+    return OntologyMatcher.new(ontology, ont).correspondences_for_concept(rdf_type)
   end
   
   def rebuild!(queryable)

@@ -24,7 +24,8 @@
 class AttributeConstraint < PatternElement
   attr_accessible :value, :operator, :node, :x, :y
   belongs_to :node, :class_name => "PatternElement"
-  before_save :assign_to_pattern!
+  validates :node, :presence => true
+  before_save :assign_to_pattern!, :assign_ontology!
 
   OPERATORS = {
     :var => "?",
@@ -44,11 +45,15 @@ class AttributeConstraint < PatternElement
   end
 
   def assign_to_pattern!
-    self.pattern = node.pattern unless node.nil?
+    self.pattern = node.pattern
+  end
+  
+  def assign_ontology!
+    self.ontology = node.ontology if ontology.nil?
   end
 
   def possible_attributes(rdf_type = nil)
-    return pattern.ontology.attributes_for(rdf_type || node.rdf_type)
+    return ontology.attributes_for(rdf_type || node.rdf_type)
   end
 
   def refers_to_variable?
@@ -63,7 +68,7 @@ class AttributeConstraint < PatternElement
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.AttributeConstraint]
   end
   
-  def pretty_print
+  def pretty_string
     "#{type_expression.fancy_string(true)} #{operator} #{value}"
   end
 end

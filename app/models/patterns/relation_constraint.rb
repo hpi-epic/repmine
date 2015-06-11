@@ -25,8 +25,10 @@ class RelationConstraint < PatternElement
   belongs_to :source, :class_name => "Node"
   belongs_to :target, :class_name => "Node"
   attr_accessible :min_cardinality, :max_cardinality, :min_path_length, :max_path_length, :source_id, :target_id
-
-  before_save :assign_to_pattern!
+  validates :source, :presence => true
+  validates :target, :presence => true
+    
+  before_save :assign_to_pattern!, :assign_ontology!
 
   def rdf_mappings
     super.merge({
@@ -40,7 +42,11 @@ class RelationConstraint < PatternElement
   end
 
   def assign_to_pattern!
-    self.pattern = source.pattern unless source.nil?
+    self.pattern = source.pattern
+  end
+  
+  def assign_ontology!
+    self.ontology = source.ontology if ontology.nil?
   end
 
   def rdf_types
@@ -48,10 +54,10 @@ class RelationConstraint < PatternElement
   end
 
   def possible_relations(source_type = nil, target_type = nil)
-    return pattern.ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
+    return ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
   end
   
-  def pretty_print
+  def pretty_string
     str = " #{type_expression.fancy_string(true)}"
     str += " (#{min_cardinality.blank? ? 0 : min_cardinality},#{max_cardinality.blank? ? '*' : max_cardinality})"
     str += "[#{min_path_length.blank? ? 1 : min_path_length},#{max_path_length.blank? ? 1 : max_path_length}] "
