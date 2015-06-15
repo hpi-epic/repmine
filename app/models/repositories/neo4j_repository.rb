@@ -16,6 +16,10 @@ class Neo4jRepository < Repository
     7474
   end
   
+  def self.query_creator_class
+    CypherQueryCreator
+  end
+  
   class OntExtractionJob < ProgressJob::Base
 
     def perform
@@ -124,5 +128,72 @@ class Neo4jRepository < Repository
   
   def neo
     @neo ||= Neography::Rest.new("http://#{host}:#{port}")
+  end
+  
+  def execute(query)
+    headers, cleansed_data, columns = get_headers_and_cleansed_data(query)
+    
+    CSV.generate do |csv|
+      csv << headers
+      cleansed_data.each do |data_row|
+        row = []
+        data_row.each_with_index do |column, i|
+          if column.is_a?(Hash)
+            column.each_pair do |key, value|
+              row[headers.index(columns[i] + "." + key)] = value
+            end
+          else
+            row[headers.index(columns[i])] = column
+          end
+        end
+        csv << row
+      end
+    end
+  end
+  
+  def get_headers_and_cleansed_data(query)
+    results = get_all_results(query)
+    cleansed_data = []
+    # all result rows
+    results["data"].each_with_index do |date, i|
+      # all columns of a row...
+      row = []
+      date.each do |ret_value|
+        if ret_value.is_a?(Hash)
+          row << ret_value["data"]
+        else
+          row << ret_value
+        end
+      end
+      cleansed_data << row
+    end
+    
+    headers = []
+    results["columns"].each_with_index do |col, i|
+      if cleansed_data.none?{|cd| cd[i].is_a?(Hash)}
+        headers << col
+      else
+        headers += cleansed_data.collect{|cd| cd[i].keys}.flatten.uniq.collect{|key| "#{col}.#{key}"}.flatten
+      end
+    end
+    
+    return [headers, cleansed_data, results["columns"]]
+  end
+  
+  def get_all_results(query)
+    results = {"data" => [], "columns" => []}
+    i = 0
+    
+    loop do
+      puts "running round #{i + 1}"
+      cur_results = neo.execute_query(query + " SKIP #{1000 * i} LIMIT 1000")
+      results["data"] += cur_results["data"]
+      results["columns"] = cur_results["columns"]
+      break if cur_results["data"].size != 1000
+      i += 1
+    end
+    
+    puts "got a total of #{results["data"].size} records"
+    return results
   end
 end

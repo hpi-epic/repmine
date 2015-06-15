@@ -75,6 +75,15 @@ RSpec.describe CypherQueryCreator, :type => :model do
     assert_equal expected, qs
   end
   
+  it "should include aggregations" do
+    pattern = FactoryGirl.create(:n_r_n_pattern)
+    pattern.nodes.last.aggregation = FactoryGirl.create(:count_aggregation)
+    qc = CypherQueryCreator.new(pattern)
+    qs = qc.query_string
+    qv = query_variables(pattern, qc)
+    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN #{qv["nv1"]}, count(#{qv["nv2"]})", qs
+  end
+  
   def query_variables(pattern, qc)
     qv = {}
     pattern.nodes.each_with_index do |node, i|

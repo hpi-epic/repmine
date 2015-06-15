@@ -12,7 +12,7 @@ class QueryCreator < Struct.new(:pattern)
   
   # override if your query language does not support underscores
   def pe_variable(pe)
-    return "#{pe.class.name.underscore}_#{pe.id}".to_sym
+    return pe.variable_name
   end
   
 end

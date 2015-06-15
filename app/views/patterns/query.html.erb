@@ -1,8 +1,16 @@
-<div class="center_everything">
-  <% @queries.each_pair do |language, query| %>
-    <h3><%= language %></h3>
-    <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%><br />
+<% @queries.each_pair do |language, query| %>
+  <%= form_tag(pattern_execute_on_repository_path(@pattern)) do %>
+  <legend><%= language %></legend>
+  <div class="btn-toolbar">
+    <div class="btn-group">
+      <% unless @potential_repositories[language].empty? %>
+        <%= button_tag("Run on: ", :class => "btn btn-info") %>      
+        <%= select_tag(:repository_id, options_from_collection_for_select(@potential_repositories[language], "id", "name"), {:class => "needs_no_space"}) %>
+      <% end %>
+    </div>
+  </div>  
+  <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%> 
   <% end %>
-</div>
+<% end %>
 <%= link_to("Overview", patterns_path(), :class => "btn")%>
 <%= link_to("Pattern", pattern_path(@pattern), :class => "btn btn-success")%>  

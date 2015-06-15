@@ -1,0 +1,8 @@
+<span id="aggregation_<%= aggregation.id %>">
+  <%= operation_visuals(aggregation).html_safe %>
+  <%= link_to(
+        fa_icon("times-circle"), 
+        pattern_aggregation_path(@pattern, aggregation), :method => :delete, :remote => true, :class => "delete_aggregation"
+      ) 
+  %>
+</span>

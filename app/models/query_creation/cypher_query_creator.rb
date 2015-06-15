@@ -34,7 +34,10 @@ class CypherQueryCreator < QueryCreator
   end
   
   def return_values
-    pattern.nodes.collect{|node| pe_variable(node)}.join(", ")
+    values = pattern.nodes.collect{|node| aggerated_variable(node)}
+    values += pattern.relation_constraints.select{|rc| !rc.aggregation.nil?}.collect{|rc| aggerated_variable(rc)}
+    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil?}.collect{|ac| aggerated_variable(ac)}    
+    return values.join(", ")
   end
   
   def parameters
@@ -44,6 +47,14 @@ class CypherQueryCreator < QueryCreator
       end
     end.compact.join(" AND ")
     return str.empty? ? "" : "WHERE #{str}"
+  end
+  
+  def aggerated_variable(pe)
+    str = pe_variable(pe)
+    unless pe.aggregation.nil?
+      str = pe.aggregation.operation.to_s + "(#{str})"
+    end
+    return str
   end
   
   # we mainly use the sames ones as cypher...

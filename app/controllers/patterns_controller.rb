@@ -140,11 +140,20 @@ class PatternsController < ApplicationController
 
   def query
     @pattern = Pattern.find(params[:pattern_id])
-    @repository = @pattern.ontology.repository || RdfRepository.new
     @queries = {
       "Cypher" => CypherQueryCreator.new(@pattern).query_string,
       "Sparql" => SparqlQueryCreator.new(@pattern).query_string
     }
+    @potential_repositories = {
+      "Cypher" => Neo4jRepository.where(:ontology_id => @pattern.ontologies),
+      "Sparql" => RdfRepository.where(:ontology_id => @pattern.ontologies)
+    }
+  end
+  
+  def execute_on_repository
+    @pattern = Pattern.find(params[:pattern_id])
+    @repository = Repository.find(params[:repository_id])
+    send_data(@repository.execute(params[:query_string]), :type => 'text/csv; charset=utf-8; header=present', :filename => @pattern.name + "_on_" + @repository.name)
   end
 
   def save_correspondence
@@ -157,7 +166,7 @@ class PatternsController < ApplicationController
     else
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
-      @oc = ""#OntologyCorrespondence.for_elements!(input_elements, output_elements)
+      @oc = "" #OntologyCorrespondence.for_elements!(input_elements, output_elements)
       if @oc.nil?
         flash[:error] = "Could not save correspondence! Contact your administrator"
         []

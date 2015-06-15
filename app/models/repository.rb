@@ -88,6 +88,10 @@ class Repository < ActiveRecord::Base
   def type_statistics
     raise "implement 'type_statistics' in #{self.class.name}"
   end
+  
+  def execute(pattern)
+    raise "implement 'execute' in #{self.class.name}"
+  end  
 
   def database_type
     "Generic"
@@ -98,7 +102,7 @@ class Repository < ActiveRecord::Base
   end
 
   def query_creator(pattern)
-    return self.class.query_creator_class.new(pattern, self)
+    return self.class.query_creator_class.new(pattern)
   end
 
   def self.query_creator_class
