@@ -12,7 +12,7 @@ class QueryCreator < Struct.new(:pattern)
   
   # override if your query language does not support underscores
   def pe_variable(pe)
-    return pe.variable_name
+    return pe.variable_name.to_sym
   end
   
 end
