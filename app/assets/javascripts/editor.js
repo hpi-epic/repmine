@@ -25,6 +25,20 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   addNodeToGraph(node);
 });
 
+$("#new_aggregation").on("ajax:success", function(e, data, status, xhr){
+  var aggregation = $(xhr.responseText);
+	console.log(aggregation.attr("id"));
+	if($("#" + aggregation.attr("id")).length > 0){
+		$("#" + aggregation.attr("id")).replaceWith(aggregation);
+	} else {
+		aggregation.appendTo($("#aggregations"));
+	}
+});
+
+$(document).on("ajax:success", ".delete_aggregation", function(event){
+	$(this).closest('span').remove();
+});
+
 var loadNodesAndConnections = function(){
 	$(".node").not(".immutable_node").each(function(index,node_div){
 	  addNodeToGraph($(node_div));

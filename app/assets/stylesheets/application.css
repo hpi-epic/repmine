@@ -21,3 +21,8 @@
 select {
   width: 150px;
 }
+
+.left-boarder {
+	padding-left: 5px;
+	border-left: 1px solid grey;
+}

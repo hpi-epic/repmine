@@ -5,6 +5,7 @@ RepMine::Application.routes.draw do
     get "translate/:ontology_id", :as => :translate, :to => "patterns#translate"
     post :process_patterns, :on => :collection
     post :combine, :on => :collection
+    post :execute_on_repository
     get :select_combination_nodes, :on => :collection
     post "/save_correspondence/:output_pattern_id", :to => "patterns#save_correspondence", :as => :save_correspondence
 
@@ -16,6 +17,8 @@ RepMine::Application.routes.draw do
         post :delete
       end
     end
+    
+    resources :aggregations
 
     resources :relation_constraints do
       get :static

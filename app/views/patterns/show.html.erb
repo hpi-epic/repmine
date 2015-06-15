@@ -11,20 +11,37 @@
 <% end %>
 
 
-<%= form_tag(pattern_nodes_path(@pattern), :remote => true, :id => "new_pattern_node") do %>
 <div class="btn-toolbar">
   <div class="btn-group">
-    <%= button_tag 'Create Node', :class => "btn" %>
-    <%= select_tag(:ontology_id, options_for_select(@pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space") %>
+    <%= form_tag(pattern_nodes_path(@pattern), :remote => true, :id => "new_pattern_node", :class => "needs_no_space") do %>      
+      <%= button_tag 'Create Node', :class => "btn" %>
+      <%= select_tag(:ontology_id, options_for_select(@pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space") %>
+    <% end %>
   </div>
-  <div class="btn-group">    
-    <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success" %>
-    <%= link_to 'Query', pattern_query_path(@pattern), :class => "btn btn-danger" %>
+  
+  <div class="btn-group left-boarder">    
+    <%= form_for(@pattern, :html => {:class => "needs_no_space"}) do %>    
+      <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success" %>      
+    <% end %>
+  </div>
+  
+  <%= link_to 'Query', pattern_query_path(@pattern), :class => "btn btn-danger" %>
+  
+  <div class="btn-group left-boarder">
+    <%= form_tag(pattern_aggregations_path(@pattern), :remote => true, :id => "new_aggregation", :class => "needs_no_space") do %>   
+      <%= select_tag(:operation, options_for_select(Aggregation.operations.keys), :class => "needs_no_space a_tad_bigger") %>:
+      <%= select_tag(:pattern_element_id, options_for_select(@pattern.pattern_elements.collect{|pe| [pe.variable_name, pe.id]}), :class => "needs_no_space a_tad_bigger") %>
+      <%= button_tag("Add Aggregation", :class => "btn btn-primary")%>
+    <% end %>        
+  </div>
+  
+  <div class="btn-group" id="aggregations" style="font-size: 14px;">
+    <% @pattern.pattern_elements.each do |pe| %>
+      <%= render :partial => "aggregations/show", :locals => {:aggregation => pe.aggregation} unless pe.aggregation.nil? %>
+    <% end %>    
   </div>
 </div>
-<% end %>
 
-<%= form_for(@pattern) do |f| %><% end %>
 <hr />
 
 <div id="drawing_canvas" class="canvas">

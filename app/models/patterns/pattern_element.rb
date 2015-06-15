@@ -37,6 +37,7 @@ class PatternElement < ActiveRecord::Base
   has_many :matching_elements, :through => :matches, :dependent => :destroy
   
   has_one :type_expression, :dependent => :destroy
+  has_one :aggregation, :dependent => :destroy
 
   after_create :build_type_expression!
   
@@ -116,6 +117,10 @@ class PatternElement < ActiveRecord::Base
   def rebuild!(queryable)
     rebuild_element_type!(queryable, self.rdf_node)
     rebuild_element_properties!(queryable, self.rdf_node)
+  end
+  
+  def variable_name
+    return "#{self.class.name.underscore}_#{id}"
   end
   
   # TODO: also become able to rebuild complex expressions (universal, someOf, and schmutz like that)  
