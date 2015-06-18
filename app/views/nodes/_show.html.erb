@@ -1,4 +1,4 @@
-<div class="node graph_element <%= node.is_group ? "double-border" : "" %>" style="<%= node_position(node) %>" id="node_<%=node.id%>" data-id="<%= node.id %>">
+<div class="node graph_element <%= node.is_group ? "double-border" : "" %>" style="<%= node_position(node, false, offset) %>" id="node_<%=node.id%>" data-id="<%= node.id %>">
 <%= simple_form_for([pattern, node]) do |f| %>
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>

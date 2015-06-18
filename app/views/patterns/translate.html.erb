@@ -42,6 +42,6 @@
   <% end %>
 
   <% @target_pattern.nodes.each do |node| %>
-    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy, :offset => @offset    }%>
+    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy, :offset => @offset + 150 }%>
   <% end %>
 </div>

@@ -123,6 +123,15 @@ class Pattern < ActiveRecord::Base
     @layouted_graph = GraphViz.parse(Rails.root.join("tmp", "pattern_layouts", "#{id}.dot").to_s)
   end
   
+  def store_auto_layout!()
+    (nodes + attribute_constraints).each do |pe|
+      pos = position_for_element(pe)
+      pe.x = pos[0]
+      pe.y = pos[1]
+      pe.save!
+    end
+  end
+  
   def position_for_element(element)
     point = layouted_graph.get_node(element.id.to_s)["pos"].point
     point[1] += 90
