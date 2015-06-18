@@ -30,6 +30,9 @@ gem "equivalent-xml"
 gem "linkeddata"
 gem 'nokogiri'
 
+# putting graphs back together
+gem "wongi-engine"
+
 group :development, :test do
   gem "rspec"
   gem "rspec-rails"

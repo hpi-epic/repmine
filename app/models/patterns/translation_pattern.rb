@@ -62,13 +62,29 @@ class TranslationPattern < Pattern
     mappings.merge!(get_complex_mappings)
     check_for_ambiguous_mappings(mappings)
     add_pattern_elements!(mappings)
+    connect_pattern_elements!(mappings)
     create_matches(mappings)
+  end
+  
+  def connect_pattern_elements!(mappings)
+    connector = ConnectionFinder.new()
+    connector.load_to_engine!(mappings, source_pattern)
+    
+    pattern_elements.each do |pe|
+      if pe.is_a?(AttributeConstraint)
+        pe.node ||= connector.node_for_ac(pe)
+      elsif pe.is_a?(RelationConstraint)
+        pe.source ||= connector.source_for_rc(pe)
+        pe.target ||= connector.target_for_rc(pe)
+      end
+      pe.save!
+    end
   end
   
   def create_matches(mappings)
     mappings.each_pair do |input_elements, target_elements|
       input_elements.each do |pe_id|
-        target_elements.first.each do |te|
+        target_elements.each do |te|
           PatternElementMatch.create(:matched_element => PatternElement.find(pe_id), :matching_element => te)
         end
       end
@@ -77,9 +93,9 @@ class TranslationPattern < Pattern
   
   def add_pattern_elements!(mappings)
     mappings.values.each do |target_elements|
-      target_elements.first.each do |te|
+      target_elements.each do |te|
         self.pattern_elements << te
-        te.save!
+        te.save!(validate: false)
       end
     end
   end
@@ -90,6 +106,9 @@ class TranslationPattern < Pattern
       raise AmbiguousTranslation.new("too many mappings for element #{key}") if mappings[key].size > 1
       # option 2: the current key is included in at least one other mapping
       raise AmbiguousTranslation.new("ambiguous mappings for element #{key}") if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
+    end
+    mappings.each_pair do |key, targets|
+      mappings[key] = targets.flatten
     end
   end
   

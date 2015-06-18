@@ -131,7 +131,7 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal 2, tp.pattern_elements.size
   end
   
-  it "should build a graph if we have simple mappings for each element" do
+  it "should build a graph if we have simple mappings for node and attribute constraint" do
     c1 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     c2 = FactoryGirl.build(:simple_attrib_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     
@@ -151,6 +151,30 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal 1, tp.nodes.size
     assert_equal 1, tp.attribute_constraints.size
     assert_equal tp.attribute_constraints.first.node, tp.nodes.first
+  end
+  
+  it "should build a graph for simple mappings for node and relation constraints" do
+    c1 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c2 = FactoryGirl.build(:simple_relation_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    
+    @pattern = FactoryGirl.create(:empty_pattern)
+    om = ontology_matcher([c1, c2])
+        
+    node = FactoryGirl.create(:node, :ontology => @source_ontology, :rdf_type => c1.entity1, :pattern => @pattern)
+    node2 = FactoryGirl.create(:node, :ontology => @source_ontology, :rdf_type => c1.entity1, :pattern => @pattern)
+    rc = FactoryGirl.create(:relation_constraint, :ontology => @source_ontology, :rdf_type => c2.entity1, :source => node, :target => node2)
+    
+    c2.onto2.ag_connection.stub(:element_class_for_rdf_type).with(c2.entity2){RelationConstraint}
+    c1.onto2.ag_connection.stub(:element_class_for_rdf_type).with(c1.entity2){Node}    
+    
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    tp.prepare!    
+    
+    assert_equal 3, tp.pattern_elements.size
+    assert_equal 2, tp.nodes.size
+    assert_equal 1, tp.relation_constraints.size
+    assert tp.relation_constraints.first.valid?
+    assert_not_equal tp.relation_constraints.first.source, tp.relation_constraints.first.target
   end
   
   it "should find ambigous mappings based on the found keys" do
