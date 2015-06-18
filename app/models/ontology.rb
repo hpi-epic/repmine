@@ -24,8 +24,12 @@ class Ontology < ActiveRecord::Base
   has_one :repository  
 
   before_validation :set_short_name_if_empty!
-  after_create :load_to_dedicated_repository!
+  after_create :load_to_dedicated_repository!, :if => :load_immediately?
   before_destroy :delete_repository!
+
+  def load_immediately?
+    return true
+  end
 
   def set_short_name_if_empty!
     self.short_name = url.split("/").last.split("\.").first if short_name.blank?

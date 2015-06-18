@@ -7,22 +7,21 @@ Ontology.where(
 
 # Conference Ontologies (OAEI)
 [
-  "http://oaei.ontologymatching.org/2014/conference/data/ekaw.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/Conference.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/sigkdd.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/iasted.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/MICRO.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/confious.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/PCS.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/OpenConf.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/confOf.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/cmt.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/Cocus.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/paperdyne.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/edas.owl",
-  "http://oaei.ontologymatching.org/2014/conference/data/MyReview.owl",
-  #"http://oaei.ontologymatching.org/2014/conference/data/linklings.owl"
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/cmt.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/Cocus.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/confOf.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/Conference.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/confious.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/crs_dr.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/edas.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/ekaw.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/iasted.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/MICRO.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/MyReview.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/OpenConf.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/PCS.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/paperdyne.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/conference/sigkdd.owl"
 ].each do |ontology_url|
   puts "Creating #{ontology_url}"
   Ontology.where(
@@ -34,13 +33,13 @@ end
 
 # Anatomy Ontologies (OAEI)
 [
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/human.owl",
-  "https://dl.dropboxusercontent.com/u/1622986/ontologies/mouse.owl"
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/anatomy/mouse.owl",
+  "https://dl.dropboxusercontent.com/u/1622986/ontologies/anatomy/human.owl"
 ].each do |ontology_url|
   puts "Creating #{ontology_url}"
-  #Ontology.where(
-  #  url: ontology_url,
-  #  short_name: "Anatomy##{ontology_url.split("/").last}",
-  #  group: "OAEI Anatomy"
-  #).first_or_create
+  Ontology.where(
+    url: ontology_url,
+    short_name: "Anatomy##{ontology_url.split("/").last}",
+    group: "OAEI Anatomy"
+  ).first_or_create
 end

@@ -110,7 +110,7 @@ class Repository < ActiveRecord::Base
   end
 
   def imports
-    return [Vocabularies::SchemaExtraction].concat(custom_imports)
+    return [RDF::Resource.new(Vocabularies::SchemaExtraction)].concat(custom_imports)
   end
 
   # overwrite this if your repository needs custom information within the ontology

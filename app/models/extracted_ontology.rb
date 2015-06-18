@@ -18,6 +18,10 @@ class ExtractedOntology < Ontology
 
   include RdfSerialization
 
+  def load_immediately?
+    return false
+  end
+
   def self.model_name
     return Ontology.model_name
   end
@@ -43,7 +47,8 @@ class ExtractedOntology < Ontology
   def custom_prefixes
     return {
      :schema_extraction => Vocabularies::SchemaExtraction,
-     url.split("/").last.underscore => url
+     url.split("/").last.underscore => url,
+     :dc => RDF::DC.to_s
     }
   end
 

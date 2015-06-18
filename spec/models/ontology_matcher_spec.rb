@@ -70,21 +70,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     corrs = @om.correspondences_for_concept("http://crs_dr/#author_not_present_in_this_ontology")
     assert_empty corrs
   end
-  
-  it "should fix the urls in a broken test file" do
-    FileUtils.cp(broken_alignment_test_file_original, broken_alignment_output_file)
-    @om.clean_uris!(broken_alignment_output_file)
-    g = RDF::Graph.load(broken_alignment_output_file)
-    q = RDF::Query.new{
-      pattern([:alignment, Vocabularies::Alignment.entity1, :ent1])
-      pattern([:alignment, Vocabularies::Alignment.entity2, :ent2])
-    }
-    g.query(q).each do |res|
-      assert_equal true, res[:ent1].to_s.starts_with?("http://crs_dr/")
-      assert_equal true, res[:ent2].to_s.starts_with?("http://ekaw/")
-    end
-  end
-  
+    
   it "should switch ontologies, if needed" do
     o1 = FactoryGirl.create(:ontology)
     o2 = FactoryGirl.create(:ontology)

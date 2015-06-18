@@ -33,12 +33,6 @@ class OntologyMatcher
     !alignment_graph.empty?
   end
   
-  def reset!()
-    call_matcher!
-    alignment_repo.clear!
-    insert_statements! 
-  end
-  
   def insert_statements!
     alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
     alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
@@ -51,7 +45,6 @@ class OntologyMatcher
       errors = stderr.read
       raise MatchingError, errors unless errors.blank?
     end
-    clean_uris!(alignment_path)
   end
   
   def alignment_path()
@@ -77,7 +70,7 @@ class OntologyMatcher
     correspondences = []
     alignment_graph.query(complex_correspondence_query(elements)) do |result|
       matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)
-      if matching_pattern.pattern_elements.all?{|pe| elements.any?{|el| el.equal_to?(pe)}}
+      if matching_pattern.pattern_elements.select{|pe| elements.none?{|el| el.equal_to?(pe)}}.empty?
         correspondences << create_correspondence(result, elements)
       end
     end
@@ -167,20 +160,6 @@ class OntologyMatcher
   
   def alignment_graph
     alignment_repo.repository
-  end
-  
-  def clean_uris!(path)
-    g = RDF::Graph.load(path)
-    q = RDF::Query.new{
-      pattern([:alignment, Vocabularies::Alignment.onto1, :onto1])
-      pattern([:alignment, Vocabularies::Alignment.onto2, :onto2])
-    }
-    g.query(q) do |res|
-      rdfxml = File.open(path).read
-      rdfxml.gsub!(res[:onto1].to_s, res[:onto1].to_s + "/") unless res[:onto1].to_s.ends_with?("/")
-      rdfxml.gsub!(res[:onto2].to_s, res[:onto2].to_s + "/") unless res[:onto2].to_s.ends_with?("/")
-      File.open(path, "wb"){|f| f.puts rdfxml}
-    end
   end
   
   def add_correspondence!(correspondence)
