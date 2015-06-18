@@ -83,6 +83,19 @@ RSpec.describe CypherQueryCreator, :type => :model do
     qv = query_variables(pattern, qc)
     assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN #{qv["nv1"]}, count(#{qv["nv2"]})", qs
   end
+
+  it "should incorporate self-introduced variables" do
+    pattern = FactoryGirl.create(:empty_pattern)
+    pattern.pattern_elements << FactoryGirl.create(:plain_node)
+    var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "?name")
+    var_ac1.create_aggregation(:operation => :sum)
+    qc = CypherQueryCreator.new(pattern)
+    qs = qc.query_string
+    qv = query_variables(pattern, qc)
+    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN #{qv["nv1"]}, sum(#{var_ac1.variable_name})"
+    assert_equal expected, qs
+  end
+
   
   def query_variables(pattern, qc)
     qv = {}

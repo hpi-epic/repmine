@@ -52,7 +52,7 @@ class RelationConstraint < PatternElement
   end
 
   def assign_to_pattern!
-    self.pattern = source.pattern
+    self.pattern = source.pattern unless source.nil?
   end
   
   def assign_ontology!

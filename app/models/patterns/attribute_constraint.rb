@@ -57,7 +57,7 @@ class AttributeConstraint < PatternElement
   end
 
   def assign_to_pattern!
-    self.pattern = node.pattern
+    self.pattern = node.pattern unless node.nil?
   end
   
   def assign_ontology!
@@ -70,6 +70,10 @@ class AttributeConstraint < PatternElement
 
   def refers_to_variable?
     return contains_variable?(self.value)
+  end
+  
+  def is_variable?
+    operator == OPERATORS[:var]
   end
 
   def variable_name

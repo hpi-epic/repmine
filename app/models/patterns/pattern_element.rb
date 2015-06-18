@@ -93,6 +93,10 @@ class PatternElement < ActiveRecord::Base
     "#{self.class.name.underscore}_#{self.id}"
   end
   
+  def is_variable?
+    return false
+  end
+  
   # RDF Serialization
   def rdf_statements
     return [

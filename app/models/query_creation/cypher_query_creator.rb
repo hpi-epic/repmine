@@ -1,7 +1,7 @@
 class CypherQueryCreator < QueryCreator
   
   def build_query!
-    "MATCH #{match} #{parameters} RETURN #{return_values} #{modifiers}".strip.gsub(/\s\s+/, ' ')
+    "MATCH #{match} #{parameters}#{with} RETURN #{return_values}".strip.gsub(/\s\s+/, ' ')
   end
   
   def match
@@ -34,9 +34,9 @@ class CypherQueryCreator < QueryCreator
   end
   
   def return_values
-    values = pattern.nodes.collect{|node| aggerated_variable(node)}
-    values += pattern.relation_constraints.select{|rc| !rc.aggregation.nil?}.collect{|rc| aggerated_variable(rc)}
-    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil?}.collect{|ac| aggerated_variable(ac)}    
+    values = pattern.nodes.collect{|node| aggregated_variable(node)}
+    values += pattern.relation_constraints.select{|rc| !rc.aggregation.nil?}.collect{|rc| aggregated_variable(rc)}
+    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil?}.collect{|ac| aggregated_variable(ac)}    
     return values.join(", ")
   end
   
@@ -49,9 +49,9 @@ class CypherQueryCreator < QueryCreator
     return str.empty? ? "" : "WHERE #{str}"
   end
   
-  def aggerated_variable(pe)
+  def aggregated_variable(pe)
     str = pe_variable(pe)
-    unless pe.aggregation.nil?
+    if !pe.aggregation.nil? && pe.aggregation.operation != :group_by
       str = pe.aggregation.operation.to_s + "(#{str})"
     end
     return str
@@ -81,9 +81,21 @@ class CypherQueryCreator < QueryCreator
     end
   end
   
-  # order by, limit, etc.
-  def modifiers
-    ""
+  # needed in case of subqueries and aliased variables
+  def with
+    if pattern.pattern_elements.any?{|pe| pe.is_variable?}
+      str = " WITH #{(plain_vars + aliased_vars).join(", ")}"
+    else
+      return ""
+    end
+  end
+  
+  def aliased_vars
+    pattern.pattern_elements.select{|pe| pe.is_variable?}.collect{|pe| "#{attribute_reference(pe)} AS #{pe_variable(pe)}"}
+  end
+  
+  def plain_vars
+    pattern.pattern_elements.select{|pe| !pe.is_variable?}.collect{|pe| pe_variable(pe)}
   end
   
 end
