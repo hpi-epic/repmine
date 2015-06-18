@@ -19,7 +19,7 @@ FactoryGirl.define do
     transient{node_count 1}
     ontologies{[FactoryGirl.create(:ontology)]}
     after(:create) do |pattern, evaluator|
-      create_list(:node, evaluator.node_count, pattern: pattern)
+      create_list(:node, evaluator.node_count, pattern: pattern, ontology: pattern.ontologies.first)
     end
   end
 
@@ -29,7 +29,7 @@ FactoryGirl.define do
     ontologies{[FactoryGirl.create(:ontology)]}
     transient{node_count 1}
     after(:create) do |pattern, evaluator|
-      create_list(:plain_node, evaluator.node_count, pattern: pattern)
+      create_list(:plain_node, evaluator.node_count, pattern: pattern, ontology: pattern.ontologies.first)
     end
   end
 
@@ -45,7 +45,7 @@ FactoryGirl.define do
     ontologies{[FactoryGirl.create(:ontology)]}
     pattern_elements{create_list :plain_node, 2}
     after(:create) do |pattern, evaluator|
-      FactoryGirl.create(:relation_constraint, :source => pattern.nodes.first, :target => pattern.nodes.last)
+      FactoryGirl.create(:relation_constraint, :source => pattern.nodes.first, :target => pattern.nodes.last, ontology: pattern.ontologies.first)
     end
   end
 end

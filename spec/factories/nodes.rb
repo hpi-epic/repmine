@@ -8,8 +8,8 @@ FactoryGirl.define do
     association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/node"
 
     after(:create) do |node, evaluator|
-      create_list(:relation_constraint, evaluator.rc_count, source: node, target: node, pattern: node.pattern)
-      create_list(:attribute_constraint, evaluator.ac_count, node: node, pattern: node.pattern)
+      create_list(:relation_constraint, evaluator.rc_count, source: node, target: node, pattern: node.pattern, ontology: node.ontology)
+      create_list(:attribute_constraint, evaluator.ac_count, node: node, pattern: node.pattern, ontology: node.ontology)
     end
   end
 

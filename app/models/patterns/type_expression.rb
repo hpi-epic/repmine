@@ -12,26 +12,26 @@
 #
 
 class TypeExpression < ActiveRecord::Base
-  attr_accessible :operator, :rdf_type, :pattern_element
+  attr_accessible :operator, :rdf_type
   belongs_to :pattern_element
   has_ancestry()
 
-  def self.create_new(pe, rdf_type = "", operator = nil)
-    te = self.create!(:pattern_element => pe, :rdf_type => nil, :operator => operator)
+  def self.create_new(rdf_type, operator = nil)
+    te = self.create!(:rdf_type => nil, :operator => operator)
     te.children.create!(:rdf_type => rdf_type)
     return te
   end
 
-  def self.for_rdf_type(pe, rdft)
-    create_new(pe, rdft, nil)
+  def self.for_rdf_type(rdft)
+    create_new(rdft, nil)
   end
 
-  def self.for_operator(pe, operator)
-    create_new(pe, nil, operator)
+  def self.for_operator(operator)
+    create_new(nil, operator)
   end
 
-  def self.for_rdf_type_and_operator(pe, rdf_type, operator)
-    create_new(pe, rdf_type, operator)
+  def self.for_rdf_type_and_operator(rdf_type, operator)
+    create_new(rdf_type, operator)
   end
 
   # this is the 'simple' structure -> an empty first expression with one RDF type child

@@ -18,7 +18,6 @@ class TranslationPattern < Pattern
 
   attr_accessible :pattern_id
   belongs_to :source_pattern, :foreign_key => "pattern_id", :class_name => "Pattern"
-  after_create :prepare!
 
   def self.for_pattern_and_ontologies(pattern, ontologies)
     tp = TranslationPattern.includes(:ontologies).where(:ontologies => {:id => ontologies.collect{|o| o.id}}, :pattern_id => pattern.id).first
@@ -48,41 +47,80 @@ class TranslationPattern < Pattern
     ontologies.collect{|target_ont| OntologyMatcher.new(source_ont, target_ont)}
   end
   
-  # return correspondences for a given pattern
-  def prepare!()
-    already_mapped = Set.new
-    
-    # first try the unmatched input elements one by one
-    input_elements.each do |pe|
-      element_correspondences = ontologies.collect{|ont| pe.correspondences_to(ont)}.flatten
-      raise AmbiguousTranslation if element_correspondences.size > 1
-      
-      unless element_correspondences.empty?
-        already_mapped << pe
-        element_correspondences.first.pattern_elements.each do |te|
-          pattern_elements << te
-          PatternElementMatch.create!(:matched_element => pe, :matching_element => te)
-        end        
+  def match!()
+    ontologies.collect do |target_ont|
+      source_pattern.ontologies.each do |source_ont|
+        OntologyMatcher.new(source_ont, target_ont).match!
       end
     end
-    
-    # let's construct all possbile combinations of the input pattern's unmatched elements
-    (2..input_elements.size).flat_map{|size| input_elements.combination(size).to_a}.reverse.each do |elements|
-      next unless elements.collect{|pe| pe.ontology_id}.uniq.size != 1
-      source_ont = elements.first.ontology
-      element_correspondences = ontology_matchers(source_ont).collect{|om| om.correspondences_for_pattern_elements(elements)}.flatten
-      
-      unless element_correspondences.empty?
-        raise AmbiguousTranslation if element_correspondences.size > 1
-        raise AmbiguousTranslation if elements.any?{|el| already_mapped.include?(el)}
-        already_mapped.merge(elements)
-        element_correspondences.first.pattern_elements.each do |te|
-          pattern_elements << te
-          elements.each{|pe| PatternElementMatch.create!(:matched_element => pe, :matching_element => te)}
+  end
+  
+  # return correspondences for a given pattern
+  def prepare!()
+    match!
+    mappings = get_simple_mappings
+    mappings.merge!(get_complex_mappings)
+    check_for_ambiguous_mappings(mappings)
+    add_pattern_elements!(mappings)
+    create_matches(mappings)
+  end
+  
+  def create_matches(mappings)
+    mappings.each_pair do |input_elements, target_elements|
+      input_elements.each do |pe_id|
+        target_elements.first.each do |te|
+          PatternElementMatch.create(:matched_element => PatternElement.find(pe_id), :matching_element => te)
         end
       end
     end
+  end
+  
+  def add_pattern_elements!(mappings)
+    mappings.values.each do |target_elements|
+      target_elements.first.each do |te|
+        self.pattern_elements << te
+        te.save!
+      end
+    end
+  end
+  
+  def check_for_ambiguous_mappings(mappings)
+    mappings.keys.sort_by{|key| key.size}.each_with_index do |key, index|
+      # option 1: more than one possible output subgraphs
+      raise AmbiguousTranslation.new("too many mappings for element #{key}") if mappings[key].size > 1
+      # option 2: the current key is included in at least one other mapping
+      raise AmbiguousTranslation.new("ambiguous mappings for element #{key}") if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
+    end
+  end
+  
+  def get_simple_mappings
+    mappings = {}
+    # first try the unmatched input elements one by one
+    input_elements.each do |pe|
+      ontologies.collect{|ont| pe.correspondences_to(ont)}.flatten.each do |correspondence|
+        mappings[[pe.id]] ||= []
+        mappings[[pe.id]] << correspondence.pattern_elements
+      end
+    end
+    return mappings
+  end  
+  
+  def get_complex_mappings()
+    mappings = {}
     
-    pattern_elements.each{|pe| pe.save}
+    # let's construct all possbile combinations of the input pattern's unmatched elements
+    (2..input_elements.size).flat_map{|size| input_elements.combination(size).to_a}.reverse.each do |elements|
+      # only try to match combinations of the same ontology
+      next if elements.collect{|pe| pe.ontology_id}.uniq.size != 1
+      
+      mapping_key = elements.collect{|pe| pe.id}
+      ontology_matchers(elements.first.ontology).each do |om|
+        om.correspondences_for_pattern_elements(elements).each do |correspondence|
+          mappings[mapping_key] ||= []
+          mappings[mapping_key] << correspondence.pattern_elements
+        end
+      end
+    end
+    return mappings
   end
 end

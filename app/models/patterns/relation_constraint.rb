@@ -40,6 +40,16 @@ class RelationConstraint < PatternElement
       Vocabularies::GraphPattern.max_path_length => {:property => :max_path_length, :literal => true}
     })
   end
+  
+  def rdf_statements
+    stmts = super
+    stmts << [resource, Vocabularies::GraphPattern.sourceNode, source.resource]
+    stmts << [resource, Vocabularies::GraphPattern.targetNode, target.resource]
+    stmts << [resource, Vocabularies::GraphPattern.min_cardinality, RDF::Literal.new(min_cardinality)]
+    stmts << [resource, Vocabularies::GraphPattern.max_cardinality, RDF::Literal.new(max_cardinality)]
+    stmts << [resource, Vocabularies::GraphPattern.min_path_length, RDF::Literal.new(min_path_length)]
+    stmts << [resource, Vocabularies::GraphPattern.max_path_length, RDF::Literal.new(max_path_length)]
+  end
 
   def assign_to_pattern!
     self.pattern = source.pattern

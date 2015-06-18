@@ -97,6 +97,28 @@ RSpec.describe Pattern, :type => :model do
     graph.output(:png => Rails.root.join("spec/testfiles/pattern_graph.png"))
   end
   
+  it "should properly rebuild a pattern from a graph" do
+    cc = FactoryGirl.build(:complex_correspondence)
+    g = cc.rdf_graph
+    query = RDF::Query.new({:pattern => {RDF.type  => Vocabularies::GraphPattern.GraphPattern}})
+    pattern = nil
+    query.execute(g) do |solution|
+      pattern = solution.pattern
+    end
+    assert_not_nil pattern
+    
+    om = OntologyMatcher.new(cc.onto1, cc.onto2)
+    om.alignment_repo.clear!
+    om.insert_statements!
+    om.add_correspondence!(cc)
+    
+    pattern = Pattern.from_graph(om.alignment_graph, pattern, cc.onto2)
+    assert_equal 3, pattern.pattern_elements.size
+    pattern.pattern_elements.each do |pe| 
+      assert pe.valid?, "#{pe.class} (#{pe.rdf_type}) is invalid: #{pe.errors.full_messages.join(", ")}"
+    end
+  end
+  
   def n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
     p = Pattern.create(name: name, description: "Generic")
     p.ontologies << ontology

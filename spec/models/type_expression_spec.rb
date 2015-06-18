@@ -23,13 +23,13 @@ RSpec.describe TypeExpression, :type => :model do
   end
 
   it "should create the correct string representation for a simple type expression" do
-    te = TypeExpression.for_rdf_type(nil, @ttype)
+    te = TypeExpression.for_rdf_type(@ttype)
     te.fancy_string.should == @ttype
     te.fancy_string(true).should == "MyType"
   end
 
   it "should create fancy strings for negations" do
-    nott = TypeExpression.for_rdf_type_and_operator(nil, @ttype, @not)
+    nott = TypeExpression.for_rdf_type_and_operator(@ttype, @not)
     nott.fancy_string.should == "#{@not}#{@ttype}"
   end
 
@@ -67,7 +67,7 @@ RSpec.describe TypeExpression, :type => :model do
   end
 
   it "should create a proper structure for operators" do
-    nott = TypeExpression.for_operator(nil, @not)
+    nott = TypeExpression.for_operator(@not)
     assert_equal "#{@not}()", nott.fancy_string
   end
 

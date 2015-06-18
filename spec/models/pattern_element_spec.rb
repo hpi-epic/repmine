@@ -51,7 +51,7 @@ RSpec.describe PatternElement, :type => :model do
     pattern = FactoryGirl.create(:empty_pattern)
     pe1 = FactoryGirl.create(:pattern_element, :pattern => pattern)    
     pe2 = FactoryGirl.create(:pattern_element, :pattern => pattern)    
-    expect{pe1.equal_to?(pe2)}.to raise_error
+    expect{pe1.equal_to?(pe2)}.to raise_error(PatternElement::ComparisonError)
   end
   
   it "should rebuild a pattern element's element type from a graph" do

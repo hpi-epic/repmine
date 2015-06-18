@@ -120,7 +120,7 @@ module Vocabularies
     property :targetNode,
       comment: %(determines the target of a relation.).freeze,
       domain: "graphpattern:RelationConstraint".freeze,
-      label: "targeteNode".freeze,
+      label: "targetNode".freeze,
       range: "graphpattern:Node".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze,
@@ -143,5 +143,14 @@ module Vocabularies
       range: "xsd:Literal".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:DatatypeProperty".freeze
+      
+    property :node,
+      comment: %(determines the node an attribute constraint belongs to.).freeze,
+      domain: "graphpattern:AttributeConstraint".freeze,
+      label: "tnNode".freeze,
+      range: "graphpattern:Node".freeze,
+      "rdfs:isDefinedBy" => %(graphpattern:).freeze,
+      type: "owl:ObjectProperty".freeze,
+      "owl:inverseOf" => %(graphpattern:attributeConstraint).freeze      
   end
 end

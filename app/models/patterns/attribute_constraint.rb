@@ -37,7 +37,19 @@ class AttributeConstraint < PatternElement
   }
   
   def rdf_mappings
-    super.merge({Vocabularies::GraphPattern.attributeValue => {:property => :value, :literal => true}})
+    super.merge({
+      Vocabularies::GraphPattern.attributeValue => {:property => :value, :literal => true},
+      Vocabularies::GraphPattern.attributeOperator => {:property => :operator, :literal => true},
+      Vocabularies::GraphPattern.node => {:property => :node},
+    })
+  end
+  
+  def rdf_statements
+    stmts = super
+    stmts << [resource, Vocabularies::GraphPattern.node, node.resource]
+    stmts << [resource, Vocabularies::GraphPattern.attributeValue, value]
+    stmts << [resource, Vocabularies::GraphPattern.attributeOperator, operator]
+    return stmts
   end
   
   def value_type

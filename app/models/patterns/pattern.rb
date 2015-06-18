@@ -22,7 +22,7 @@ class Pattern < ActiveRecord::Base
   acts_as_taggable_on :tags
 
   has_and_belongs_to_many :ontologies
-  has_many :pattern_elements
+  has_many :pattern_elements, :dependent => :destroy
   has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
 
   # validations
@@ -67,7 +67,7 @@ class Pattern < ActiveRecord::Base
 
   # RDF Serialization
   def rdf_statements
-    return nodes.collect{|qn| qn.rdf}.flatten(1)
+    return pattern_elements.collect{|pe| pe.rdf}.flatten(1)
   end
 
   def custom_prefixes()

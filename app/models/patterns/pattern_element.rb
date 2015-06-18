@@ -38,10 +38,13 @@ class PatternElement < ActiveRecord::Base
   
   has_one :type_expression, :dependent => :destroy
   has_one :aggregation, :dependent => :destroy
-
-  after_create :build_type_expression!
+  
+  #after_create :build_type_expression!
   
   include RdfSerialization
+  
+  class ComparisonError < Error
+  end
 
   def build_type_expression!()
     TypeExpression.for_rdf_type(self, "")
@@ -62,7 +65,7 @@ class PatternElement < ActiveRecord::Base
   # this method allows overwriting an existing type expression with a SIMPLE rdf type
   def rdf_type=(str)
     if type_expression.nil?
-      self.type_expression = TypeExpression.for_rdf_type(self, str)
+      self.type_expression = TypeExpression.for_rdf_type(str)
     else
       # we only need to overwrite if the strings differ...
       if type_expression.fancy_string != str
@@ -70,14 +73,14 @@ class PatternElement < ActiveRecord::Base
           type_expression.children.first.update_attributes(:rdf_type => str)
         else
           type_expression.destroy
-          self.type_expression = TypeExpression.for_rdf_type(self, str)
+          self.type_expression = TypeExpression.for_rdf_type(str)
         end
       end
     end
   end
   
   def equal_to?(other)
-    raise "operation not permitted on elements of the same pattern" if self.pattern == other.pattern
+    raise ComparisonError.new("operation not permitted on elements of the same pattern") if self.pattern == other.pattern
     return self.class == other.class && self.rdf_type == other.rdf_type
   end
 
@@ -137,7 +140,7 @@ class PatternElement < ActiveRecord::Base
         if mapping[:collection]
           connected_element = pattern.pattern_elements.find{|el| el.rdf_node == res.object}
           self.send(mapping[:property]).send(:<< , connected_element) unless connected_element.nil?
-        else
+        else        
           value = mapping[:literal] ? res.object.object : pattern.pattern_elements.find{|pe| pe.rdf_node == res.object}
           self.send("#{mapping[:property]}=".to_sym, value) unless value.nil?
         end

@@ -31,14 +31,6 @@ class Node < PatternElement
   has_many :attribute_constraints, :dependent => :destroy
   validates :ontology, :presence => true
 
-  def rdf_mappings
-    super.merge({
-      Vocabularies::GraphPattern.attributeConstraint => {:property => :attribute_constraints, :collection => true},
-      Vocabularies::GraphPattern.outgoingRelation => {:property => :source_relation_constraints, :collection => true},
-      Vocabularies::GraphPattern.incomingRelation => {:property => :target_relation_constraints, :collection => true}
-    })
-  end
-
   def query_variable()
     return rdf_type.split("/").last.downcase + self.id.to_s
   end
@@ -47,19 +39,18 @@ class Node < PatternElement
     "#{type_expression.fancy_string(true)}"
   end
 
+  def rdf_mappings
+    super.merge({
+      Vocabularies::GraphPattern.attributeConstraint => {:property => :attribute_constraints, :collection => true},
+      Vocabularies::GraphPattern.outgoingRelation => {:property => :source_relation_constraints, :collection => true},
+      Vocabularies::GraphPattern.incomingRelation => {:property => :target_relation_constraints, :collection => true}
+    })
+  end
+
   def rdf_statements
     stmts = super
-    
-    attribute_constraints.each do |ac|
-      stmts << [resource, Vocabularies::GraphPattern.attributeConstraint, ac.resource]
-      stmts.concat(ac.rdf)
-    end
-
-    source_relation_constraints.each do |src|
-      stmts << [resource, Vocabularies::GraphPattern.outgoingRelation, src.resource]
-      stmts.concat(src.rdf)
-    end
-
+    attribute_constraints.each{|ac| stmts << [resource, Vocabularies::GraphPattern.attributeConstraint, ac.resource]}
+    source_relation_constraints.each{|src| stmts << [resource, Vocabularies::GraphPattern.outgoingRelation, src.resource]}
     target_relation_constraints.each{|trc| stmts << [resource, Vocabularies::GraphPattern.incomingRelation, trc.resource]}
     return stmts
   end
