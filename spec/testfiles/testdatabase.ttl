@@ -131,6 +131,13 @@
       rdfs:label "pattern_elements_source_id" ;
       rdfs:range xsd:integer .
 
+:repositories_skipped_tables
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_skipped_tables" ;
+      rdfs:range xsd:string .
+
 :ontologies_type
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies ;
@@ -188,13 +195,6 @@
       rdfs:domain :patterns ;
       rdfs:isDefinedBy : ;
       rdfs:label "patterns_type" ;
-      rdfs:range xsd:string .
-
-:schema_migrations_version
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :schema_migrations ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "schema_migrations_version" ;
       rdfs:range xsd:string .
 
 :sessions_id
@@ -295,11 +295,6 @@
       rdfs:label "delayed_jobs_created_at" ;
       rdfs:range xsd:string .
 
-:schema_migrations
-      a       owl:Class , rdfs:Class ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "schema_migrations" .
-
 :taggings_taggable_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :taggings ;
@@ -331,11 +326,6 @@
 :     a       owl:Ontology ;
       dc:creator "D2RQ Mapping Generator" ;
       owl:imports dc: .
-
-:sqlite_sequence
-      a       owl:Class , rdfs:Class ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "sqlite_sequence" .
 
 :type_expressions
       a       owl:Class , rdfs:Class ;
@@ -408,13 +398,6 @@
       rdfs:domain :sessions ;
       rdfs:isDefinedBy : ;
       rdfs:label "sessions_data" ;
-      rdfs:range xsd:string .
-
-:sqlite_sequence_seq
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :sqlite_sequence ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "sqlite_sequence_seq" ;
       rdfs:range xsd:string .
 
 :taggings_tagger_id
@@ -652,13 +635,6 @@
       rdfs:domain :sessions ;
       rdfs:isDefinedBy : ;
       rdfs:label "sessions_session_id" ;
-      rdfs:range xsd:string .
-
-:sqlite_sequence_name
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :sqlite_sequence ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "sqlite_sequence_name" ;
       rdfs:range xsd:string .
 
 :aggregations_created_at

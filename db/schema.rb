@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(:version => 20150612120121) do
     t.integer "ontology_id"
     t.string  "type"
     t.integer "rdbms_type_cd"
+    t.string  "skip_tables"
   end
 
   add_index "repositories", ["ontology_id"], :name => "index_repositories_on_ontology_id"

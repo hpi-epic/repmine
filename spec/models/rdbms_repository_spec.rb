@@ -40,6 +40,7 @@ RSpec.describe RdbmsRepository, :type => :model do
       :host => config["host"],
       :port => config["port"],
       :name => "testdatabase",
+      :skip_tables => "schema_migrations,sqlite_sequence",
       :rdbms_type => db_type(config)
     )
   end

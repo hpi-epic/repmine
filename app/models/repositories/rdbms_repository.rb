@@ -19,7 +19,7 @@ require 'open3'
 
 class RdbmsRepository < Repository
 
-  attr_accessible :rdbms_type
+  attr_accessible :rdbms_type, :skip_tables
   as_enum :rdbms_type, mysql: 1, postgresql: 2, sqlite: 3
 
   validates :rdbms_type, :presence => true
@@ -36,6 +36,7 @@ class RdbmsRepository < Repository
     options += ["-u #{db_username}"] unless db_username.blank?
     options += ["-p #{db_password}"] unless db_password.blank?
     options += ["-d org.sqlite.JDBC"] if rdbms_type == :sqlite
+    options += ["--skip-tables=#{skip_tables}"] unless skip_tables.blank?
     options << connection_string
     errors = ""
 

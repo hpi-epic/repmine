@@ -12,6 +12,7 @@ class CreateRepository < ActiveRecord::Migration
       t.integer :ontology_id
       t.string :type
       t.integer :rdbms_type_cd
+      t.string :skip_tables
     end
     add_index :repositories, :ontology_id
   end
