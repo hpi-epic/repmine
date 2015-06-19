@@ -29,4 +29,32 @@ RSpec.describe ComplexCorrespondence, :type => :model do
     assert ent2.anonymous?
     assert_not_empty stmts
   end
+  
+  it "should store a complex correspondence if we only provide a list of pattern elements" do
+    i_pattern = FactoryGirl.create(:pattern)
+    o_pattern = FactoryGirl.create(:pattern)
+    cc = ComplexCorrespondence.from_elements(i_pattern.pattern_elements, o_pattern.pattern_elements)
+    g = RDF::Graph.new
+    g.insert(*cc.rdf_statements)
+    g.each do |stmt|
+      if stmt[1] == Vocabularies::Alignment.entity1 || stmt[1] == Vocabularies::Alignment.entity2
+        assert_not_nil stmt[2]
+      end
+    end
+  end
+  
+  it "should also work if we have simple -> complex mappings" do
+    i_pattern = FactoryGirl.create(:pattern)
+    o_node = FactoryGirl.create(:node_only_pattern).nodes.first
+    cc = ComplexCorrespondence.from_elements(i_pattern.pattern_elements, [o_node])
+    g = RDF::Graph.new
+    g.insert(*cc.rdf_statements)    
+  end
+  
+  it "should determine that we try to fool it ;)" do
+    i_node = FactoryGirl.create(:node)
+    o_node = FactoryGirl.create(:node)
+    cc = ComplexCorrespondence.from_elements([i_node], [o_node])
+    assert cc.is_a?(SimpleCorrespondence)
+  end
 end

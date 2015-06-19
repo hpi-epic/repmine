@@ -45,10 +45,11 @@ class RelationConstraint < PatternElement
     stmts = super
     stmts << [resource, Vocabularies::GraphPattern.sourceNode, source.resource]
     stmts << [resource, Vocabularies::GraphPattern.targetNode, target.resource]
-    stmts << [resource, Vocabularies::GraphPattern.min_cardinality, RDF::Literal.new(min_cardinality)]
-    stmts << [resource, Vocabularies::GraphPattern.max_cardinality, RDF::Literal.new(max_cardinality)]
-    stmts << [resource, Vocabularies::GraphPattern.min_path_length, RDF::Literal.new(min_path_length)]
-    stmts << [resource, Vocabularies::GraphPattern.max_path_length, RDF::Literal.new(max_path_length)]
+    stmts << [resource, Vocabularies::GraphPattern.min_cardinality, RDF::Literal.new(min_cardinality)] unless min_cardinality.blank?
+    stmts << [resource, Vocabularies::GraphPattern.max_cardinality, RDF::Literal.new(max_cardinality)] unless max_cardinality.blank?
+    stmts << [resource, Vocabularies::GraphPattern.min_path_length, RDF::Literal.new(min_path_length)] unless min_path_length.blank?
+    stmts << [resource, Vocabularies::GraphPattern.max_path_length, RDF::Literal.new(max_path_length)] unless max_path_length.blank?
+    return stmts
   end
 
   def assign_to_pattern!

@@ -20,9 +20,9 @@ class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2,
     ]
   end
   
+  # the measure is somewhat problematic here due to floats being transformed weirdly...
+  # hence, we remove this statement from our query...entities and relation should suffice, though  
   def query_patterns
-    # the measure is somewhat problematic here due to floats being transformed weirdly...
-    # hence, we remove this statement from our query...entities and relation should suffice, though
     self.rdf_statements.select{|rdfs| rdfs[1] != Vocabularies::Alignment.measure}.collect{|qp| 
       RDF::Query::Pattern.new(*qp.map!{|x| x == resource ? :cell : x })
     }

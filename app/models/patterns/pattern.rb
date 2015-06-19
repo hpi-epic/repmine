@@ -45,6 +45,7 @@ class Pattern < ActiveRecord::Base
   
   def create_node!(ontology)
     node = self.nodes.create!(:ontology_id => ontology.id)
+    node.type_expression = TypeExpression.for_rdf_type("")
     return node.becomes(Node)
   end
 
@@ -86,10 +87,12 @@ class Pattern < ActiveRecord::Base
     pattern = Pattern.new()
     
     graph.build_query do |q|
-      q.pattern([:element, Vocabularies::GraphPattern.belongsTo, pattern_node])
+      q.pattern([:element, Vocabularies::GraphPattern.belongsTo, :pattern])
       q.pattern([:element, RDF.type, :type])
       q.pattern([:type, RDF::RDFS.subClassOf, Vocabularies::GraphPattern.PatternElement])
     end.run do |res|
+      # ugly, but agraph treats anonymous nodes in queries like wildcards. Hence, check on the results
+      next if res[:pattern] != pattern_node
       pattern_element = Kernel.const_get(res[:type].to_s.split("/").last).new
       pattern_element.rdf_node = res[:element]
       pattern_element.pattern = pattern

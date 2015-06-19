@@ -69,7 +69,7 @@ class OntologyMatcher
   def correspondences_for_pattern_elements(elements)
     correspondences = []
     alignment_graph.query(complex_correspondence_query(elements)) do |result|
-      matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)
+      matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)      
       if matching_pattern.pattern_elements.select{|pe| elements.none?{|el| el.equal_to?(pe)}}.empty?
         correspondences << create_correspondence(result, elements)
       end

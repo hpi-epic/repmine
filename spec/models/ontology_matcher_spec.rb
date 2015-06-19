@@ -139,6 +139,17 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal ComplexCorrespondence, corrs.first.class
   end
   
+  it "should add a complex correspondence stemming from just sample elements and find it again" do
+    p1 = FactoryGirl.create(:pattern)
+    p2 = FactoryGirl.create(:pattern)
+    cc = ComplexCorrespondence.from_elements(p1.pattern_elements, p2.pattern_elements)
+    @om.insert_statements!
+    @om.add_correspondence!(cc)
+    corrs = @om.correspondences_for_pattern_elements(p1.pattern_elements)
+    assert_not_empty corrs
+    assert_equal p2.pattern_elements.size, corrs.first.pattern_elements.size
+  end
+  
   it "should find a complex correspondence based on provided elements" do
     correspondence = FactoryGirl.build(:hardway_complex)
     pattern = FactoryGirl.create(:pattern)
