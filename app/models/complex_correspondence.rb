@@ -1,7 +1,5 @@
 class ComplexCorrespondence < SimpleCorrespondence
 
-  class UnsupportedCorrespondence < Exception;end
-
   def rdf_statements()
     res1, stmts1 = process_entity(entity1)
     res2, stmts2 = process_entity(entity2)
