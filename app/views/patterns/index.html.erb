@@ -3,8 +3,14 @@
 <div class="btn-toolbar">
   <div class="btn-group">
     <%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
-    <%= button_tag("Combine Selected", :class => "btn btn-success", :name => "combine") %>
-    <%= button_tag("Translate Selected to:", :class => "btn btn-info", :name => "translate") %>
+  </div>
+  <div class="btn-group">  
+    <%= button_tag("Select Targets", :class => "btn btn-success", :name => "monitor") %>
+    <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor_on") %>
+    <%= select_tag(:repository_id, options_from_collection_for_select(@repositories, "id", "name"), {:class => "needs_no_space"}) %>
+  </div>
+  <div class="btn-group">
+    <%= button_tag("Translate selected to:", :class => "btn btn-info", :name => "translate") %>
     <%= select_tag(:ontology_ids, grouped_options_for_select(@ontology_groups), {:class => "needs_no_space"}) %>
   </div>
 </div>

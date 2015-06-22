@@ -5,6 +5,5 @@ class AddProgressToDelayedJobs < ActiveRecord::Migration
       t.integer :progress_current, required: true, default: 0
       t.integer :progress_max, required: true, default: 0
     end
-
   end
 end

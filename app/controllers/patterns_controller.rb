@@ -60,6 +60,7 @@ class PatternsController < ApplicationController
       @ontology_groups = Ontology.pluck(:group).uniq.map do |group| 
         [group, Ontology.where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
       end
+      @repositories = Repository.all    
     end
   end
 
@@ -93,51 +94,14 @@ class PatternsController < ApplicationController
         else          
           redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
         end
-      elsif params[:combine]
-        redirect_to select_combination_nodes_patterns_path({:patterns => params[:patterns]}) 
+      elsif params[:monitor]
+        redirect_to monitor_patterns_path({:patterns => params[:patterns]})
+      elsif params[:monitor_on]
+        redirect_to patterns_path, :alert => "Working on it..."        
       else
         redirect_to patterns_path, :alert => "How did you get here, anyway?"
       end
     end
-  end
-  
-  def select_combination_nodes
-    if params[:patterns].size != 2
-      redirect_to patterns_path, :alert => "You can only combine exactly two patterns at a time!"
-    else
-      @patterns = Pattern.find(params[:patterns])
-      unless @patterns.first.ontologies.any?{|ont| @patterns.last.ontologies.include?(ont)}
-        redirect_to patterns_path, :alert => "At least one ontology needs to be shared between combined patterns"
-      end
-      a1, r1 = load_attributes_and_constraints!(@patterns.first, true)
-      a2, r2 = load_attributes_and_constraints!(@patterns.last, true)
-      @attribute = a1.merge(a2)
-      @relations = r1 + r2
-      @second_pattern_offset = @patterns.first.node_offset + 200
-    end
-  end
-  
-  def combine
-    @patterns = Pattern.find(params[:patterns])
-    
-    @nodes = begin
-      Node.find(@patterns.collect{|pattern| params["selected_node_#{pattern.id}"].to_sym})
-    rescue ActiveRecord::RecordNotFound => error
-      []
-    end
-    
-    if @nodes.size != 2
-      redirect_to select_combination_nodes_patterns_path({:patterns => params[:patterns]})
-    else
-      @combination = Pattern.combine!(@patterns, @nodes, params[:combination_operator], params[:new_name])
-      redirect_to patterns_path, :notice => "Combined '#{@patterns.first.name}' and '#{@patterns.last.name}' to '#{@combination.name}'"
-    end
-  end
-
-  def missing_concepts
-    @pattern = Pattern.find(params[:pattern_id])
-    @ontology = Ontology.find(params[:ontology_id])
-    render :layout => false
   end
 
   def query
@@ -152,6 +116,12 @@ class PatternsController < ApplicationController
     }
   end
   
+  
+  def monitor
+    @patterns = Pattern.find(params[:patterns])
+    @repositories = Repository.all
+  end
+  
   def execute_on_repository
     @pattern = Pattern.find(params[:pattern_id])
     @repository = Repository.find(params[:repository_id])
@@ -161,22 +131,23 @@ class PatternsController < ApplicationController
   def save_correspondence
     sources = (params[:source_element_ids] || []).reject{|x| x.blank?}.first
     targets = (params[:target_element_ids] || []).reject{|x| x.blank?}.first
+    matched_concepts = []
 
-    matched_concepts = if sources.blank? || targets.blank?
+    if sources.blank? || targets.blank?
       flash[:error] = "You forgot to specify in or output elements. Please, watch the notifications in the top right corner!"
-      []
     else
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
-      @oc = "" #OntologyCorrespondence.for_elements!(input_elements, output_elements)
-      if @oc.nil?
-        flash[:error] = "Could not save correspondence! Contact your administrator"
-        []
-      else
+      begin
+        @oc = ComplexCorrespondence.from_elements(input_elements, output_elements)
+        @oc.add_to_alignment!
         flash[:notice] = "Thanks for the correspondence!"
-        params[:source_element_ids].collect{|id| id.to_s}
+        matched_concepts = params[:source_element_ids].collect{|id| id.to_s}
+      rescue SimpleCorrespondence::UnsupportedCorrespondence => e
+        flash[:error] = "Could not save correspondence! #{e.message}"
       end
     end
+    
     render :json => matched_concepts
   end
 

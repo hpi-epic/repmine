@@ -47,7 +47,7 @@
 <div id="drawing_canvas" class="canvas">
 
   <% @pattern.nodes.each do |node| %>
-    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @pattern, :type_hierarchy => @type_hierarchy }%>
+    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @pattern, :type_hierarchy => @type_hierarchy, :offset => 0 }%>
   <% end %>
 
 </div>
