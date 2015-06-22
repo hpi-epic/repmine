@@ -24,6 +24,7 @@ class Pattern < ActiveRecord::Base
   has_and_belongs_to_many :ontologies
   has_many :pattern_elements, :dependent => :destroy
   has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
+  has_many :monitoring_tasks, :dependent => :destroy
 
   # validations
   validates :name, :presence => true

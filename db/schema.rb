@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150612120121) do
+ActiveRecord::Schema.define(:version => 20150622125315) do
 
   create_table "aggregations", :force => true do |t|
     t.integer  "pattern_element_id"
@@ -38,6 +38,13 @@ ActiveRecord::Schema.define(:version => 20150612120121) do
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
+  create_table "monitoring_tasks", :force => true do |t|
+    t.integer  "pattern_id"
+    t.integer  "repository_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
 
   create_table "ontologies", :force => true do |t|
     t.string   "url"

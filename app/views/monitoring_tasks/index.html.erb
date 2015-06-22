@@ -1,0 +1,23 @@
+<% @repos_with_tasks.each do |repo| %>
+  <table class="table table-bordered">
+    <tr class="info">
+      <td colspan="5"><strong><%= repo.name %></strong> (<%= repo.monitoring_tasks.size%>)</td>
+    </tr>
+    <% repo.monitoring_tasks.each do |mt| %>
+    <tr>
+      <td><%= mt.pattern.name %></td>
+      <td>
+        <%= link_to("Download latest CSV", monitoring_task_latest_results_path(mt), :class => "btn btn-success")%>        
+        <%= link_to("Show Results", pattern_execute_on_repository_path(mt.pattern, mt.repository), :class => "btn btn-info") %>
+        <%= link_to("Stop Monitoring", 
+              monitoring_task_path(mt),
+              :method => :delete,
+              :class => "btn btn-danger",
+              :confirm => "Really stop monitoring #{mt.pattern.name} on #{repo.name}?"
+            ) 
+        %>
+      </td>      
+    </tr>
+    <% end %>
+  </table>
+<% end %>

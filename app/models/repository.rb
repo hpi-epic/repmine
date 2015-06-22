@@ -18,6 +18,7 @@
 class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password, :group
   belongs_to :ontology
+  has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
 
   TYPES = ["RdfRepository", "RdbmsRepository", "Neo4jRepository"]
@@ -89,7 +90,7 @@ class Repository < ActiveRecord::Base
     raise "implement 'type_statistics' in #{self.class.name}"
   end
   
-  def execute(pattern)
+  def execute(query_string)
     raise "implement 'execute' in #{self.class.name}"
   end  
 
@@ -99,6 +100,10 @@ class Repository < ActiveRecord::Base
 
   def database_version
     return "1.0"
+  end
+  
+  def results_for_pattern(pattern)
+    return execute(query_creator(pattern).query_string)
   end
 
   def query_creator(pattern)

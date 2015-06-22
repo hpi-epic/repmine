@@ -133,7 +133,7 @@ class Neo4jRepository < Repository
   def execute(query)
     headers, cleansed_data, columns = get_headers_and_cleansed_data(query)
     
-    CSV.generate do |csv|
+    csv_results = CSV.generate do |csv|
       csv << headers
       cleansed_data.each do |data_row|
         row = []
@@ -149,6 +149,8 @@ class Neo4jRepository < Repository
         csv << row
       end
     end
+    
+    return cleansed_data, csv_results
   end
   
   def get_headers_and_cleansed_data(query)

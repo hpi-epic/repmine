@@ -12,6 +12,13 @@
       rdfs:label "repositories_db_name" ;
       rdfs:range xsd:string .
 
+:repositories_skip_tables
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_skip_tables" ;
+      rdfs:range xsd:string .
+
 :delayed_jobs_run_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :delayed_jobs ;
@@ -61,6 +68,11 @@
       rdfs:label "ontologies_updated_at" ;
       rdfs:range xsd:string .
 
+:monitoring_tasks
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "monitoring_tasks" .
+
 :pattern_element_matches_created_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :pattern_element_matches ;
@@ -94,6 +106,13 @@
       rdfs:domain :ontologies_patterns ;
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_patterns_ontology_id" ;
+      rdfs:range xsd:integer .
+
+:monitoring_tasks_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :monitoring_tasks ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "monitoring_tasks_id" ;
       rdfs:range xsd:integer .
 
 :delayed_jobs_queue
@@ -130,13 +149,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_elements_source_id" ;
       rdfs:range xsd:integer .
-
-:repositories_skipped_tables
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :repositories ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "repositories_skipped_tables" ;
-      rdfs:range xsd:string .
 
 :ontologies_type
       a       owl:DatatypeProperty , rdf:Property ;
@@ -274,6 +286,13 @@
       rdfs:label "ontologies_id" ;
       rdfs:range xsd:integer .
 
+:monitoring_tasks_updated_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :monitoring_tasks ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "monitoring_tasks_updated_at" ;
+      rdfs:range xsd:string .
+
 :aggregations_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :aggregations ;
@@ -286,6 +305,13 @@
       rdfs:domain :taggings ;
       rdfs:isDefinedBy : ;
       rdfs:label "taggings_tag_id" ;
+      rdfs:range xsd:integer .
+
+:monitoring_tasks_pattern_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :monitoring_tasks ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "monitoring_tasks_pattern_id" ;
       rdfs:range xsd:integer .
 
 :delayed_jobs_created_at
@@ -338,6 +364,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "patterns_created_at" ;
       rdfs:range xsd:string .
+
+:monitoring_tasks_repository_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :monitoring_tasks ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "monitoring_tasks_repository_id" ;
+      rdfs:range xsd:integer .
 
 :aggregations_pattern_element_id
       a       owl:DatatypeProperty , rdf:Property ;
@@ -720,6 +753,13 @@
       rdfs:domain :pattern_element_matches ;
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_element_matches_updated_at" ;
+      rdfs:range xsd:string .
+
+:monitoring_tasks_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :monitoring_tasks ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "monitoring_tasks_created_at" ;
       rdfs:range xsd:string .
 
 :patterns_updated_at

@@ -2,12 +2,11 @@
 
 <div class="btn-toolbar">
   <div class="btn-group">
-    <%= link_to "New Pattern", new_pattern_path, :class => "btn"%>
+    <%= link_to "New Pattern", new_pattern_path, :class => "btn btn-success"%>
   </div>
   <div class="btn-group">  
-    <%= button_tag("Select Targets", :class => "btn btn-success", :name => "monitor") %>
-    <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor_on") %>
-    <%= select_tag(:repository_id, options_from_collection_for_select(@repositories, "id", "name"), {:class => "needs_no_space"}) %>
+    <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor") %>
+    <%= select_tag("repository_id", options_from_collection_for_select(@repositories, "id", "name"), {:class => "needs_no_space"}) %>
   </div>
   <div class="btn-group">
     <%= button_tag("Translate selected to:", :class => "btn btn-info", :name => "translate") %>
@@ -43,7 +42,7 @@
         <td>
           <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-mini") %>
           <%= link_to(
-            "Delete", 
+            "Delete",
             pattern_path(pattern), 
             :method => :delete, 
             :class => "btn btn-danger btn-mini", 

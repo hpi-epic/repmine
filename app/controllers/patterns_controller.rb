@@ -60,7 +60,7 @@ class PatternsController < ApplicationController
       @ontology_groups = Ontology.pluck(:group).uniq.map do |group| 
         [group, Ontology.where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
       end
-      @repositories = Repository.all    
+      @repositories = Repository.all
     end
   end
 
@@ -95,9 +95,10 @@ class PatternsController < ApplicationController
           redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
         end
       elsif params[:monitor]
-        redirect_to monitor_patterns_path({:patterns => params[:patterns]})
-      elsif params[:monitor_on]
-        redirect_to patterns_path, :alert => "Working on it..."        
+        Pattern.find(params[:patterns]).each do |pattern|
+          pattern.monitoring_tasks.where(:repository_id => params[:repository_id]).first_or_create!
+        end
+        redirect_to monitoring_tasks_path
       else
         redirect_to patterns_path, :alert => "How did you get here, anyway?"
       end
@@ -125,7 +126,7 @@ class PatternsController < ApplicationController
   def execute_on_repository
     @pattern = Pattern.find(params[:pattern_id])
     @repository = Repository.find(params[:repository_id])
-    send_data(@repository.execute(params[:query_string]), :type => 'text/csv; charset=utf-8; header=present', :filename => @pattern.name + "_on_" + @repository.name)
+    @results = @repository.results_for_pattern(@pattern)
   end
 
   def save_correspondence
