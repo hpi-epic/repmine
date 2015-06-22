@@ -116,4 +116,14 @@ RSpec.describe PatternElement, :type => :model do
     rc.rebuild!(g)
     assert_equal node, rc.source
   end
+  
+  it "should determine that a variable reference does not mean it is a variable" do
+    ac1 = FactoryGirl.build(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :value => "?name")
+    ac2 = FactoryGirl.build(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:equals], :value => "?name")
+    
+    assert ac1.is_variable?
+    assert !ac2.is_variable?
+    assert ac2.refers_to_variable?
+    assert !ac1.refers_to_variable?
+  end
 end

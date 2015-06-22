@@ -69,7 +69,7 @@ class AttributeConstraint < PatternElement
   end
 
   def refers_to_variable?
-    return contains_variable?(self.value)
+    return contains_variable?(self.value) && !is_variable?
   end
   
   def is_variable?

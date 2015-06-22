@@ -26,7 +26,7 @@ class CypherQueryCreator < QueryCreator
   end
   
   def relation_reference(rel)
-    "[:`#{rel.label_for_type}`]"
+    "[#{pe_variable(rel)}:`#{rel.label_for_type}`]"
   end
   
   def attribute_reference(ac)
@@ -34,7 +34,7 @@ class CypherQueryCreator < QueryCreator
   end
   
   def return_values
-    values = pattern.nodes.collect{|node| aggregated_variable(node)}
+    values = pattern.nodes.select{|node| node.attribute_constraints.all?{|ac| ac.aggregation.nil?}}.collect{|node| aggregated_variable(node)}
     values += pattern.relation_constraints.select{|rc| !rc.aggregation.nil?}.collect{|rc| aggregated_variable(rc)}
     values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil?}.collect{|ac| aggregated_variable(ac)}    
     return values.join(", ")
@@ -83,7 +83,7 @@ class CypherQueryCreator < QueryCreator
   
   # needed in case of subqueries and aliased variables
   def with
-    if pattern.pattern_elements.any?{|pe| pe.is_variable?}
+    if pattern.pattern_elements.any?{|pe| pe.is_variable? && !pe.aggregation.nil?}
       str = " WITH #{(plain_vars + aliased_vars).join(", ")}"
     else
       return ""

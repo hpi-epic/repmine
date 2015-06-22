@@ -65,6 +65,10 @@ class Pattern < ActiveRecord::Base
       return self.pattern_elements.find{|pe| other.pattern_elements.select{|ope| pe.equal_to?(ope)}.size != 1}.nil?
     end
   end
+  
+  def compatible_with?(other)
+    return pattern_elements.any?{|pe| other.pattern_elements.any?{|ope| pe.equal_to?(ope)}}
+  end
 
   # RDF Serialization
   def rdf_statements
