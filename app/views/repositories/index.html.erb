@@ -1,11 +1,12 @@
 <% unless @repositories.empty? %>
-<table style="width:40%" class="table">
+<table style="width:40%" class="table table-bordered">
   <thead>
     <tr>
       <th>Name</th>
       <th>Actions</th>
     </tr>
   </thead>
+  <tbody>
   <% @repositories.each_with_index do |repository, i| %>
   <tr>
     <td><%= link_to(repository.name, repository) %></td>
@@ -14,9 +15,10 @@
       <%= link_to "Extract Data Schema", repository_extract_schema_path(repository), {:class => "btn btn-info"} %>            
       <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-warning"} %>
       <%= link_to "Delete", repository, {:method => :delete, :confirm => "Really?", :class => "btn btn-danger"} %>
-    <td>
+    </td>
   </tr>
   <% end %>
+  <tbody>  
 </table>
 <% end %>
 
