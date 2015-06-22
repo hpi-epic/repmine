@@ -147,6 +147,8 @@ GEM
     polyglot (0.3.5)
     progress_job (0.0.4)
       delayed_job
+    quiet_safari (1.0.0)
+      railties (>= 3.1.0)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -344,6 +346,7 @@ DEPENDENCIES
   neography
   nokogiri
   progress_job
+  quiet_safari
   rails (~> 3.2.19)
   rails3-jquery-autocomplete
   rdf

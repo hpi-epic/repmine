@@ -33,6 +33,9 @@ gem 'nokogiri'
 # putting graphs back together
 gem "wongi-engine"
 
+# peace of mind
+gem 'quiet_safari', group: :development
+
 group :development, :test do
   gem "rspec"
   gem "rspec-rails"
