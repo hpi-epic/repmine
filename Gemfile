@@ -33,18 +33,13 @@ gem 'nokogiri'
 # putting graphs back together
 gem "wongi-engine"
 
-# peace of mind
-gem 'quiet_safari', group: :development
-
 group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem 'factory_girl_rails'
   gem 'simplecov'
+  gem 'quiet_safari'
 end
-
-gem 'autotest-rails'
-gem 'annotate', '~> 2.6.5'
 
 # Gems used only for assets and not required
 # in production environments by default.

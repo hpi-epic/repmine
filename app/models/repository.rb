@@ -1,20 +1,3 @@
-# == Schema Information
-#
-# Table name: repositories
-#
-#  id            :integer          not null, primary key
-#  name          :string(255)
-#  db_name       :string(255)
-#  db_username   :string(255)
-#  db_password   :string(255)
-#  host          :string(255)
-#  port          :integer
-#  description   :text
-#  ontology_id   :integer
-#  type          :string(255)
-#  rdbms_type_cd :integer
-#
-
 class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password, :group
   belongs_to :ontology
@@ -121,9 +104,5 @@ class Repository < ActiveRecord::Base
   # overwrite this if your repository needs custom information within the ontology
   def custom_imports
     return []
-  end
-
-  def self.all_that_have_an_ontology
-    self.all.select{|repo| repo.ontology.does_exist}
   end
 end

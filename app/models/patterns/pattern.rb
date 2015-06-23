@@ -1,17 +1,3 @@
-# == Schema Information
-#
-# Table name: patterns
-#
-#  id          :integer          not null, primary key
-#  name        :string(255)
-#  description :text
-#  ontology_id :integer
-#  type        :string(255)
-#  pattern_id  :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#
-
 class Pattern < ActiveRecord::Base
 
   include RdfSerialization

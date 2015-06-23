@@ -1,7 +1,6 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    ZenTest (4.11.0)
     actionmailer (3.2.21)
       actionpack (= 3.2.21)
       mail (~> 2.5.4)
@@ -36,12 +35,7 @@ GEM
       transport (~> 1.0.5)
     ancestry (2.1.0)
       activerecord (>= 3.0.0)
-    annotate (2.6.10)
-      activerecord (>= 3.2, <= 4.3)
-      rake (~> 10.4)
     arel (3.0.3)
-    autotest-rails (4.2.1)
-      ZenTest (~> 4.5)
     bcp47 (0.3.3)
       i18n
     bson (1.12.3)
@@ -330,8 +324,6 @@ PLATFORMS
 DEPENDENCIES
   acts-as-taggable-on
   ancestry
-  annotate (~> 2.6.5)
-  autotest-rails
   bson_ext
   coffee-rails (~> 3.2.1)
   daemons

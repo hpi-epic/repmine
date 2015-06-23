@@ -1,16 +1,3 @@
-# == Schema Information
-#
-# Table name: type_expressions
-#
-#  id                 :integer          not null, primary key
-#  operator           :string(255)
-#  rdf_type           :string(255)
-#  pattern_element_id :integer
-#  ancestry           :string(255)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#
-
 class TypeExpression < ActiveRecord::Base
   attr_accessible :operator, :rdf_type
   belongs_to :pattern_element

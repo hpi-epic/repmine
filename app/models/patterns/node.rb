@@ -1,27 +1,4 @@
 # encoding: utf-8
-# == Schema Information
-#
-# Table name: pattern_elements
-#
-#  id              :integer          not null, primary key
-#  type            :string(255)
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  pattern_id      :integer
-#  node_id         :integer
-#  value           :string(255)
-#  operator        :string(255)
-#  min_cardinality :string(255)
-#  max_cardinality :string(255)
-#  min_path_length :string(255)
-#  max_path_length :string(255)
-#  source_id       :integer
-#  target_id       :integer
-#  x               :integer          default(0)
-#  y               :integer          default(0)
-#  is_group        :boolean          default(FALSE)
-#
-
 #!/bin/env ruby
 
 class Node < PatternElement
@@ -62,24 +39,20 @@ class Node < PatternElement
   def type_hierarchy
     return ontology.type_hierarchy
   end
-  
+
   def equal_to?(other)
     if super
-      # check cardinalities of all the relations
       return check_ac_and_rc_similarity(other) && other.check_ac_and_rc_similarity(self)
     else
       return false
     end
   end
   
+  # checks whether each of our elements has exactly one twin. Does NOT check whether "other" has more elements
   def check_ac_and_rc_similarity(other)
-    equal = source_relation_constraints.size == other.source_relation_constraints.size
-    equal &&= target_relation_constraints.size == other.target_relation_constraints.size
-    equal &&= attribute_constraints.size == other.attribute_constraints.size
-    # then check if each rc and ac has exactly one twin
-    equal &&= source_relation_constraints.find{|src| other.source_relation_constraints.select{|osrc| src.equal_to?(osrc)}.size != 1}.nil?
-    equal &&= target_relation_constraints.find{|trc| other.target_relation_constraints.select{|otrc| trc.equal_to?(otrc)}.size != 1}.nil?      
-    equal &&= attribute_constraints.find{|ac| other.attribute_constraints.select{|oac| ac.equal_to?(oac)}.size != 1}.nil?
+    equal = source_relation_constraints.none?{|src| other.source_relation_constraints.select{|osrc| src.equal_to?(osrc)}.size != 1}
+    equal &&= target_relation_constraints.none?{|trc| other.target_relation_constraints.select{|otrc| trc.equal_to?(otrc)}.size != 1}
+    equal &&= attribute_constraints.none?{|ac| other.attribute_constraints.select{|oac| ac.equal_to?(oac)}.size != 1}
     return equal
   end
 end
