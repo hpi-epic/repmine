@@ -14,17 +14,10 @@ class PatternElement < ActiveRecord::Base
   has_many :matching_elements, :through => :matches, :dependent => :destroy
   
   has_one :type_expression, :dependent => :destroy
-  has_one :aggregation, :dependent => :destroy
-  
-  #after_create :build_type_expression!
-  
+  has_one :aggregation, :dependent => :destroy  
   include RdfSerialization
   
   class ComparisonError < Error
-  end
-
-  def build_type_expression!()
-    TypeExpression.for_rdf_type(self, "")
   end
 
   def url
@@ -64,10 +57,6 @@ class PatternElement < ActiveRecord::Base
   # Query stuff
   def contains_variable?(str)
     return !str.match(/\?([A-Za-z0-9\-_]+)/).nil?
-  end
-
-  def query_variable()
-    "#{self.class.name.underscore}_#{self.id}"
   end
   
   def is_variable?

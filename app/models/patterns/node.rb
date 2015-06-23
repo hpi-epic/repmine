@@ -7,10 +7,6 @@ class Node < PatternElement
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy
   has_many :attribute_constraints, :dependent => :destroy
   validates :ontology, :presence => true
-
-  def query_variable()
-    return rdf_type.split("/").last.downcase + self.id.to_s
-  end
   
   def pretty_string
     "#{type_expression.fancy_string(true)}"

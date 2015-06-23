@@ -67,14 +67,6 @@ class AgraphConnection
     end
     return nil
   end
-
-  def outgoing_relations(domain)
-    relations(domain, nil)
-  end
-
-  def incoming_relations(range)
-    relations(nil, range)
-  end
   
   def relations(domain, range)
     rels = []

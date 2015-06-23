@@ -1,6 +1,5 @@
 class OwlClass
   attr_accessor :subclasses, :name, :relations, :attributes, :ontology, :class_url, :superclasses
-
   SET_OPS = {:sub => "&sub;", :sup => "&sup;", :not => "&not;"}
 
   include RdfSerialization
@@ -19,36 +18,6 @@ class OwlClass
     @attributes = Set.new
     @class_url = url
     ontology.add_class(self) unless ontology.nil?
-  end
-  
-  def is_subclass_of?(concept_url)
-    direct = superclasses.any?{|sc| sc.class_url == concept_url}
-    return direct || superclasses.any?{|sc| sc.is_subclass_of?(concept_url)}
-  end
-  
-  def is_superclass_of?(concept_url)
-    direct = subclasses.any?{|sc| sc.class_url == concept_url}
-    return direct || subclasses.any?{|sc| sc.is_superclass_of?(concept_url)}
-  end
-  
-  def is_sister_class_of?(concept_url)
-    superclasses.any?{|sc| sc.subclasses.any?{|ssc| ssc.class_url == concept_url}}
-  end
-  
-  def has_class_relation_with?(concept_url)
-    is_subclass_of?(concept_url) || is_superclass_of?(concept_url) || is_sister_class_of?(concept_url)
-  end
-  
-  def all_siblings()
-    return superclasses.collect{|sc| sc.subclasses.collect{|scc| scc.class_url}}.flatten
-  end
-  
-  def all_superclasses
-    return superclasses.collect{|sc| sc.class_url} + superclasses.collect{|sc| sc.all_superclasses}.flatten
-  end
-  
-  def all_subclasses
-    return subclasses.collect{|sc| sc.class_url} + subclasses.collect{|sc| sc.all_subclasses}.flatten
   end
   
   def add_subclass(owl_class)
