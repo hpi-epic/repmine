@@ -16,28 +16,13 @@
 
 <% unless @job.nil? %>
   <% content_for :javascript_includes do %>
-    <%= javascript_include_tag "repository_overview.js" %>
+    <%= javascript_include_tag "progress_bars.js" %>
   <% end %>
   <script type="text/javascript">
-    var job_id = <%= @job.id %>;
+    var jobs = <%= {@job.id => "Creating ontology for repository"}.to_json.html_safe %>;
   </script>
-
-  <div class="well">
-    <div class="row">
-      <div class="col-xs-12" style="padding-left: 20px;">
-        <div class="progress-status text-primary"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12" style="padding-left: 20px;">
-        <div class="progress progress-striped active">
-          <div class="progress-bar">
-            <div class="text-primary">0%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    
+  <%= render :partial => "stuff/progress_bar", :locals => {:job_id => @job.id} %>  
 <% end %>
 
 <table style="width:40%">
