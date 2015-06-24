@@ -20,59 +20,40 @@ class Neo4jRepository < Repository
     CypherQueryCreator
   end
   
-  class OntExtractionJob < ProgressJob::Base
-
-    def perform
-      @repository = Repository.find(@repository_id)
-      @repository.analyze_neo4j_repository!(self)
-    end
-
-  end
-  
-  def analyze_neo4j_repository!(job = nil)
-    properties = {}
-    log_msg("Getting properties per label", job)
-    labels_and_counts.each_pair{|label, count| 
-      properties[label] = get_properties(label, count, job)
-      log_status("Finished '#{label}'", 1, job)
-    }
-    log_msg("Getting relationships per label", job)
-    populate_ontology!(properties, get_relationships())
-    log_status("Finished analyzing the ontology!", 1, job)
-    ontology.update_attributes({:does_exist => true})
-    ontology.load_to_dedicated_repository!
-  end
-  
-  def log_status(msg, step, job)
-    job.nil? ? puts(msg) : job.update_stage_progress(msg, :step => step)
-  end
-  
-  def log_msg(msg, job)
-    job.nil? ? puts(msg) : job.update_stage(msg)
-  end
-
   # queries the graph in order to create an ontology that describes it...
   # 1. Get all nodes with certain labels and determine their properties + value types
   # 2. get all relations between different node types
+  def analyze_repository()
+    properties = {}
+    log_msg("Getting properties per label")
+    labels_and_counts.each_pair{|label, count| 
+      properties[label] = get_properties(label, count)
+      log_status("Finished '#{label}'", 1)
+    }
+    log_msg("Getting relationships per label")
+    populate_ontology!(properties, get_relationships())
+    log_status("Finished analyzing the ontology!", 1)
+    ontology.update_attributes({:does_exist => true})
+    ontology.load_to_dedicated_repository!
+  end
+
   def create_ontology!
     if ontology_creation_job.nil?
       lc = labels_and_counts      
-      j = OntExtractionJob.new(progress_max: lc.size + 1)
-      j.instance_variable_set("@repository_id", self.id)
+      j = OntologyExtractionJob.new(progress_max: lc.size + 1, repository_id: self.id)
       Delayed::Job.enqueue(j, :queue => ont_creation_queue)
     end
     return nil
   end
   
-  # yeah, sue me ... this is slow as f**k, but it does the job ^^
-  def get_properties(label, count, job = nil)
+  def get_properties(label, count)
     offset = sensible_offset(label)
     rounds = (count / offset).to_i
     rounds += 1 if offset.modulo(count) != 0 || count < offset
-    log_msg("Getting samples for '#{label}' in #{rounds} rounds.", job)
+    log_msg("Getting samples for '#{label}' in #{rounds} rounds.")
     node_properties = {}
     rounds.times do |i|
-      log_msg("Collecting samples for '#{label}'. Round #{i+1} of #{rounds}" ,job)
+      log_msg("Collecting samples for '#{label}'. Round #{i+1} of #{rounds}")
       nodes = query_result("MATCH (n:`#{label}`) RETURN n SKIP #{offset * i} LIMIT #{offset}")
       nodes.collect{|node| node.first["data"]}.each{|bh| node_properties.merge!(bh.reject{|k,v| v.nil?})}
     end
@@ -131,6 +112,7 @@ class Neo4jRepository < Repository
   end
   
   def execute(query)
+    log_msg("Getting results from repository")
     headers, cleansed_data, columns = get_headers_and_cleansed_data(query)
     
     csv_results = CSV.generate do |csv|
@@ -150,7 +132,7 @@ class Neo4jRepository < Repository
       end
     end
     
-    return cleansed_data, csv_results
+    return {:headers => headers, :data => cleansed_data}, csv_results
   end
   
   def get_headers_and_cleansed_data(query)
@@ -187,7 +169,7 @@ class Neo4jRepository < Repository
     i = 0
     
     loop do
-      puts "running round #{i + 1}"
+      log_msg("Results so far: #{i*1000}")
       cur_results = neo.execute_query(query + " SKIP #{1000 * i} LIMIT 1000")
       results["data"] += cur_results["data"]
       results["columns"] = cur_results["columns"]
@@ -195,7 +177,7 @@ class Neo4jRepository < Repository
       i += 1
     end
     
-    puts "got a total of #{results["data"].size} records"
+    log_status("got a total of #{results["data"].size} records", 75)
     return results
   end
 end

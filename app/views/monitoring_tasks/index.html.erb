@@ -1,22 +1,46 @@
+<% unless @query_jobs.empty? %>
+  <% content_for :javascript_includes do %>
+    <%= javascript_include_tag "progress_bars.js" %>
+  <% end %>
+  <script type="text/javascript">
+    var jobs = <%= @query_jobs.to_json.html_safe %>;
+  </script>
+<% end %>
+
+
+
 <% @repos_with_tasks.each do |repo| %>
   <table class="table table-bordered">
     <tr class="info">
       <td colspan="5"><strong><%= repo.name %></strong> (<%= repo.monitoring_tasks.size%>)</td>
     </tr>
-    <% repo.monitoring_tasks.each do |mt| %>
+    <% repo.monitoring_tasks.each_with_index do |mt, i| %>
     <tr>
-      <td><%= mt.pattern.name %></td>
+      <td><%= link_to(mt.pattern.name, mt.pattern) %></td>
       <td>
-        <%= link_to("Download latest CSV", monitoring_task_latest_results_path(mt), :class => "btn btn-success")%>        
-        <%= link_to("Show Results", pattern_execute_on_repository_path(mt.pattern, mt.repository), :class => "btn btn-info") %>
+        <% if mt.has_latest_results? %>
+          <%= link_to("CSV", monitoring_task_csv_results_path(mt), :class => "btn btn-success")%>
+          <%= link_to("Webview", monitoring_task_show_results_path(mt), :class => "btn btn-success")%>
+        <% else %>
+          <strong>No results present, press update!</strong>
+        <% end %>
+        <%= link_to("Update!", monitoring_task_run_path(mt), :class => "btn btn-info", :method => :post) %>
         <%= link_to("Stop Monitoring", 
               monitoring_task_path(mt),
               :method => :delete,
               :class => "btn btn-danger",
               :confirm => "Really stop monitoring #{mt.pattern.name} on #{repo.name}?"
-            ) 
+            )
         %>
-      </td>      
+      </td>
+      <% if i == 0%>
+      <td rowspan="0" class="span8">
+        <em>Running Queries:</em><br />
+        <% repo.query_jobs.each_with_index do |qj, ii| %>
+          <%= render :partial => "stuff/progress_bar", :locals => {:job_id => qj.id} %>  
+        <% end %>
+      </td>
+      <% end %>
     </tr>
     <% end %>
   </table>

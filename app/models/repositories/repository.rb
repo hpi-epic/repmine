@@ -3,6 +3,9 @@ class Repository < ActiveRecord::Base
   belongs_to :ontology
   has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
+  
+  # this is meant to temporarily hold a job object that loggin happens in...
+  attr_accessor :job
 
   TYPES = ["RdfRepository", "RdbmsRepository", "Neo4jRepository"]
 
@@ -31,8 +34,6 @@ class Repository < ActiveRecord::Base
     return self.class.accessible_attributes.select{|at| !at.blank?}
   end
 
-  # too bad Rails 3 does not handle inheritance and associations well...
-  # just not way of saying self.create_extracted_ontology or self.create_ontology(type: "Extracted")
   def build_ontology
     ont_url = ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
     self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => group || "Misc", :url => ont_url)
@@ -51,6 +52,14 @@ class Repository < ActiveRecord::Base
   def ont_creation_queue
     "ont_creation_#{self.id}"
   end
+  
+  def query_queue
+    "queries_#{self.id}"
+  end
+  
+  def query_jobs
+    Delayed::Job.find_all_by_queue(query_queue)
+  end
 
   def extract_ontology!
     ontology.remove_local_copy!
@@ -68,6 +77,10 @@ class Repository < ActiveRecord::Base
   def create_ontology!
     raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
   end
+  
+  def analyze_repository(job = nil)
+    raise "implement 'analyze_repository' in #{self.class.name}"
+  end
 
   def type_statistics
     raise "implement 'type_statistics' in #{self.class.name}"
@@ -75,7 +88,15 @@ class Repository < ActiveRecord::Base
   
   def execute(query_string)
     raise "implement 'execute' in #{self.class.name}"
-  end  
+  end
+  
+  def log_status(msg, step)
+    job.nil? ? puts(msg) : job.update_stage_progress(msg, :step => step)
+  end
+  
+  def log_msg(msg)
+    job.nil? ? puts(msg) : job.update_stage(msg)
+  end
 
   def database_type
     "Generic"
@@ -83,14 +104,6 @@ class Repository < ActiveRecord::Base
 
   def database_version
     return "1.0"
-  end
-  
-  def results_for_pattern(pattern)
-    return execute(query_creator(pattern).query_string)
-  end
-
-  def query_creator(pattern)
-    return self.class.query_creator_class.new(pattern)
   end
 
   def self.query_creator_class

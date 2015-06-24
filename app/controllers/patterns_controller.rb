@@ -117,16 +117,9 @@ class PatternsController < ApplicationController
     }
   end
   
-  
   def monitor
     @patterns = Pattern.find(params[:patterns])
     @repositories = Repository.all
-  end
-  
-  def execute_on_repository
-    @pattern = Pattern.find(params[:pattern_id])
-    @repository = Repository.find(params[:repository_id])
-    @results = @repository.results_for_pattern(@pattern)
   end
 
   def save_correspondence

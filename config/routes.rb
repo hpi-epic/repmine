@@ -4,7 +4,6 @@ RepMine::Application.routes.draw do
     get :query
     get "translate/:ontology_id", :as => :translate, :to => "patterns#translate"
     post :process_patterns, :on => :collection
-    get "execute_on_repository/:repository_id", :as => :execute_on_repository, :to => "patterns#execute_on_repository"
     get :monitor, :on => :collection
     post "/save_correspondence/:output_pattern_id", :to => "patterns#save_correspondence", :as => :save_correspondence
 
@@ -39,8 +38,9 @@ RepMine::Application.routes.draw do
   end
   
   resources :monitoring_tasks do
-    get :latest_results
+    get :csv_results
     get :show_results
+    post :run
   end
 
   root :to => "patterns#index"
