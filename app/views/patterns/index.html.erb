@@ -28,6 +28,7 @@
   <tbody>
 
   <% @pattern_groups.each_pair do |tag, patterns| %>
+    <% next if patterns.empty? %>
     <tr class="info">
       <td colspan="5"><strong><%= tag %></strong> (<%= patterns.size%>)</td>
     </tr>
