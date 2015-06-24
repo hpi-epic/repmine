@@ -36,7 +36,7 @@ class CypherQueryCreator < QueryCreator
   def return_values
     values = pattern.nodes.select{|node| node.attribute_constraints.all?{|ac| ac.aggregation.nil?}}.collect{|node| aggregated_variable(node)}
     values += pattern.relation_constraints.select{|rc| !rc.aggregation.nil?}.collect{|rc| aggregated_variable(rc)}
-    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil?}.collect{|ac| aggregated_variable(ac)}    
+    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil? || ac.operator == AttributeConstraint::OPERATORS[:var]}.collect{|ac| aggregated_variable(ac)}
     return values.join(", ")
   end
   
@@ -53,6 +53,8 @@ class CypherQueryCreator < QueryCreator
     str = pe_variable(pe)
     if !pe.aggregation.nil? && pe.aggregation.operation != :group_by
       str = pe.aggregation.operation.to_s + "(#{str})"
+    elsif pe.is_a?(Node)
+      str = "id(#{str})"
     end
     return str
   end
