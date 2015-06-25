@@ -13,7 +13,7 @@ class OntologyExtractionJob < ProgressJob::Base
   def perform
     @repository = Repository.find(@repository_id)
     @repository.job = self
-    @repository.analyze_repository(self)
+    @repository.analyze_repository()
     @repository.job = nil
   end
 end

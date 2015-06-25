@@ -22,10 +22,14 @@
           <%= link_to("CSV", monitoring_task_csv_results_path(mt), :class => "btn btn-success")%>
           <%= link_to("Webview", monitoring_task_show_results_path(mt), :class => "btn btn-success")%>
         <% else %>
-          <strong>No results present, press update!</strong>
+          <strong>No results present:</strong>
         <% end %>
-        <%= link_to("Update!", monitoring_task_run_path(mt), :class => "btn btn-info", :method => :post) %>
-        <%= link_to("Stop Monitoring", 
+        <% if mt.executable? %>
+          <%= link_to("Update!", monitoring_task_run_path(mt), :class => "btn btn-info", :method => :post) %>
+        <% else %>
+          <%= link_to("Translate!", pattern_translate_path(mt.pattern, mt.repository.ontology), :class => "btn btn-warning") %>
+        <% end %>
+        <%= link_to("Stop Monitoring",
               monitoring_task_path(mt),
               :method => :delete,
               :class => "btn btn-danger",

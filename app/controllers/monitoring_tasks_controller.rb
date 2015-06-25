@@ -7,6 +7,7 @@ class MonitoringTasksController < ApplicationController
       pattern = Pattern.find(qj.payload_object.pattern_id)
       @query_jobs[qj.id] = pattern.name
     end
+    @new_tasks = params[:task_ids] || []
   end
   
   def csv_results
@@ -24,6 +25,24 @@ class MonitoringTasksController < ApplicationController
     @task = MonitoringTask.find(params[:monitoring_task_id])
     @results = @task.results[:data]
     @headers = @task.results[:headers]
+  end
+  
+  def destroy
+    @task = MonitoringTask.find(params[:id])
+    @task.destroy
+    redirect_to monitoring_tasks_path, :notice => "Stopped monitoring pattern on repository."
+  end
+  
+  def check
+    tasks = MonitoringTask.find(params[:task_ids])
+    
+    tasks.each do |task|
+      unless task.executable?
+        redirect_to(pattern_translate_path(task.pattern, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
+      end
+    end
+    
+    redirect_to monitoring_tasks_path(:new_tasks => params[:task_ids]), :notice => "Successfully added monitoring tasks!"
   end
   
 end

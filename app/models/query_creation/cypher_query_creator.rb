@@ -34,9 +34,9 @@ class CypherQueryCreator < QueryCreator
   end
   
   def return_values
-    values = pattern.nodes.select{|node| node.attribute_constraints.all?{|ac| ac.aggregation.nil?}}.collect{|node| aggregated_variable(node)}
+    values = return_these_nodes.collect{|node| aggregated_variable(node)}
     values += pattern.relation_constraints.select{|rc| !rc.aggregation.nil?}.collect{|rc| aggregated_variable(rc)}
-    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil? || ac.operator == AttributeConstraint::OPERATORS[:var]}.collect{|ac| aggregated_variable(ac)}
+    values += pattern.attribute_constraints.select{|ac| !ac.aggregation.nil?}.collect{|ac| aggregated_variable(ac)}
     return values.join(", ")
   end
   
@@ -49,10 +49,18 @@ class CypherQueryCreator < QueryCreator
     return str.empty? ? "" : "WHERE #{str}"
   end
   
+  def return_these_nodes
+    pattern.nodes.select{|node|
+      (!node.aggregation.nil? && node.aggregation.operation == :group_by) || node.attribute_constraints.all?{|ac| 
+        ac.aggregation.nil? && !ac.is_variable?
+      }
+    }
+  end
+  
   def aggregated_variable(pe)
     str = pe_variable(pe)
     if !pe.aggregation.nil? && pe.aggregation.operation != :group_by
-      str = pe.aggregation.operation.to_s + "(#{str})"
+      str = pe.aggregation.operation.to_s + "(#{str}) AS #{pe.aggregation.speaking_name}"
     elsif pe.is_a?(Node)
       str = "id(#{str})"
     end

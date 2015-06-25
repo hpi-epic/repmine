@@ -105,7 +105,8 @@ RSpec.describe TranslationPattern, :type => :model do
     new_node = @pattern.create_node!(@source_ontology)
     new_node.rdf_type = correspondence1.entity1
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
-    tp.prepare!    
+    tp.prepare!
+    assert_equal 1, @pattern.unmatched_elements(@target_ontology).size
     assert_equal new_node, @pattern.unmatched_elements(@target_ontology).first
     assert_equal 1, tp.pattern_elements.size
     assert_equal 1, @pattern.unmatched_elements([@target_ontology]).size

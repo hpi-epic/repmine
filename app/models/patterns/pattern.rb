@@ -37,11 +37,18 @@ class Pattern < ActiveRecord::Base
   end
 
   def matched_elements(onts)
-    return pattern_elements.select{|pe| not pe.matching_elements.where(:ontology_id => onts).empty?}
+    PatternElement.where(:id => find_element_matches(onts) & pattern_elements.pluck(:id))
   end
   
   def unmatched_elements(onts)
-    return pattern_elements.select{|pe| pe.matching_elements.where(:ontology_id => onts).empty?}
+    PatternElement.where(:id => pattern_elements.pluck(:id) - find_element_matches(onts))
+  end
+  
+  def find_element_matches(onts)
+    return PatternElementMatch.includes(:matching_element).where(
+      :matched_element_id => pattern_elements,
+      :pattern_elements => {:ontology_id => onts}
+    ).collect{|pem| pem.matched_element_id}
   end
   
   # some comparison
@@ -51,10 +58,6 @@ class Pattern < ActiveRecord::Base
     else
       return self.pattern_elements.find{|pe| other.pattern_elements.select{|ope| pe.equal_to?(ope)}.size != 1}.nil?
     end
-  end
-  
-  def compatible_with?(other)
-    return pattern_elements.any?{|pe| other.pattern_elements.any?{|ope| pe.equal_to?(ope)}}
   end
 
   # RDF Serialization
@@ -149,5 +152,25 @@ class Pattern < ActiveRecord::Base
 
   def rdf_types
     [Vocabularies::GraphPattern.GraphPattern]
+  end
+  
+  def aggregations
+    pattern_elements.collect{|pe| pe.aggregation}.compact
+  end
+  
+  def self.grouped(nice_display = false)
+    pattern_groups = {}
+    where(:type => nil).each do |pattern|
+      tag_list = pattern.tag_list.empty? ? ["Uncategorized"] : pattern.tag_list
+      tag_list.each do |tag|
+        pattern_groups[tag] ||= []
+        if nice_display
+          pattern_groups[tag] << [pattern.name, pattern.id] 
+        else
+          pattern_groups[tag] << pattern
+        end
+      end
+    end
+    return pattern_groups
   end
 end

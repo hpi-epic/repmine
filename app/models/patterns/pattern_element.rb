@@ -96,6 +96,14 @@ class PatternElement < ActiveRecord::Base
     return "#{self.class.name.underscore}_#{id}"
   end
   
+  def speaking_name
+    str = short_rdf_type.downcase.singularize
+    if pattern.pattern_elements.any?{|pe| pe.id != id && pe.rdf_type == rdf_type}
+      str += id.to_s
+    end
+    return str
+  end
+  
   # TODO: also become able to rebuild complex expressions (universal, someOf, and schmutz like that)  
   # P.S.: that is also why this is currently a separate method...
   def rebuild_element_type!(queryable, node)

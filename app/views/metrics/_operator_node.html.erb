@@ -1,0 +1,7 @@
+<div class="metric_node operator_node img-circle" id="metric_node_<%= node.id%>" style="<%= metric_node_position(node) %>"  data-id="<%= node.id%>">
+  <%= form_for(node) do |f| %>
+  <%= f.hidden_field :x %>
+  <%= f.hidden_field :y %>
+  <%= icon_for_operator(node.operator) %>
+  <% end %>
+</div>

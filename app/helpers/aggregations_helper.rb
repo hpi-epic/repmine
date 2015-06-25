@@ -1,6 +1,6 @@
 module AggregationsHelper
   def operation_visuals(aggregation)
-    vname = aggregation.pattern_element.variable_name 
+    vname = aggregation.pattern_element.speaking_name 
     case aggregation.operation
       when :group_by then fa_icon("sitemap", :text => vname)
       when :sum then "&sum; #{vname}"

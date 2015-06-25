@@ -51,10 +51,5 @@ RSpec.describe Node, :type => :model do
     ac2 = FactoryGirl.create(:attribute_constraint, :node => n2)
     ac2.rdf_type = ac1.rdf_type + "stuff"
     assert !n1.equal_to?(n2)
-  end  
-  
-  it "should return a proper query variable" do
-    node = FactoryGirl.create(:node)
-    assert_equal "node#{node.id}", node.query_variable
   end
 end

@@ -49,14 +49,7 @@ class PatternsController < ApplicationController
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
     else
-      @pattern_groups = {"Uncategorized" => []}
-      @patterns.each do |pattern| 
-        pattern.tag_list.each do |tag|
-          @pattern_groups[tag] ||= []
-          @pattern_groups[tag] << pattern
-        end
-        @pattern_groups["Uncategorized"] << pattern if pattern.tag_list.empty?
-      end
+      @pattern_groups = Pattern.grouped
       @ontology_groups = Ontology.pluck(:group).uniq.map do |group| 
         [group, Ontology.where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
       end
@@ -95,10 +88,8 @@ class PatternsController < ApplicationController
           redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
         end
       elsif params[:monitor]
-        Pattern.find(params[:patterns]).each do |pattern|
-          pattern.monitoring_tasks.where(:repository_id => params[:repository_id]).first_or_create!
-        end
-        redirect_to monitoring_tasks_path
+        task_ids = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
+        redirect_to check_monitoring_tasks_path(:task_ids => task_ids)
       else
         redirect_to patterns_path, :alert => "How did you get here, anyway?"
       end
@@ -117,11 +108,6 @@ class PatternsController < ApplicationController
     }
   end
   
-  def monitor
-    @patterns = Pattern.find(params[:patterns])
-    @repositories = Repository.all
-  end
-
   def save_correspondence
     sources = (params[:source_element_ids] || []).reject{|x| x.blank?}.first
     targets = (params[:target_element_ids] || []).reject{|x| x.blank?}.first

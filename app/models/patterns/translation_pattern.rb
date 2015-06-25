@@ -6,11 +6,15 @@ class TranslationPattern < Pattern
   belongs_to :source_pattern, :foreign_key => "pattern_id", :class_name => "Pattern"
 
   def self.for_pattern_and_ontologies(pattern, ontologies)
-    tp = TranslationPattern.includes(:ontologies).where(:ontologies => {:id => ontologies.collect{|o| o.id}}, :pattern_id => pattern.id).first
+    tp = existing_translation_pattern(pattern, ontologies)
     tp ||= TranslationPattern.new(:name => pattern_name(pattern, ontologies), :description => description(pattern, ontologies), :pattern_id => pattern.id)
     tp.ontologies += ontologies
     tp.save
     return tp
+  end
+  
+  def self.existing_translation_pattern(pattern, ontologies)
+    TranslationPattern.includes(:ontologies).where(:ontologies => {:id => ontologies.collect{|o| o.id}}, :pattern_id => pattern.id).first    
   end
 
   def self.pattern_name(pattern, ontologies)

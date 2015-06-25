@@ -4,6 +4,12 @@ class MonitoringTask < ActiveRecord::Base
   belongs_to :repository
   belongs_to :pattern
   
+  def self.create_multiple(pattern_ids, repository_id)
+    return pattern_ids.collect do |p_id|
+      self.where(:pattern_id => p_id, :repository_id => repository_id).first_or_create!.id
+    end.uniq
+  end
+  
   def has_latest_results?
     return File.exist?(results_file("yml")) && File.exist?(results_file("csv"))
   end
@@ -11,6 +17,12 @@ class MonitoringTask < ActiveRecord::Base
   def run
     job = QueryExecutionJob.new(:repository_id => repository.id, :pattern_id => pattern.id)
     Delayed::Job.enqueue(job, :queue => repository.query_queue)
+  end
+  
+  def executable?
+    translation_unnecessary = (pattern.ontologies - [repository.ontology]).empty?
+    translation_exists = !TranslationPattern.existing_translation_pattern(pattern, [repository.ontology]).nil?
+    return translation_unnecessary || (translation_exists && pattern.unmatched_elements([repository.ontology]).empty?)
   end
   
   def results_file(ending)

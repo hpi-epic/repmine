@@ -7,6 +7,6 @@ class CreateTypeExpressions < ActiveRecord::Migration
       t.string :ancestry
       t.timestamps
     end
-    add_index :type_expressions, :ancestry    
+    add_index :type_expressions, :ancestry
   end
 end

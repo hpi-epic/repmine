@@ -106,19 +106,6 @@ RSpec.describe Pattern, :type => :model do
     end
   end
   
-  it "should determine two patterns are compatible if they share a node of the same type" do
-    p1 = FactoryGirl.create(:empty_pattern)
-    p2 = FactoryGirl.create(:empty_pattern)
-    n1 = FactoryGirl.create(:plain_node, :pattern => p1, :ontology => p1.ontologies.first, :rdf_type => "http://example.org/Node")
-    n2 = FactoryGirl.create(:plain_node, :pattern => p2, :ontology => p2.ontologies.first, :rdf_type => "http://example.org/Node")
-    assert p1.compatible_with?(p2)
-    n2.rdf_type = "http://example.org/Node2"
-    assert !p1.compatible_with?(p2)
-    ac = FactoryGirl.create(:attribute_constraint, :node => n1)
-    n2.rdf_type = "http://example.org/Node"
-    assert p1.compatible_with?(p2)
-  end
-  
   def n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
     p = Pattern.create(name: name, description: "Generic")
     p.ontologies << ontology

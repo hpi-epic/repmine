@@ -28,6 +28,16 @@ RepMine::Application.routes.draw do
 
     get :autocomplete_tag_name, :on => :collection
   end
+  
+  resources :metrics do
+    post :create_operator
+    post :create_node
+    post :create_connection    
+    post :destroy_connection
+    get :build, :on => :collection
+  end
+  
+  resources :metric_nodes, :only => [:update]
 
   resources :repositories do
     get :extract_schema
@@ -41,6 +51,7 @@ RepMine::Application.routes.draw do
     get :csv_results
     get :show_results
     post :run
+    get :check, :on => :collection
   end
 
   root :to => "patterns#index"

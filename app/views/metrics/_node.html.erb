@@ -1,0 +1,10 @@
+<div class="metric_node real_node" id="metric_node_<%= node.id%>" style="<%= metric_node_position(node) %>" data-id="<%= node.id%>">
+  <em><%= node.aggregation.pattern_element.pattern.name %></em>
+  <hr style = "margin-top: 0px; margin-bottom: 5px" />
+  <%= form_for(node) do |f| %>
+    <%= f.hidden_field :x %>
+    <%= f.hidden_field :y %>
+    <%= f.select(:operation_cd, MetricNode.operations, {:include_blank => true}, {:class => "narrow"})%>
+    <%= f.select(:aggregation_id, options_from_collection_for_select(node.aggregation_options, "id", "speaking_name"), {}, {:class => "justRight"}) %>
+  <% end %>
+</div>
