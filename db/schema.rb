@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
 
   create_table "metric_nodes", :force => true do |t|
     t.integer  "aggregation_id"
+    t.integer  "pattern_id"
     t.string   "ancestry"
     t.integer  "operator_cd"
     t.integer  "operation_cd"
@@ -53,6 +54,7 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
 
   add_index "metric_nodes", ["aggregation_id"], :name => "index_metric_nodes_on_aggregation_id"
   add_index "metric_nodes", ["ancestry"], :name => "index_metric_nodes_on_ancestry"
+  add_index "metric_nodes", ["pattern_id"], :name => "index_metric_nodes_on_pattern_id"
 
   create_table "metrics", :force => true do |t|
     t.text     "description"

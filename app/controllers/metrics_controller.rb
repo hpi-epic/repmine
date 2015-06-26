@@ -31,10 +31,13 @@ class MetricsController < ApplicationController
   end
   
   def destroy_connection
-    source = MetricNode.find(params[:source_id])
-    target = MetricNode.find(params[:target_id])
-    target.parent = nil
-    target.save
+    begin
+      source = MetricNode.find(params[:source_id])
+      target = MetricNode.find(params[:target_id])
+      target.parent = nil
+      target.save
+    rescue Exception => e
+    end
     render :nothing => true, :status => 200, :content_type => 'text/html'
   end  
   
@@ -49,7 +52,7 @@ class MetricsController < ApplicationController
     if pattern.aggregations.empty?
       render :nothing => true, :status => 200, :content_type => 'text/html'
     else
-      @node = metric.metric_nodes.create(:aggregation_id => pattern.aggregations.first.id)
+      @node = metric.metric_nodes.create(:pattern_id => pattern.id)
       render :partial => "metrics/node", :layout => false, :locals => {:node => @node}      
     end
   end

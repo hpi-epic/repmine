@@ -26,7 +26,7 @@ class MonitoringTask < ActiveRecord::Base
   end
   
   def results_file(ending)
-    return Rails.root.join("public","data","pattern_#{pattern.id}_repo_#{self.id}.#{ending}").to_s
+    return Rails.root.join("public","data","pattern_#{pattern.id}_repo_#{repository.id}.#{ending}").to_s
   end
   
   def csv_result

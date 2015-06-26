@@ -137,6 +137,15 @@ class Pattern < ActiveRecord::Base
     return point
   end
   
+  # determines which elements of a pattern will be returned by a query. No select *
+  def returnable_elements
+    elements = Set.new
+    elements.merge(pattern_elements.select{|pe| !pe.aggregation.nil?})
+    elements.merge(nodes.select{|node| !node.aggregation.nil? && node.aggregation.operation == :group_by})
+    elements.merge(nodes.select{|node| node.attribute_constraints.all?{|ac| ac.aggregation.nil? && !ac.is_variable?}})
+    return elements
+  end
+  
   def node_offset
     furthest = (nodes + attribute_constraints).sort_by{|pe| position_for_element(pe)[0]}.last
     return position_for_element(furthest)[0]

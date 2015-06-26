@@ -37,7 +37,7 @@ RepMine::Application.routes.draw do
     get :build, :on => :collection
   end
   
-  resources :metric_nodes, :only => [:update]
+  resources :metric_nodes, :only => [:update, :destroy]
 
   resources :repositories do
     get :extract_schema

@@ -22,7 +22,8 @@ $("#new_node").on("ajax:success", function(e, data, status, xhr){
   var node = $(xhr.responseText);
   node.appendTo($("#drawing_canvas"));
   jsPlumb.draggable(node);	
-	jsPlumb.addEndpoint(node, topEndpoint());	
+	jsPlumb.addEndpoint(node, topEndpoint());
+	createDestroyCallback(node);
 });
 
 $("#new_operator").on("ajax:success", function(e, data, status, xhr){
@@ -31,6 +32,7 @@ $("#new_operator").on("ajax:success", function(e, data, status, xhr){
   jsPlumb.draggable(node);
 	jsPlumb.addEndpoint(node, topEndpoint());
 	jsPlumb.addEndpoint(node, bottomEndpoint());
+	createDestroyCallback(node);
 });
 
 $(".edit_metric").on("ajax:success", function(e, data, status, xhr){
@@ -49,6 +51,22 @@ $(".edit_metric").on("ajax:success", function(e, data, status, xhr){
 var makeEverythingDraggable = function(){
 	$(".metric_node").each(function(i, node){
 		jsPlumb.draggable($(node));
+		createDestroyCallback($(node));
+	});
+};
+
+var createDestroyCallback = function(node){
+	node.dblclick(function() {
+	  console.log($(this));
+		var form = node.find("form");
+		$.ajax({
+			url : $(form).attr("action"),
+			type: "DELETE",
+			data : $(form).serialize(),
+			success: function(data){
+		    jsPlumb.remove(node);
+			}
+		});
 	});
 };
 
@@ -76,7 +94,7 @@ var loadExistingConnections = function(){
 // same for the attribute endpoints
 var topEndpoint = function() {
   return {
-		endpoint:["Rectangle", {width:5, height:5} ],
+		endpoint:["Dot", {radius:3}],
 		anchor: ["Top"],
     deleteEndpointsOnDetach:false,
 		paintStyle:{ fillStyle:"#0087CF", opacity:0.5 },
@@ -94,14 +112,13 @@ var topEndpoint = function() {
 
 var bottomEndpoint = function() {
   return {
-		endpoint:["Rectangle", {width:5, height:5} ],
+		endpoint:["Dot", {radius:3}],
 		anchor: ["Bottom"],
     deleteEndpointsOnDetach:false,
 		paintStyle:{ fillStyle:"#0087CF", opacity:0.5 },
     maxConnections: -1,
 		connectorStyle:{ strokeStyle:"#0087CF", lineWidth:2 },
 		connector : "Straight",
-		isTarget:true,
 		isSource: true,
     dropOptions : {
   		tolerance:"touch",
