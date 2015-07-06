@@ -16,7 +16,11 @@
       </div>
       <div class="input-prepend">
         <span class="add-on">Description</span>
-        <%= f.text_field(:description, :class => "needs_no_space", :style => "width: #{@metric.description.size * 7}px;") %>      
+        <%= f.text_field(
+          :description, 
+          :class => "needs_no_space", 
+          :style => "width: #{@metric.description.blank? ? 200 : @metric.description.size * 7}px;") 
+        %>      
       </div>
       <%= submit_tag("Save Metric", :class => "btn btn-success") %>
     <% end %>
@@ -32,7 +36,11 @@
   
   <div class="btn-group left-boarder">
     <%= form_tag(metric_create_node_path(@metric), :remote => true, :class => "needs_no_space", :id => "new_node") do %>
-      <%= select_tag(:pattern_id, grouped_options_for_select(@pattern_groups), {:class => "needs_no_space"}) %>
+      <%= select_tag(
+        :pattern_id, 
+        grouped_options_for_select(@pattern_groups), 
+        {:class => "needs_no_space selectpicker", "data-live-search" => "true"}) 
+      %>
       <%= submit_tag("New Node", :class => "btn btn-info") %>
     <% end %>
   </div>

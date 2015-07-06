@@ -4,21 +4,10 @@ class OntologiesController < ApplicationController
   # GET /ontologies.json
   def index
     @ontologies = Ontology.all
-
+    @title = "Ontology overview"
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @ontologies }
-    end
-  end
-
-  # GET /ontologies/1
-  # GET /ontologies/1.json
-  def show
-    @ontology = Ontology.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @ontology }
     end
   end
 
@@ -36,6 +25,7 @@ class OntologiesController < ApplicationController
   # GET /ontologies/1/edit
   def edit
     @ontology = Ontology.find(params[:id])
+    @title = "Ontology '#{@ontology.short_name}'"    
   end
 
   # POST /ontologies

@@ -14,6 +14,7 @@ class MetricsController < ApplicationController
         @existing_connections << {:source => node.id, :target => child.id}
       end
     end
+    @title = @metric.name.blank? ? "New metric" : "Metric '#{@metric.name}'"
   end
   
   def update
@@ -44,6 +45,7 @@ class MetricsController < ApplicationController
   def index
     @metrics = Metric.all
     @repositories = Repository.all()
+    @title = "Metric overview"
   end
   
   def download_csv

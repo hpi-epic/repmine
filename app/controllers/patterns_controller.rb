@@ -4,12 +4,14 @@ class PatternsController < ApplicationController
 
   def new
     @pattern = Pattern.new
+    @title = "Create new pattern"
   end
 
   def show
     @pattern = Pattern.find(params[:id])
     # little performance tweak, only load the hierarchy, if we have nodes that go with it
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
+    @title = "'#{@pattern.name}' Pattern"
   end
   
   def translate
@@ -31,13 +33,14 @@ class PatternsController < ApplicationController
     
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
     @matched_elements = @source_pattern.matched_elements(@target_ontologies).collect{|me| me.id.to_s}
+    @title = "Translating '#{@source_pattern.name}'"
   end
 
   def create
     ontologies = Ontology.find(params[:pattern].delete(:ontology_ids).reject{|oid| oid.blank?})
     @pattern = Pattern.new(params[:pattern])
-    
     @pattern.ontologies = ontologies
+    
     respond_to do |format|
       if @pattern.save
         flash[:notice] = 'Pattern was successfully created.'
@@ -61,6 +64,7 @@ class PatternsController < ApplicationController
       end
       @repositories = Repository.all
     end
+    @title = "Pattern Overview"
   end
 
   def update
@@ -112,6 +116,7 @@ class PatternsController < ApplicationController
       "Cypher" => Neo4jRepository.where(:ontology_id => @pattern.ontologies),
       "Sparql" => RdfRepository.where(:ontology_id => @pattern.ontologies)
     }
+    @title = "Queries for '#{@pattern.name}'"    
   end
   
   def save_correspondence

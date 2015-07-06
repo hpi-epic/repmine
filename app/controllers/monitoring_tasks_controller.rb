@@ -2,11 +2,15 @@ class MonitoringTasksController < ApplicationController
   
   def index
     @repos_with_tasks = Repository.find(MonitoringTask.pluck(:repository_id).uniq)
-    @query_jobs = {}
-    @repos_with_tasks.collect{|repo| repo.query_jobs}.flatten.each do |qj|
-      @query_jobs[qj.id] = qj.payload_object.pattern.name
+    if @repos_with_tasks.empty?
+      redirect_to patterns_path, :notice => "Please select patterns and metrics that you want to monitor!"
+    else
+      @query_jobs = {}
+      @repos_with_tasks.collect{|repo| repo.query_jobs}.flatten.each do |qj|
+        @query_jobs[qj.id] = qj.payload_object.pattern.name
+      end
+      @new_tasks = params[:task_ids] || []      
     end
-    @new_tasks = params[:task_ids] || []
   end
   
   def csv_results

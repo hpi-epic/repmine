@@ -5,6 +5,7 @@ class RepositoriesController < ApplicationController
   def index
     @repositories = Repository.all
     flash[:notice] = "No repositories present. Please create a new one!" if @repositories.empty?
+    @title = "Repository overview"    
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json =>  @repositories }
@@ -18,7 +19,8 @@ class RepositoriesController < ApplicationController
     @stats = [["Item Type", "Occurrences in Repository"]]
     @stats.concat(@repository.type_statistics)
     @job = @repository.ontology_creation_job
-
+    @title = "Repository '#{@repository.name}'"    
+    
     respond_to do |format|
       format.html # show.html.erb
       format.json { render :json =>  @repository }

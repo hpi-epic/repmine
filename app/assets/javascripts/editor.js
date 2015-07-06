@@ -115,9 +115,11 @@ var submitAndHighlight = function(form){
 
 var updatePositionInformation = function(form){
   var position = $(form).parent().position();
-  $(form).find("input[id$=_x]").val(position.left);
-  $(form).find("input[id$=_y]").val(position.top);
-}
+	if($(form).find("input[id$=_x]").length > 0){
+	  $(form).find("input[id$=_x]").val(position.left);
+	  $(form).find("input[id$=_y]").val(position.top);		
+	}
+};
 
 // updates all connections of a node upon change of the node class
 var updateConnectionsAndAttributes = function(node){
@@ -295,7 +297,6 @@ var highlightSelector = function(element) {
 // takes a jqXHR object and if it has the X-Message header set, displays a growl message
 var showGrowlNotification = function(request){
   var msg = request.getResponseHeader('X-Message');
-	console.log(msg);	
   var msg_type = request.getResponseHeader('X-Message-Type');
   if(msg){
     $.jGrowl(msg, { theme: msg_type});
