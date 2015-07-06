@@ -3,15 +3,10 @@ class AggregationsController < ApplicationController
   layout false
     
   def create
-    @pattern = Pattern.find(params[:pattern_id])
-    @pattern_element = PatternElement.find(params[:pattern_element_id])
-    if @pattern_element.aggregation.nil?
-      @pattern_element.create_aggregation(:operation => params[:operation])
-    else
-      @pattern_element.aggregation.update_attributes(:operation => params[:operation])
-    end
-    
-    render :partial => "aggregations/show", :locals => {:aggregation => @pattern_element.aggregation}
+    mn = MetricNode.find(params[:metric_node_id])
+    aggregation = mn.aggregations.where(:pattern_element_id => params[:pattern_element_id]).first_or_create!
+    aggregation.update_attributes(:operation => params[:operation])
+    render :partial => "aggregations/show", :locals => {:aggregation => aggregation}
   end
   
   def destroy

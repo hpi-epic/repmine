@@ -88,6 +88,8 @@ class ConnectionFinder
   def process_ids(element_ids)
     if element_ids.size == 1
       return PatternElement.find(element_ids.first)
+    elsif element_ids.empty?
+      return nil
     else
       # TODO: if we have mutliple ones, we could just as well look whether one is more fitting ... domain and stuff
       raise NoMatchFoundError.new("Could not determine exactly one fitting node. #{element_ids} would work.")

@@ -15,8 +15,6 @@ RepMine::Application.routes.draw do
         post :delete
       end
     end
-    
-    resources :aggregations
 
     resources :relation_constraints do
       get :static
@@ -31,13 +29,15 @@ RepMine::Application.routes.draw do
   
   resources :metrics do
     post :create_operator
-    post :create_node
+    post :create_node    
     post :create_connection    
     post :destroy_connection
-    get :build, :on => :collection
+    post :download_csv, :on => :collection
   end
   
-  resources :metric_nodes, :only => [:update, :destroy]
+  resources :metric_nodes, :only => [:update, :destroy, :show] do
+    resources :aggregations, :only => [:create, :destroy]
+  end
 
   resources :repositories do
     get :extract_schema

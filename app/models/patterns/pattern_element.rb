@@ -14,7 +14,7 @@ class PatternElement < ActiveRecord::Base
   has_many :matching_elements, :through => :matches, :dependent => :destroy
   
   has_one :type_expression, :dependent => :destroy
-  has_one :aggregation, :dependent => :destroy  
+  has_many :aggregations, :dependent => :destroy
   include RdfSerialization
   
   class ComparisonError < Error
@@ -97,7 +97,7 @@ class PatternElement < ActiveRecord::Base
   end
   
   def speaking_name
-    str = short_rdf_type.downcase.singularize
+    str = short_rdf_type
     if pattern.pattern_elements.any?{|pe| pe.id != id && pe.rdf_type == rdf_type}
       str += id.to_s
     end

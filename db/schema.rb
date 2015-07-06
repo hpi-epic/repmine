@@ -15,10 +15,14 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
 
   create_table "aggregations", :force => true do |t|
     t.integer  "pattern_element_id"
+    t.integer  "metric_node_id"
     t.integer  "operation_cd"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
   end
+
+  add_index "aggregations", ["metric_node_id"], :name => "index_aggregations_on_metric_node_id"
+  add_index "aggregations", ["pattern_element_id"], :name => "index_aggregations_on_pattern_element_id"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",         :default => 0, :null => false
@@ -40,8 +44,8 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "metric_nodes", :force => true do |t|
-    t.integer  "aggregation_id"
     t.integer  "pattern_id"
+    t.integer  "aggregation_id"
     t.string   "ancestry"
     t.integer  "operator_cd"
     t.integer  "operation_cd"
@@ -66,8 +70,9 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
   create_table "monitoring_tasks", :force => true do |t|
     t.integer  "pattern_id"
     t.integer  "repository_id"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.integer  "metric_node_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "ontologies", :force => true do |t|

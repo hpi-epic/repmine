@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :metrics_node do
+  factory :metric_node do
     
   end
 

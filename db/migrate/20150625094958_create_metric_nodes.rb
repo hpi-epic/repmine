@@ -1,8 +1,8 @@
 class CreateMetricNodes < ActiveRecord::Migration
   def change
     create_table :metric_nodes do |t|
-      t.references :aggregation
       t.references :pattern
+      t.references :aggregation
       t.string :ancestry
       t.integer :operator_cd
       t.integer :operation_cd
@@ -12,8 +12,8 @@ class CreateMetricNodes < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :metric_nodes, :ancestry
-    add_index :metric_nodes, :aggregation_id    
+    add_index :metric_nodes, :ancestry  
     add_index :metric_nodes, :pattern_id       
+    add_index :metric_nodes, :aggregation_id           
   end
 end

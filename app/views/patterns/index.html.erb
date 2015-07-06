@@ -4,16 +4,25 @@
   <div class="btn-group">
     <%= link_to "New Pattern", new_pattern_path, :class => "btn btn-success"%>
   </div>
-  <div class="btn-group">
-    <%= link_to "New Metric", metrics_path, :class => "btn btn-primary", :method => :post %>
-  </div>  
   <div class="btn-group left-boarder">  
     <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor") %>
-    <%= select_tag("repository_id", options_from_collection_for_select(@repositories, "id", "name"), {:class => "needs_no_space"}) %>
+    <%= select_tag(
+      "repository_id", 
+      options_from_collection_for_select(@repositories, "id", "name"), 
+      {:class => "selectpicker", "data-live-search" => "true"}) 
+    %>
   </div>
   <div class="btn-group left-boarder">
     <%= button_tag("Translate selected to:", :class => "btn btn-info", :name => "translate") %>
-    <%= select_tag(:ontology_ids, grouped_options_for_select(@ontology_groups), {:class => "needs_no_space"}) %>
+    <%= select_tag(
+      :ontology_ids, 
+      grouped_options_for_select(@ontology_groups), 
+      {:class => "selectpicker", "data-live-search" => "true"}) 
+    %>
+  </div>
+  <div class="input-append btn-group left-boarder" style="margin-bottom: 0px">
+    <input type="text" class="input-medium needs_no_space">
+    <span class="add-on needs_no_space"><%= fa_icon("search")%></span>      
   </div>
 </div>
 

@@ -4,8 +4,7 @@ class MonitoringTasksController < ApplicationController
     @repos_with_tasks = Repository.find(MonitoringTask.pluck(:repository_id).uniq)
     @query_jobs = {}
     @repos_with_tasks.collect{|repo| repo.query_jobs}.flatten.each do |qj|
-      pattern = Pattern.find(qj.payload_object.pattern_id)
-      @query_jobs[qj.id] = pattern.name
+      @query_jobs[qj.id] = qj.payload_object.pattern.name
     end
     @new_tasks = params[:task_ids] || []
   end

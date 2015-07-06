@@ -67,7 +67,7 @@ class TranslationPattern < Pattern
         pe.source ||= connector.source_for_rc(pe)
         pe.target ||= connector.target_for_rc(pe)
       end
-      pe.save!
+      pe.valid? ? pe.save! : pe.destroy
     end
   end
   
@@ -93,7 +93,7 @@ class TranslationPattern < Pattern
   def check_for_ambiguous_mappings(mappings)
     mappings.keys.sort_by{|key| key.size}.each_with_index do |key, index|
       # option 1: more than one possible output subgraphs
-      raise AmbiguousTranslation.new("too many mappings for element #{key}") if mappings[key].size > 1
+      raise AmbiguousTranslation.new("too many mappings for element #{key}: #{mappings[key]}") if mappings[key].size > 1
       # option 2: the current key is included in at least one other mapping
       raise AmbiguousTranslation.new("ambiguous mappings for element #{key}") if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
     end

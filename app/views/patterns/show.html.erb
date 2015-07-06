@@ -27,19 +27,6 @@
   
   <%= link_to 'Query', pattern_query_path(@pattern), :class => "btn btn-danger" %>
   
-  <div class="btn-group left-boarder">
-    <%= form_tag(pattern_aggregations_path(@pattern), :remote => true, :id => "new_aggregation", :class => "needs_no_space") do %>   
-      <%= select_tag(:operation, options_for_select(Aggregation.operations.keys), :class => "needs_no_space a_tad_bigger") %>:
-      <%= select_tag(:pattern_element_id, options_for_select(@pattern.pattern_elements.collect{|pe| [pe.variable_name, pe.id]}), :class => "needs_no_space a_tad_bigger") %>
-      <%= button_tag("Add Aggregation", :class => "btn btn-primary")%>
-    <% end %>        
-  </div>
-  
-  <div class="btn-group" id="aggregations" style="font-size: 14px;">
-    <% @pattern.pattern_elements.each do |pe| %>
-      <%= render :partial => "aggregations/show", :locals => {:aggregation => pe.aggregation} unless pe.aggregation.nil? %>
-    <% end %>    
-  </div>
 </div>
 
 <hr />

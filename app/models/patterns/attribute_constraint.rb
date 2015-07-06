@@ -10,7 +10,7 @@ class AttributeConstraint < PatternElement
     :equals => "=",
     :less_than => "<",
     :greater_than => ">",
-    :not => "!"
+    :not => "!="
   }
   
   def rdf_mappings
@@ -54,7 +54,11 @@ class AttributeConstraint < PatternElement
   end
 
   def variable_name
-    value.start_with?("?") ? value[1..-1] : value
+    if value.blank?
+      return super
+    else
+      value.start_with?("?") ? value[1..-1] : value
+    end
   end
 
   def rdf_types

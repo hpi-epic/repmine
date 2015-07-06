@@ -138,12 +138,12 @@ class Pattern < ActiveRecord::Base
   end
   
   # determines which elements of a pattern will be returned by a query. No select *
-  def returnable_elements
-    elements = Set.new
-    elements.merge(pattern_elements.select{|pe| !pe.aggregation.nil?})
-    elements.merge(nodes.select{|node| !node.aggregation.nil? && node.aggregation.operation == :group_by})
-    elements.merge(nodes.select{|node| node.attribute_constraints.all?{|ac| ac.aggregation.nil? && !ac.is_variable?}})
-    return elements
+  def returnable_elements(aggregations)
+    if aggregations.blank?
+      return nodes + attribute_constraints.select{|ac| ac.is_variable?}
+    else
+      return aggregations.collect{|agg| agg.pattern_element}
+    end
   end
   
   def node_offset

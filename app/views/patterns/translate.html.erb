@@ -15,7 +15,7 @@
 <% end %>
 
 <%= form_tag(pattern_nodes_path(@target_pattern), :remote => true, :id => "new_pattern_node") do %>
-  <div class="translation_controls" style="left: <%= @offset %>px" />
+  <div class="translation_controls" style="left: <%= @controls_offset %>px" />
     <div class="btn-group">
       <%= button_tag 'Create Node', :class => "btn" %>
       <%= select_tag(:ontology_id, options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space") %>
@@ -42,6 +42,6 @@
   <% end %>
 
   <% @target_pattern.nodes.each do |node| %>
-    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy, :offset => @offset + 150 }%>
+    <%= render :partial => "nodes/show", :locals => {:node => node, :pattern => @target_pattern, :type_hierarchy => @type_hierarchy, :offset => @node_offset }%>
   <% end %>
 </div>

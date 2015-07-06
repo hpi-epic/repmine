@@ -25,20 +25,6 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   addNodeToGraph(node);
 });
 
-$("#new_aggregation").on("ajax:success", function(e, data, status, xhr){
-  var aggregation = $(xhr.responseText);
-	console.log(aggregation.attr("id"));
-	if($("#" + aggregation.attr("id")).length > 0){
-		$("#" + aggregation.attr("id")).replaceWith(aggregation);
-	} else {
-		aggregation.appendTo($("#aggregations"));
-	}
-});
-
-$(document).on("ajax:success", ".delete_aggregation", function(event){
-	$(this).closest('span').remove();
-});
-
 var loadNodesAndConnections = function(){
 	$(".node").not(".immutable_node").each(function(index,node_div){
 	  addNodeToGraph($(node_div));
@@ -309,6 +295,7 @@ var highlightSelector = function(element) {
 // takes a jqXHR object and if it has the X-Message header set, displays a growl message
 var showGrowlNotification = function(request){
   var msg = request.getResponseHeader('X-Message');
+	console.log(msg);	
   var msg_type = request.getResponseHeader('X-Message-Type');
   if(msg){
     $.jGrowl(msg, { theme: msg_type});

@@ -16,7 +16,7 @@
     </tr>
     <% repo.monitoring_tasks.each_with_index do |mt, i| %>
     <tr>
-      <td><%= link_to(mt.pattern.name, mt.pattern) %></td>
+      <td><%= link_to(mt.the_pattern.name, mt.the_pattern) %></td>
       <td>
         <% if mt.has_latest_results? %>
           <%= link_to("CSV", monitoring_task_csv_results_path(mt), :class => "btn btn-success")%>
@@ -33,7 +33,7 @@
               monitoring_task_path(mt),
               :method => :delete,
               :class => "btn btn-danger",
-              :confirm => "Really stop monitoring #{mt.pattern.name} on #{repo.name}?"
+              :confirm => "Really stop monitoring #{mt.the_pattern.name} on #{repo.name}?"
             )
         %>
       </td>

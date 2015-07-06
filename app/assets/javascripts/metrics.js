@@ -127,3 +127,23 @@ var bottomEndpoint = function() {
   	}		
 	};
 };
+
+$(document).on("ajax:success", "#new_aggregation", function(e, data, status, xhr){
+  var aggregation = $(xhr.responseText);
+	updateAggregationSelections(aggregation.attr("data-node-id"));
+});
+
+$(document).on("ajax:success", ".delete_aggregation", function(event){
+	updateAggregationSelections($(this).closest('span').attr("data-node-id"));
+});
+
+var updateAggregationSelections = function(node_id){
+	var form = $("#edit_metric_node_" + node_id);
+	$.ajax({
+		url : $(form).attr("action"),
+		type: "GET",
+		success: function(data){
+	    form.parent().html($(data).html());
+		}
+	});
+};

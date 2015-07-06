@@ -72,20 +72,20 @@ RSpec.describe CypherQueryCreator, :type => :model do
   
   it "should include aggregations" do
     pattern = FactoryGirl.create(:n_r_n_pattern)
-    pattern.nodes.last.aggregation = FactoryGirl.create(:count_aggregation)
-    qc = CypherQueryCreator.new(pattern)
+    agg = FactoryGirl.create(:count_aggregation, :pattern_element => pattern.nodes.last)
+    qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN #{qv["nid1"]}, count(#{qv["nv2"]})", qc.query_string
+    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN count(#{qv["nv2"]}) AS node2_count", qc.query_string
   end
 
   it "should incorporate self-introduced variables" do
     pattern = FactoryGirl.create(:empty_pattern)
     n1 = FactoryGirl.create(:plain_node, :pattern => pattern)
     var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => n1, :value => "?name")
-    var_ac1.create_aggregation(:operation => :sum)
-    qc = CypherQueryCreator.new(pattern)
+    agg = FactoryGirl.create(:aggregation, :operation => :sum, :pattern_element => var_ac1)
+    qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN sum(#{var_ac1.variable_name})"
+    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN sum(#{var_ac1.variable_name}) AS attribute_sum"
     assert_equal expected, qc.query_string
   end
   
@@ -94,7 +94,7 @@ RSpec.describe CypherQueryCreator, :type => :model do
     n1 = FactoryGirl.create(:plain_node, :pattern => pattern)
     var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => n1, :value => "?name")    
     agg = FactoryGirl.create(:aggregation, :pattern_element => var_ac1)
-    qc = CypherQueryCreator.new(pattern)
+    qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
     expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN name"
     assert_equal expected, qc.query_string

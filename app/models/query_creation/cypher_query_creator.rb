@@ -5,9 +5,7 @@ class CypherQueryCreator < QueryCreator
   end
   
   def match
-    pattern.nodes.collect do |pn|
-      paths_for_node(pn)
-    end.flatten.compact.join(", ")
+    pattern.nodes.collect{|pn| paths_for_node(pn)}.flatten.compact.join(", ")
   end
   
   def paths_for_node(node)
@@ -34,13 +32,17 @@ class CypherQueryCreator < QueryCreator
   end
   
   def return_values
-    pattern.returnable_elements.collect{|pe| aggregated_variable(pe)}.join(", ")
+    pattern.returnable_elements(aggregations).collect{|pe| aggregated_variable(pe)}.join(", ")
   end
   
   def parameters
     str = pattern.attribute_constraints.collect do |ac|
       unless ac.operator == AttributeConstraint::OPERATORS[:var]
-        "#{attribute_reference(ac)} #{cypher_operator(ac.operator)} #{escaped_value(ac)}"
+        if ac.operator == AttributeConstraint::OPERATORS[:not] && ac.value.blank?
+          "has(#{attribute_reference(ac)})"
+        else
+          "#{attribute_reference(ac)} #{cypher_operator(ac.operator)} #{escaped_value(ac)}"
+        end
       end
     end.compact.join(" AND ")
     return str.empty? ? "" : "WHERE #{str}"
@@ -49,11 +51,16 @@ class CypherQueryCreator < QueryCreator
   
   def aggregated_variable(pe)
     str = pe_variable(pe)
-    if !pe.aggregation.nil? && pe.aggregation.operation != :group_by
-      str = pe.aggregation.operation.to_s + "(#{str}) AS #{pe.aggregation.speaking_name}"
+    aggregation = aggregation_for_element(pe)
+    
+    if !aggregation.nil? && aggregation.operation != :group_by 
+      str = aggregation.operation.to_s + "(#{str}) AS #{aggregation.speaking_name}"
+    elsif aggregation.nil? && pe.is_variable? && pe.is_a?(AttributeConstraint)
+      str = "#{attribute_reference(pe)} AS #{pe.variable_name}"
     elsif pe.is_a?(Node)
       str = "id(#{str})"
     end
+    
     return str
   end
   
@@ -83,7 +90,7 @@ class CypherQueryCreator < QueryCreator
   
   # needed in case of subqueries and aliased variables
   def with
-    if pattern.pattern_elements.any?{|pe| pe.is_variable? && !pe.aggregation.nil?}
+    if pattern.pattern_elements.any?{|pe| pe.is_variable? && !aggregation_for_element(pe).nil?}
       str = " WITH #{(plain_vars + aliased_vars).join(", ")}"
     else
       return ""
@@ -91,11 +98,11 @@ class CypherQueryCreator < QueryCreator
   end
   
   def aliased_vars
-    pattern.pattern_elements.select{|pe| pe.is_variable?}.collect{|pe| "#{attribute_reference(pe)} AS #{pe_variable(pe)}"}
+    pattern.pattern_elements.select{|pe| pe.is_variable?}.collect{|pe| "#{attribute_reference(pe)} AS #{pe_variable(pe)}"}.compact
   end
   
   def plain_vars
-    pattern.pattern_elements.select{|pe| !pe.is_variable?}.collect{|pe| pe_variable(pe)}
+    pattern.pattern_elements.select{|pe| !pe.is_variable?}.collect{|pe| pe_variable(pe) unless pe.is_a?(AttributeConstraint)}.compact
   end
   
 end

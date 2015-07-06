@@ -18,4 +18,5 @@
 //= require autocomplete-rails
 //= require jquery.jsPlumb-1.5.5-min
 //= require jquery.jgrowl.min
+//= require bootstrap-select
 //= require_self

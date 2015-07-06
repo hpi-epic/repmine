@@ -43,24 +43,32 @@ class MetricsController < ApplicationController
   
   def index
     @metrics = Metric.all
+    @repositories = Repository.all()
+  end
+  
+  def download_csv
+    repository = Repository.find(params[:repository_id])
+    metric = Metric.find(params[:metrics].first)
+    metric.calculate(repository)
+    send_data(
+      File.open(metric.metrics_path("csv", repository)).read, 
+      :type => 'text/csv; charset=utf-8; header=present', 
+      :filename => metric.fancy_metric_file_name(repository)
+    )
   end
   
   def create_node
     metric = Metric.find(params[:metric_id])
     pattern = Pattern.find(params[:pattern_id])
     
-    if pattern.aggregations.empty?
-      render :nothing => true, :status => 200, :content_type => 'text/html'
-    else
-      @node = metric.metric_nodes.create(:pattern_id => pattern.id)
-      render :partial => "metrics/node", :layout => false, :locals => {:node => @node}      
-    end
+    @node = metric.metric_nodes.create(:pattern_id => pattern.id)
+    render :partial => "metric_nodes/node", :layout => false, :locals => {:node => @node}
   end
   
   def create_operator
     metric = Metric.find(params[:metric_id])
     @node = metric.metric_nodes.create(:operator_cd => params[:operator])
-    render :partial => "metrics/operator_node", :layout => false, :locals => {:node => @node}
+    render :partial => "metric_nodes/operator_node", :layout => false, :locals => {:node => @node}
   end
   
 end

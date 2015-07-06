@@ -8,9 +8,9 @@
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
  *
- *= require_self
  *= require font-awesome
  *= require_tree .
+ *= require_self
  */
 
 /* use whenever you want to remove bootstrap margins */
@@ -25,4 +25,14 @@ select {
 .left-boarder {
 	padding-left: 5px;
 	border-left: 1px solid grey;
+}
+
+.bs-searchbox input{
+	padding-right: 0px;
+	padding-left: 0px;
+}
+
+.dropdown-header span {
+	padding-left: 5px;
+	font-weight: bold;
 }

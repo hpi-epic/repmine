@@ -55,6 +55,7 @@ GEM
     delayed_job_active_record (4.0.3)
       activerecord (>= 3.0, < 5.0)
       delayed_job (>= 3.0, < 4.1)
+    dentaku (1.2.6)
     diff-lcs (1.2.5)
     docile (1.1.5)
     domain_name (0.5.24)
@@ -328,6 +329,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   daemons
   delayed_job_active_record
+  dentaku
   equivalent-xml
   factory_girl_rails
   font-awesome-rails

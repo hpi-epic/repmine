@@ -12,6 +12,13 @@
       rdfs:label "repositories_db_name" ;
       rdfs:range xsd:string .
 
+:metric_nodes_aggregation_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_aggregation_id" ;
+      rdfs:range xsd:integer .
+
 :repositories_skip_tables
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
@@ -40,6 +47,13 @@
       rdfs:label "repositories_description" ;
       rdfs:range xsd:string .
 
+:metric_nodes_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_id" ;
+      rdfs:range xsd:integer .
+
 :tags_name
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :tags ;
@@ -53,6 +67,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_does_exist" ;
       rdfs:range xsd:integer .
+
+:metric_nodes_updated_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_updated_at" ;
+      rdfs:range xsd:string .
 
 :delayed_jobs_last_error
       a       owl:DatatypeProperty , rdf:Property ;
@@ -115,12 +136,33 @@
       rdfs:label "monitoring_tasks_id" ;
       rdfs:range xsd:integer .
 
+:metric_nodes_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_created_at" ;
+      rdfs:range xsd:string .
+
+:metrics_name
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metrics ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metrics_name" ;
+      rdfs:range xsd:string .
+
 :delayed_jobs_queue
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :delayed_jobs ;
       rdfs:isDefinedBy : ;
       rdfs:label "delayed_jobs_queue" ;
       rdfs:range xsd:string .
+
+:metric_nodes_pattern_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_pattern_id" ;
+      rdfs:range xsd:integer .
 
 :repositories_db_username
       a       owl:DatatypeProperty , rdf:Property ;
@@ -150,6 +192,13 @@
       rdfs:label "pattern_elements_source_id" ;
       rdfs:range xsd:integer .
 
+:metric_nodes_ancestry
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_ancestry" ;
+      rdfs:range xsd:string .
+
 :ontologies_type
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies ;
@@ -168,6 +217,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "taggings_id" ;
       rdfs:range xsd:integer .
+
+:metrics_updated_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metrics ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metrics_updated_at" ;
+      rdfs:range xsd:string .
 
 :delayed_jobs_failed_at
       a       owl:DatatypeProperty , rdf:Property ;
@@ -195,12 +251,26 @@
       rdfs:isDefinedBy : ;
       rdfs:label "patterns" .
 
+:metric_nodes_x
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_x" ;
+      rdfs:range xsd:integer .
+
 :pattern_elements_x
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :pattern_elements ;
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_elements_x" ;
       rdfs:range xsd:integer .
+
+:metrics_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metrics ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metrics_created_at" ;
+      rdfs:range xsd:string .
 
 :patterns_type
       a       owl:DatatypeProperty , rdf:Property ;
@@ -353,6 +423,18 @@
       dc:creator "D2RQ Mapping Generator" ;
       owl:imports dc: .
 
+:metric_nodes
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes" .
+
+:metric_nodes_metric_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_metric_id" ;
+      rdfs:range xsd:integer .
+
 :type_expressions
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
@@ -412,6 +494,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "tags" .
 
+:metrics_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metrics ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metrics_id" ;
+      rdfs:range xsd:integer .
+
 :type_expressions_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :type_expressions ;
@@ -433,11 +522,25 @@
       rdfs:label "sessions_data" ;
       rdfs:range xsd:string .
 
+:metric_nodes_operator_cd
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_operator_cd" ;
+      rdfs:range xsd:integer .
+
 :taggings_tagger_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :taggings ;
       rdfs:isDefinedBy : ;
       rdfs:label "taggings_tagger_id" ;
+      rdfs:range xsd:integer .
+
+:metric_nodes_operation_cd
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_operation_cd" ;
       rdfs:range xsd:integer .
 
 :delayed_jobs_attempts
@@ -452,6 +555,13 @@
       rdfs:domain :pattern_elements ;
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_elements_y" ;
+      rdfs:range xsd:integer .
+
+:metric_nodes_y
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_y" ;
       rdfs:range xsd:integer .
 
 :delayed_jobs_progress_current
@@ -557,6 +667,13 @@
       rdfs:domain :ontologies ;
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_short_name" ;
+      rdfs:range xsd:string .
+
+:metrics_description
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metrics ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metrics_description" ;
       rdfs:range xsd:string .
 
 :aggregations
@@ -789,6 +906,11 @@
       rdfs:isDefinedBy : ;
       rdfs:label "type_expressions_ancestry" ;
       rdfs:range xsd:string .
+
+:metrics
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metrics" .
 
 :ontologies_patterns
       a       owl:Class , rdfs:Class ;

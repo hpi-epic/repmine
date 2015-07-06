@@ -1,4 +1,6 @@
 class MetricNodesController < ApplicationController
+
+  layout :false
   
   def update
     mn = MetricNode.find(params[:id])
@@ -9,6 +11,10 @@ class MetricNodesController < ApplicationController
   def destroy
     MetricNode.find(params[:id]).destroy
     render :nothing => true, :status => 200, :content_type => 'text/html'
+  end
+  
+  def show
+    @node = MetricNode.find(params[:id])
   end
   
 end

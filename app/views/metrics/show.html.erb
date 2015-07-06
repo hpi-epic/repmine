@@ -7,7 +7,21 @@
 <% content_for :javascript_includes do %>
   <%= javascript_include_tag "metrics.js" %>
 <% end %>
-
+  
+  <div class="btn-group">
+    <%= form_for(@metric, :remote => true, :html => {:class => "edit_metric form-horizontal needs_no_space"}) do |f| %>
+      <div class="input-prepend">
+        <span class="add-on">Name</span>
+        <%= f.text_field(:name, :class => "needs_no_space") %>
+      </div>
+      <div class="input-prepend">
+        <span class="add-on">Description</span>
+        <%= f.text_field(:description, :class => "needs_no_space", :style => "width: #{@metric.description.size * 7}px;") %>      
+      </div>
+      <%= submit_tag("Save Metric", :class => "btn btn-success") %>
+    <% end %>
+  </div>  
+  
 <div class="btn-toolbar">
   <div class="btn-group">
     <%= form_tag(metric_create_operator_path(@metric), :remote => true, :class => "needs_no_space", :id => "new_operator") do %>
@@ -22,28 +36,14 @@
       <%= submit_tag("New Node", :class => "btn btn-info") %>
     <% end %>
   </div>
-  
-  <div class="btn-group left-boarder">
-    <%= form_for(@metric, :remote => true, :html => {:class => "edit_metric form-horizontal needs_no_space"}) do |f| %>
-      <div class="input-prepend">
-        <span class="add-on">Name</span>
-        <%= f.text_field(:name, :class => "needs_no_space") %>
-      </div>
-      <div class="input-prepend">
-        <span class="add-on">Description</span>
-        <%= f.text_field(:description, :class => "needs_no_space") %>      
-      </div>s
-      <%= submit_tag("Save Metric", :class => "btn btn-success") %>
-    <% end %>
-  </div>  
 </div>
 
 <div id="drawing_canvas" class="canvas">
   <% @metric.metric_nodes.each do |metric_node| %>
-    <% if metric_node.is_operator? %>
-      <%= render :partial => "metrics/operator_node", :locals => {:node => metric_node} %>      
+    <% if metric_node.operator? %>
+      <%= render :partial => "metric_nodes/operator_node", :locals => {:node => metric_node} %>      
     <% else %>
-      <%= render :partial => "metrics/node", :locals => {:node => metric_node} %>
+      <%= render :partial => "metric_nodes/node", :locals => {:node => metric_node} %>
     <% end %>
   <% end %>
 </div>

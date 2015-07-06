@@ -16,12 +16,18 @@ class PatternsController < ApplicationController
     @source_pattern = Pattern.find(params[:pattern_id])
     @source_pattern.auto_layout!
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
-    @offset = @source_pattern.node_offset
+    
 
     @target_ontologies = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontologies(@source_pattern, [@target_ontologies])
     @target_pattern.prepare!
-    @target_pattern.store_auto_layout!
+
+    @controls_offset = @source_pattern.node_offset - 30
+    @node_offset = 0
+    if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
+      @target_pattern.store_auto_layout!
+      @node_offset = @controls_offset      
+    end
     
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
     @matched_elements = @source_pattern.matched_elements(@target_ontologies).collect{|me| me.id.to_s}
@@ -121,6 +127,11 @@ class PatternsController < ApplicationController
       begin
         @oc = ComplexCorrespondence.from_elements(input_elements, output_elements)
         @oc.add_to_alignment!
+        input_elements.each{|ie|
+          output_elements.each{|oe|
+            PatternElementMatch.create(:matched_element => ie, :matching_element => oe)
+          }
+        }
         flash[:notice] = "Thanks for the correspondence!"
         matched_concepts = params[:source_element_ids].collect{|id| id.to_s}
       rescue SimpleCorrespondence::UnsupportedCorrespondence => e

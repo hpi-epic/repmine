@@ -33,6 +33,9 @@ gem 'nokogiri'
 # putting graphs back together
 gem "wongi-engine"
 
+# calculating
+gem "dentaku"
+
 group :development, :test do
   gem "rspec"
   gem "rspec-rails"

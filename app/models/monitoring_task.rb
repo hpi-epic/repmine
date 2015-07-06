@@ -1,8 +1,9 @@
 class MonitoringTask < ActiveRecord::Base
-  attr_accessible :repository_id, :pattern_id
+  attr_accessible :repository_id, :pattern_id, :metric_node_id
   
   belongs_to :repository
   belongs_to :pattern
+  belongs_to :metric_node
   
   def self.create_multiple(pattern_ids, repository_id)
     return pattern_ids.collect do |p_id|
@@ -15,18 +16,37 @@ class MonitoringTask < ActiveRecord::Base
   end
   
   def run
-    job = QueryExecutionJob.new(:repository_id => repository.id, :pattern_id => pattern.id)
+    job = QueryExecutionJob.new(:repository_id => repository_id, :pattern_id => pattern_id, :metric_node_id => metric_node_id)
     Delayed::Job.enqueue(job, :queue => repository.query_queue)
   end
   
   def executable?
-    translation_unnecessary = (pattern.ontologies - [repository.ontology]).empty?
-    translation_exists = !TranslationPattern.existing_translation_pattern(pattern, [repository.ontology]).nil?
-    return translation_unnecessary || (translation_exists && pattern.unmatched_elements([repository.ontology]).empty?)
+    translation_unnecessary = (the_pattern.ontologies - [repository.ontology]).empty?
+    puts "#{short_name}. translation is unnecessary: #{translation_unnecessary}"
+    translation_exists = !TranslationPattern.existing_translation_pattern(the_pattern, [repository.ontology]).nil?
+    puts "#{short_name}. translation exists: #{translation_exists}"
+    puts "#{short_name}. unmatched_elements: #{the_pattern.unmatched_elements([repository.ontology]).size}"
+    return translation_unnecessary || (translation_exists && the_pattern.unmatched_elements([repository.ontology]).empty?)
+  end
+  
+  def the_pattern
+    pattern.nil? ? metric_node.pattern : pattern
+  end
+  
+  def short_name
+    "#{the_pattern.name} on #{repository.name}"
   end
   
   def results_file(ending)
-    return Rails.root.join("public","data","pattern_#{pattern.id}_repo_#{repository.id}.#{ending}").to_s
+    return Rails.root.join("public","data","#{filename}.#{ending}").to_s
+  end
+  
+  def filename
+    if pattern.nil?
+      "metric_node_#{metric_node_id}_repo_#{repository.id}"
+    else
+      "pattern_#{pattern.id}_repo_#{repository.id}"
+    end
   end
   
   def csv_result
@@ -34,7 +54,7 @@ class MonitoringTask < ActiveRecord::Base
   end
   
   def pretty_csv_name
-    return "#{pattern.name.underscore}-on-#{repository.name.underscore}.csv"
+    return "#{pattern.nil? ? metric_node.metric.name.underscore : pattern.name.underscore}-on-#{repository.name.underscore}.csv"
   end
   
   def results
