@@ -111,11 +111,18 @@ class Neo4jRepository < Repository
     @neo ||= Neography::Rest.new("http://#{host}:#{port}")
   end
   
-  def execute(query)
+  def execute(query, generate_csv)
     log_msg("Getting results from repository")
     headers, cleansed_data, columns = get_headers_and_cleansed_data(query)
-    
-    csv_results = CSV.generate do |csv|
+    if generate_csv
+      return {:headers => headers, :data => cleansed_data}, csv_results(headers, cleansed_data, columns)
+    else
+      return {:headers => headers, :data => cleansed_data}
+    end
+  end
+  
+  def csv_results(headers, cleansed_data, columns)
+    CSV.generate do |csv|
       csv << headers
       cleansed_data.each do |data_row|
         row = []
@@ -131,8 +138,6 @@ class Neo4jRepository < Repository
         csv << row
       end
     end
-    
-    return {:headers => headers, :data => cleansed_data}, csv_results
   end
   
   def get_headers_and_cleansed_data(query)

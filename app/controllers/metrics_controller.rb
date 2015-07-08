@@ -1,4 +1,6 @@
 class MetricsController < ApplicationController
+
+  autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
   
   def create
     @metric = Metric.create
@@ -43,9 +45,14 @@ class MetricsController < ApplicationController
   end  
   
   def index
-    @metrics = Metric.all
+    @metrics_groups = Metric.grouped
     @repositories = Repository.all()
     @title = "Metric overview"
+  end
+  
+  def monitor
+    task_ids = MonitoringTask.create_multiple(params[:metrics], params[:repository_id])
+    redirect_to check_monitoring_tasks_path(:task_ids => task_ids)
   end
   
   def download_csv
