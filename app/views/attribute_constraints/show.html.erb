@@ -1,5 +1,5 @@
 <% div_id = "attribute_constraint_#{@ac.id}" %>
-<div id="<%= div_id %>" class="attribute_constraints graph_element" data-id="<%= @ac.id %>" style="<%= ac_position(@ac) %>">
+<div id="<%= div_id %>" class="attribute_constraint graph_element" data-id="<%= @ac.id %>" style="<%= ac_position(@ac) %>">
   <%= form_for([@pattern,@ac], :html => {:class => "needs_no_space edit_attribute_constraint"}) do |f| %>
     <%= f.select(:rdf_type, attrib_selector(@possible_attributes, @ac), {}, {:class => "just_right"}) %>
     <%= f.select(:operator, operator_selector(), {}, {:class => "very_narrow"}) %>

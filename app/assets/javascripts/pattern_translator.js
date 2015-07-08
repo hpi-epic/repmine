@@ -4,6 +4,7 @@ jsPlumb.ready(function() {
   $(".immutable_node").each(function(index, node_div){addNodeEndpoints($(node_div).attr("id"));});
 
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);
+	
   $.when.apply($, requests).done(function(){
     removeExcessEndpoints();
     addMatchedClass();
