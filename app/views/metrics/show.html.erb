@@ -20,8 +20,13 @@
           :description, 
           :class => "needs_no_space", 
           :style => "width: #{@metric.description.blank? ? 200 : @metric.description.size * 7}px;") 
-        %>      
+        %>    
       </div>
+      <div class="input-prepend">      
+        <span class="add-on">Categories</span>
+        <%= f.autocomplete_field :tag_list, autocomplete_tag_name_metrics_path, :"data-delimiter" => ', ' %>
+      </div>
+      
       <%= submit_tag("Save Metric", :class => "btn btn-success") %>
     <% end %>
   </div>  

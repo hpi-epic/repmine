@@ -1,13 +1,12 @@
 class MonitoringTask < ActiveRecord::Base
-  attr_accessible :repository_id, :pattern_id, :metric_node_id
+  attr_accessible :repository_id, :measurable_id
   
   belongs_to :repository
-  belongs_to :pattern
-  belongs_to :metric_node
+  belongs_to :measurable
   
-  def self.create_multiple(pattern_ids, repository_id)
-    return pattern_ids.collect do |p_id|
-      self.where(:pattern_id => p_id, :repository_id => repository_id).first_or_create!.id
+  def self.create_multiple(measurable_ids, repository_id)
+    return measurable_ids.collect do |m_id|
+      self.where(:measurable_id => m_id,  :repository_id => repository_id).first_or_create!.id
     end.uniq
   end
   
@@ -15,26 +14,25 @@ class MonitoringTask < ActiveRecord::Base
     return File.exist?(results_file("yml")) && File.exist?(results_file("csv"))
   end
   
-  def run
-    job = QueryExecutionJob.new(:repository_id => repository_id, :pattern_id => pattern_id, :metric_node_id => metric_node_id)
+  def enqueue
+    job = QueryExecutionJob.new(:monitoring_task_id => id)
     Delayed::Job.enqueue(job, :queue => repository.query_queue)
   end
   
-  def executable?
-    translation_unnecessary = (the_pattern.ontologies - [repository.ontology]).empty?
-    puts "#{short_name}. translation is unnecessary: #{translation_unnecessary}"
-    translation_exists = !TranslationPattern.existing_translation_pattern(the_pattern, [repository.ontology]).nil?
-    puts "#{short_name}. translation exists: #{translation_exists}"
-    puts "#{short_name}. unmatched_elements: #{the_pattern.unmatched_elements([repository.ontology]).size}"
-    return translation_unnecessary || (translation_exists && the_pattern.unmatched_elements([repository.ontology]).empty?)
+  def run(job = nil)
+    repository.job = job
+    res, csv = measurable.run_on_repository(repository)
+    repository.job = nil
+    File.open(results_file("yml"), "w+"){|f| f.puts res.to_yaml}
+    File.open(results_file("csv"), "w+"){|f| f.puts csv}
   end
   
-  def the_pattern
-    pattern.nil? ? metric_node.pattern : pattern
+  def executable?
+    measurable.executable_on?(repository)
   end
   
   def short_name
-    "#{the_pattern.name} on #{repository.name}"
+    "'#{measurable.name}' on '#{repository.name}'"
   end
   
   def results_file(ending)
@@ -42,11 +40,7 @@ class MonitoringTask < ActiveRecord::Base
   end
   
   def filename
-    if pattern.nil?
-      "metric_node_#{metric_node_id}_repo_#{repository.id}"
-    else
-      "pattern_#{pattern.id}_repo_#{repository.id}"
-    end
+    "#{measurable.class.name}_#{measurable_id}_repo_#{repository.id}"
   end
   
   def csv_result
@@ -54,7 +48,7 @@ class MonitoringTask < ActiveRecord::Base
   end
   
   def pretty_csv_name
-    return "#{pattern.nil? ? metric_node.metric.name.underscore : pattern.name.underscore}-on-#{repository.name.underscore}.csv"
+    return "#{measurable.name.underscore}-on-#{repository.name.underscore}.csv"
   end
   
   def results

@@ -53,8 +53,7 @@ class PatternsController < ApplicationController
   end
 
   def index
-    @patterns = Pattern.where(:type => nil)
-    if @patterns.empty?
+    if Pattern.count == 0
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
     else

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150625094958) do
+ActiveRecord::Schema.define(:version => 20150706160423) do
 
   create_table "aggregations", :force => true do |t|
     t.integer  "pattern_element_id"
@@ -43,6 +43,17 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
+  create_table "measurables", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.string   "type"
+    t.integer  "pattern_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  add_index "measurables", ["pattern_id"], :name => "index_measurables_on_pattern_id"
+
   create_table "metric_nodes", :force => true do |t|
     t.integer  "pattern_id"
     t.integer  "aggregation_id"
@@ -60,19 +71,11 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
   add_index "metric_nodes", ["ancestry"], :name => "index_metric_nodes_on_ancestry"
   add_index "metric_nodes", ["pattern_id"], :name => "index_metric_nodes_on_pattern_id"
 
-  create_table "metrics", :force => true do |t|
-    t.text     "description"
-    t.string   "name"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
-  end
-
   create_table "monitoring_tasks", :force => true do |t|
-    t.integer  "pattern_id"
     t.integer  "repository_id"
-    t.integer  "metric_node_id"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
+    t.integer  "measurable_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "ontologies", :force => true do |t|
@@ -123,17 +126,6 @@ ActiveRecord::Schema.define(:version => 20150625094958) do
     t.integer  "y",               :default => 0
     t.boolean  "is_group",        :default => false
   end
-
-  create_table "patterns", :force => true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.string   "type"
-    t.integer  "pattern_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
-  end
-
-  add_index "patterns", ["pattern_id"], :name => "index_patterns_on_pattern_id"
 
   create_table "repositories", :force => true do |t|
     t.string  "name"

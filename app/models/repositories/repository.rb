@@ -73,6 +73,12 @@ class Repository < ActiveRecord::Base
     
     return errors
   end
+  
+  def results_for_pattern(pattern, aggregations, generate_csv = true)
+    query_string = self.class.query_creator_class.new(pattern, aggregations).query_string
+    puts "executing query: #{query_string}"
+    res, csv = execute(query_string, generate_csv)
+  end
 
   def create_ontology!
     raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
@@ -86,7 +92,7 @@ class Repository < ActiveRecord::Base
     raise "implement 'type_statistics' in #{self.class.name}"
   end
   
-  def execute(query_string)
+  def execute(query_string, generate_csv)
     raise "implement 'execute' in #{self.class.name}"
   end
   

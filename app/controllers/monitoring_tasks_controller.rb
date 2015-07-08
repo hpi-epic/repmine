@@ -7,7 +7,8 @@ class MonitoringTasksController < ApplicationController
     else
       @query_jobs = {}
       @repos_with_tasks.collect{|repo| repo.query_jobs}.flatten.each do |qj|
-        @query_jobs[qj.id] = qj.payload_object.pattern.name
+        mt = MonitoringTask.includes(:measurable).find(qj.payload_object.monitoring_task_id)
+        @query_jobs[qj.id] = mt.measurable.name
       end
       @new_tasks = params[:task_ids] || []      
     end
@@ -20,8 +21,8 @@ class MonitoringTasksController < ApplicationController
   
   def run
     @task = MonitoringTask.find(params[:monitoring_task_id])
-    @task.run
-    redirect_to monitoring_tasks_path, :notice => "Enqueued new query!"
+    @task.enqueue
+    redirect_to monitoring_tasks_path, :notice => "Enqueued monitoring task! Results will show up, soon..."
   end
   
   def show_results

@@ -1,12 +1,16 @@
-<%= form_tag(download_csv_metrics_path) do %>
+<%= form_tag(monitor_metrics_path) do %>
 
 <div class="btn-toolbar">
   <div class="btn-group">
     <%= link_to "New Metric", metrics_path, :class => "btn btn-primary", :method => :post %>
   </div>  
   <div class="btn-group left-boarder">  
-    <%= button_tag("Get Results for:", :class => "btn btn-warning", :name => "monitor") %>
-    <%= select_tag("repository_id", options_from_collection_for_select(@repositories, "id", "name"), {:class => "needs_no_space"}) %>
+    <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor") %>
+    <%= select_tag(
+      "repository_id", 
+      options_from_collection_for_select(@repositories, "id", "name"), 
+      {:class => "selectpicker", "data-live-search" => "true"}) 
+    %>
   </div>
 </div>
 
@@ -22,23 +26,29 @@
   
   <tbody>
 
-  <% @metrics.each do |metric| %>
-  <tr>
-    <td>
-      <label class="radio"><%= radio_button_tag("metrics[]", metric.id)%><%= link_to(metric.name, metric_path(metric)) %></label>
-    </td>
-    <td class="span8"><%= metric.description %></td>
-    <td><%= metric.metric_nodes.collect{|mn| mn.pattern}.compact.uniq.collect{|pat| pat.name}.join("<br />") %></td>
-    <td>
-      <%= link_to(
-        "Delete",
-        metric_path(metric), 
-        :method => :delete, 
-        :class => "btn btn-danger btn-mini", 
-        :confirm => "Really delete #{metric.name}?") 
-      %>
-    </td>
-  </tr>
+  <% @metrics_groups.each_pair do |tag, metrics| %>
+    <% next if metrics.empty? %>
+    <tr class="info">
+      <td colspan="5"><strong><%= tag %></strong> (<%= metrics.size%>)</td>
+    </tr>
+    <% metrics.each do |metric|%>
+      <tr>
+        <td>
+          <label class="checkbox"><%= check_box_tag("metrics[]", metric.id)%><%= link_to(metric.name, metric_path(metric)) %></label>
+        </td>
+        <td class="span8"><%= metric.description %></td>
+        <td><%= metric.metric_nodes.collect{|mn| mn.pattern}.compact.uniq.collect{|pat| pat.name}.join("<br />") %></td>
+        <td>
+          <%= link_to(
+            "Delete",
+            metric_path(metric), 
+            :method => :delete, 
+            :class => "btn btn-danger btn-mini", 
+            :confirm => "Really delete #{metric.name}?") 
+          %>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
   </tbody>
 </table>

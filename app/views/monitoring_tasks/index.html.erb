@@ -16,7 +16,7 @@
     </tr>
     <% repo.monitoring_tasks.each_with_index do |mt, i| %>
     <tr>
-      <td><%= link_to(mt.the_pattern.name, mt.the_pattern) %></td>
+      <td><%= link_to(mt.measurable.name, mt.measurable) %></td>
       <td>
         <% if mt.has_latest_results? %>
           <%= link_to("CSV", monitoring_task_csv_results_path(mt), :class => "btn btn-success")%>
@@ -27,18 +27,18 @@
         <% if mt.executable? %>
           <%= link_to("Update!", monitoring_task_run_path(mt), :class => "btn btn-info", :method => :post) %>
         <% else %>
-          <%= link_to("Translate!", pattern_translate_path(mt.pattern, mt.repository.ontology), :class => "btn btn-warning") %>
+          <%= link_to("Translate!", pattern_translate_path(mt.measurable, mt.repository.ontology), :class => "btn btn-warning") %>
         <% end %>
         <%= link_to("Stop Monitoring",
               monitoring_task_path(mt),
               :method => :delete,
               :class => "btn btn-danger",
-              :confirm => "Really stop monitoring #{mt.the_pattern.name} on #{repo.name}?"
+              :confirm => "Really stop monitoring #{mt.measurable.name} on #{repo.name}?"
             )
         %>
       </td>
-      <% if i == 0%>
-      <td rowspan="0" class="span8">
+      <% if i == 0 %>
+      <td rowspan="<%= repo.monitoring_tasks.size %>" class="span7">
         <em>Running Queries:</em><br />
         <% repo.query_jobs.each_with_index do |qj, ii| %>
           <%= render :partial => "stuff/progress_bar", :locals => {:job_id => qj.id} %>  

@@ -13,7 +13,7 @@ class CreateMetricNodes < ActiveRecord::Migration
     end
     
     add_index :metric_nodes, :ancestry  
-    add_index :metric_nodes, :pattern_id       
+    add_index :metric_nodes, :pattern_id
     add_index :metric_nodes, :aggregation_id           
   end
 end

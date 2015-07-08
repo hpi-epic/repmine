@@ -1,41 +1,34 @@
-class Metric < ActiveRecord::Base
-  attr_accessible :name, :description
+class Metric < Measurable
+  
   has_many :metric_nodes
   
-  def calculate(repository)
+  def run_on_repository(repository)
     results = {}
+    
     metric_nodes.where("aggregation_id IS NOT NULL").each do |metric_node|
-      puts "getting results for node #{metric_node.id}"
-      mt = MonitoringTask.where(:repository_id => repository.id, :metric_node_id => metric_node.id).first_or_create!
-      unless mt.has_latest_results?
-        mt.run
-        return
-      end
-      results[metric_node] = mt.results
+      results[metric_node] = repository.results_for_pattern(metric_node.pattern, metric_node.aggregations, false)
     end
     
-    res, csv = process_results(results)
-    File.open(metrics_path("yml", repository), "w+"){|f| f.puts res.to_yaml}
-    File.open(metrics_path("csv", repository), "w+"){|f| f.puts csv}
+    return process_results(results)
   end
   
-  def metrics_path(ending, repository)
-    Rails.root.join("public","data","metric_#{id}_repo_#{repository.id}.#{ending}").to_s
-  end
-  
-  def fancy_metric_file_name(repository)
-    return "#{name} for #{repository.name}"
+  def executable_on?(repository)
+    leaf_nodes.collect{|leaf_node| leaf_node.pattern.executable_on?(repository)}.inject(:&)
   end
   
   def process_results(results)
-    join_headers = results.values.collect{|res| res[:headers]}.inject(:&) - plain_leaf_nodes.collect{|ln| ln.aggregation.speaking_name}
-    puts "using the following join headers: #{join_headers}"
-    return compute_metrics(combine_results(results, join_headers))
+    overlapping_res_headers = results.values.collect{|res| res[:headers]}.inject(:&)
+    combined_results = combine_results(results, overlapping_res_headers - all_aggregations)
+    return compute_metrics(combined_results)
+  end
+  
+  def all_aggregations
+    plain_leaf_nodes.collect{|ln| ln.aggregation.speaking_name}
   end
   
   def compute_metrics(complete_results)
     root_nodes = operator_nodes.select{|on| on.is_root?}
-    raise "Too many root nodes..." if root_nodes.size != 1
+    return flatten_results(complete_results) if root_nodes.empty?
     
     calculator = Dentaku::Calculator.new
     aggregated_values(complete_results).each_pair{|av_name, av_value| calculator.store(av_name => av_value.to_f)}
@@ -69,6 +62,7 @@ class Metric < ActiveRecord::Base
         res_row
       end
     end
+    
     return {:headers => headers, :data => data}, csv_results
   end
   
@@ -115,6 +109,10 @@ class Metric < ActiveRecord::Base
   
   def operator_nodes
     metric_nodes.where("operator_cd IS NOT NULL")
+  end
+  
+  def leaf_nodes
+    metric_nodes.where("operator_cd IS NULL")
   end
   
   def plain_leaf_nodes

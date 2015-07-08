@@ -1,11 +1,9 @@
-class Pattern < ActiveRecord::Base
+class Pattern < Measurable
 
   include RdfSerialization
 
-  attr_accessible :name, :description, :tag_list, :ontology_id
+  attr_accessible :ontology_id
   attr_accessor :ag_connection, :layouted_graph
-
-  acts_as_taggable_on :tags
 
   has_and_belongs_to_many :ontologies
   has_many :pattern_elements, :dependent => :destroy
@@ -28,6 +26,12 @@ class Pattern < ActiveRecord::Base
 
   def relation_constraints
     pattern_elements.where(:type => "RelationConstraint")
+  end
+  
+  def executable_on?(repository)
+    translation_unnecessary = (ontologies - [repository.ontology]).empty?
+    translation_exists = !TranslationPattern.existing_translation_pattern(self, [repository.ontology]).nil?
+    return translation_unnecessary || (translation_exists && unmatched_elements([repository.ontology]).empty?)
   end
   
   def create_node!(ontology)
@@ -97,7 +101,8 @@ class Pattern < ActiveRecord::Base
     pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}
     return pattern
   end
-    
+  
+  # Layouting
   def graphviz_graph
     g = GraphViz.new("#{id}", {:type => :digraph, :splines => true})
     node_cache = {}
@@ -163,23 +168,7 @@ class Pattern < ActiveRecord::Base
     [Vocabularies::GraphPattern.GraphPattern]
   end
   
-  def aggregations
-    pattern_elements.collect{|pe| pe.aggregation}.compact
-  end
-  
-  def self.grouped(nice_display = false)
-    pattern_groups = {}
-    where(:type => nil).each do |pattern|
-      tag_list = pattern.tag_list.empty? ? ["Uncategorized"] : pattern.tag_list
-      tag_list.each do |tag|
-        pattern_groups[tag] ||= []
-        if nice_display
-          pattern_groups[tag] << [pattern.name, pattern.id] 
-        else
-          pattern_groups[tag] << pattern
-        end
-      end
-    end
-    return pattern_groups
+  def run_on_repository(repository)
+    return repository.results_for_pattern(self, [])
   end
 end

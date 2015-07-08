@@ -29,10 +29,11 @@ RepMine::Application.routes.draw do
   
   resources :metrics do
     post :create_operator
-    post :create_node    
+    post :create_node
     post :create_connection    
     post :destroy_connection
-    post :download_csv, :on => :collection
+    post :monitor, :on => :collection
+    get :autocomplete_tag_name, :on => :collection    
   end
   
   resources :metric_nodes, :only => [:update, :destroy, :show] do

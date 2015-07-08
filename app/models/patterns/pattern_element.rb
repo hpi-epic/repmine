@@ -14,7 +14,6 @@ class PatternElement < ActiveRecord::Base
   has_many :matching_elements, :through => :matches, :dependent => :destroy
   
   has_one :type_expression, :dependent => :destroy
-  has_many :aggregations, :dependent => :destroy
   include RdfSerialization
   
   class ComparisonError < Error
