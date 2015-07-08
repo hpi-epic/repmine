@@ -1,7 +1,16 @@
-<table class="table table-striped table-condensed table-bordered">
+<% content_for :javascript_includes do %>
+  <%= javascript_include_tag "jquery.dataTables.min.js" %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#results-table').DataTable();
+    });
+  </script>
+<% end %>
+
+<table class="table table-striped table-condensed table-bordered" id="results-table">
   <thead>
     <tr class="info">
-      <td colspan="<%= @headers.size %>">Results for '<%= @task.pattern.name%>' on <%= @task.repository.name %> (<%= @results.size%>)</td>
+      <td colspan="<%= @headers.size %>">Results for '<%= @task.measurable.name %>' on <%= @task.repository.name %> (<%= @results.size%>)</td>
     </tr>
     <tr>
       <% @headers.each do |key|%>
