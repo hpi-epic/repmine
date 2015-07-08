@@ -8,12 +8,17 @@ class OntologyMatcher
 
   def initialize(source_ontology, target_ontology, use_speaking_names = false)
     @source_ontology, @target_ontology = [source_ontology, target_ontology].sort{|a,b| a.id <=> b.id}
+    raise "What the fuck, man!" if source_ontology == target_ontology
     @inverted = @source_ontology != source_ontology
     @alignment_repo = AgraphConnection.new(repo_name)
   end
   
   def repo_name
     "alignment_" + [source_ontology, target_ontology].collect{|o| o.id.to_s}.join("_")
+  end
+  
+  def delete_alignment_repository!
+    alignment_repo.delete!
   end
 
   def match!()
