@@ -48,8 +48,11 @@ class TranslationPattern < Pattern
   # return correspondences for a given pattern
   def prepare!()
     match!
-    mappings = get_simple_mappings
-    mappings.merge!(get_complex_mappings)
+    process_mappings(get_simple_mappings)
+    process_mappings(get_complex_mappings)
+  end
+  
+  def process_mappings(mappings)
     check_for_ambiguous_mappings(mappings)
     add_pattern_elements!(mappings)
     connect_pattern_elements!(mappings)
@@ -75,7 +78,7 @@ class TranslationPattern < Pattern
     mappings.each_pair do |input_elements, target_elements|
       input_elements.each do |pe_id|
         target_elements.each do |te|
-          PatternElementMatch.create(:matched_element => PatternElement.find(pe_id), :matching_element => te)
+          PatternElementMatch.where(:matched_element_id => pe_id, :matching_element_id => te.id).first_or_create!
         end
       end
     end
@@ -114,14 +117,13 @@ class TranslationPattern < Pattern
     return mappings
   end  
   
+  # TODO: instead of getting mappings for all combinations, get all complex mappings and compare them to our combinations...
   def get_complex_mappings()
     mappings = {}
-    
     # let's construct all possbile combinations of the input pattern's unmatched elements
     (2..input_elements.size).flat_map{|size| input_elements.combination(size).to_a}.reverse.each do |elements|
       # only try to match combinations of the same ontology
       next if elements.collect{|pe| pe.ontology_id}.uniq.size != 1
-      
       mapping_key = elements.collect{|pe| pe.id}
       ontology_matchers(elements.first.ontology).each do |om|
         om.correspondences_for_pattern_elements(elements).each do |correspondence|
@@ -130,6 +132,7 @@ class TranslationPattern < Pattern
         end
       end
     end
+
     return mappings
   end
 end

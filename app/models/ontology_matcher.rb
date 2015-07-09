@@ -8,7 +8,6 @@ class OntologyMatcher
 
   def initialize(source_ontology, target_ontology, use_speaking_names = false)
     @source_ontology, @target_ontology = [source_ontology, target_ontology].sort{|a,b| a.id <=> b.id}
-    raise "What the fuck, man!" if source_ontology == target_ontology
     @inverted = @source_ontology != source_ontology
     @alignment_repo = AgraphConnection.new(repo_name)
   end
@@ -134,8 +133,8 @@ class OntologyMatcher
       result[:relation].to_s,
       entity1,
       result[:target].anonymous? ? Pattern.from_graph(alignment_graph, result[:target], target_ontology) : result[:target].to_s,
-      source_ontology,
-      target_ontology
+      inverted ? target_ontology : source_ontology,
+      inverted ? source_ontology : target_ontology
     )
   end
   
@@ -145,8 +144,8 @@ class OntologyMatcher
       result[:relation].to_s,
       entity1,
       result[:target].to_s,
-      source_ontology,
-      target_ontology
+      inverted ? target_ontology : source_ontology,
+      inverted ? source_ontology : target_ontology
     )
   end
   
