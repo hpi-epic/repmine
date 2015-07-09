@@ -38,6 +38,7 @@ jQuery.each(jobs, function(job_id, initial_text){
 				pbar.find('.progress-status').text('Successfully finished: ' + initial_text);
 				pbar.find('.well').hide();
 	      clearInterval(intervals[job_id]);
+				location.reload();
 	    }
 	  })
 	},1000);	

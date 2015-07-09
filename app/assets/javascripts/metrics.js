@@ -57,17 +57,18 @@ var makeEverythingDraggable = function(){
 
 var createDestroyCallback = function(node){
 	node.dblclick(function() {
-	  console.log($(this));
-		var form = node.find("form");
-		$.ajax({
-			url : $(form).attr("action"),
-			type: "DELETE",
-			data : $(form).serialize(),
-			success: function(data){
-		    jsPlumb.remove(node);
-			}
-		});
-	});
+		if(confirm("Really delete the node?")){
+			var form = node.find("form");
+			$.ajax({
+				url : $(form).attr("action"),
+				type: "DELETE",
+				data : $(form).serialize(),
+				success: function(data){
+			    jsPlumb.remove(node);
+				}
+			});
+		}
+	});	
 };
 
 var createEndpoints = function(){
