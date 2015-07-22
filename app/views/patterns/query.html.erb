@@ -1,3 +1,14 @@
+<%= form_tag(pattern_query_path) do %>
+  <div class="btn-group">
+    <%= button_tag("Translate queries to:", :class => "btn btn-info", :name => "translate") %>
+    <%= select_tag(
+      :ontology_id, 
+      grouped_options_for_select(@ontology_groups), 
+      {:class => "selectpicker", "data-live-search" => "true"}) 
+    %>
+  </div>
+<% end %>
+
 <% @queries.each_pair do |language, query| %>
   <legend><%= language %></legend>
   <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%> 

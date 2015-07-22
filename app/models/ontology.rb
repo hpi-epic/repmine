@@ -117,4 +117,10 @@ class Ontology < ActiveRecord::Base
   def download_url
     return url
   end
+  
+  def self.grouped
+    pluck(:group).uniq.map do |group| 
+      [group, where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
+    end
+  end
 end

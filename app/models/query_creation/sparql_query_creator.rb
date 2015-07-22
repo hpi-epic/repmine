@@ -34,7 +34,7 @@ class SparqlQueryCreator < QueryCreator
   end
 
   def fill_variables!
-    @variables = pattern.nodes.collect{|n| pe_variable(n)}
+    @variables = pattern.returnable_elements([]).collect{|n| pe_variable(n)}
   end
 
   def pattern_for_ac_equals(node, ac)

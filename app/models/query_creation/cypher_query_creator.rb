@@ -64,7 +64,7 @@ class CypherQueryCreator < QueryCreator
     return str
   end
   
-  # we mainly use the sames ones as cypher...
+  # we mainly use the sames ones as cypher...this is just in case, I forgot something...
   def cypher_operator(our_operator)
     return our_operator
   end

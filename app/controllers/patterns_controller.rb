@@ -58,9 +58,7 @@ class PatternsController < ApplicationController
       redirect_to new_pattern_path
     else
       @pattern_groups = Pattern.grouped
-      @ontology_groups = Ontology.pluck(:group).uniq.map do |group| 
-        [group, Ontology.where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
-      end
+      @ontology_groups = Ontology.grouped
       @repositories = Repository.all
     end
     @title = "Pattern Overview"
@@ -107,14 +105,16 @@ class PatternsController < ApplicationController
 
   def query
     @pattern = Pattern.find(params[:pattern_id])
+    unless params[:ontology_id].nil?
+      @ontology = Ontology.find(params[:ontology_id])
+      @t_pattern = TranslationPattern.existing_translation_pattern(@pattern, [@ontology])
+      flash[:error] = "No translation available, yet, for #{@pattern.name} to #{@ontology.short_name}" if @t_pattern.nil?
+    end
     @queries = {
-      "Cypher" => CypherQueryCreator.new(@pattern).query_string,
-      "Sparql" => SparqlQueryCreator.new(@pattern).query_string
+      "Cypher" => CypherQueryCreator.new(@t_pattern || @pattern).query_string,
+      "Sparql" => SparqlQueryCreator.new(@t_pattern || @pattern).query_string
     }
-    @potential_repositories = {
-      "Cypher" => Neo4jRepository.where(:ontology_id => @pattern.ontologies),
-      "Sparql" => RdfRepository.where(:ontology_id => @pattern.ontologies)
-    }
+    @ontology_groups = Ontology.grouped
     @title = "Queries for '#{@pattern.name}'"    
   end
   
