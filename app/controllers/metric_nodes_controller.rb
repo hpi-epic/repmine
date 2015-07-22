@@ -14,7 +14,8 @@ class MetricNodesController < ApplicationController
   end
   
   def show
-    @node = MetricNode.find(params[:id])
+    node = MetricNode.find(params[:id])
+    render :partial => "metric_nodes/show", :layout => false, :locals => {:node => node}
   end
   
 end

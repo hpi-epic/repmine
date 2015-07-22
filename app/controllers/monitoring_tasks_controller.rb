@@ -12,6 +12,7 @@ class MonitoringTasksController < ApplicationController
       end
       @new_tasks = params[:task_ids] || []      
     end
+    @title = "Monitoring Task Overview"
   end
   
   def csv_results
@@ -27,8 +28,9 @@ class MonitoringTasksController < ApplicationController
   
   def show_results
     @task = MonitoringTask.find(params[:monitoring_task_id])
-    @results = @task.results[:data]
-    @headers = @task.results[:headers]
+    @results = @task.results
+    @headers = @results.collect{|res| res.keys}.flatten.uniq
+    @title = "Results for '#{@task.measurable.name}' on #{@task.repository.name}"
   end
   
   def destroy
@@ -42,7 +44,7 @@ class MonitoringTasksController < ApplicationController
     
     tasks.each do |task|
       unless task.executable?
-        redirect_to(pattern_translate_path(task.pattern, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
+        redirect_to(pattern_translate_path(task.translate_this, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
       end
     end
     

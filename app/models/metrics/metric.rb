@@ -1,40 +1,38 @@
-class Metric < Measurable
-  
+class Metric < Measurable  
   has_many :metric_nodes
   
+  def create_node(measurable)
+    node = if measurable.is_a?(Pattern)
+      MetricNode.create(:measurable_id => measurable.id)
+    else
+      MetricMetricNode.create(:measurable_id => measurable.id)
+    end
+    metric_nodes << node
+    return node
+  end
+    
   def run_on_repository(repository)
     results = {}
-    
     metric_nodes.where("aggregation_id IS NOT NULL").each do |metric_node|
-      results[metric_node] = repository.results_for_pattern(metric_node.pattern, metric_node.aggregations, false)
+      results[metric_node] = metric_node.results_on(repository)
     end
-    
-    return process_results(results)
+    return process_results(results, repository)
   end
   
-  def executable_on?(repository)
-    leaf_nodes.collect{|leaf_node| leaf_node.pattern.executable_on?(repository)}.inject(:&)
-  end
-  
-  def process_results(results)
-    overlapping_res_headers = results.values.collect{|res| res[:headers]}.inject(:&)
+  def process_results(results, repository)
+    overlapping_res_headers = results.values.collect{|res| res.collect{|val| val.keys}.flatten.uniq}.inject(:&)
     combined_results = combine_results(results, overlapping_res_headers - all_aggregations)
-    return compute_metrics(combined_results)
-  end
-  
-  def all_aggregations
-    plain_leaf_nodes.collect{|ln| ln.aggregation.speaking_name}
+    complete_results = compute_metrics(combined_results)
+    return prepare_results(complete_results, repository)
   end
   
   def compute_metrics(complete_results)
     root_nodes = operator_nodes.select{|on| on.is_root?}
-    return flatten_results(complete_results) if root_nodes.empty?
+    return complete_results if root_nodes.empty?
     
     calculator = Dentaku::Calculator.new
-    aggregated_values(complete_results).each_pair{|av_name, av_value| calculator.store(av_name => av_value.to_f)}
     calculation_template = root_nodes.first.calculation_template
-    puts "using template: #{calculation_template}"
-    required_values = plain_leaf_nodes.collect{|ln| ln.qualified_name}    
+    required_values = leaf_nodes.collect{|ln| ln.qualified_name}
     
     complete_results.each do |res_object|
       required_values.each{|rv| calculator.store(rv => res_object[rv].to_f)}
@@ -44,82 +42,116 @@ class Metric < Measurable
         0
       end
     end
-    
-    return flatten_results(complete_results)
+
+    return complete_results
   end
   
-  def flatten_results(complete_results)
+  def prepare_results(complete_results, repository)
     headers = complete_results.collect{|val| val.keys}.flatten.uniq
-    puts "headers: #{headers}"
+    hf_headers = human_friendly_headers(headers, repository)
     
-    data = []
     csv_results = CSV.generate do |csv|
-      csv << headers
-      data = complete_results.collect do |k| 
+      csv << hf_headers
+      complete_results.collect do |res_hash| 
         res_row = []
-        k.each_pair{|kk,vv| res_row[headers.index(kk)] = vv}
+        hf_headers.each_with_index do |header,i|
+          if !res_hash.has_key?(header)
+            res_hash[header] = res_hash[headers[i]]
+            res_hash.delete(headers[i])
+          end
+          res_row << res_hash[header]
+        end
         csv << res_row
-        res_row
       end
     end
     
-    return {:headers => headers, :data => data}, csv_results
+    return complete_results, csv_results
   end
   
-  def aggregated_values(complete_results)
-    aggregation_values = {}
-    aggregation_leaf_nodes.each do |aln|
-      puts "getting #{aln.operation} of all #{aln.qualified_name}"
-      aggregation_values[aln.fully_qualified_name] = aln.compute(complete_results.collect{|k,v| v[aln.qualified_name]})
+  def human_friendly_headers(old_headers, repository)
+    hfh = old_headers.clone
+    leaf_nodes.each do |ln|
+      ln.translated_aggregations(repository).each do |agg|
+        index = old_headers.index("#{ln.id}_#{agg.underscored_speaking_name}")
+        hfh[index] = agg.name_in_result unless index.nil?
+      end
     end
-    puts "complete aggregations: #{aggregation_values}"
-    return aggregation_values
+    return hfh
   end
   
   def combine_results(results, join_headers)
     complete_result = {}
-    order = results.keys.sort_by{|key| results[key][:headers].size}.reverse.collect{|key| results.keys.index(key)}
-
-    order.each_with_index do |key_index, i|
-      metric_node = results.keys[key_index]
-      res = results[metric_node]
+    results.each_pair do |metric_node, values|
+      make_them_unique = values.collect{|val| val.keys}.flatten.uniq - join_headers
+      do_not_overwrite = make_them_unique.collect{|uh|"#{metric_node.id}_#{uh}"}
       
-      join_indices = join_headers.collect{|jh| res[:headers].index(jh)}
-      copy_them = res[:headers] - join_headers
-      copy_indices = copy_them.collect{|cid| res[:headers].index(cid)}
-      
-      res[:data].each do |res_row|
-        res_hash = {}
-        copy_indices.each_with_index{|cid, ii| res_hash["#{metric_node.id}_#{copy_them[ii]}"] = res_row[cid]}
-        join_indices.each_with_index{|cid, ii| res_hash[res[:headers][cid]] = res_row[cid]}
-        res_row_index = join_indices.collect{|ji| res_row[ji].to_s}.join("_")
-        complete_result[res_row_index] ||= []
-        if i == 0
-          complete_result[res_row_index] << res_hash
+      puts "we'll make the following unique: #{make_them_unique}"
+      values.each_with_index do |res_hash|
+        # replace the keys which would be overwritten
+        make_them_unique.each do |uh|
+          res_hash["#{metric_node.id}_#{uh}"] = res_hash[uh]
+          res_hash.delete(uh)
+        end
+        
+        # gets a unique ID for each element based on the joined attributes
+        res_index = join_headers.collect{|jh| res_hash[jh].to_s}.join("_")
+        if complete_result[res_index].nil?
+          complete_result[res_index] = [res_hash]
         else
-          complete_result[res_row_index].each do |rr|
-            rr.merge!(res_hash)
+          # if the first thing already has some of our unique keys, we need to be added and merge with them
+          if (do_not_overwrite - complete_result[res_index].first.keys).empty?
+            complete_result[res_index] << complete_result[res_index].first.merge(res_hash) 
+          else
+            # otherwise, just add all our information to all existing elements
+            complete_result[res_index].each{|res| res.merge!(res_hash)}
           end
         end
       end
     end
     
+    puts "got #{complete_result.size} unique indexes with #{complete_result.values.flatten.size} overall results"
     return complete_result.values.flatten
   end
   
+  def translate_column(column_name, repository)
+    result_columns(repository)[result_columns.index(column_name)]
+  end
+  
   def operator_nodes
-    metric_nodes.where("operator_cd IS NOT NULL")
+    metric_nodes.where(:type => "MetricOperatorNode")
   end
   
   def leaf_nodes
-    metric_nodes.where("operator_cd IS NULL")
+    metric_nodes.where(:type => [nil, "MetricMetricNode"])
   end
   
-  def plain_leaf_nodes
-    metric_nodes.where("operator_cd IS NULL AND operation_cd IS NULL")
+  def executable_on?(repository)
+    leaf_nodes.collect{|leaf_node| leaf_node.measurable.executable_on?(repository)}.inject(:&)
   end
   
-  def aggregation_leaf_nodes
-    metric_nodes.where("operator_cd IS NULL AND operation_cd IS NOT NULL")
+  def first_unexecutable_pattern(repository)
+    ln = leaf_nodes.find{|leaf_node| !leaf_node.measurable.executable_on?(repository)}
+    if ln.nil?
+      return nil
+    else
+      return ln.measurable.first_unexecutable_pattern(repository)
+    end
+  end
+  
+  def result_columns(repository = nil)
+    if repository.nil?
+      leaf_nodes.collect{|ln| ln.aggregations.collect{|agg| agg.name_in_result}}.flatten.uniq + [name]
+    else
+      leaf_nodes.collect{|ln| ln.translated_aggregations(repository).collect{|agg| agg.name_in_result}}.flatten.uniq + [name]
+    end
+  end
+  
+  def is_ambiguous?
+    aliases = leaf_nodes.collect{|ln| ln.aggregations.collect{|agg| agg.alias_name}}.flatten.compact
+    return aliases.uniq.size != aliases.size
+  end
+  
+  def all_aggregations
+    leaf_nodes.collect{|ln| ln.aggregation.nil? ? nil : ln.aggregation.underscored_speaking_name}.compact
   end
 end

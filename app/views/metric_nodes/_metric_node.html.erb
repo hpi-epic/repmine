@@ -18,11 +18,11 @@
   <div class="btn-group">
   <%= form_tag(metric_node_aggregations_path(node), :remote => true, :id => "new_aggregation", :class => "needs_no_space") do %>  
     <%= select_tag(:operation, options_for_select(Aggregation.operations.keys), :class => "needs_no_space a_tad_bigger") %>:
-    <%= select_tag(:pattern_element_id, options_for_select(node.aggregation_options), :class => "needs_no_space a_tad_bigger") %>
+    <%= select_tag(:column_name, options_for_select(node.aggregation_options), :class => "needs_no_space a_tad_bigger") %>
     <div class="input-prepend needs_no_space">      
       <span class="add-on">As:</span>
       <%= text_field_tag(:alias_name, nil, :style => "width: 60px;") %>
-    </div>    
+    </div>     
     <%= button_tag("Add", :class => "btn btn-primary")%>
   <% end %>
   </div>

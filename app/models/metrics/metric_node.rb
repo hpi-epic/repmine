@@ -1,47 +1,44 @@
-class MetricNode < ActiveRecord::Base
-  
-  attr_accessible :operation, :operator_cd, :operation_cd, :aggregation_id, :pattern_id, :x, :y
+class MetricNode < ActiveRecord::Base  
+  attr_accessible :aggregation_id, :measurable_id, :x, :y
   belongs_to :metric
-  belongs_to :pattern
-  belongs_to :aggregation  
-  has_many :aggregations
-  attr_accessor :qualified_name
+  belongs_to :measurable
   
-  as_enum :operation, %i{sum avg min max}
-  as_enum :operator, %i{add subtract multiply divide}
-  OPERATOR_MAPPING = {:add => "+", :subtract => "-", :multiply => "*", :divide => "/"}  
+  # this is the main aggregation we use for further computation
+  belongs_to :aggregation
+  
+  # these are the ones required to calculate the main one
+  has_many :aggregations
+  
+  attr_accessor :qualified_name
   
   has_ancestry(:orphan_strategy => :rootify)
   
-  def operator?
-    return !operator.nil?
+  def calculation_template
+    qualified_name
   end
   
-  def calculation_template
-    if operator?
-      return "(#{children.collect{|child| child.calculation_template}.join(math_op)})"
+  def results_on(repository)
+    repository.results_for_pattern(measurable_for(repository), translated_aggregations(repository), false)
+  end
+  
+  def translated_aggregations(repository)
+    return aggregations if aggregations.all?{|agg| agg.pattern_element.ontology == repository.ontology}
+    aggregations.collect{|agg| agg.clone_for(repository)}
+  end
+  
+  def measurable_for(repository)
+    if measurable.translation_unnecessary?(repository)
+      return measurable
     else
-      return fully_qualified_name
+      return TranslationPattern.existing_translation_pattern(measurable, [repository.ontology])
     end
+  end
+  
+  def aggregation_options
+    measurable.returnable_elements([]).collect{|pe| [pe.speaking_name, pe.id]}
   end
   
   def qualified_name
-    @qualified_name ||= "#{id}_#{aggregation.speaking_name}"
-  end
-  
-  def fully_qualified_name
-    "#{operation}#{operation.nil? ? "" : "_"}#{qualified_name}"
-  end
-  
-  def compute(array)
-    if operation == :avg 
-      return array.compact.sum / array.compact.size.to_f
-    else
-      return array.compact.send(operation)
-    end
-  end
-  
-  def math_op()
-    return OPERATOR_MAPPING[operator]
+    @qualified_name ||= "#{id}_#{aggregation.underscored_speaking_name}"
   end
 end

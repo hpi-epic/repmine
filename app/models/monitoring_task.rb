@@ -31,6 +31,14 @@ class MonitoringTask < ActiveRecord::Base
     measurable.executable_on?(repository)
   end
   
+  def translate_this
+    if measurable.is_a?(Pattern)
+      return measurable
+    else
+      return measurable.first_unexecutable_pattern(repository)
+    end
+  end
+  
   def short_name
     "'#{measurable.name}' on '#{repository.name}'"
   end

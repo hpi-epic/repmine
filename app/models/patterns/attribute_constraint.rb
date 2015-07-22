@@ -54,10 +54,18 @@ class AttributeConstraint < PatternElement
   end
 
   def variable_name
-    if value.blank?
+    if value.blank? || !is_variable?
       return super
     else
       value.start_with?("?") ? value[1..-1] : value
+    end
+  end
+  
+  def speaking_name
+    if !is_variable?
+      super
+    else
+      variable_name
     end
   end
 

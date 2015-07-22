@@ -27,7 +27,7 @@
         <% if mt.executable? %>
           <%= link_to("Update!", monitoring_task_run_path(mt), :class => "btn btn-info", :method => :post) %>
         <% else %>
-          <%= link_to("Translate!", pattern_translate_path(mt.measurable, mt.repository.ontology), :class => "btn btn-warning") %>
+          <%= link_to("Translate!", pattern_translate_path(mt.translate_this, mt.repository.ontology), :class => "btn btn-warning") %>
         <% end %>
         <%= link_to("Stop Monitoring",
               monitoring_task_path(mt),

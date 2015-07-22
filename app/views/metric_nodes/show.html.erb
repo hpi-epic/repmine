@@ -1,5 +1,0 @@
-<% if @node.operator? %>
-  <%= render :partial => "metric_nodes/operator_node", :locals => {:node => @node} %>      
-<% else %>
-  <%= render :partial => "metric_nodes/node", :locals => {:node => @node} %>
-<% end %>

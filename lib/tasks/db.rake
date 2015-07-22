@@ -29,7 +29,7 @@ namespace :db do
     remove_all_files_from("public/ontologies/tmp")
     remove_all_files_from("public/ontologies/extracted")    
     remove_all_files_from("public/ontologies/alignments")    
-    remove_all_files_from("public/data")    
+    remove_all_files_from("public/data")
   end
   
   def remove_all_files_from(folder_name)

@@ -11,14 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150706160423) do
+ActiveRecord::Schema.define(:version => 20150720150651) do
 
   create_table "aggregations", :force => true do |t|
     t.integer  "pattern_element_id"
     t.integer  "metric_node_id"
+    t.string   "column_name"
     t.integer  "operation_cd"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
+    t.string   "alias_name"
   end
 
   add_index "aggregations", ["metric_node_id"], :name => "index_aggregations_on_metric_node_id"
@@ -55,11 +57,13 @@ ActiveRecord::Schema.define(:version => 20150706160423) do
   add_index "measurables", ["pattern_id"], :name => "index_measurables_on_pattern_id"
 
   create_table "metric_nodes", :force => true do |t|
-    t.integer  "pattern_id"
+    t.integer  "measurable_id"
     t.integer  "aggregation_id"
     t.string   "ancestry"
     t.integer  "operator_cd"
     t.integer  "operation_cd"
+    t.string   "name"
+    t.string   "type"
     t.integer  "metric_id"
     t.integer  "x",              :default => 0
     t.integer  "y",              :default => 0
@@ -69,7 +73,7 @@ ActiveRecord::Schema.define(:version => 20150706160423) do
 
   add_index "metric_nodes", ["aggregation_id"], :name => "index_metric_nodes_on_aggregation_id"
   add_index "metric_nodes", ["ancestry"], :name => "index_metric_nodes_on_ancestry"
-  add_index "metric_nodes", ["pattern_id"], :name => "index_metric_nodes_on_pattern_id"
+  add_index "metric_nodes", ["measurable_id"], :name => "index_metric_nodes_on_measurable_id"
 
   create_table "monitoring_tasks", :force => true do |t|
     t.integer  "repository_id"

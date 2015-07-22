@@ -113,60 +113,26 @@ class Neo4jRepository < Repository
   
   def execute(query, generate_csv)
     log_msg("Getting results from repository")
-    headers, cleansed_data, columns = get_headers_and_cleansed_data(query)
-    if generate_csv
-      return {:headers => headers, :data => cleansed_data}, csv_results(headers, cleansed_data, columns)
-    else
-      return {:headers => headers, :data => cleansed_data}
-    end
-  end
-  
-  def csv_results(headers, cleansed_data, columns)
-    CSV.generate do |csv|
-      csv << headers
-      cleansed_data.each do |data_row|
-        row = []
-        data_row.each_with_index do |column, i|
-          if column.is_a?(Hash)
-            column.each_pair do |key, value|
-              row[headers.index(columns[i] + "." + key)] = value
-            end
-          else
-            row[headers.index(columns[i])] = column
-          end
-        end
-        csv << row
-      end
-    end
-  end
-  
-  def get_headers_and_cleansed_data(query)
     results = get_all_results(query)
-    cleansed_data = []
-    # all result rows
-    results["data"].each_with_index do |date, i|
-      # all columns of a row...
-      row = []
-      date.each do |ret_value|
-        if ret_value.is_a?(Hash)
-          row << ret_value["data"]
-        else
-          row << ret_value
-        end
-      end
-      cleansed_data << row
-    end
     
-    headers = []
-    results["columns"].each_with_index do |col, i|
-      if cleansed_data.none?{|cd| cd[i].is_a?(Hash)}
-        headers << col
-      else
-        headers += cleansed_data.collect{|cd| cd[i].keys}.flatten.uniq.collect{|key| "#{col}.#{key}"}.flatten
-      end
+    if generate_csv
+      return hash_data(results), csv_data(results)
+    else
+      return hash_data(results)
     end
-    
-    return [headers, cleansed_data, results["columns"]]
+  end
+  
+  def csv_data(results)
+    CSV.generate do |csv|
+      csv << results["columns"]
+      results["data"].each{|data_row| csv << data_row}
+    end
+  end
+  
+  def hash_data(results)
+    return results["data"].collect do |row|
+      Hash[ *row.enum_for(:each_with_index).collect{ |val, i| [ results["columns"][i], val ] }.flatten ]
+    end
   end
   
   def get_all_results(query)
@@ -174,9 +140,9 @@ class Neo4jRepository < Repository
     i = 0
     
     loop do
-      log_msg("Results so far: #{i*1000}")
       cur_results = neo.execute_query(query + " SKIP #{1000 * i} LIMIT 1000")
       results["data"] += cur_results["data"]
+      log_msg("Results so far: #{results["data"].size}")
       results["columns"] = cur_results["columns"]
       break if cur_results["data"].size != 1000
       i += 1

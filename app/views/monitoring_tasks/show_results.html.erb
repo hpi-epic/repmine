@@ -23,9 +23,9 @@
   <tbody>
   <% @results.each do |res_row| %>
     <tr>
-      <% res_row.each do |value|%>
+      <% @headers.each do |header|%>
       <td>
-        <%= value%>
+        <%= res_row[header] %>
       </td>
       <% end %>
     </tr>

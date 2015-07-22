@@ -37,7 +37,7 @@
           <label class="checkbox"><%= check_box_tag("metrics[]", metric.id)%><%= link_to(metric.name, metric_path(metric)) %></label>
         </td>
         <td class="span8"><%= metric.description %></td>
-        <td><%= metric.metric_nodes.collect{|mn| mn.pattern}.compact.uniq.collect{|pat| pat.name}.join("<br />") %></td>
+        <td><%= metric.metric_nodes.collect{|mn| mn.measurable}.compact.uniq.collect{|pat| pat.name}.join("<br />") %></td>
         <td>
           <%= link_to(
             "Delete",

@@ -3,6 +3,7 @@ class CreateAggregations < ActiveRecord::Migration
     create_table :aggregations do |t|
       t.references :pattern_element
       t.references :metric_node
+      t.string :column_name
       t.integer :operation_cd
       t.timestamps
     end

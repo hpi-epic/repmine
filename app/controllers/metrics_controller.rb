@@ -1,5 +1,4 @@
 class MetricsController < ApplicationController
-
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
   
   def create
@@ -8,8 +7,8 @@ class MetricsController < ApplicationController
   end
   
   def show
-    @pattern_groups = Pattern.grouped(true)
     @metric = Metric.find(params[:id])
+    @pattern_groups = Pattern.grouped(true, true).merge(Metric.grouped(true, true, [@metric])){|key, val1, val2| val1 + val2}
     @existing_connections = []
     @metric.metric_nodes.each do |node|
       node.children.each do |child|
@@ -23,6 +22,11 @@ class MetricsController < ApplicationController
     metric = Metric.find(params[:id])
     metric.update_attributes(params[:metric])
     render :nothing => true, :status => 200, :content_type => 'text/html'
+  end
+  
+  def destroy
+    Metric.find(params[:id]).destroy
+    redirect_to metrics_path
   end
   
   def create_connection
@@ -46,8 +50,9 @@ class MetricsController < ApplicationController
   
   def index
     @metrics_groups = Metric.grouped
+    flash[:info] = "No metrics available! Please create a new one." if @metrics_groups.empty?    
     @repositories = Repository.all()
-    @title = "Metric overview"
+    @title = "Metric overview"    
   end
   
   def monitor
@@ -68,16 +73,15 @@ class MetricsController < ApplicationController
   
   def create_node
     metric = Metric.find(params[:metric_id])
-    pattern = Pattern.find(params[:pattern_id])
-    
-    @node = metric.metric_nodes.create(:pattern_id => pattern.id)
-    render :partial => "metric_nodes/node", :layout => false, :locals => {:node => @node}
+    measurable = Measurable.find(params[:pattern_id])
+    node = metric.create_node(measurable)
+    render :partial => "metric_nodes/show", :layout => false, :locals => {:node => node}
   end
   
   def create_operator
     metric = Metric.find(params[:metric_id])
-    @node = metric.metric_nodes.create(:operator_cd => params[:operator])
-    render :partial => "metric_nodes/operator_node", :layout => false, :locals => {:node => @node}
+    node = MetricOperatorNode.create(:operator_cd => params[:operator])
+    metric.metric_nodes << node
+    render :partial => "metric_nodes/show", :layout => false, :locals => {:node => node}
   end
-  
 end

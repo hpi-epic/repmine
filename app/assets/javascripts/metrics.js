@@ -46,6 +46,7 @@ $(".edit_metric").on("ajax:success", function(e, data, status, xhr){
 			data : $(form).serialize()
 		});
 	});
+	$.jGrowl("Successfully saved metric!");
 });
 
 var makeEverythingDraggable = function(){

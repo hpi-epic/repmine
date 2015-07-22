@@ -19,7 +19,7 @@
         <%= f.text_field(
           :description, 
           :class => "needs_no_space", 
-          :style => "width: #{@metric.description.blank? ? 200 : @metric.description.size * 7}px;") 
+          :style => "width: #{@metric.description.nil? ? 250 : [@metric.description.size * 7, 250].max}px;") 
         %>    
       </div>
       <div class="input-prepend">      
@@ -29,12 +29,14 @@
       
       <%= submit_tag("Save Metric", :class => "btn btn-success") %>
     <% end %>
-  </div>  
+  </div> 
+
+<hr />
   
 <div class="btn-toolbar">
   <div class="btn-group">
     <%= form_tag(metric_create_operator_path(@metric), :remote => true, :class => "needs_no_space", :id => "new_operator") do %>
-      <%= select_tag(:operator, options_for_select(MetricNode.operators), {:class => "needs_no_space narrow"}) %>
+      <%= select_tag(:operator, options_for_select(MetricOperatorNode.operators), {:class => "needs_no_space narrow"}) %>
       <%= submit_tag("New Operator", :class => "btn btn-info") %>
     <% end %>
   </div>
@@ -53,10 +55,6 @@
 
 <div id="drawing_canvas" class="canvas">
   <% @metric.metric_nodes.each do |metric_node| %>
-    <% if metric_node.operator? %>
-      <%= render :partial => "metric_nodes/operator_node", :locals => {:node => metric_node} %>      
-    <% else %>
-      <%= render :partial => "metric_nodes/node", :locals => {:node => metric_node} %>
-    <% end %>
+    <%= render :partial => "metric_nodes/show", :locals => {:node => metric_node} %>
   <% end %>
 </div>

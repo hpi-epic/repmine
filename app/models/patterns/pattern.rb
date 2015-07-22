@@ -8,7 +8,6 @@ class Pattern < Measurable
   has_and_belongs_to_many :ontologies
   has_many :pattern_elements, :dependent => :destroy
   has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
-  has_many :monitoring_tasks, :dependent => :destroy
 
   # validations
   validates :name, :presence => true
@@ -28,10 +27,19 @@ class Pattern < Measurable
     pattern_elements.where(:type => "RelationConstraint")
   end
   
+  # determines whether a pattern can already be executed on a given repository
+  # case1: no element used in the pattern is from another ontology than the repository one
+  # case2: a translation pattern exists and all input elements are matched to an output element
   def executable_on?(repository)
-    translation_unnecessary = (ontologies - [repository.ontology]).empty?
-    translation_exists = !TranslationPattern.existing_translation_pattern(self, [repository.ontology]).nil?
-    return translation_unnecessary || (translation_exists && unmatched_elements([repository.ontology]).empty?)
+    return translation_unnecessary?(repository) || (translation_exists?(repository) && unmatched_elements([repository.ontology]).empty?)
+  end
+  
+  def translation_unnecessary?(repository)
+    (pattern_elements.collect{|pe| pe.ontology}.uniq - [repository.ontology]).empty?
+  end
+  
+  def translation_exists?(repository)
+    !TranslationPattern.existing_translation_pattern(self, [repository.ontology]).nil?
   end
   
   def create_node!(ontology)
@@ -53,6 +61,19 @@ class Pattern < Measurable
       :matched_element_id => pattern_elements,
       :pattern_elements => {:ontology_id => onts}
     ).collect{|pem| pem.matched_element_id}
+  end
+  
+  def find_matching_element(element, ont) 
+    matches = PatternElementMatch.includes(:matching_element).where(
+      :matched_element_id => element,
+      :pattern_elements => {:ontology_id => ont}
+    ).collect{|pem| pem.matching_element_id}
+    
+    if matches.size != 1
+      raise "handle complex correspondences ASAP!"
+    else
+      return PatternElement.find(matches.first)
+    end
   end
   
   # some comparison

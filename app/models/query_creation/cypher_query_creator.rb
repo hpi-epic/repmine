@@ -53,8 +53,8 @@ class CypherQueryCreator < QueryCreator
     str = pe_variable(pe)
     aggregation = aggregation_for_element(pe)
     
-    if !aggregation.nil? && aggregation.operation != :group_by 
-      str = aggregation.operation.to_s + "(#{str}) AS #{aggregation.speaking_name}"
+    if !aggregation.nil? && !aggregation.is_grouping?
+      str = aggregation.operation.to_s + "(#{str}) AS #{aggregation.underscored_speaking_name}"
     elsif aggregation.nil? && pe.is_variable? && pe.is_a?(AttributeConstraint)
       str = "#{attribute_reference(pe)} AS #{pe.variable_name}"
     elsif pe.is_a?(Node)

@@ -19,12 +19,12 @@ class PatternsController < ApplicationController
     @source_pattern.auto_layout!
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
     
-
     @target_ontologies = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontologies(@source_pattern, [@target_ontologies])
     @target_pattern.prepare!
 
     @controls_offset = @source_pattern.node_offset - 30
+    
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
       @target_pattern.store_auto_layout!

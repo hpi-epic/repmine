@@ -5,7 +5,7 @@ class PatternElement < ActiveRecord::Base
   # allows to access the rdf node, in case this pattern stems from an rdf graph
   attr_accessor :rdf_node
   
-  belongs_to :pattern
+  belongs_to :pattern, :class_name => "Measurable"
   belongs_to :ontology
   
   has_many :matches, :foreign_key => :matched_element_id, :class_name => "PatternElementMatch", :dependent => :destroy
@@ -93,6 +93,10 @@ class PatternElement < ActiveRecord::Base
   
   def variable_name
     return "#{self.class.name.underscore}_#{id}"
+  end
+  
+  def buddy_for_ontology(ont)
+    pattern.find_matching_element(self, ont)
   end
   
   def speaking_name
