@@ -1,40 +1,58 @@
 class SparqlQueryCreator < QueryCreator
 
-  attr_accessor :filter, :where, :variables
+  attr_accessor :filter, :where, :variables, :groupings
 
   def initialize(*args)
     @where = []
     @filter = []
     @variables = []
+    @groupings = []
     super
   end
 
-  def build_query!
+  def build_query
     @sparql = SPARQL::Client.new(RDF::Repository.new())
-    fill_variables!
-    fill_where_clause!
-    query = @sparql.select(*variables).where(*where)
-    filter.each{|filter| query.filter(filter)}
-    return query.to_s
+    fill_variables
+    fill_where_clause
+    query = @sparql.select(*variables).where(*where)    
+    query.group_by(*groupings) unless groupings.empty?
+    filter.each{|filter| query.filter(filter)}    
+    return clean_query_string(query.to_s)
+  end
+  
+  # SPARQL Client is incapable of doing count sum and stuff like that...
+  def clean_query_string(query_str)
+    return query_str.gsub(" ?(", " (")
   end
 
-  def fill_where_clause!
+  def fill_where_clause
     pattern.nodes.each do |node|
       where << [pe_variable(node), RDF.type, RDF::Resource.new(node.rdf_type)]
     end
-    pattern.nodes.each do |node|
-      node.source_relation_constraints.each do |rc|
-        where << [pe_variable(node), rc.type_expression.resource, pe_variable(rc.target)]
-      end
-      node.attribute_constraints.each do |ac|
-        meth = "pattern_for_ac_#{AttributeConstraint::OPERATORS.key(ac.operator)}".to_sym
-        self.send(meth, node, ac) unless !self.respond_to?(meth) || ac.value.nil?
-      end
+
+    pattern.relation_constraints.each do |rc|
+      where << [pe_variable(rc.source), rc.type_expression.resource, pe_variable(rc.target)]
+    end
+
+
+    pattern.attribute_constraints.each do |ac|
+      meth = "pattern_for_ac_#{AttributeConstraint::OPERATORS.key(ac.operator)}".to_sym
+      self.send(meth, ac.node, ac) unless !self.respond_to?(meth) || ac.value.nil?
     end
   end
 
-  def fill_variables!
-    @variables = pattern.returnable_elements([]).collect{|n| pe_variable(n)}
+  def fill_variables
+    @variables = pattern.returnable_elements(aggregations).collect{|n| return_variable(n)}
+  end
+  
+  def return_variable(pe)
+    aggregation = aggregation_for_element(pe)
+    if aggregation.nil? || aggregation.operation == :group_by
+      @groupings << pe_variable(pe) unless aggregation.nil?
+      pe_variable(pe)
+    else
+      "(#{aggregation.operation.upcase}(?#{pe_variable(pe)}) AS ?#{aggregation.underscored_speaking_name})"      
+    end
   end
 
   def pattern_for_ac_equals(node, ac)

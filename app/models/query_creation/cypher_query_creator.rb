@@ -1,6 +1,6 @@
 class CypherQueryCreator < QueryCreator
   
-  def build_query!
+  def build_query
     "MATCH #{match} #{parameters}#{with} RETURN #{return_values}".strip.gsub(/\s\s+/, ' ')
   end
   

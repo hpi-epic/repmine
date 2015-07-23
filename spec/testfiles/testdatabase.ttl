@@ -82,6 +82,13 @@
       rdfs:label "delayed_jobs_last_error" ;
       rdfs:range xsd:string .
 
+:aggregations_alias_name
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :aggregations ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "aggregations_alias_name" ;
+      rdfs:range xsd:string .
+
 :ontologies_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies ;

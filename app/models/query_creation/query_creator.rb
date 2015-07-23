@@ -3,10 +3,10 @@ class QueryCreator < Struct.new(:pattern, :aggregations)
   attr_accessor :query_string
   
   def query_string
-    @query_string ||= build_query!
+    @query_string ||= build_query
   end
   
-  def build_query!()
+  def build_query()
     raise "implement me!"
   end
   

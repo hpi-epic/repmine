@@ -85,7 +85,7 @@ RSpec.describe CypherQueryCreator, :type => :model do
     agg = FactoryGirl.create(:aggregation, :operation => :sum, :pattern_element => var_ac1)
     qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN sum(#{var_ac1.variable_name}) AS sum_attribute"
+    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN sum(#{var_ac1.variable_name}) AS sum_name"
     assert_equal expected, qc.query_string
   end
   
