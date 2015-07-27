@@ -328,15 +328,6 @@ var saveAllTypeExpressions = function(list){
   return requests;
 };
 
-var toggleNodeGroup = function(node){
-  node.find("#nodeGroupIcon").toggleClass("fa-circle-o");
-  node.find("#nodeGroupIcon").toggleClass("fa-dot-circle-o");
-  node.toggleClass("double-border");
-  var hiddenField = node.find("#node_is_group")
-  var val = hiddenField.val();
-  hiddenField.val(val === "true" ? "false" : "true");
-};
-
 var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selector, modal){
   $.when.apply($, saveAllTypeExpressions(list)).done(function(){
     $.ajax({url: fancy_string_url, success: function(data){
