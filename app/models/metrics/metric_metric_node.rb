@@ -26,6 +26,10 @@ class MetricMetricNode < MetricNode
     return aggregations
   end
   
+  def aggregation_for(repository)
+    return aggregation
+  end
+  
   def get_aggregates(grouped_results)
     non_grouping_aggregations.each_with_index do |agg, i|
       grouped_results.each do |res_hash|

@@ -111,22 +111,8 @@ class Neo4jRepository < Repository
     @neo ||= Neography::Rest.new("http://#{host}:#{port}")
   end
   
-  def execute(query, generate_csv)
-    log_msg("Getting results from repository")
-    results = get_all_results(query)
-    
-    if generate_csv
-      return hash_data(results), csv_data(results)
-    else
-      return hash_data(results)
-    end
-  end
-  
-  def csv_data(results)
-    CSV.generate do |csv|
-      csv << results["columns"]
-      results["data"].each{|data_row| csv << data_row}
-    end
+  def results_for_query(query)
+    return hash_data(get_all_results(query))
   end
   
   def hash_data(results)

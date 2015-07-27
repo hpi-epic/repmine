@@ -1,5 +1,5 @@
 class Repository < ActiveRecord::Base
-  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password, :group
+  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
   belongs_to :ontology
   has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
@@ -36,7 +36,7 @@ class Repository < ActiveRecord::Base
 
   def build_ontology
     ont_url = ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
-    self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => group || "Misc", :url => ont_url)
+    self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => "Extracted", :url => ont_url)
     self.ontology.repository = self
     self.ontology.save
   end
@@ -75,9 +75,13 @@ class Repository < ActiveRecord::Base
   end
   
   def results_for_pattern(pattern, aggregations, generate_csv = true)
-    query_string = self.class.query_creator_class.new(pattern, aggregations).query_string
-    puts "executing query: #{query_string}"
-    res, csv = execute(query_string, generate_csv)
+    qs = query_for_pattern(pattern, aggregations)
+    puts "Executing query: #{qs}"
+    res, csv = execute(query_for_pattern(pattern, aggregations), generate_csv)
+  end
+  
+  def query_for_pattern(pattern, aggregations)
+    return self.class.query_creator_class.new(pattern, aggregations).query_string
   end
 
   def create_ontology!
@@ -92,8 +96,24 @@ class Repository < ActiveRecord::Base
     raise "implement 'type_statistics' in #{self.class.name}"
   end
   
-  def execute(query_string, generate_csv)
-    raise "implement 'execute' in #{self.class.name}"
+  def csv_data(results)
+    CSV.generate do |csv|
+      csv << results["columns"]
+      results["data"].each{|data_row| csv << data_row}
+    end
+  end
+  
+  def execute(query, generate_csv)
+    results = results_for_query(query)
+    if generate_csv
+      return results, csv_data(results)
+    else
+      return results
+    end
+  end
+  
+  def results_for_query(query)
+    raise "implement 'results for query' in #{self.class.name}"
   end
   
   def log_status(msg, step)

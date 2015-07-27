@@ -113,8 +113,8 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
 
   create_table "pattern_elements", :force => true do |t|
     t.string   "type"
-    t.datetime "created_at",                         :null => false
-    t.datetime "updated_at",                         :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
     t.integer  "ontology_id"
     t.integer  "pattern_id"
     t.integer  "node_id"
@@ -128,7 +128,6 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
     t.integer  "target_id"
     t.integer  "x",               :default => 0
     t.integer  "y",               :default => 0
-    t.boolean  "is_group",        :default => false
   end
 
   create_table "repositories", :force => true do |t|
@@ -139,10 +138,10 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
     t.string  "host"
     t.integer "port"
     t.text    "description"
-    t.string  "group"
     t.integer "ontology_id"
     t.string  "type"
     t.integer "rdbms_type_cd"
+    t.string  "ontology_url"
     t.string  "skip_tables"
   end
 

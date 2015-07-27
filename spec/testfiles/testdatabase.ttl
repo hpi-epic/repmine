@@ -61,6 +61,13 @@
       rdfs:label "tags_name" ;
       rdfs:range xsd:string .
 
+:repositories_ontology_url
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :repositories ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "repositories_ontology_url" ;
+      rdfs:range xsd:string .
+
 :ontologies_does_exist
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies ;
@@ -634,20 +641,6 @@
       rdfs:domain :sessions ;
       rdfs:isDefinedBy : ;
       rdfs:label "sessions_created_at" ;
-      rdfs:range xsd:string .
-
-:pattern_elements_is_group
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :pattern_elements ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "pattern_elements_is_group" ;
-      rdfs:range xsd:integer .
-
-:repositories_group
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :repositories ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "repositories_group" ;
       rdfs:range xsd:string .
 
 :ontologies_short_name

@@ -77,6 +77,14 @@ RSpec.describe CypherQueryCreator, :type => :model do
     qv = query_variables(pattern, qc)
     assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN count(#{qv["nv2"]}) AS count_node2", qc.query_string
   end
+  
+  it "should use alias names for group by" do
+    pattern = FactoryGirl.create(:n_r_n_pattern)
+    agg = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.last)
+    qc = CypherQueryCreator.new(pattern, [agg])
+    qv = query_variables(pattern, qc)
+    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN id(#{qv["nv2"]}) AS node2", qc.query_string
+  end
 
   it "should incorporate self-introduced variables" do
     pattern = FactoryGirl.create(:empty_pattern)

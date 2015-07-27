@@ -9,8 +9,12 @@ class MetricOperatorNode < MetricNode
     return MetricNode.model_name
   end
   
-  def calculation_template
-    return "(#{children.sort{|c1,c2| c1.x <=> c2.x}.collect{|child| child.calculation_template}.join(math_op)})"
+  def calculation_template(repository)
+    return "(#{children.sort{|c1,c2| c1.x <=> c2.x}.collect{|child| child.calculation_template(repository)}.join(math_op)})"
+  end
+  
+  def self.operator_symbols
+    OPERATOR_MAPPING.collect{|k,v| [v, operators[k]]}
   end
   
   def math_op()

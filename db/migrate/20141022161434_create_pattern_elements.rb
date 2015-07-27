@@ -20,7 +20,6 @@ class CreatePatternElements < ActiveRecord::Migration
       # node
       t.integer :x, :default => 0
       t.integer :y, :default => 0
-      t.boolean :is_group, :default => false
     end
   end
 end

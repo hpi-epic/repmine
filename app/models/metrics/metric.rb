@@ -21,18 +21,18 @@ class Metric < Measurable
   
   def process_results(results, repository)
     overlapping_res_headers = results.values.collect{|res| res.collect{|val| val.keys}.flatten.uniq}.inject(:&)
-    combined_results = combine_results(results, overlapping_res_headers - all_aggregations)
-    complete_results = compute_metrics(combined_results)
+    combined_results = combine_results(results, overlapping_res_headers - all_aggregations(repository))
+    complete_results = compute_metrics(combined_results, repository)
     return prepare_results(complete_results, repository)
   end
   
-  def compute_metrics(complete_results)
+  def compute_metrics(complete_results, repository)
     root_nodes = operator_nodes.select{|on| on.is_root?}
     return complete_results if root_nodes.empty?
     
     calculator = Dentaku::Calculator.new
-    calculation_template = root_nodes.first.calculation_template
-    required_values = leaf_nodes.collect{|ln| ln.qualified_name}
+    calculation_template = root_nodes.first.calculation_template(repository)
+    required_values = leaf_nodes.collect{|ln| ln.qualified_name(repository)}
     
     complete_results.each do |res_object|
       required_values.each{|rv| calculator.store(rv => res_object[rv].to_f)}
@@ -85,7 +85,6 @@ class Metric < Measurable
       make_them_unique = values.collect{|val| val.keys}.flatten.uniq - join_headers
       do_not_overwrite = make_them_unique.collect{|uh|"#{metric_node.id}_#{uh}"}
       
-      puts "we'll make the following unique: #{make_them_unique}"
       values.each_with_index do |res_hash|
         # replace the keys which would be overwritten
         make_them_unique.each do |uh|
@@ -109,7 +108,6 @@ class Metric < Measurable
       end
     end
     
-    puts "got #{complete_result.size} unique indexes with #{complete_result.values.flatten.size} overall results"
     return complete_result.values.flatten
   end
   
@@ -139,11 +137,7 @@ class Metric < Measurable
   end
   
   def result_columns(repository = nil)
-    if repository.nil?
-      leaf_nodes.collect{|ln| ln.aggregations.collect{|agg| agg.name_in_result}}.flatten.uniq + [name]
-    else
-      leaf_nodes.collect{|ln| ln.translated_aggregations(repository).collect{|agg| agg.name_in_result}}.flatten.uniq + [name]
-    end
+    leaf_nodes.collect{|ln| ln.translated_aggregations(repository).collect{|agg| agg.name_in_result}}.flatten.uniq + [name]
   end
   
   def is_ambiguous?
@@ -151,7 +145,7 @@ class Metric < Measurable
     return aliases.uniq.size != aliases.size
   end
   
-  def all_aggregations
-    leaf_nodes.collect{|ln| ln.aggregation.nil? ? nil : ln.aggregation.underscored_speaking_name}.compact
+  def all_aggregations(repository)
+    leaf_nodes.collect{|ln| ln.aggregation_for(repository).underscored_speaking_name}.flatten.compact
   end
 end

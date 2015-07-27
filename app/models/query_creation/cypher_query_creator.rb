@@ -59,6 +59,7 @@ class CypherQueryCreator < QueryCreator
       str = "#{attribute_reference(pe)} AS #{pe.variable_name}"
     elsif pe.is_a?(Node)
       str = "id(#{str})"
+      str += " AS #{aggregation.underscored_speaking_name}" if !aggregation.nil? 
     end
     
     return str
@@ -71,8 +72,7 @@ class CypherQueryCreator < QueryCreator
   
   def escaped_value(ac)
     if ac.refers_to_variable?
-      aac = pattern.attribute_constraints.find{|aac| aac.value == ac.value}
-      return aac.nil? ? ac.value : attribute_reference(aac)
+      return attribute_reference(ac.referenced_element)
     elsif ac.value_type == RDF::XSD.string
       return "'#{clean_value(ac)}'"
     else

@@ -14,4 +14,8 @@ class QueryExecutionJob < ProgressJob::Base
     mt = MonitoringTask.find(monitoring_task_id)
     mt.run(self)
   end
+  
+  def destroy_failed_jobs?
+    true
+  end
 end

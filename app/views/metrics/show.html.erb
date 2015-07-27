@@ -36,7 +36,7 @@
 <div class="btn-toolbar">
   <div class="btn-group">
     <%= form_tag(metric_create_operator_path(@metric), :remote => true, :class => "needs_no_space", :id => "new_operator") do %>
-      <%= select_tag(:operator, options_for_select(MetricOperatorNode.operators), {:class => "needs_no_space narrow"}) %>
+      <%= select_tag(:operator, options_for_select(MetricOperatorNode.operator_symbols), {:class => "needs_no_space narrow"}) %>
       <%= submit_tag("New Operator", :class => "btn btn-info") %>
     <% end %>
   </div>

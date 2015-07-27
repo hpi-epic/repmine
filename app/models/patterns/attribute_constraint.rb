@@ -52,6 +52,10 @@ class AttributeConstraint < PatternElement
   def is_variable?
     operator == OPERATORS[:var]
   end
+  
+  def referenced_element
+    pattern.pattern_elements.find{|pe| pe.is_variable? && (("?" + pe.variable_name) == self.value)}
+  end
 
   def variable_name
     if value.blank? || !is_variable?

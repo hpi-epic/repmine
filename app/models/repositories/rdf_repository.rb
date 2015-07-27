@@ -1,5 +1,6 @@
 class RdfRepository < Repository
 
+  attr_accessible :ontology_url
   attr_accessor :sparql_client
 
   def self.model_name
@@ -15,24 +16,17 @@ class RdfRepository < Repository
     return @sparql_client
   end
 
-  # builds an ontology from a corresponding entry in the dataset
-  # TODO: think about knowlegebases with multiple <blub> a owl:Ontology . statements ...
   def build_ontology
-    query = sparql_client.select(:ont).where([:ont, RDF.type, RDF::OWL.Ontology])
-    raise "no ontology url found within the knowledge base" if query.solutions.empty?
-    url = query.solutions.first[:ont].to_s
-    # not entirely sure, where these should go groupwhise...but let's put the in extracted for now
-    self.ontology = Ontology.where(:url => url).first_or_create(:group => "Extracted")
+    self.ontology = Ontology.where(:url => ontology_url).first_or_create(:group => "Extracted")
     self.save
   end
 
-  # as we already build a proper ontology, we don't have to extract one
   def create_ontology!
     return true
   end
 
   def type_statistics
-    blacklist = [RDF::RDFS.Class, RDF::OWL.Class]
+    blacklist = [RDF::RDFS.Class, RDF::OWL.Class, RDF::OWL.DatatypeProperty, RDF::OWL.ObjectProperty]
     statistics = {}
     query = sparql_client.select(:x, :y).where([:x, RDF.type, :y])
     query.each_solution do |solution|
@@ -41,5 +35,12 @@ class RdfRepository < Repository
       statistics[solution[:y].to_s] += 1
     end
     return statistics.collect{|k,v| [k,v]}
+  end
+  
+  # iterates over all results and returns a hash with string keys and objects based on the returned literal values
+  def results_for_query(query)
+    sparql_client.query(query).collect do |solution| 
+      Hash[solution.collect{|key, val| [key.to_s, val.is_a?(RDF::Literal) ? val.object :  val.to_s]}.map {|x| [x[0], x[1]]}]
+    end
   end
 end
