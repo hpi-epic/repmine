@@ -9,7 +9,11 @@ module RepositoriesHelper
   end
 
   def field_for_string(attribute, form, t_class)
-    return form.text_field(attribute, default_value(attribute, t_class))
+    if attribute.include?("password")
+      return form.password_field(attribute, default_value(attribute, t_class))
+    else
+      return form.text_field(attribute, default_value(attribute, t_class))
+    end
   end
 
   def field_for_datetime(attribute, form, t_class)
