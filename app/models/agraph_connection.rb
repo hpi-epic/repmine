@@ -1,9 +1,9 @@
 class AgraphConnection
 
-  attr_accessor :repository, :repository_name
+  attr_accessor :repository, :repository_name, :config
 
   def config
-    return RepMine::Application.config.database_configuration["agraph"]
+    return @config || RepMine::Application.config.database_configuration["agraph"]
   end
 
   def initialize(repo_name)
