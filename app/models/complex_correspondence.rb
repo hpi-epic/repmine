@@ -10,7 +10,7 @@ class ComplexCorrespondence < SimpleCorrespondence
       [resource, Vocabularies::Alignment.relation, RDF::Literal.new(relation)]
     ].concat(stmts1).concat(stmts2)
   end
-  
+
   def process_entity(entity)
     if entity.is_a?(Pattern)
       return self.class.clean_rdf_statements(entity.rdf, entity.resource)
@@ -21,18 +21,18 @@ class ComplexCorrespondence < SimpleCorrespondence
       return [RDF::Resource.new(entity), []]
     end
   end
-  
+
   def self.clean_rdf_statements(stmts, resource)
     entity_cache = {resource => RDF::Node.new}
     stmts.each{|stmt| entity_cache[stmt[0]] ||= RDF::Node.new}
     anonymized_stmts = stmts.collect{|stmt| stmt.map!{|el| entity_cache[el] || el}}
     return [entity_cache[resource], anonymized_stmts]
   end
-  
+
   def pattern_elements
     entity2.is_a?(Pattern) ? entity2.pattern_elements : super
   end
-  
+
   def self.from_elements(input_elements, output_elements)
     if input_elements.size == 1 && output_elements.size == 1
       i_el = input_elements.first

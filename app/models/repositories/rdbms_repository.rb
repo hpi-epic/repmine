@@ -26,13 +26,13 @@ class RdbmsRepository < Repository
     Open3.popen3(cmd + " #{options.join(" ")}") do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
     end
-    
+
     # these errors are mainly warnings telling you that certain fields are ambiguous or so
     # if there are none, just return nil...
     add_ontology_namespace! if File.exists?(ontology.local_file_path)
     return errors
   end
-  
+
   def add_ontology_namespace!
     File.open(ontology.local_file_path + ".new", "w+") do |f2|
       f2.puts("@prefix :\t<#{ontology.url + (ontology.url.end_with?("/") ? "" : "/")}> .")

@@ -44,7 +44,7 @@ class Ontology < ActiveRecord::Base
   def type_hierarchy()
     @type_hierarchy ||= ag_connection.type_hierarchy(self)
   end
-  
+
   def add_class(klazz)
     classes << klazz
   end
@@ -56,16 +56,16 @@ class Ontology < ActiveRecord::Base
 
   def clear!
     @classes = Set.new()
-  end  
+  end
 
   def repository_name
     return id.nil? ? self.short_name : "ontology_#{self.id}"
   end
-  
+
   # expose the agraph_connection interface to ontology users
   def method_missing(sym, *args, &block)
     return ag_connection.send(sym, *args, &block) if ag_connection.respond_to?(sym)
-    super(sym, *args, &block)  
+    super(sym, *args, &block)
   end
 
   def imports()
@@ -113,13 +113,13 @@ class Ontology < ActiveRecord::Base
   def rdf_xml
     RestClient.get(self.url).body
   end
-  
+
   def download_url
     return url
   end
-  
+
   def self.grouped
-    pluck(:group).uniq.map do |group| 
+    pluck(:group).uniq.map do |group|
       [group, where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
     end
   end

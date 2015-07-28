@@ -26,22 +26,22 @@ class Pattern < Measurable
   def relation_constraints
     pattern_elements.where(:type => "RelationConstraint")
   end
-  
+
   # determines whether a pattern can already be executed on a given repository
   # case1: no element used in the pattern is from another ontology than the repository one
   # case2: a translation pattern exists and all input elements are matched to an output element
   def executable_on?(repository)
     return translation_unnecessary?(repository) || (translation_exists?(repository) && unmatched_elements([repository.ontology]).empty?)
   end
-  
+
   def translation_unnecessary?(repository)
     (pattern_elements.collect{|pe| pe.ontology}.uniq - [repository.ontology]).empty?
   end
-  
+
   def translation_exists?(repository)
     !TranslationPattern.existing_translation_pattern(self, [repository.ontology]).nil?
   end
-  
+
   def create_node!(ontology)
     node = self.nodes.create!(:ontology_id => ontology.id)
     node.type_expression = TypeExpression.for_rdf_type("")
@@ -51,31 +51,31 @@ class Pattern < Measurable
   def matched_elements(onts)
     PatternElement.where(:id => find_element_matches(onts) & pattern_elements.pluck(:id))
   end
-  
+
   def unmatched_elements(onts)
     PatternElement.where(:id => pattern_elements.pluck(:id) - find_element_matches(onts))
   end
-  
+
   def find_element_matches(onts)
     return PatternElementMatch.includes(:matching_element).where(
       :matched_element_id => pattern_elements,
       :pattern_elements => {:ontology_id => onts}
     ).collect{|pem| pem.matched_element_id}
   end
-  
-  def find_matching_element(element, ont) 
+
+  def find_matching_element(element, ont)
     matches = PatternElementMatch.includes(:matching_element).where(
       :matched_element_id => element,
       :pattern_elements => {:ontology_id => ont}
     ).collect{|pem| pem.matching_element_id}
-    
+
     if matches.size != 1
       raise "handle complex correspondences ASAP!"
     else
       return PatternElement.find(matches.first)
     end
   end
-  
+
   # some comparison
   def equal_to?(other)
     if self == other
@@ -95,16 +95,16 @@ class Pattern < Measurable
     ontologies.each{|ontology| prefixes[ontology.short_prefix] = ont.url}
     return prefixes
   end
-  
+
   def print!
     puts "Pattern: #{self.name}"
     puts "Pattern Elements: #{pattern_elements.collect{|pe| pe.rdf_type}}"
   end
-  
+
   # RDF deserialization
   def self.from_graph(graph, pattern_node, ont)
     pattern = Pattern.new()
-    
+
     graph.build_query do |q|
       q.pattern([:element, Vocabularies::GraphPattern.belongsTo, :pattern])
       q.pattern([:element, RDF.type, :type])
@@ -118,18 +118,18 @@ class Pattern < Measurable
       pattern_element.ontology = ont
       pattern.pattern_elements << pattern_element
     end
-    
+
     pattern.pattern_elements.each{|pe| pe.rebuild!(graph)}
     return pattern
   end
-  
+
   # Layouting
   def graphviz_graph
     g = GraphViz.new("#{id}", {:type => :digraph, :splines => true})
     node_cache = {}
-    nodes.each do |node| 
+    nodes.each do |node|
       node_cache[node] = g.add_node(node.id.to_s, {:label => node.pretty_string})
-      node.attribute_constraints.each do |ac| 
+      node.attribute_constraints.each do |ac|
         ac_node = g.add_node(ac.id.to_s, {:shape => "box", :label => ac.pretty_string})
         g.add_edge(node_cache[node], ac_node)
       end
@@ -139,13 +139,13 @@ class Pattern < Measurable
     end
     return g
   end
-  
+
   def auto_layout!()
     graphviz_graph.output(:dot => Rails.root.join("tmp", "pattern_layouts", "#{id}.dot"))
-    graphviz_graph.output(:png => Rails.root.join("tmp", "pattern_layouts", "#{id}.png"))    
+    graphviz_graph.output(:png => Rails.root.join("tmp", "pattern_layouts", "#{id}.png"))
     @layouted_graph = GraphViz.parse(Rails.root.join("tmp", "pattern_layouts", "#{id}.dot").to_s)
   end
-  
+
   def store_auto_layout!()
     (nodes + attribute_constraints).each do |pe|
       pos = position_for_element(pe)
@@ -154,7 +154,7 @@ class Pattern < Measurable
       pe.save!
     end
   end
-  
+
   def position_for_element(element)
     point = layouted_graph.get_node(element.id.to_s)["pos"].point
     point[1] += 90
@@ -162,7 +162,7 @@ class Pattern < Measurable
     point[0] *= 1.4
     return point
   end
-  
+
   # determines which elements of a pattern will be returned by a query. No select *
   def returnable_elements(aggregations)
     if aggregations.blank?
@@ -171,12 +171,12 @@ class Pattern < Measurable
       return aggregations.collect{|agg| agg.pattern_element}
     end
   end
-  
+
   def node_offset
     furthest = (nodes + attribute_constraints).sort_by{|pe| position_for_element(pe)[0]}.last
     return position_for_element(furthest)[0]
   end
-  
+
   def layouted_graph
     @layouted_graph || auto_layout!
   end
@@ -188,7 +188,7 @@ class Pattern < Measurable
   def rdf_types
     [Vocabularies::GraphPattern.GraphPattern]
   end
-  
+
   def run_on_repository(repository)
     return repository.results_for_pattern(self, [])
   end

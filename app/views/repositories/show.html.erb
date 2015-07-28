@@ -21,8 +21,8 @@
   <script type="text/javascript">
     var jobs = <%= {@job.id => "Creating ontology for repository"}.to_json.html_safe %>;
   </script>
-    
-  <%= render :partial => "stuff/progress_bar", :locals => {:job_id => @job.id} %>  
+
+  <%= render :partial => "stuff/progress_bar", :locals => {:job_id => @job.id} %>
 <% end %>
 
 <table style="width:40%">

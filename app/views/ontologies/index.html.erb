@@ -14,10 +14,10 @@
   <tr>
     <td><%= ontology.does_exist ? link_to(ontology.short_name, ontology.download_url) : ontology.short_name %></td>
     <td><%= ontology.description %></td>
-    <td><%= ontology.group %></td>    
+    <td><%= ontology.group %></td>
     <td>
       <%= link_to 'Delete', ontology, method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger" %>
-      <%= link_to 'Edit', edit_ontology_path(ontology), :class => "btn btn-success" %>      
+      <%= link_to 'Edit', edit_ontology_path(ontology), :class => "btn btn-success" %>
       <% if ontology.is_a?(ExtractedOntology) %>
         <%= link_to("Repository", repository_path(ontology.repository), :class => "btn btn-info") %>
       <% end %>

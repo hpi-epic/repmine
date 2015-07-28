@@ -1,5 +1,5 @@
-RepMine::Application.routes.draw do  
-  
+RepMine::Application.routes.draw do
+
   resources :patterns do
     get :query
     post :query
@@ -27,16 +27,16 @@ RepMine::Application.routes.draw do
 
     get :autocomplete_tag_name, :on => :collection
   end
-  
+
   resources :metrics do
     post :create_operator
     post :create_node
-    post :create_connection    
+    post :create_connection
     post :destroy_connection
     post :monitor, :on => :collection
-    get :autocomplete_tag_name, :on => :collection    
+    get :autocomplete_tag_name, :on => :collection
   end
-  
+
   resources :metric_nodes, :only => [:update, :destroy, :show] do
     resources :aggregations, :only => [:create, :destroy]
   end
@@ -48,7 +48,7 @@ RepMine::Application.routes.draw do
   resources :ontologies do
     get :autocomplete_ontology_group, :on => :collection
   end
-  
+
   resources :monitoring_tasks do
     get :csv_results
     get :show_results

@@ -1,37 +1,37 @@
 <div class="metric_node real_node" id="metric_node_<%= node.id%>" style="<%= metric_node_position(node) %>" data-id="<%= node.id%>">
   <strong><%= link_to(node.measurable.name, node.measurable) %></strong>
   <hr style = "margin-top: 0px; margin-bottom: 5px" />
-  
+
   <%= form_for(node) do |f| %>
     <%= f.hidden_field :x %>
     <%= f.hidden_field :y %>
     <%= f.select(
-          :aggregation_id, 
+          :aggregation_id,
           options_from_collection_for_select(node.aggregations, "id", "speaking_name", node.aggregation_id),
-          {}, 
-          {:class => "justRight"}) 
+          {},
+          {:class => "justRight"})
     %>
   <% end %>
-   
-  <hr style = "margin-top: -25px; margin-bottom: 5px" />    
-  
+
+  <hr style = "margin-top: -25px; margin-bottom: 5px" />
+
   <div class="btn-group">
-  <%= form_tag(metric_node_aggregations_path(node), :remote => true, :id => "new_aggregation", :class => "needs_no_space") do %>  
+  <%= form_tag(metric_node_aggregations_path(node), :remote => true, :id => "new_aggregation", :class => "needs_no_space") do %>
     <%= select_tag(:operation, options_for_select(Aggregation.operations.keys), :class => "needs_no_space a_tad_bigger") %>:
     <%= select_tag(:pattern_element_id, options_for_select(node.aggregation_options), :class => "needs_no_space a_tad_bigger") %>
-    <div class="input-prepend needs_no_space">      
+    <div class="input-prepend needs_no_space">
       <span class="add-on">As:</span>
       <%= text_field_tag(:alias_name, nil, :style => "width: 60px;") %>
-    </div>    
+    </div>
     <%= button_tag("Add", :class => "btn btn-primary")%>
   <% end %>
   </div>
 
-  <hr style = "margin-top: 5px; margin-bottom: 5px" />        
-  
+  <hr style = "margin-top: 5px; margin-bottom: 5px" />
+
   <div class="btn-group" id="aggregations_<%= node.id %>" style="font-size: 14px;">
     <% node.aggregations.each do |aggregation| %>
       <%= render :partial => "aggregations/show", :locals => {:aggregation => aggregation} %>
-    <% end %>    
+    <% end %>
   </div>
 </div>

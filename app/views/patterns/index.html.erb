@@ -4,25 +4,25 @@
   <div class="btn-group">
     <%= link_to "New Pattern", new_pattern_path, :class => "btn btn-success"%>
   </div>
-  <div class="btn-group left-boarder">  
+  <div class="btn-group left-boarder">
     <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor") %>
     <%= select_tag(
-      "repository_id", 
-      options_from_collection_for_select(@repositories, "id", "name"), 
-      {:class => "selectpicker", "data-live-search" => "true"}) 
+      "repository_id",
+      options_from_collection_for_select(@repositories, "id", "name"),
+      {:class => "selectpicker", "data-live-search" => "true"})
     %>
   </div>
   <div class="btn-group left-boarder">
     <%= button_tag("Translate selected to:", :class => "btn btn-info", :name => "translate") %>
     <%= select_tag(
-      :ontology_ids, 
-      grouped_options_for_select(@ontology_groups), 
-      {:class => "selectpicker", "data-live-search" => "true"}) 
+      :ontology_ids,
+      grouped_options_for_select(@ontology_groups),
+      {:class => "selectpicker", "data-live-search" => "true"})
     %>
   </div>
   <div class="input-append btn-group left-boarder" style="margin-bottom: 0px">
     <input type="text" class="input-medium needs_no_space">
-    <span class="add-on needs_no_space"><%= fa_icon("search")%></span>      
+    <span class="add-on needs_no_space"><%= fa_icon("search")%></span>
   </div>
 </div>
 
@@ -30,13 +30,13 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Description</th>      
+      <th>Description</th>
       <th>Elements</th>
       <th>Ontology</th>
       <th>Actions</th>
     </tr>
   </thead>
-  
+
   <tbody>
 
   <% @pattern_groups.each_pair do |tag, patterns| %>
@@ -56,10 +56,10 @@
           <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-mini") %>
           <%= link_to(
             "Delete",
-            pattern_path(pattern), 
-            :method => :delete, 
-            :class => "btn btn-danger btn-mini", 
-            :confirm => "Really delete #{pattern.name}?") 
+            pattern_path(pattern),
+            :method => :delete,
+            :class => "btn btn-danger btn-mini",
+            :confirm => "Really delete #{pattern.name}?")
           %>
         </td>
       </tr>

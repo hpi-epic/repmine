@@ -13,9 +13,9 @@ class CreateMetricNodes < ActiveRecord::Migration
       t.integer :y, :default => 0
       t.timestamps
     end
-    
-    add_index :metric_nodes, :ancestry  
+
+    add_index :metric_nodes, :ancestry
     add_index :metric_nodes, :measurable_id
-    add_index :metric_nodes, :aggregation_id           
+    add_index :metric_nodes, :aggregation_id
   end
 end

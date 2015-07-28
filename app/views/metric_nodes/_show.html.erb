@@ -1,5 +1,5 @@
 <% if node.is_a?(MetricOperatorNode) %>
-  <%= render :partial => "metric_nodes/operator_node", :locals => {:node => node} %>      
+  <%= render :partial => "metric_nodes/operator_node", :locals => {:node => node} %>
 <% elsif node.is_a?(MetricMetricNode) %>
   <%= render :partial => "metric_nodes/metric_node", :locals => {:node => node} %>
 <% else%>

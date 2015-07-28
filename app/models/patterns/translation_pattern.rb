@@ -1,5 +1,5 @@
 class TranslationPattern < Pattern
-  
+
   class AmbiguousTranslation < Error; end
 
   attr_accessible :pattern_id
@@ -12,9 +12,9 @@ class TranslationPattern < Pattern
     tp.save
     return tp
   end
-  
+
   def self.existing_translation_pattern(pattern, ontologies)
-    TranslationPattern.includes(:ontologies).where(:ontologies => {:id => ontologies.collect{|o| o.id}}, :pattern_id => pattern.id).first    
+    TranslationPattern.includes(:ontologies).where(:ontologies => {:id => ontologies.collect{|o| o.id}}, :pattern_id => pattern.id).first
   end
 
   def self.pattern_name(pattern, ontologies)
@@ -28,15 +28,15 @@ class TranslationPattern < Pattern
   def self.model_name
     return Pattern.model_name
   end
-  
+
   def input_elements
     return source_pattern.unmatched_elements(ontologies)
   end
-  
+
   def ontology_matchers(source_ont)
     ontologies.collect{|target_ont| OntologyMatcher.new(source_ont, target_ont)}
   end
-  
+
   def match!()
     ontologies.collect do |target_ont|
       source_pattern.ontologies.each do |source_ont|
@@ -44,25 +44,25 @@ class TranslationPattern < Pattern
       end
     end
   end
-  
+
   # return correspondences for a given pattern
   def prepare!()
     match!
     process_mappings(get_simple_mappings)
     process_mappings(get_complex_mappings)
   end
-  
+
   def process_mappings(mappings)
     check_for_ambiguous_mappings(mappings)
     add_pattern_elements!(mappings)
     connect_pattern_elements!(mappings)
     create_matches(mappings)
   end
-  
+
   def connect_pattern_elements!(mappings)
     connector = ConnectionFinder.new()
     connector.load_to_engine!(mappings, source_pattern)
-    
+
     pattern_elements.each do |pe|
       if pe.is_a?(AttributeConstraint)
         pe.node ||= connector.node_for_ac(pe)
@@ -73,7 +73,7 @@ class TranslationPattern < Pattern
       pe.valid? ? pe.save! : pe.destroy
     end
   end
-  
+
   def create_matches(mappings)
     mappings.each_pair do |input_elements, target_elements|
       input_elements.each do |pe_id|
@@ -83,7 +83,7 @@ class TranslationPattern < Pattern
       end
     end
   end
-  
+
   def add_pattern_elements!(mappings)
     mappings.values.each do |target_elements|
       target_elements.each do |te|
@@ -92,7 +92,7 @@ class TranslationPattern < Pattern
       end
     end
   end
-  
+
   def check_for_ambiguous_mappings(mappings)
     mappings.keys.sort_by{|key| key.size}.each_with_index do |key, index|
       # option 1: more than one possible output subgraphs
@@ -104,7 +104,7 @@ class TranslationPattern < Pattern
       mappings[key] = targets.flatten
     end
   end
-  
+
   def get_simple_mappings
     mappings = {}
     # first try the unmatched input elements one by one
@@ -115,8 +115,8 @@ class TranslationPattern < Pattern
       end
     end
     return mappings
-  end  
-  
+  end
+
   # TODO: instead of getting mappings for all combinations, get all complex mappings and compare them to our combinations...
   def get_complex_mappings()
     mappings = {}

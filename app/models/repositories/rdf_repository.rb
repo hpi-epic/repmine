@@ -36,10 +36,10 @@ class RdfRepository < Repository
     end
     return statistics.collect{|k,v| [k,v]}
   end
-  
+
   # iterates over all results and returns a hash with string keys and objects based on the returned literal values
   def results_for_query(query)
-    sparql_client.query(query).collect do |solution| 
+    sparql_client.query(query).collect do |solution|
       Hash[solution.collect{|key, val| [key.to_s, val.is_a?(RDF::Literal) ? val.object :  val.to_s]}.map {|x| [x[0], x[1]]}]
     end
   end

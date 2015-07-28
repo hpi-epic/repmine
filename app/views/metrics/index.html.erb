@@ -3,13 +3,13 @@
 <div class="btn-toolbar">
   <div class="btn-group">
     <%= link_to "New Metric", metrics_path, :class => "btn btn-primary", :method => :post %>
-  </div>  
-  <div class="btn-group left-boarder">  
+  </div>
+  <div class="btn-group left-boarder">
     <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor") %>
     <%= select_tag(
-      "repository_id", 
-      options_from_collection_for_select(@repositories, "id", "name"), 
-      {:class => "selectpicker", "data-live-search" => "true"}) 
+      "repository_id",
+      options_from_collection_for_select(@repositories, "id", "name"),
+      {:class => "selectpicker", "data-live-search" => "true"})
     %>
   </div>
 </div>
@@ -18,12 +18,12 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Description</th>      
+      <th>Description</th>
       <th>Patterns</th>
       <th>Actions</th>
     </tr>
   </thead>
-  
+
   <tbody>
 
   <% @metrics_groups.each_pair do |tag, metrics| %>
@@ -41,10 +41,10 @@
         <td>
           <%= link_to(
             "Delete",
-            metric_path(metric), 
-            :method => :delete, 
-            :class => "btn btn-danger btn-mini", 
-            :confirm => "Really delete #{metric.name}?") 
+            metric_path(metric),
+            :method => :delete,
+            :class => "btn btn-danger btn-mini",
+            :confirm => "Really delete #{metric.name}?")
           %>
         </td>
       </tr>

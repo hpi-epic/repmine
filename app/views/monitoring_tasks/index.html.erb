@@ -41,7 +41,7 @@
       <td rowspan="<%= repo.monitoring_tasks.size %>" class="span7">
         <em>Running Queries:</em><br />
         <% repo.query_jobs.each_with_index do |qj, ii| %>
-          <%= render :partial => "stuff/progress_bar", :locals => {:job_id => qj.id} %>  
+          <%= render :partial => "stuff/progress_bar", :locals => {:job_id => qj.id} %>
         <% end %>
       </td>
       <% end %>

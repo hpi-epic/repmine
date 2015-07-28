@@ -1,10 +1,10 @@
 <span id="aggregation_<%= aggregation.id %>" data-node-id="<%= aggregation.metric_node_id %>">
   <%= operation_visuals(aggregation).html_safe %>
   <%= link_to(
-        fa_icon("times-circle"), 
-        metric_node_aggregation_path(aggregation.metric_node, aggregation), 
+        fa_icon("times-circle"),
+        metric_node_aggregation_path(aggregation.metric_node, aggregation),
         :method => :delete, :remote => true, :class => "delete_aggregation"
       )
   %>
-<br />  
+<br />
 </span>

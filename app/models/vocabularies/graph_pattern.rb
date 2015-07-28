@@ -124,7 +124,7 @@ module Vocabularies
       range: "graphpattern:Node".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze,
-      "owl:inverseOf" => %(graphpattern:incomingRelation).freeze      
+      "owl:inverseOf" => %(graphpattern:incomingRelation).freeze
 
 
     # properties - attribute constraint
@@ -143,7 +143,7 @@ module Vocabularies
       range: "xsd:Literal".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:DatatypeProperty".freeze
-      
+
     property :node,
       comment: %(determines the node an attribute constraint belongs to.).freeze,
       domain: "graphpattern:AttributeConstraint".freeze,
@@ -151,6 +151,6 @@ module Vocabularies
       range: "graphpattern:Node".freeze,
       "rdfs:isDefinedBy" => %(graphpattern:).freeze,
       type: "owl:ObjectProperty".freeze,
-      "owl:inverseOf" => %(graphpattern:attributeConstraint).freeze      
+      "owl:inverseOf" => %(graphpattern:attributeConstraint).freeze
   end
 end

@@ -4,7 +4,7 @@ class RelationConstraint < PatternElement
   attr_accessible :min_cardinality, :max_cardinality, :min_path_length, :max_path_length, :source_id, :target_id
   validates :source, :presence => true
   validates :target, :presence => true
-    
+
   before_save :assign_to_pattern!, :assign_ontology!
 
   def rdf_mappings
@@ -17,7 +17,7 @@ class RelationConstraint < PatternElement
       Vocabularies::GraphPattern.max_path_length => {:property => :max_path_length, :literal => true}
     })
   end
-  
+
   def rdf_statements
     stmts = super
     stmts << [resource, Vocabularies::GraphPattern.sourceNode, source.resource]
@@ -32,7 +32,7 @@ class RelationConstraint < PatternElement
   def assign_to_pattern!
     self.pattern = source.pattern unless source.nil?
   end
-  
+
   def assign_ontology!
     self.ontology = source.ontology if ontology.nil?
   end
@@ -44,7 +44,7 @@ class RelationConstraint < PatternElement
   def possible_relations(source_type = nil, target_type = nil)
     return ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
   end
-  
+
   def pretty_string
     str = " #{type_expression.fancy_string(true)}"
     str += " (#{min_cardinality.blank? ? 0 : min_cardinality},#{max_cardinality.blank? ? '*' : max_cardinality})"

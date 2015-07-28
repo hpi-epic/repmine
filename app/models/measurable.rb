@@ -1,17 +1,17 @@
 class Measurable < ActiveRecord::Base
-  attr_accessible :name, :description, :tag_list  
+  attr_accessible :name, :description, :tag_list
   acts_as_taggable_on :tags
-  
+
   has_many :monitoring_tasks, :dependent => :destroy
-  
+
   def run_on_repository(repository)
     raise "implement 'run_on_repository' in #{self.class.name}"
   end
-  
+
   def executable_on?(repository)
     raise "implement 'executable_on?' in #{self.class.name}"
   end
-  
+
   def self.grouped(nice_display = false, include_class = false, exceptions = [])
     measurable_groups = {}
     where(:type => self.name).each do |measurable|
@@ -28,7 +28,7 @@ class Measurable < ActiveRecord::Base
     end
     return measurable_groups
   end
-  
+
   def first_unexecutable_pattern(repository)
     return self
   end

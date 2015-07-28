@@ -9,11 +9,11 @@ class DatatypeProperty
     @range = range.is_a?(RDF::Resource) ? range : RDF::Resource.new(range)
     @domain = domain
   end
-  
+
   def self.from_sample(name, domain, sample)
     return self.new(name, RDF::Literal.new(sample).datatype, domain)
   end
-  
+
   def self.from_url(url, range, domain)
     name = url.split("/").last.split("#").last
     prop = self.new(name, range, domain)

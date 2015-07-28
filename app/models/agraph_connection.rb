@@ -38,7 +38,7 @@ class AgraphConnection
   def clear!
     repository().clear
   end
-  
+
   # at some point, this could be replaced with a fancy SPARQL query...
   def relations_with(domain, range)
     rels = []
@@ -49,7 +49,7 @@ class AgraphConnection
     end
     return rels
   end
-  
+
   def attribute_range(attrib)
     repository.build_query() do |q|
       q.pattern([RDF::Resource.new(attrib), RDF::RDFS.range, :range])
@@ -58,7 +58,7 @@ class AgraphConnection
     end
     return nil
   end
-  
+
   def label_for_resource(res)
     repository.build_query() do |q|
       q.pattern([RDF::Resource.new(res), RDF::RDFS.label, :label])
@@ -67,7 +67,7 @@ class AgraphConnection
     end
     return nil
   end
-  
+
   def relations(domain, range)
     rels = []
     repository.build_query(:infer => true) do |q|
@@ -77,8 +77,8 @@ class AgraphConnection
       q.pattern([:range, RDF::OWL.unionOf, :list], :optional => true)
     end.run do |res|
       rel = ObjectProperty.from_url(
-        res.rel.to_s, 
-        domain.nil? ? res.domain : domain, 
+        res.rel.to_s,
+        domain.nil? ? res.domain : domain,
         range.nil? ? (res.bound?(:list) ? decipher_union(res.list) : [res.range]) : [range]
       )
       rels << rel unless rels.include?(rel)
@@ -128,7 +128,7 @@ class AgraphConnection
       end
       return clazz
     end
-    
+
     return PatternElement
   end
 
@@ -158,7 +158,7 @@ class AgraphConnection
     subclasses.each{|sc| classes.delete(sc)}
     return classes.values
   end
-  
+
   # this is slow as hell ... TODO: figure out how to get the entire collection through agraph
   def decipher_union(union_node)
     classes = []

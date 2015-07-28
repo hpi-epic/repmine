@@ -14,12 +14,12 @@ class SparqlQueryCreator < QueryCreator
     @sparql = SPARQL::Client.new(RDF::Repository.new())
     fill_variables
     fill_where_clause
-    query = @sparql.select(*variables).where(*where)    
+    query = @sparql.select(*variables).where(*where)
     query.group_by(*groupings) unless groupings.empty?
-    filter.each{|filter| query.filter(filter)}    
+    filter.each{|filter| query.filter(filter)}
     return clean_query_string(query.to_s)
   end
-  
+
   # SPARQL Client is incapable of doing count sum and stuff like that...
   def clean_query_string(query_str)
     return query_str.gsub(" ?(", " (")
@@ -44,14 +44,14 @@ class SparqlQueryCreator < QueryCreator
   def fill_variables
     @variables = pattern.returnable_elements(aggregations).collect{|n| return_variable(n)}
   end
-  
+
   def return_variable(pe)
     aggregation = aggregation_for_element(pe)
     if aggregation.nil? || aggregation.operation == :group_by
       @groupings << pe_variable(pe) unless aggregation.nil?
       pe_variable(pe)
     else
-      "(#{aggregation.operation.upcase}(?#{pe_variable(pe)}) AS ?#{aggregation.underscored_speaking_name})"      
+      "(#{aggregation.operation.upcase}(?#{pe_variable(pe)}) AS ?#{aggregation.underscored_speaking_name})"
     end
   end
 

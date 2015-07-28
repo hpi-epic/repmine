@@ -12,7 +12,7 @@ class AttributeConstraint < PatternElement
     :greater_than => ">",
     :not => "!="
   }
-  
+
   def rdf_mappings
     super.merge({
       Vocabularies::GraphPattern.attributeValue => {:property => :value, :literal => true},
@@ -20,7 +20,7 @@ class AttributeConstraint < PatternElement
       Vocabularies::GraphPattern.node => {:property => :node},
     })
   end
-  
+
   def rdf_statements
     stmts = super
     stmts << [resource, Vocabularies::GraphPattern.node, node.resource]
@@ -28,7 +28,7 @@ class AttributeConstraint < PatternElement
     stmts << [resource, Vocabularies::GraphPattern.attributeOperator, operator]
     return stmts
   end
-  
+
   def value_type
     ontology.attribute_range(rdf_type)
   end
@@ -36,7 +36,7 @@ class AttributeConstraint < PatternElement
   def assign_to_pattern!
     self.pattern = node.pattern unless node.nil?
   end
-  
+
   def assign_ontology!
     self.ontology = node.ontology if ontology.nil?
   end
@@ -48,11 +48,11 @@ class AttributeConstraint < PatternElement
   def refers_to_variable?
     return contains_variable?(self.value) && !is_variable?
   end
-  
+
   def is_variable?
     operator == OPERATORS[:var]
   end
-  
+
   def referenced_element
     pattern.pattern_elements.find{|pe| pe.is_variable? && (("?" + pe.variable_name) == self.value)}
   end
@@ -64,7 +64,7 @@ class AttributeConstraint < PatternElement
       value.start_with?("?") ? value[1..-1] : value
     end
   end
-  
+
   def speaking_name
     if !is_variable?
       super
@@ -76,7 +76,7 @@ class AttributeConstraint < PatternElement
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.AttributeConstraint]
   end
-  
+
   def pretty_string
     "#{type_expression.fancy_string(true)} #{operator} #{value}"
   end

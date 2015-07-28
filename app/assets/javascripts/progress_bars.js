@@ -1,7 +1,7 @@
 var intervals = {};
 jQuery.each(jobs, function(job_id, initial_text){
 	intervals[job_id] = setInterval(function(){
-		var pbar = $("#progress_bar_" + job_id);		
+		var pbar = $("#progress_bar_" + job_id);
 	  $.ajax({
 	    url: '/progress-job/' + job_id,
 	    success: function(job){
@@ -41,5 +41,5 @@ jQuery.each(jobs, function(job_id, initial_text){
 				location.reload();
 	    }
 	  })
-	},1000);	
+	},1000);
 });

@@ -5,6 +5,6 @@ class CreateOntologiesPatterns < ActiveRecord::Migration
       t.integer :pattern_id
     end
     add_index :ontologies_patterns, :ontology_id
-    add_index :ontologies_patterns, :pattern_id          
+    add_index :ontologies_patterns, :pattern_id
   end
 end

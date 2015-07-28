@@ -13,28 +13,28 @@
 
 <div class="btn-toolbar">
   <div class="btn-group">
-    <%= form_tag(pattern_nodes_path(@pattern), :remote => true, :id => "new_pattern_node", :class => "needs_no_space") do %>      
+    <%= form_tag(pattern_nodes_path(@pattern), :remote => true, :id => "new_pattern_node", :class => "needs_no_space") do %>
       <%= button_tag 'Create Node', :class => "btn" %>
       <% if @pattern.ontologies.size != 1 %>
         <%= select_tag(
-          :ontology_id, 
-          options_for_select(@pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), 
-          :class => "needs_no_space") 
+          :ontology_id,
+          options_for_select(@pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}),
+          :class => "needs_no_space")
         %>
       <% else %>
         <%= hidden_field_tag(:ontology_id, @pattern.ontologies.first.id) %>
       <% end %>
     <% end %>
   </div>
-  
-  <div class="btn-group left-boarder">    
+
+  <div class="btn-group left-boarder">
     <%= form_for(@pattern, :html => {:class => "needs_no_space edit_pattern"}) do |f| %>
       <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success" %>
     <% end %>
   </div>
-  
+
   <%= link_to 'Query', pattern_query_path(@pattern), :class => "btn btn-danger" %>
-  
+
 </div>
 
 <hr />

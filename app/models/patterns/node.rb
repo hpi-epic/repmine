@@ -7,7 +7,7 @@ class Node < PatternElement
   has_many :target_relation_constraints, :class_name => "RelationConstraint", :foreign_key => "target_id", :dependent => :destroy
   has_many :attribute_constraints, :dependent => :destroy
   validates :ontology, :presence => true
-  
+
   def pretty_string
     "#{type_expression.fancy_string(true)}"
   end
@@ -31,7 +31,7 @@ class Node < PatternElement
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.Node]
   end
-  
+
   def type_hierarchy
     return ontology.type_hierarchy
   end
@@ -43,7 +43,7 @@ class Node < PatternElement
       return false
     end
   end
-  
+
   # checks whether each of our elements has exactly one twin. Does NOT check whether "other" has more elements
   def check_ac_and_rc_similarity(other)
     equal = source_relation_constraints.none?{|src| other.source_relation_constraints.select{|osrc| src.equal_to?(osrc)}.size != 1}

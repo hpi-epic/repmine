@@ -6,6 +6,6 @@ class CreatePatternElementMatchings < ActiveRecord::Migration
       t.timestamps
     end
     add_index :pattern_element_matches, :matched_element_id
-    add_index :pattern_element_matches, :matching_element_id          
+    add_index :pattern_element_matches, :matching_element_id
   end
 end

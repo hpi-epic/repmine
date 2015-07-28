@@ -20,7 +20,7 @@
             <legend><%= group %></legend>
             <fieldset class="fieldset">
               <%= f.association(
-                    :ontologies, as: :check_boxes, 
+                    :ontologies, as: :check_boxes,
                     collection: Ontology.where(:does_exist => true, :group => group),
                     label_method: :short_name, label: false
               ) %>

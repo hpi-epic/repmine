@@ -73,7 +73,7 @@ var savePattern = function(){
 
 // takes a form, submits it, and stores all the requests so we can wait for ... it
 var saveForm = function(form_finder){
-  var requests = [];  
+  var requests = [];
   $(form_finder).not(".static").each(function(index){
     requests.push(submitAndHighlight($(this)));
   });
@@ -117,7 +117,7 @@ var updatePositionInformation = function(form){
   var position = $(form).parent().position();
 	if($(form).find("input[id$=_x]").length > 0){
 	  $(form).find("input[id$=_x]").val(position.left);
-	  $(form).find("input[id$=_y]").val(position.top);		
+	  $(form).find("input[id$=_y]").val(position.top);
 	}
 };
 
@@ -169,8 +169,8 @@ var buildConnection = function(source_id, target_id, reinstall_endpoints, overla
   var free_source = freeRelationEndpointOn("node_" + source_id);
   var free_target = freeRelationEndpointOn("node_" + target_id);
   var connection = jsPlumb.connect({
-    source: free_source, 
-    target: free_target, 
+    source: free_source,
+    target: free_target,
     deleteEndpointsOnDetach:true,
 		overlays:[
       ["Custom", {
@@ -182,7 +182,7 @@ var buildConnection = function(source_id, target_id, reinstall_endpoints, overla
 		],
     fireEvent:false
   });
-  
+
   // reinstall the endpoints
   if(reinstall_endpoints){
     jsPlumb.addEndpoint(connection.source, connectionEndpoint());
@@ -212,7 +212,7 @@ var insertAttributeConstraint = function(node_id, data){
   }
   $("#drawing_canvas").append(ac);
   jsPlumb.draggable(ac);
-  var ae = jsPlumb.addEndpoint(ac, { anchor:[ "BottomCenter"], deleteEndpointsOnDetach:true }, attributeEndpoint());  
+  var ae = jsPlumb.addEndpoint(ac, { anchor:[ "BottomCenter"], deleteEndpointsOnDetach:true }, attributeEndpoint());
   jsPlumb.connect({source: jsPlumb.getEndpoints("node_" + node_id)[1], target: ae});
 };
 
@@ -220,7 +220,7 @@ var insertAttributeConstraint = function(node_id, data){
 var addAttributeFilter = function(node_id, url) {
   if(url){
     return $.ajax({
-      url: url, 
+      url: url,
       success: function(data) {
         insertAttributeConstraint(node_id, data)
       }

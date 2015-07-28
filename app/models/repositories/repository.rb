@@ -3,7 +3,7 @@ class Repository < ActiveRecord::Base
   belongs_to :ontology
   has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
-  
+
   # this is meant to temporarily hold a job object that loggin happens in...
   attr_accessor :job
 
@@ -40,23 +40,23 @@ class Repository < ActiveRecord::Base
     self.ontology.repository = self
     self.ontology.save
   end
-    
+
   def name_url_safe
     return name.gsub(/[^\w\s_-]+/, '').gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2').gsub(/\s+/, '_') + "_#{self.id}"
   end
-  
+
   def ontology_creation_job
     Delayed::Job.find_by_queue(ont_creation_queue)
   end
-  
+
   def ont_creation_queue
     "ont_creation_#{self.id}"
   end
-  
+
   def query_queue
     "queries_#{self.id}"
   end
-  
+
   def query_jobs
     Delayed::Job.find_all_by_queue(query_queue)
   end
@@ -70,16 +70,16 @@ class Repository < ActiveRecord::Base
       ontology.update_attributes({:does_exist => true})
       ontology.load_to_dedicated_repository!
     end
-    
+
     return errors
   end
-  
+
   def results_for_pattern(pattern, aggregations, generate_csv = true)
     qs = query_for_pattern(pattern, aggregations)
     puts "Executing query: #{qs}"
     res, csv = execute(query_for_pattern(pattern, aggregations), generate_csv)
   end
-  
+
   def query_for_pattern(pattern, aggregations)
     return self.class.query_creator_class.new(pattern, aggregations).query_string
   end
@@ -87,7 +87,7 @@ class Repository < ActiveRecord::Base
   def create_ontology!
     raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
   end
-  
+
   def analyze_repository(job = nil)
     raise "implement 'analyze_repository' in #{self.class.name}"
   end
@@ -95,14 +95,14 @@ class Repository < ActiveRecord::Base
   def type_statistics
     raise "implement 'type_statistics' in #{self.class.name}"
   end
-  
+
   def csv_data(results)
     CSV.generate do |csv|
       csv << results["columns"]
       results["data"].each{|data_row| csv << data_row}
     end
   end
-  
+
   def execute(query, generate_csv)
     results = results_for_query(query)
     if generate_csv
@@ -111,15 +111,15 @@ class Repository < ActiveRecord::Base
       return results
     end
   end
-  
+
   def results_for_query(query)
     raise "implement 'results for query' in #{self.class.name}"
   end
-  
+
   def log_status(msg, step)
     job.nil? ? puts(msg) : job.update_stage_progress(msg, :step => step)
   end
-  
+
   def log_msg(msg)
     job.nil? ? puts(msg) : job.update_stage(msg)
   end

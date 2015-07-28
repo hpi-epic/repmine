@@ -7,7 +7,7 @@ class CreateMeasurables < ActiveRecord::Migration
       t.integer :pattern_id
       t.text :description
       t.string :name
-      t.string :type      
+      t.string :type
       t.timestamps
     end
     add_index :measurables, :pattern_id

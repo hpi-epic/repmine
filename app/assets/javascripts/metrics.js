@@ -6,7 +6,7 @@ jsPlumb.ready(function() {
 	jsPlumb.bind("connection", function(info, originalEvent) {
 		updateConnection(connect_nodes_path, info.connection)
 	});
-	
+
 	jsPlumb.bind("connectionDetached", function(info, originalEvent) {
 		updateConnection(disconnect_nodes_path, info.connection)
 	});
@@ -21,7 +21,7 @@ var updateConnection = function(url, connection){
 $("#new_node").on("ajax:success", function(e, data, status, xhr){
   var node = $(xhr.responseText);
   node.appendTo($("#drawing_canvas"));
-  jsPlumb.draggable(node);	
+  jsPlumb.draggable(node);
 	jsPlumb.addEndpoint(node, topEndpoint());
 	createDestroyCallback(node);
 });
@@ -69,18 +69,18 @@ var createDestroyCallback = function(node){
 				}
 			});
 		}
-	});	
+	});
 };
 
 var createEndpoints = function(){
 	$(".real_node").each(function(i, node){
 		jsPlumb.addEndpoint($(node), topEndpoint());
 	});
-	
+
 	$(".operator_node").each(function(i, node){
 		jsPlumb.addEndpoint($(node), topEndpoint());
 		jsPlumb.addEndpoint($(node), bottomEndpoint());
-	});	
+	});
 };
 
 var loadExistingConnections = function(){
@@ -108,7 +108,7 @@ var topEndpoint = function() {
   		tolerance:"touch",
   		hoverClass:"dropHover",
   		activeClass:"dragActive"
-  	}			
+  	}
 	};
 };
 
@@ -126,7 +126,7 @@ var bottomEndpoint = function() {
   		tolerance:"touch",
   		hoverClass:"dropHover",
   		activeClass:"dragActive"
-  	}		
+  	}
 	};
 };
 

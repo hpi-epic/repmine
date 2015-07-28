@@ -41,7 +41,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'simplecov'
   gem 'quiet_safari'
-  gem 'test-unit', '~> 3.0'  
+  gem 'test-unit', '~> 3.0'
 end
 
 # Gems used only for assets and not required
@@ -81,5 +81,5 @@ gem 'sql-maker'
 platforms :ruby do
   gem 'thin'
   gem 'sqlite3'
-  gem 'bson_ext'  
+  gem 'bson_ext'
 end
