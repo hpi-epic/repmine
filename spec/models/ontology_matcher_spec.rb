@@ -54,7 +54,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal 1, corrs.size
     assert_equal "http://ekaw/#Paper_Author", corrs.first.entity2
   end
-  
+
   it "should find substitutes within the rdf files in both directions" do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
@@ -63,14 +63,14 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal 1, corrs.size
     assert_equal author, corrs.first.entity2
   end
-  
+
   it "should not find non-existing correspondences" do
     @om.stub(:alignment_path => alignment_test_file)
-    @om.match!    
+    @om.match!
     corrs = @om.correspondences_for_concept("http://crs_dr/#author_not_present_in_this_ontology")
     assert_empty corrs
   end
-    
+
   it "should switch ontologies, if needed" do
     o1 = FactoryGirl.create(:ontology)
     o2 = FactoryGirl.create(:ontology)
@@ -78,7 +78,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert !OntologyMatcher.new(o1,o2).inverted
     assert OntologyMatcher.new(o2,o1).inverted
   end
-  
+
   it "should properly insert a new correspondence" do
     correspondence = FactoryGirl.build(:simple_correspondence)
     assert_empty @om.correspondences_for_concept(correspondence.entity1)
@@ -86,7 +86,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_not_nil @om.find_correspondence_node(correspondence)
     assert_not_empty @om.correspondences_for_concept(correspondence.entity1)
   end
-  
+
   it "should properly run for two of the conference ontologies" do
     o1 = Ontology.create(:url => "http://oaei.ontologymatching.org/2014/conference/data/crs_dr.owl", :short_name => "crs")
     o1.stub(:local_file_path => Rails.root.join("spec", "testfiles","crs_dr.owl").to_s)
@@ -99,7 +99,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.match!
     assert_equal true, File.exists?(aml_test_file)
   end
-  
+
   it "should find an existing correspondence within the graph" do
     correspondence = FactoryGirl.build(:simple_correspondence)
     assert_empty @om.alignment_graph
@@ -107,7 +107,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_not_empty @om.alignment_graph
     assert_not_nil @om.find_correspondence_node(correspondence)
   end
-  
+
   it "should remove an existing correspondence from the graph" do
     correspondence = FactoryGirl.build(:simple_correspondence)
     assert_empty @om.alignment_graph
@@ -115,8 +115,8 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_not_empty @om.alignment_graph
     rdf_node = @om.remove_correspondence!(correspondence)
     assert_empty @om.alignment_graph
-  end  
-  
+  end
+
   it "should remove correspondences properly" do
     FileUtils.cp(alignment_test_file, alignment_test_output_file)
     @om.stub(:alignment_path => alignment_test_output_file)
@@ -127,18 +127,18 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.remove_correspondence!(correspondences.first)
     assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract")
   end
-  
+
   it "should properly add a complex correspondence" do
     correspondence = FactoryGirl.build(:complex_correspondence)
     assert_empty @om.alignment_graph
     assert_empty @om.correspondences_for_concept(correspondence.entity1)
     @om.add_correspondence!(correspondence)
     assert_not_empty @om.alignment_graph
-    corrs = @om.correspondences_for_concept(correspondence.entity1)    
+    corrs = @om.correspondences_for_concept(correspondence.entity1)
     assert_not_empty corrs
     assert_equal ComplexCorrespondence, corrs.first.class
   end
-  
+
   it "should add a complex correspondence stemming from just sample elements and find it again" do
     p1 = FactoryGirl.create(:pattern)
     p2 = FactoryGirl.create(:pattern)
@@ -149,18 +149,18 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_not_empty corrs
     assert_equal p2.pattern_elements.size, corrs.first.pattern_elements.size
   end
-  
+
   it "should find a complex correspondence based on provided elements" do
     correspondence = FactoryGirl.build(:hardway_complex)
     pattern = FactoryGirl.create(:pattern)
-    @om.insert_statements!    
+    @om.insert_statements!
     assert_empty @om.correspondences_for_pattern_elements(pattern.pattern_elements)
     @om.add_correspondence!(correspondence)
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements)
     assert_not_empty corrs
     assert_equal ComplexCorrespondence, corrs.first.class
   end
-  
+
   it "should not return correspondences where the input graph only matches a real subgraph of entity1" do
     correspondence = FactoryGirl.build(:hardway_complex)
     @om.insert_statements!
@@ -170,7 +170,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements[0..-2])
     assert_empty corrs
   end
-    
+
   it "should return simple correspondences only when both elements are concepts, not patterns" do
     Pattern.stub(:from_graph => nil)
     assert @om.create_correspondence({:target => RDF::Resource.new("entity2")}, "entity1").is_a?(SimpleCorrespondence)
@@ -178,7 +178,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert @om.create_correspondence({:target => RDF::Node.new}, [Node.new]).is_a?(ComplexCorrespondence)
     assert @om.create_correspondence({:target => RDF::Node.new}, "entity1").is_a?(ComplexCorrespondence)
   end
-  
+
   it "should be able to build complex correspondences" do
     correspondence = FactoryGirl.build(:complex_correspondence)
     @om.insert_statements!
@@ -188,7 +188,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert corr.is_a?(ComplexCorrespondence)
     assert corr.entity2.is_a?(Pattern)
     assert_equal correspondence.entity2.pattern_elements.size, corr.entity2.pattern_elements.size
-    
+
     correspondence.entity2.pattern_elements.each do |pe|
       assert corr.entity2.pattern_elements.any?{|pee| pe.equal_to?(pee)}, "no match found for #{pe.class} - #{pe.rdf_type}"
     end

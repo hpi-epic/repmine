@@ -13,24 +13,24 @@ class PatternsController < ApplicationController
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
     @title = "'#{@pattern.name}' Pattern"
   end
-  
+
   def translate
     @source_pattern = Pattern.find(params[:pattern_id])
     @source_pattern.auto_layout!
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
-    
+
     @target_ontologies = Ontology.find(params[:ontology_id])
     @target_pattern = TranslationPattern.for_pattern_and_ontologies(@source_pattern, [@target_ontologies])
     @target_pattern.prepare!
 
     @controls_offset = @source_pattern.node_offset - 30
-    
+
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
       @target_pattern.store_auto_layout!
-      @node_offset = @controls_offset      
+      @node_offset = @controls_offset
     end
-    
+
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
     @matched_elements = @source_pattern.matched_elements(@target_ontologies).collect{|me| me.id.to_s}
     @title = "Translating '#{@source_pattern.name}'"
@@ -40,7 +40,7 @@ class PatternsController < ApplicationController
     ontologies = Ontology.find(params[:pattern].delete(:ontology_ids).reject{|oid| oid.blank?})
     @pattern = Pattern.new(params[:pattern])
     @pattern.ontologies = ontologies
-    
+
     respond_to do |format|
       if @pattern.save
         flash[:notice] = 'Pattern was successfully created.'
@@ -83,7 +83,7 @@ class PatternsController < ApplicationController
     flash[:notice] = "Destroyed Pattern '#{qn}'"
     redirect_to patterns_path
   end
-  
+
   def process_patterns
     if !params[:patterns]
       redirect_to patterns_path, :alert => "Please pick at least one target pattern!"
@@ -91,7 +91,7 @@ class PatternsController < ApplicationController
       if params[:translate]
         if params[:patterns].size > 1
           redirect_to patterns_path, :alert => "You can only translate one pattern at a time!"
-        else          
+        else
           redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
         end
       elsif params[:monitor]
@@ -115,9 +115,9 @@ class PatternsController < ApplicationController
       "Sparql" => SparqlQueryCreator.new(@t_pattern || @pattern).query_string
     }
     @ontology_groups = Ontology.grouped
-    @title = "Queries for '#{@pattern.name}'"    
+    @title = "Queries for '#{@pattern.name}'"
   end
-  
+
   def save_correspondence
     sources = (params[:source_element_ids] || []).reject{|x| x.blank?}.first
     targets = (params[:target_element_ids] || []).reject{|x| x.blank?}.first
@@ -142,7 +142,7 @@ class PatternsController < ApplicationController
         flash[:error] = "Could not save correspondence! #{e.message}"
       end
     end
-    
+
     render :json => matched_concepts
   end
 
@@ -152,8 +152,8 @@ class PatternsController < ApplicationController
     # load existing relation constraints
     relations = pattern.relation_constraints.collect do |rc|
       {
-        :source => rc.source.id, 
-        :target => rc.target.id, 
+        :source => rc.source.id,
+        :target => rc.target.id,
         :url => static ? pattern_relation_constraint_static_path(pattern, rc) : pattern_relation_constraint_path(pattern, rc)
       }
     end

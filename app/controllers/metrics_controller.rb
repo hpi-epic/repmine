@@ -1,11 +1,11 @@
 class MetricsController < ApplicationController
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
-  
+
   def create
     @metric = Metric.create
     redirect_to metric_path(@metric)
   end
-  
+
   def show
     @metric = Metric.find(params[:id])
     @pattern_groups = Pattern.grouped(true, true).merge(Metric.grouped(true, true, [@metric])){|key, val1, val2| val1 + val2}
@@ -17,18 +17,18 @@ class MetricsController < ApplicationController
     end
     @title = @metric.name.blank? ? "New metric" : "Metric '#{@metric.name}'"
   end
-  
+
   def update
     metric = Metric.find(params[:id])
     metric.update_attributes(params[:metric])
     render :nothing => true, :status => 200, :content_type => 'text/html'
   end
-  
+
   def destroy
     Metric.find(params[:id]).destroy
     redirect_to metrics_path
   end
-  
+
   def create_connection
     source = MetricNode.find(params[:source_id])
     target = MetricNode.find(params[:target_id])
@@ -36,7 +36,7 @@ class MetricsController < ApplicationController
     target.save
     render :nothing => true, :status => 200, :content_type => 'text/html'
   end
-  
+
   def destroy_connection
     begin
       source = MetricNode.find(params[:source_id])
@@ -46,38 +46,38 @@ class MetricsController < ApplicationController
     rescue Exception => e
     end
     render :nothing => true, :status => 200, :content_type => 'text/html'
-  end  
-  
+  end
+
   def index
     @metrics_groups = Metric.grouped
-    flash[:info] = "No metrics available! Please create a new one." if @metrics_groups.empty?    
+    flash[:info] = "No metrics available! Please create a new one." if @metrics_groups.empty?
     @repositories = Repository.all()
-    @title = "Metric overview"    
+    @title = "Metric overview"
   end
-  
+
   def monitor
     task_ids = MonitoringTask.create_multiple(params[:metrics], params[:repository_id])
     redirect_to check_monitoring_tasks_path(:task_ids => task_ids)
   end
-  
+
   def download_csv
     repository = Repository.find(params[:repository_id])
     metric = Metric.find(params[:metrics].first)
     metric.calculate(repository)
     send_data(
-      File.open(metric.metrics_path("csv", repository)).read, 
-      :type => 'text/csv; charset=utf-8; header=present', 
+      File.open(metric.metrics_path("csv", repository)).read,
+      :type => 'text/csv; charset=utf-8; header=present',
       :filename => metric.fancy_metric_file_name(repository)
     )
   end
-  
+
   def create_node
     metric = Metric.find(params[:metric_id])
     measurable = Measurable.find(params[:pattern_id])
     node = metric.create_node(measurable)
     render :partial => "metric_nodes/show", :layout => false, :locals => {:node => node}
   end
-  
+
   def create_operator
     metric = Metric.find(params[:metric_id])
     node = MetricOperatorNode.create(:operator_cd => params[:operator])

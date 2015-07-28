@@ -82,6 +82,9 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
     t.datetime "updated_at",    :null => false
   end
 
+  add_index "monitoring_tasks", ["measurable_id"], :name => "index_monitoring_tasks_on_measurable_id"
+  add_index "monitoring_tasks", ["repository_id"], :name => "index_monitoring_tasks_on_repository_id"
+
   create_table "ontologies", :force => true do |t|
     t.string   "url"
     t.text     "description"
@@ -129,6 +132,9 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
     t.integer  "x",               :default => 0
     t.integer  "y",               :default => 0
   end
+
+  add_index "pattern_elements", ["ontology_id"], :name => "index_pattern_elements_on_ontology_id"
+  add_index "pattern_elements", ["pattern_id"], :name => "index_pattern_elements_on_pattern_id"
 
   create_table "repositories", :force => true do |t|
     t.string  "name"
@@ -186,5 +192,6 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
   end
 
   add_index "type_expressions", ["ancestry"], :name => "index_type_expressions_on_ancestry"
+  add_index "type_expressions", ["pattern_element_id"], :name => "index_type_expressions_on_pattern_element_id"
 
 end

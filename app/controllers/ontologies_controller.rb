@@ -25,7 +25,7 @@ class OntologiesController < ApplicationController
   # GET /ontologies/1/edit
   def edit
     @ontology = Ontology.find(params[:id])
-    @title = "Ontology '#{@ontology.short_name}'"    
+    @title = "Ontology '#{@ontology.short_name}'"
   end
 
   # POST /ontologies

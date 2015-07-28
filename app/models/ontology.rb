@@ -7,7 +7,7 @@ class Ontology < ActiveRecord::Base
   validates :url, :uniqueness => true, :presence => true
 
   has_many :patterns
-  has_one :repository  
+  has_one :repository
 
   before_validation :set_short_name_if_empty!
   after_create :load_to_dedicated_repository!, :if => :load_immediately?

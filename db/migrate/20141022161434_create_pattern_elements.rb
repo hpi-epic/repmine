@@ -21,5 +21,8 @@ class CreatePatternElements < ActiveRecord::Migration
       t.integer :x, :default => 0
       t.integer :y, :default => 0
     end
+    
+    add_index :pattern_elements, :ontology_id
+    add_index :pattern_elements, :pattern_id    
   end
 end

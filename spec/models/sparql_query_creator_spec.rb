@@ -48,7 +48,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     qc = SparqlQueryCreator.new(pattern)
     qs = qc.query_string
     nv = qc.pe_variable(pattern.nodes.first)
-    nv2 = qc.pe_variable(pattern.attribute_constraints.first)    
+    nv2 = qc.pe_variable(pattern.attribute_constraints.first)
     ac1v = qc.pe_variable(var_ac1)
     ac2v = qc.pe_variable(var_ac2)
     expected = "SELECT ?#{nv} ?#{nv2} WHERE { ?#{nv} a <http://example.org/node> . ?#{nv} <#{var_ac1.rdf_type}> ?name . ?#{nv} <#{var_ac2.rdf_type}> ?#{ac2v} . FILTER(?#{ac2v} = ?name) }"
@@ -61,10 +61,10 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     qc = SparqlQueryCreator.new(pattern, [agg])
     nv1 = qc.pe_variable(pattern.nodes.first)
     nv2 = qc.pe_variable(pattern.nodes.last)
-    
+
     expected = "SELECT (COUNT(?#{nv2}) AS ?count_node2) WHERE { ?#{nv1} a <http://example.org/node> . ?#{nv2} a <http://example.org/node> . ?#{nv1} <http://example.org/relation> ?#{nv2} . }"
     assert_equal expected, qc.query_string
-    
+
     agg2 = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.first)
     expected = "SELECT ?#{nv1} (COUNT(?#{nv2}) AS ?count_node2) WHERE { ?#{nv1} a <http://example.org/node> . ?#{nv2} a <http://example.org/node> . ?#{nv1} <http://example.org/relation> ?#{nv2} . } GROUP BY ?#{nv1}"
     qc = SparqlQueryCreator.new(pattern, [agg2, agg])

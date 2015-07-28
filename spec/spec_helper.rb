@@ -28,7 +28,7 @@ RSpec.configure do |config|
       :delete_repository! => true
     )
     OntologyMatcher.any_instance.stub(:repo_name => "XXX_alignment_test_repo")
-    
+
   end
 
 begin

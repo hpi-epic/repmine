@@ -27,7 +27,7 @@ RSpec.describe RdbmsRepository, :type => :model do
       :rdbms_type => db_type(config)
     )
   end
-  
+
   def db_type(config)
     return case config["adapter"]
       when "sqlite3" then 3

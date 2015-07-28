@@ -5,7 +5,7 @@ class RepositoriesController < ApplicationController
   def index
     @repositories = Repository.all
     flash[:notice] = "No repositories present. Please create a new one!" if @repositories.empty?
-    @title = "Repository overview"    
+    @title = "Repository overview"
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json =>  @repositories }
@@ -19,8 +19,8 @@ class RepositoriesController < ApplicationController
     @stats = [["Item Type", "Occurrences in Repository"]]
     @stats.concat(@repository.type_statistics)
     @job = @repository.ontology_creation_job
-    @title = "Repository '#{@repository.name}'"    
-    
+    @title = "Repository '#{@repository.name}'"
+
     respond_to do |format|
       format.html # show.html.erb
       format.json { render :json =>  @repository }
@@ -103,7 +103,7 @@ class RepositoriesController < ApplicationController
         redirect_to @repository, :alert => "Created ontology with warnings: #{errors}"
       end
     else
-      redirect_to @repository, :notice => "Started analyzing the repository in a background thread."            
+      redirect_to @repository, :notice => "Started analyzing the repository in a background thread."
     end
   end
 end
