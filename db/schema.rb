@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150720150651) do
+ActiveRecord::Schema.define(:version => 20150924134336) do
 
   create_table "aggregations", :force => true do |t|
     t.integer  "pattern_element_id"
@@ -152,6 +152,37 @@ ActiveRecord::Schema.define(:version => 20150720150651) do
   end
 
   add_index "repositories", ["ontology_id"], :name => "index_repositories_on_ontology_id"
+
+  create_table "service_call_parameters", :force => true do |t|
+    t.integer  "service_call_id"
+    t.integer  "pattern_element_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  create_table "service_calls", :force => true do |t|
+    t.integer  "service_id"
+    t.integer  "pattern_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "service_parameters", :force => true do |t|
+    t.string   "name"
+    t.integer  "datatype_cd"
+    t.boolean  "is_collection", :default => true
+    t.integer  "service_id"
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+  end
+
+  create_table "services", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.string   "url"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false

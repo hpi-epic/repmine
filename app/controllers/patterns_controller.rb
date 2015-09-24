@@ -47,7 +47,7 @@ class PatternsController < ApplicationController
         format.html { redirect_to @pattern}
       else
         flash[:error] = 'Could not create pattern. ' + @pattern.errors.full_messages.join(", ")
-        format.html {render action: "new"}
+        format.html {render :new}
       end
     end
   end

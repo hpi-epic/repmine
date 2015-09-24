@@ -1,9 +1,9 @@
 namespace :data do
-  task :create_seon => [:environment] do 
-    transform_issues()    
+  task :create_seon => [:environment] do
+    transform_issues()
     transform_commits()
   end
-  
+
   def transform_commits
     repo = Repository.last
     res = repo.get_all_results("MATCH (n:`GithubCommit`)-[:author]-(a:`GithubUser`) RETURN n.url, a.url")["data"]
@@ -16,7 +16,7 @@ namespace :data do
       stmts << [user, seon[:performs_commit], commit]
       stmts << [commit, seon[:carried_out_by],user]
     end
-    
+
     res = repo.get_all_results("MATCH (n:`GithubCommit`)-[:files]-(f:`GithubFileChange`) WHERE has(f.status) RETURN n.url, f.url, f.filename")["data"]
     res.each do |ci|
       commit = RDF::Resource.new(ci[0])
@@ -27,9 +27,9 @@ namespace :data do
       stmts << [commit,seon[:constitutesVersion],version]
       stmts << [version,seon[:isVersionOf],file]
     end
-    upload_statements(stmts)    
+    upload_statements(stmts)
   end
-  
+
   def transform_issues()
     repo = Repository.last
     res = repo.get_all_results("MATCH (n:`GithubIssue`), (c:`GithubIssueComment`)-[:user]-(a:`GithubUser`) WHERE c.issue_url = n.url RETURN n.url, c.url, a.url")["data"]
@@ -46,14 +46,14 @@ namespace :data do
     end
     upload_statements(stmts)
   end
-  
+
   def upload_statements(stmts)
     ag = AgraphConnection.new("seon_data")
-    puts "inserting #{stmts.size} statements"     
+    puts "inserting #{stmts.size} statements"
     ag.repository.insert(*stmts)
     ag.remove_duplicates!()
   end
-  
+
   def seon
     {
       :commit => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/history.owl#Commit"),
@@ -65,10 +65,10 @@ namespace :data do
       :isVersionOf => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/history.owl#isVersionOf"),
       :version => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/history.owl#Version"),
       :comment => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/issues.owl#Comment"),
-      :issue => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/issues.owl#Issue"),      
+      :issue => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/issues.owl#Issue"),
       :stakeholder => RDF::Resource.new("http://se-on.org/ontologies/general/2012/2/main.owl#hasAuthor"),
       :isCommentedBy => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/issues.owl#isCommentedBy"),
-      :isCommentOf => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/issues.owl#isCommentOf")      
+      :isCommentOf => RDF::Resource.new("http://se-on.org/ontologies/domain-specific/2012/02/issues.owl#isCommentOf")
     }
   end
 end

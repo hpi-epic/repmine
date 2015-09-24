@@ -23,7 +23,6 @@ gem "sparql-client", :github => "tkowark/sparql-client"
 
 # ontology work with allegrograph
 gem "rdf-agraph"
-gem "rest-client"
 gem "rdf-reasoner"
 gem "equivalent-xml"
 gem "linkeddata"
@@ -35,11 +34,15 @@ gem "wongi-engine"
 # calculating
 gem "dentaku"
 
+# calling external services
+gem "rest-client"
+
 group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem 'factory_girl_rails'
   gem 'simplecov'
+  gem 'ruby-prof'
   gem 'quiet_safari'
   gem 'test-unit', '~> 3.0'
 end

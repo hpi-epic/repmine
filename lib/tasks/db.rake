@@ -17,21 +17,21 @@ namespace :db do
     Rake::Task["db:drop"].invoke
     Rake::Task["db:create"].invoke
     Rake::Task["db:migrate"].invoke
-    Rake::Task["db:seed"].invoke            
+    Rake::Task["db:seed"].invoke
   end
-  
+
   desc "Builds a fresh application"
   task :build_fresh => ["db:drop", "db:create", "db:migrate", "db:seed"]
-  
+
   desc "clear all downloaded ontologies, created alignments, etc"
   task :clear_tmp_folders do
     puts "== clearing all tmp folders =="
     remove_all_files_from("public/ontologies/tmp")
-    remove_all_files_from("public/ontologies/extracted")    
-    remove_all_files_from("public/ontologies/alignments")    
+    remove_all_files_from("public/ontologies/extracted")
+    remove_all_files_from("public/ontologies/alignments")
     remove_all_files_from("public/data")
   end
-  
+
   def remove_all_files_from(folder_name)
     puts "= clearing #{folder_name} ="
     FileUtils.rm_rf("#{folder_name}/*.*", secure: true)

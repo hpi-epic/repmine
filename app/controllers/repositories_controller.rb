@@ -58,7 +58,7 @@ class RepositoriesController < ApplicationController
         format.html { redirect_to @repository, :notice => 'Repository was successfully created.' }
         format.json { render :json =>  @repository, :status => :created, :location => @repository }
       else
-        format.html { render :action =>  "new" }
+        format.html { render :new }
         format.json { render :json =>  @repository.errors, :status => :unprocessable_entity }
       end
     end
@@ -75,7 +75,7 @@ class RepositoriesController < ApplicationController
         format.html { redirect_to @repository, :notice => 'Graph was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render :action =>  "edit" }
+        format.html { render :edit }
         format.json { render :json =>  @repository.errors, :status => :unprocessable_entity }
       end
     end

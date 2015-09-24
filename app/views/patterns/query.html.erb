@@ -2,16 +2,16 @@
   <div class="btn-group">
     <%= button_tag("Translate queries to:", :class => "btn btn-info", :name => "translate") %>
     <%= select_tag(
-      :ontology_id, 
-      grouped_options_for_select(@ontology_groups), 
-      {:class => "selectpicker", "data-live-search" => "true"}) 
+      :ontology_id,
+      grouped_options_for_select(@ontology_groups),
+      {:class => "selectpicker", "data-live-search" => "true"})
     %>
   </div>
 <% end %>
 
 <% @queries.each_pair do |language, query| %>
   <legend><%= language %></legend>
-  <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%> 
+  <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%>
 <% end %>
 <%= link_to("Overview", patterns_path(), :class => "btn")%>
-<%= link_to("Pattern", pattern_path(@pattern), :class => "btn btn-success")%>  
+<%= link_to("Pattern", pattern_path(@pattern), :class => "btn btn-success")%>

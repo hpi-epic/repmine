@@ -13,9 +13,11 @@ class Metric < Measurable
 
   def run_on_repository(repository)
     results = {}
+    threads = []
     metric_nodes.where("aggregation_id IS NOT NULL").each do |metric_node|
-      results[metric_node] = metric_node.results_on(repository)
+      threads << Thread.new{results[metric_node] = metric_node.results_on(repository)}
     end
+    threads.each { |thr| thr.join }
     return process_results(results, repository)
   end
 

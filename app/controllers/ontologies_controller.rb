@@ -38,7 +38,7 @@ class OntologiesController < ApplicationController
         format.html { redirect_to ontologies_path, notice: 'Ontology was successfully created.' }
         format.json { render json: @ontology, status: :created, location: @ontology }
       else
-        format.html { render action: "new" }
+        format.html { render :new }
         format.json { render json: @ontology.errors, status: :unprocessable_entity }
       end
     end
@@ -54,7 +54,7 @@ class OntologiesController < ApplicationController
         format.html { redirect_to @ontology, notice: 'Ontology was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render :edit }
         format.json { render json: @ontology.errors, status: :unprocessable_entity }
       end
     end

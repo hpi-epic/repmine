@@ -95,6 +95,7 @@ class Neo4jRepository < Repository
   def query_result(query, columns = false)
     tx = neo.begin_transaction(query)
     raise tx["errors"].first["message"] unless tx["errors"].empty?
+    neo.commit_transaction(tx)
     if !columns
       return tx["results"].first["data"].collect{|row| row["row"]}
     else
@@ -107,13 +108,25 @@ class Neo4jRepository < Repository
   end
 
   def results_for_query(query)
-    data, columns = query_result(query, true)
+    data = []
+    columns = []
+    round = 0
+
+    loop do
+      round_data, round_columns = query_result(query + " SKIP #{round*1000} LIMIT 1000", true)
+      data += round_data
+      columns = round_columns
+      log_msg("Results so far: #{data.size}")
+      round += 1
+      break if round_data.size != 1000
+    end
+
     return hash_data(data, columns)
   end
 
   def hash_data(data, columns)
     return data.collect do |row|
-      Hash[ *row.each_with_index{|val, i| [ columns[i], val ] }.flatten ]
+      Hash[ *row.enum_for(:each_with_index).collect{|val, i| [ columns[i], val ] }.flatten ]
     end
   end
 end

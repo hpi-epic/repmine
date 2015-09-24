@@ -1,22 +1,22 @@
-<%= simple_form_for(@repository) do |f| %>
-  <% if @repository.errors.any? %>
+<%= simple_form_for(repository) do |f| %>
+  <% if repository.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@repository.errors.count, "error") %> prohibited this repository from being saved:</h2>
+      <h2><%= pluralize(repository.errors.count, "error") %> prohibited this repository from being saved:</h2>
 
       <ul>
-      <% @repository.errors.full_messages.each do |msg| %>
+      <% repository.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
       </ul>
     </div>
   <% end %>
 
-  <% @repository.editable_attributes.each do |attrib| %>
+  <% repository.editable_attributes.each do |attrib| %>
     <%= f.label attrib.to_sym %>
-    <%= field_for_attribute(attrib, @repository.class, f) %>
+    <%= field_for_attribute(attrib, repository.class, f) %>
   <% end %>
 
-  <%= f.input :type, :as => :hidden, :input_html => { :value => @repository.type } %>
+  <%= f.input :type, :as => :hidden, :input_html => { :value => repository.type } %>
 
   <div class="actions form-actions">
     <%= f.submit("Save", :class => "btn btn-success") %>

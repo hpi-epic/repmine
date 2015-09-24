@@ -1,5 +1,7 @@
 RepMine::Application.routes.draw do
 
+  resources :services
+
   resources :patterns do
     get :query
     post :query
