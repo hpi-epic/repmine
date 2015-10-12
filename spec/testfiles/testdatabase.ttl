@@ -33,6 +33,11 @@
       rdfs:label "delayed_jobs_run_at" ;
       rdfs:range xsd:string .
 
+:services
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "services" .
+
 :type_expressions_operator
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :type_expressions ;
@@ -46,13 +51,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_description" ;
       rdfs:range xsd:string .
-
-:service_parameters_external_service_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_parameters ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "service_parameters_external_service_id" ;
-      rdfs:range xsd:integer .
 
 :metric_nodes_id
       a       owl:DatatypeProperty , rdf:Property ;
@@ -68,12 +66,12 @@
       rdfs:label "tags_name" ;
       rdfs:range xsd:string .
 
-:external_services_created_at
+:ontologies_does_exist
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
+      rdfs:domain :ontologies ;
       rdfs:isDefinedBy : ;
-      rdfs:label "external_services_created_at" ;
-      rdfs:range xsd:string .
+      rdfs:label "ontologies_does_exist" ;
+      rdfs:range xsd:integer .
 
 :repositories_ontology_url
       a       owl:DatatypeProperty , rdf:Property ;
@@ -81,13 +79,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_ontology_url" ;
       rdfs:range xsd:string .
-
-:ontologies_does_exist
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :ontologies ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "ontologies_does_exist" ;
-      rdfs:range xsd:integer .
 
 :metric_nodes_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
@@ -103,13 +94,6 @@
       rdfs:label "delayed_jobs_last_error" ;
       rdfs:range xsd:string .
 
-:external_services_updated_at
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "external_services_updated_at" ;
-      rdfs:range xsd:string .
-
 :aggregations_alias_name
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :aggregations ;
@@ -117,11 +101,11 @@
       rdfs:label "aggregations_alias_name" ;
       rdfs:range xsd:string .
 
-:external_services_last_raml_update
+:service_call_parameters_created_at
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
+      rdfs:domain :service_call_parameters ;
       rdfs:isDefinedBy : ;
-      rdfs:label "external_services_last_raml_update" ;
+      rdfs:label "service_call_parameters_created_at" ;
       rdfs:range xsd:string .
 
 :service_parameters_datatype_cd
@@ -137,6 +121,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_updated_at" ;
       rdfs:range xsd:string .
+
+:service_call_parameters_pattern_element_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_call_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters_pattern_element_id" ;
+      rdfs:range xsd:integer .
 
 :monitoring_tasks
       a       owl:Class , rdfs:Class ;
@@ -204,18 +195,18 @@
       rdfs:isDefinedBy : ;
       rdfs:label "service_parameters" .
 
+:service_call_parameters_updated_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_call_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters_updated_at" ;
+      rdfs:range xsd:string .
+
 :delayed_jobs_queue
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :delayed_jobs ;
       rdfs:isDefinedBy : ;
       rdfs:label "delayed_jobs_queue" ;
-      rdfs:range xsd:string .
-
-:external_services_description
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "external_services_description" ;
       rdfs:range xsd:string .
 
 :repositories_db_username
@@ -265,6 +256,11 @@
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies" .
 
+:service_calls
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls" .
+
 :taggings_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :taggings ;
@@ -300,13 +296,6 @@
       rdfs:label "pattern_elements_id" ;
       rdfs:range xsd:integer .
 
-:external_services_name
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "external_services_name" ;
-      rdfs:range xsd:string .
-
 :metric_nodes_x
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :metric_nodes ;
@@ -321,6 +310,13 @@
       rdfs:label "pattern_elements_x" ;
       rdfs:range xsd:integer .
 
+:service_call_parameters_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_call_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters_id" ;
+      rdfs:range xsd:integer .
+
 :sessions_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :sessions ;
@@ -328,11 +324,11 @@
       rdfs:label "sessions_id" ;
       rdfs:range xsd:integer .
 
-:pattern_elements_min_path_length
+:service_calls_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :pattern_elements ;
+      rdfs:domain :service_calls ;
       rdfs:isDefinedBy : ;
-      rdfs:label "pattern_elements_min_path_length" ;
+      rdfs:label "service_calls_updated_at" ;
       rdfs:range xsd:string .
 
 :repositories_rdbms_type_cd
@@ -341,6 +337,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_rdbms_type_cd" ;
       rdfs:range xsd:integer .
+
+:pattern_elements_min_path_length
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_min_path_length" ;
+      rdfs:range xsd:string .
 
 :repositories_type
       a       owl:DatatypeProperty , rdf:Property ;
@@ -376,6 +379,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "delayed_jobs_priority" ;
       rdfs:range xsd:integer .
+
+:services_description
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :services ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "services_description" ;
+      rdfs:range xsd:string .
 
 :measurables_pattern_id
       a       owl:DatatypeProperty , rdf:Property ;
@@ -465,6 +475,13 @@
       dc:creator "D2RQ Mapping Generator" ;
       owl:imports dc: .
 
+:service_call_parameters_service_call_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_call_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters_service_call_id" ;
+      rdfs:range xsd:integer .
+
 :metric_nodes
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
@@ -488,6 +505,13 @@
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
       rdfs:label "type_expressions" .
+
+:service_calls_service_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_calls ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls_service_id" ;
+      rdfs:range xsd:integer .
 
 :measurables_description
       a       owl:DatatypeProperty , rdf:Property ;
@@ -538,28 +562,16 @@
       rdfs:label "delayed_jobs_locked_by" ;
       rdfs:range xsd:string .
 
-:external_services
-      a       owl:Class , rdfs:Class ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "external_services" .
-
 :tags
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
       rdfs:label "tags" .
 
-:service_parameters_collection
+:services_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_parameters ;
+      rdfs:domain :services ;
       rdfs:isDefinedBy : ;
-      rdfs:label "service_parameters_collection" ;
-      rdfs:range xsd:integer .
-
-:type_expressions_updated_at
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_updated_at" ;
+      rdfs:label "services_updated_at" ;
       rdfs:range xsd:string .
 
 :type_expressions_pattern_element_id
@@ -569,11 +581,11 @@
       rdfs:label "type_expressions_pattern_element_id" ;
       rdfs:range xsd:integer .
 
-:service_parameters_created_at
+:type_expressions_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_parameters ;
+      rdfs:domain :type_expressions ;
       rdfs:isDefinedBy : ;
-      rdfs:label "service_parameters_created_at" ;
+      rdfs:label "type_expressions_updated_at" ;
       rdfs:range xsd:string .
 
 :aggregations_metric_node_id
@@ -583,12 +595,24 @@
       rdfs:label "aggregations_metric_node_id" ;
       rdfs:range xsd:integer .
 
+:service_parameters_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_parameters_created_at" ;
+      rdfs:range xsd:string .
+
 :sessions_data
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :sessions ;
       rdfs:isDefinedBy : ;
       rdfs:label "sessions_data" ;
       rdfs:range xsd:string .
+
+:service_call_parameters
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters" .
 
 :metric_nodes_operator_cd
       a       owl:DatatypeProperty , rdf:Property ;
@@ -603,6 +627,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "taggings_tagger_id" ;
       rdfs:range xsd:integer .
+
+:service_calls_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_calls ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls_created_at" ;
+      rdfs:range xsd:string .
 
 :metric_nodes_operation_cd
       a       owl:DatatypeProperty , rdf:Property ;
@@ -639,19 +670,19 @@
       rdfs:label "monitoring_tasks_measurable_id" ;
       rdfs:range xsd:integer .
 
-:delayed_jobs_progress_current
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :delayed_jobs ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "delayed_jobs_progress_current" ;
-      rdfs:range xsd:integer .
-
 :delayed_jobs_handler
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :delayed_jobs ;
       rdfs:isDefinedBy : ;
       rdfs:label "delayed_jobs_handler" ;
       rdfs:range xsd:string .
+
+:delayed_jobs_progress_current
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :delayed_jobs ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "delayed_jobs_progress_current" ;
+      rdfs:range xsd:integer .
 
 :ontologies_url
       a       owl:DatatypeProperty , rdf:Property ;
@@ -686,6 +717,13 @@
       rdfs:domain :repositories ;
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_ontology_id" ;
+      rdfs:range xsd:integer .
+
+:service_calls_pattern_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_calls ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls_pattern_id" ;
       rdfs:range xsd:integer .
 
 :repositories_db_password
@@ -723,6 +761,13 @@
       rdfs:label "sessions_created_at" ;
       rdfs:range xsd:string .
 
+:services_name
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :services ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "services_name" ;
+      rdfs:range xsd:string .
+
 :ontologies_short_name
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies ;
@@ -740,13 +785,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "taggings" .
 
-:external_services_raml_url
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "external_services_raml_url" ;
-      rdfs:range xsd:string .
-
 :pattern_elements_min_cardinality
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :pattern_elements ;
@@ -754,11 +792,11 @@
       rdfs:label "pattern_elements_min_cardinality" ;
       rdfs:range xsd:string .
 
-:external_services_id
+:service_parameters_is_collection
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
+      rdfs:domain :service_parameters ;
       rdfs:isDefinedBy : ;
-      rdfs:label "external_services_id" ;
+      rdfs:label "service_parameters_is_collection" ;
       rdfs:range xsd:integer .
 
 :pattern_elements_pattern_id
@@ -782,6 +820,13 @@
       rdfs:label "taggings_taggable_type" ;
       rdfs:range xsd:string .
 
+:metric_nodes_name
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :metric_nodes ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "metric_nodes_name" ;
+      rdfs:range xsd:string .
+
 :delayed_jobs_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :delayed_jobs ;
@@ -789,11 +834,11 @@
       rdfs:label "delayed_jobs_updated_at" ;
       rdfs:range xsd:string .
 
-:metric_nodes_name
+:services_url
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :metric_nodes ;
+      rdfs:domain :services ;
       rdfs:isDefinedBy : ;
-      rdfs:label "metric_nodes_name" ;
+      rdfs:label "services_url" ;
       rdfs:range xsd:string .
 
 :pattern_elements_ontology_id
@@ -810,17 +855,17 @@
       rdfs:label "aggregations_column_name" ;
       rdfs:range xsd:string .
 
-:pattern_element_matches
-      a       owl:Class , rdfs:Class ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "pattern_element_matches" .
-
 :repositories_host
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_host" ;
       rdfs:range xsd:string .
+
+:pattern_element_matches
+      a       owl:Class , rdfs:Class ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_element_matches" .
 
 :delayed_jobs_locked_at
       a       owl:DatatypeProperty , rdf:Property ;
@@ -855,12 +900,12 @@
       rdfs:label "sessions_session_id" ;
       rdfs:range xsd:string .
 
-:external_services_raml_parsed
+:services_created_at
       a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :external_services ;
+      rdfs:domain :services ;
       rdfs:isDefinedBy : ;
-      rdfs:label "external_services_raml_parsed" ;
-      rdfs:range xsd:integer .
+      rdfs:label "services_created_at" ;
+      rdfs:range xsd:string .
 
 :metric_nodes_measurable_id
       a       owl:DatatypeProperty , rdf:Property ;
@@ -869,18 +914,18 @@
       rdfs:label "metric_nodes_measurable_id" ;
       rdfs:range xsd:integer .
 
-:aggregations_created_at
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :aggregations ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "aggregations_created_at" ;
-      rdfs:range xsd:string .
-
 :pattern_elements_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :pattern_elements ;
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_elements_updated_at" ;
+      rdfs:range xsd:string .
+
+:aggregations_created_at
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :aggregations ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "aggregations_created_at" ;
       rdfs:range xsd:string .
 
 :tags_id
@@ -911,6 +956,13 @@
       rdfs:label "taggings_tagger_type" ;
       rdfs:range xsd:string .
 
+:services_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :services ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "services_id" ;
+      rdfs:range xsd:integer .
+
 :delayed_jobs
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
@@ -923,13 +975,6 @@
       rdfs:label "aggregations_operation_cd" ;
       rdfs:range xsd:integer .
 
-:pattern_elements_target_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :pattern_elements ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "pattern_elements_target_id" ;
-      rdfs:range xsd:integer .
-
 :measurables_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :measurables ;
@@ -937,10 +982,24 @@
       rdfs:label "measurables_id" ;
       rdfs:range xsd:integer .
 
+:pattern_elements_target_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_target_id" ;
+      rdfs:range xsd:integer .
+
 :pattern_elements
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_elements" .
+
+:service_parameters_service_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_parameters_service_id" ;
+      rdfs:range xsd:integer .
 
 :type_expressions_rdf_type
       a       owl:DatatypeProperty , rdf:Property ;
@@ -948,6 +1007,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "type_expressions_rdf_type" ;
       rdfs:range xsd:string .
+
+:service_calls_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_calls ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls_id" ;
+      rdfs:range xsd:integer .
 
 :repositories
       a       owl:Class , rdfs:Class ;
@@ -982,18 +1048,18 @@
       rdfs:label "taggings_context" ;
       rdfs:range xsd:string .
 
-:service_parameters_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_parameters ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "service_parameters_id" ;
-      rdfs:range xsd:integer .
-
 :type_expressions_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :type_expressions ;
       rdfs:isDefinedBy : ;
       rdfs:label "type_expressions_id" ;
+      rdfs:range xsd:integer .
+
+:service_parameters_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_parameters_id" ;
       rdfs:range xsd:integer .
 
 :type_expressions_ancestry
