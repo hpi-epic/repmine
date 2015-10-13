@@ -42,9 +42,9 @@ class Pattern < Measurable
     !TranslationPattern.existing_translation_pattern(self, [repository.ontology]).nil?
   end
 
-  def create_node!(ontology)
+  def create_node!(ontology, rdf_type = "")
     node = self.nodes.create!(:ontology_id => ontology.id)
-    node.type_expression = TypeExpression.for_rdf_type("")
+    node.type_expression = TypeExpression.for_rdf_type(rdf_type)
     return node.becomes(Node)
   end
 

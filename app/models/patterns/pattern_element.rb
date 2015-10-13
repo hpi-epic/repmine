@@ -14,9 +14,15 @@ class PatternElement < ActiveRecord::Base
   has_many :matching_elements, :through => :matches, :dependent => :destroy
 
   has_one :type_expression, :dependent => :destroy
+  before_destroy :invalidate_translations, prepend: true
+
   include RdfSerialization
 
   class ComparisonError < Error
+  end
+
+  def invalidate_translations
+    matching_elements.each{|me| me.pattern.destroy}
   end
 
   def url
@@ -35,6 +41,7 @@ class PatternElement < ActiveRecord::Base
   def rdf_type=(str)
     if type_expression.nil?
       self.type_expression = TypeExpression.for_rdf_type(str)
+      invalidate_translations
     else
       # we only need to overwrite if the strings differ...
       if type_expression.fancy_string != str
@@ -44,6 +51,7 @@ class PatternElement < ActiveRecord::Base
           type_expression.destroy
           self.type_expression = TypeExpression.for_rdf_type(str)
         end
+        invalidate_translations
       end
     end
   end

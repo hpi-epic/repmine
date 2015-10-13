@@ -110,12 +110,48 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal new_node, @pattern.unmatched_elements(@target_ontology).first
     assert_equal 1, tp.pattern_elements.size
     assert_equal 1, @pattern.unmatched_elements([@target_ontology]).size
+    # adding a new correspondence
     corr2 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om.add_correspondence!(corr2)
+    # now we change the rdf type on one node -> translation is deleted subsequently
     @pattern.unmatched_elements(@target_ontology).first.rdf_type = corr2.entity1
-    tp.prepare!()
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    tp.prepare!
     assert_empty @pattern.unmatched_elements([@target_ontology])
     assert_equal 2, tp.pattern_elements.size
+  end
+
+  it "should throw away existing translation patterns if the original one was changed" do
+    correspondence1 = FactoryGirl.build(:hardway_complex)
+    om = ontology_matcher([correspondence1])
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    tp.prepare!
+    assert_equal 1, TranslationPattern.count
+    @pattern.nodes.first.rdf_type = @pattern.nodes.first.rdf_type + "_new"
+    assert_equal 0, TranslationPattern.count
+  end
+
+  it "should throw away a translation if an existing element was remvoved" do
+    correspondence1 = FactoryGirl.build(:hardway_complex)
+    om = ontology_matcher([correspondence1])
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    tp.prepare!
+    assert_equal 1, TranslationPattern.count
+    @pattern.nodes.first.destroy
+    assert_equal 0, TranslationPattern.count
+  end
+
+  it "should extend the translation pattern if the original one was extended" do
+    correspondence1 = FactoryGirl.build(:hardway_complex)
+    om = ontology_matcher([correspondence1])
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    assert_equal 1, TranslationPattern.count
+    corr2 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    om.add_correspondence!(corr2)
+    new_node = @pattern.create_node!(@source_ontology, corr2.entity1)
+    assert_equal 1, TranslationPattern.count
+    tp.prepare!
+    assert_empty @pattern.unmatched_elements(@target_ontology)
   end
 
   it "should build a graph if we have simple mappings for node and attribute constraint" do
