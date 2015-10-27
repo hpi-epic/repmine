@@ -80,4 +80,8 @@ class AttributeConstraint < PatternElement
   def pretty_string
     "#{type_expression.fancy_string(true)} #{operator} #{value}"
   end
+
+  def virtual?
+    false
+  end
 end

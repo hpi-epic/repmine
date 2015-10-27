@@ -78,13 +78,6 @@ var saveForm = function(form_finder){
     requests.push(submitAndHighlight($(this)));
   });
   return requests;
-}
-
-var removeAttributeConstraint = function(url, div_id){
-  jsPlumb.select({target:div_id}).each(function(conn){
-    jsPlumb.detach(conn);
-  });
-  jsPlumb.remove(div_id);
 };
 
 var openComplexDialog = function(url, modal_tree, modal){
@@ -197,10 +190,6 @@ jsPlumb.bind("connectionDetached", function(info, originalEvent){
     if(delete_me_link != undefined){
       $.ajax({url: delete_me_link, method: "DELETE"});
     };
-  } else {
-    $(info.connection.target).find("form").each(function(i, form){
-      $.ajax({url: $(form).attr("action"), method: "DELETE"});
-    })
   }
 });
 

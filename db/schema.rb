@@ -18,9 +18,9 @@ ActiveRecord::Schema.define(:version => 20150924134336) do
     t.integer  "metric_node_id"
     t.string   "column_name"
     t.integer  "operation_cd"
+    t.string   "alias_name"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
-    t.string   "alias_name"
   end
 
   add_index "aggregations", ["metric_node_id"], :name => "index_aggregations_on_metric_node_id"

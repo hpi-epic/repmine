@@ -5,42 +5,42 @@
         <div id="node_<%= node.id%>_modal_tree">
         <%= render(
           :partial => "type_expressions/show",
-          :locals => {:type_expression => node.type_expression, :type_hierarchy => node.type_hierarchy, :pattern => pattern, :node => node}) %>
+          :locals => {:type_expression => node.type_expression, :type_hierarchy => node.type_hierarchy, :node => node}) %>
         </div>
       </td>
       <td style="width: 100px; text-align: left">
         <%= link_to(
           fa_icon("save", :text => "save"),
           "#",
-          :onclick => "saveTypeExpressions($('#node_#{node.id}_modal_tree'), '#{pattern_node_fancy_rdf_string_path(pattern, node)}', $('#node_#{node.id}').find('select'), $('#node_#{node.id}_modal'));"
+          :onclick => "saveTypeExpressions($('#node_#{node.id}_modal_tree'), '#{node_fancy_rdf_string_path(node)}', $('#node_#{node.id}').find('select'), $('#node_#{node.id}_modal'));"
         ) %>
         <hr />
         <%= link_to(
           fa_icon("arrow-circle-o-down", :text => "operator below"),
           "#",
-          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_below_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
+          :onclick => "addTypeExpression('#{node_type_expression_add_below_path( node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
         ) %><br />
         <%= link_to(
           fa_icon("arrow-circle-o-left", :text => "operator same level"),
           "#",
-          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_same_level_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
+          :onclick => "addTypeExpression('#{node_type_expression_add_same_level_path( node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), true);"
         ) %>
         <hr />
         <%= link_to(
           fa_icon("arrow-circle-down", :text => "type below"),
           "#",
-          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_below_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
+          :onclick => "addTypeExpression('#{node_type_expression_add_below_path( node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
         ) %><br />
         <%= link_to(
           fa_icon("arrow-circle-left", :text => "type same level"),
           "#",
-          :onclick => "addTypeExpression('#{pattern_node_type_expression_add_same_level_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
+          :onclick => "addTypeExpression('#{node_type_expression_add_same_level_path( node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'), false);"
         ) %>
         <hr />
         <%= link_to(
           fa_icon("times-circle", :text => "delete"),
           "#",
-          :onclick => "addTypeExpression('#{pattern_node_type_expression_delete_path(pattern, node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'));"
+          :onclick => "addTypeExpression('#{node_type_expression_delete_path( node,"XXX")}',$('li.highlighted'),$('#node_#{node.id}_modal_tree'));"
         ) %>
       </td>
     </tr>

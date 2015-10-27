@@ -2,13 +2,9 @@ class NodesController < ApplicationController
 
   # these are always just embedded, no need for a layout
   layout false
-  before_filter :get_pattern
-
-  def get_pattern
-    @pattern = Pattern.find(params[:pattern_id])
-  end
 
   def create
+    @pattern = Pattern.find(params[:pattern_id])
     @node = @pattern.create_node!(Ontology.find(params[:ontology_id]))
     render :show
   end

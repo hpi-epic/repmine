@@ -11,6 +11,10 @@ class CreateDelayedJobs < ActiveRecord::Migration
       table.string :locked_by                                # Who is working on this object (if locked)
       table.string :queue                                    # The name of the queue this job is in
       table.timestamps
+
+      table.string :progress_stage, required: true
+      table.integer :progress_current, required: true, default: 0
+      table.integer :progress_max, required: true, default: 0
     end
 
     add_index :delayed_jobs, [:priority, :run_at], :name => 'delayed_jobs_priority'

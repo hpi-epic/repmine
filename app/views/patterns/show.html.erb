@@ -1,6 +1,6 @@
 <%= javascript_tag do %>
-  var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@pattern) %>';
-  var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@pattern) %>';
+  var new_relation_constraint_path = '<%= relation_constraints_path() %>';
+  var new_attribute_constraint_path = '<%= attribute_constraints_path() %>';
   var connect_these_nodes = <%= @relations.to_json.html_safe %>;
   var load_their_attribute_constraints = <%= @attributes.to_json.html_safe %>
 <% end %>
@@ -9,7 +9,6 @@
   <%= javascript_include_tag "editor.js" %>
   <%= javascript_include_tag "pattern_editor.js" %>
 <% end %>
-
 
 <div class="btn-toolbar">
   <div class="btn-group">

@@ -34,4 +34,18 @@ Calculate complexity for query B by running shell script and adding the value
 
 Test Case B (Value computation):
 Data A - N4jGD w/ owner
-Data B - 
+Data B -
+
+
+== As an MSR researcher ==
+* Gather data for a study
+* Process it by computing sentiment values for whatever people write
+* Formulate query that test whether issues with lots of negative sentiment took longer to solve
+ - Group by issue, avg sentiment of comments, get open duration
+
+- Now, I get a different dataset
+* Add the repository to Repmine
+* Use the original query to model with Repmine
+* Transfer using ontology matching tools and (X) manual interactions
+* Integrate original sentiment service by creating a virtual attribute
+* Replicate the original study by clicking (do)

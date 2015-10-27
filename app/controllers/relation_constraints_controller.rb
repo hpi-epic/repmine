@@ -2,12 +2,6 @@ class RelationConstraintsController < ApplicationController
 
   layout false
 
-  before_filter :get_pattern
-
-  def get_pattern
-    @pattern = Pattern.find(params[:pattern_id])
-  end
-
   def create
     @rc = RelationConstraint.create(:source_id => params[:source_id], :target_id => params[:target_id])
     @possible_relations = @rc.possible_relations(params[:source_type], params[:target_type])

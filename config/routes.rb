@@ -1,7 +1,5 @@
 RepMine::Application.routes.draw do
 
-  resources :services
-
   resources :patterns do
     get :query
     post :query
@@ -9,25 +7,26 @@ RepMine::Application.routes.draw do
     post :process_patterns, :on => :collection
     get :monitor, :on => :collection
     post "/save_correspondence/:output_pattern_id", :to => "patterns#save_correspondence", :as => :save_correspondence
-
-    resources :nodes do
-      get :fancy_rdf_string
-      resources :type_expressions do
-        post :add_below
-        post :add_same_level
-        post :delete
-      end
-    end
-
-    resources :relation_constraints do
-      get :static
-    end
-
-    resources :attribute_constraints do
-      get :static
-    end
-
     get :autocomplete_tag_name, :on => :collection
+    resources :nodes, :only => [:create]
+  end
+
+  resources :relation_constraints do
+    get :static
+  end
+
+  resources :nodes do
+    get :fancy_rdf_string
+    resources :type_expressions do
+      post :add_below
+      post :add_same_level
+      post :delete
+    end
+  end
+
+  resources :attribute_constraints do
+    get :static
+    get :magic
   end
 
   resources :metrics do
@@ -57,6 +56,8 @@ RepMine::Application.routes.draw do
     post :run
     get :check, :on => :collection
   end
+
+  resources :services
 
   root :to => "patterns#index"
 end

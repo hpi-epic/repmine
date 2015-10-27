@@ -22,7 +22,7 @@ class TypeExpressionsController < ApplicationController
   end
 
   def get_locals()
-    {:type_expression => @node.type_expression, :type_hierarchy => @node.type_hierarchy, :pattern => @pattern, :node => @node}
+    {:type_expression => @node.type_expression, :type_hierarchy => @node.type_hierarchy, :node => @node}
   end
 
   def update
@@ -39,7 +39,6 @@ class TypeExpressionsController < ApplicationController
   private
 
   def set_inst_vars
-    @pattern = Pattern.find(params[:pattern_id])
     @node = Node.find(params[:node_id])
     @te = begin
       get_type_expression

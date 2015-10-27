@@ -5,6 +5,7 @@ class CreateAggregations < ActiveRecord::Migration
       t.references :metric_node
       t.string :column_name
       t.integer :operation_cd
+      t.string :alias_name
       t.timestamps
     end
 

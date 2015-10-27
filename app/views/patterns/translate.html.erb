@@ -1,6 +1,6 @@
 <%= javascript_tag do %>
-  var new_relation_constraint_path = '<%= pattern_relation_constraints_path(@target_pattern) %>';
-  var new_attribute_constraint_path = '<%= pattern_attribute_constraints_path(@target_pattern) %>';
+  var new_relation_constraint_path = '<%= relation_constraints_path() %>';
+  var new_attribute_constraint_path = '<%= attribute_constraints_path() %>';
 
   var connect_these_static_nodes = <%= @source_relations.to_json.html_safe %>;
   var load_static_attribute_constraints = <%= @source_attributes.to_json.html_safe %>

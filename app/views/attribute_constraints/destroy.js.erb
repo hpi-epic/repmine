@@ -1,0 +1,4 @@
+jsPlumb.select({target: '<%= div_id(@ac) %>'}).each(function(conn){
+  jsPlumb.detach(conn);
+});
+jsPlumb.remove('<%= div_id(@ac) %>');

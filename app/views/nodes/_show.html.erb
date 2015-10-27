@@ -1,13 +1,13 @@
 <div class="node graph_element" style="<%= node_position(node, false, offset) %>" id="node_<%=node.id%>" data-id="<%= node.id %>">
-<%= simple_form_for([pattern, node]) do |f| %>
+<%= simple_form_for(node) do |f| %>
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>
   <%= f.select(:rdf_type, type_select(node.type_hierarchy, node), :class => "classSelector") %>
   <%= link_to(fa_icon("sitemap"), "#",
-  :onclick => "openComplexDialog('#{pattern_node_type_expression_path(pattern, node, node.type_expression)}',$('#node_#{ node.id}_modal_tree'), $('#node_#{node.id}_modal'))") %>
+  :onclick => "openComplexDialog('#{node_type_expression_path(node, node.type_expression)}',$('#node_#{ node.id}_modal_tree'), $('#node_#{node.id}_modal'))") %>
   &nbsp;|&nbsp;
   <%= link_to(fa_icon("times-circle"), "#", :onclick => "deleteNode($('#node_#{node.id}'))") %>
 <% end %>
 </div>
 
-<%= render :partial => "nodes/modal", :locals => {:pattern => pattern, :node => node} %>
+<%= render :partial => "nodes/modal", :locals => {:node => node} %>

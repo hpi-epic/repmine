@@ -1,6 +1,6 @@
 <ul class="type_expression">
   <li class="type_expression " data-id="<%= type_expression.id %>" onclick="highlightSelector($(this));">
-    <%= form_for([pattern, node, type_expression]) do |f| %>
+    <%= form_for([node, type_expression]) do |f| %>
       <% if type_expression.operator? %>
       <%= f.select(:operator, options_for_select(["&sub;", "&sup;", "&not;"].collect{|x| x.html_safe}),{}, {:class => "very_narrow"}) %>
       <% else %>
@@ -11,6 +11,6 @@
   <% type_expression.children.each do |child| %>
   	<%= render(
   	  :partial => "type_expressions/show",
-  	  :locals => {:type_expression => child, :type_hierarchy => type_hierarchy, :pattern => pattern, :node => node}) %>
+  	  :locals => {:type_expression => child, :type_hierarchy => type_hierarchy, :node => node}) %>
   <% end %>
 </ul>

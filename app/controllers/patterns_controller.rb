@@ -154,7 +154,7 @@ class PatternsController < ApplicationController
       {
         :source => rc.source.id,
         :target => rc.target.id,
-        :url => static ? pattern_relation_constraint_static_path(pattern, rc) : pattern_relation_constraint_path(pattern, rc)
+        :url => static ? relation_constraint_static_path(rc) : relation_constraint_path(rc)
       }
     end
 
@@ -163,9 +163,9 @@ class PatternsController < ApplicationController
     pattern.attribute_constraints.each do |ac|
       attributes[ac.node.id] ||= []
       attributes[ac.node.id] << if static
-        pattern_attribute_constraint_static_path(pattern, ac)
+        attribute_constraint_static_path(ac)
       else
-        pattern_attribute_constraint_path(pattern, ac)
+        attribute_constraint_path(ac)
       end
     end
     return attributes, relations
