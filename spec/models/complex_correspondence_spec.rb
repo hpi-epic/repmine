@@ -11,7 +11,8 @@ RSpec.describe ComplexCorrespondence, :type => :model do
       [ress[2], ress[0], ress[1]],
       [ress[0], ress[0], ress[0]]
     ]
-    resource, cleaned_statements = ComplexCorrespondence.clean_rdf_statements(stmts, ress[0])
+    c = FactoryGirl.build(:complex_correspondence)
+    resource, cleaned_statements = c.clean_rdf_statements(stmts, ress[0])
     assert resource.anonymous?
     cleaned_statements.each{|cs| cs.all?{|el| el.anonymous?}}
     assert_equal resource, cleaned_statements[0][0]

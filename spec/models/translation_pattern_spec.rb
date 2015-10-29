@@ -144,7 +144,6 @@ RSpec.describe TranslationPattern, :type => :model do
   it "should extend the translation pattern if the original one was extended" do
     correspondence1 = FactoryGirl.create(:hardway_complex)
     om = ontology_matcher([correspondence1])
-    om.print_alignment_graph!
 
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     assert_equal 1, TranslationPattern.count
