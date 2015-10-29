@@ -7,7 +7,8 @@ class ComplexCorrespondence < SimpleCorrespondence
       [resource, Vocabularies::Alignment.entity1, res1],
       [resource, Vocabularies::Alignment.entity2, res2],
       [resource, Vocabularies::Alignment.measure, RDF::Literal.new(measure.to_f)],
-      [resource, Vocabularies::Alignment.relation, RDF::Literal.new(relation)]
+      [resource, Vocabularies::Alignment.relation, RDF::Literal.new(relation)],
+      [resource, Vocabularies::Alignment.db_id, RDF::Literal.new(id)]
     ].concat(stmts1).concat(stmts2)
   end
 

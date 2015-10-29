@@ -35,6 +35,7 @@ RSpec.describe ComplexCorrespondence, :type => :model do
     i_pattern = FactoryGirl.create(:pattern)
     o_pattern = FactoryGirl.create(:pattern)
     cc = ComplexCorrespondence.from_elements(i_pattern.pattern_elements, o_pattern.pattern_elements)
+
     g = RDF::Graph.new
     g.insert(*cc.rdf_statements)
     g.each do |stmt|
@@ -42,6 +43,9 @@ RSpec.describe ComplexCorrespondence, :type => :model do
         assert_not_nil stmt[2]
       end
     end
+
+    assert_equal i_pattern.pattern_elements.size * o_pattern.pattern_elements.size, PatternElementMatch.count
+    PatternElementMatch.all.each{|pem| assert_equal cc, pem.correspondence}
   end
 
   it "should also work if we have simple -> complex mappings" do

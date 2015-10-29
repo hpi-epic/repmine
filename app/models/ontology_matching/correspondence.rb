@@ -17,6 +17,7 @@ class Correspondence < ActiveRecord::Base
     c.onto2 = onto2
     c.entity1 = entity1
     c.entity2 = entity2
+    c.save
     return c
   end
 
@@ -28,12 +29,16 @@ class Correspondence < ActiveRecord::Base
     return ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:correspondences_path] + id.to_s
   end
 
+  def ontology_matcher()
+    OntologyMatcher.new(onto1, onto2)
+  end
+
   def add_to_alignment()
-    OntologyMatcher.new(onto1, onto2).add_correspondence!(self)
+    ontology_matcher.add_correspondence!(self)
   end
 
   def remove_from_alignment()
-    OntologyMatcher.new(onto1, onto2).remove_correspondence!(self)
+    ontology_matcher.remove_correspondence!(self)
   end
 
   # uses a set of elements provided by a user and creates a complex or simple correspondence
@@ -50,7 +55,6 @@ class Correspondence < ActiveRecord::Base
       end
       ComplexCorrespondence.construct(1.0, "=", input_elements, output_elements, i_ont, o_ont)
     end
-    corr.save
 
     input_elements.each do |ie|
       output_elements.each do |oe|

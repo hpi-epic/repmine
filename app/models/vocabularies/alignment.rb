@@ -11,6 +11,7 @@ module Vocabularies
     property :relation
     property :measure
     property :part_of
+    property :db_id
     term :Cell
   end
 end

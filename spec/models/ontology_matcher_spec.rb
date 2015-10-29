@@ -80,9 +80,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   end
 
   it "should properly insert a new correspondence" do
-    correspondence = FactoryGirl.build(:simple_correspondence)
-    assert_empty @om.correspondences_for_concept(correspondence.entity1)
-    @om.add_correspondence!(correspondence)
+    correspondence = FactoryGirl.create(:simple_correspondence)
     assert_not_nil @om.find_correspondence_node(correspondence)
     assert_not_empty @om.correspondences_for_concept(correspondence.entity1)
   end
@@ -101,17 +99,13 @@ RSpec.describe OntologyMatcher, :type => :model do
   end
 
   it "should find an existing correspondence within the graph" do
-    correspondence = FactoryGirl.build(:simple_correspondence)
-    assert_empty @om.alignment_graph
-    @om.add_correspondence!(correspondence)
+    correspondence = FactoryGirl.create(:simple_correspondence)
     assert_not_empty @om.alignment_graph
     assert_not_nil @om.find_correspondence_node(correspondence)
   end
 
   it "should remove an existing correspondence from the graph" do
-    correspondence = FactoryGirl.build(:simple_correspondence)
-    assert_empty @om.alignment_graph
-    @om.add_correspondence!(correspondence)
+    correspondence = FactoryGirl.create(:simple_correspondence)
     assert_not_empty @om.alignment_graph
     rdf_node = @om.remove_correspondence!(correspondence)
     assert_empty @om.alignment_graph
@@ -154,10 +148,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   end
 
   it "should properly add a complex correspondence" do
-    correspondence = FactoryGirl.build(:complex_correspondence)
-    assert_empty @om.alignment_graph
-    assert_empty @om.correspondences_for_concept(correspondence.entity1)
-    @om.add_correspondence!(correspondence)
+    correspondence = FactoryGirl.create(:complex_correspondence)
     assert_not_empty @om.alignment_graph
     corrs = @om.correspondences_for_concept(correspondence.entity1)
     assert_not_empty corrs
@@ -169,45 +160,32 @@ RSpec.describe OntologyMatcher, :type => :model do
     p2 = FactoryGirl.create(:pattern)
     cc = ComplexCorrespondence.from_elements(p1.pattern_elements, p2.pattern_elements)
     @om.insert_statements!
-    @om.add_correspondence!(cc)
     corrs = @om.correspondences_for_pattern_elements(p1.pattern_elements)
     assert_not_empty corrs
     assert_equal p2.pattern_elements.size, corrs.first.pattern_elements.size
   end
 
   it "should find a complex correspondence based on provided elements" do
-    correspondence = FactoryGirl.build(:hardway_complex)
+    correspondence = FactoryGirl.create(:hardway_complex)
     pattern = FactoryGirl.create(:pattern)
     @om.insert_statements!
-    assert_empty @om.correspondences_for_pattern_elements(pattern.pattern_elements)
-    @om.add_correspondence!(correspondence)
+    @om.print_alignment_graph!
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements)
     assert_not_empty corrs
     assert_equal ComplexCorrespondence, corrs.first.class
   end
 
   it "should not return correspondences where the input graph only matches a real subgraph of entity1" do
-    correspondence = FactoryGirl.build(:hardway_complex)
+    correspondence = FactoryGirl.create(:hardway_complex)
     @om.insert_statements!
     pattern = FactoryGirl.create(:pattern)
-    assert_empty @om.correspondences_for_pattern_elements(pattern.pattern_elements)
-    @om.add_correspondence!(correspondence)
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements[0..-2])
     assert_empty corrs
   end
 
-  it "should return simple correspondences only when both elements are concepts, not patterns" do
-    Pattern.stub(:from_graph => nil)
-    assert @om.create_correspondence({:target => RDF::Resource.new("entity2")}, "entity1").is_a?(SimpleCorrespondence)
-    assert @om.create_correspondence({:target => RDF::Resource.new("entity2")}, [Node.new]).is_a?(ComplexCorrespondence)
-    assert @om.create_correspondence({:target => RDF::Node.new}, [Node.new]).is_a?(ComplexCorrespondence)
-    assert @om.create_correspondence({:target => RDF::Node.new}, "entity1").is_a?(ComplexCorrespondence)
-  end
-
   it "should be able to build complex correspondences" do
-    correspondence = FactoryGirl.build(:complex_correspondence)
+    correspondence = FactoryGirl.create(:complex_correspondence)
     @om.insert_statements!
-    @om.add_correspondence!(correspondence)
     corr = @om.correspondences_for_concept(correspondence.entity1).first
     assert_not_nil corr
     assert corr.is_a?(ComplexCorrespondence)
@@ -217,5 +195,11 @@ RSpec.describe OntologyMatcher, :type => :model do
     correspondence.entity2.pattern_elements.each do |pe|
       assert corr.entity2.pattern_elements.any?{|pee| pe.equal_to?(pee)}, "no match found for #{pe.class} - #{pe.rdf_type}"
     end
+  end
+
+  it "should create a new correspondence for an unnamed one created by the automated matcher" do
+    @om.stub(:alignment_path => alignment_test_file)
+    @om.match!
+    assert_equal 1, Correspondence.count
   end
 end

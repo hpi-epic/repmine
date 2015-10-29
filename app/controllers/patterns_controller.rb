@@ -29,7 +29,7 @@ class PatternsController < ApplicationController
     @target_pattern = TranslationPattern.find(params[:target_id])
     @source_pattern.auto_layout!
 
-    controls_offset = @source_pattern.node_offset - 30
+    @controls_offset = @source_pattern.node_offset - 30
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
       @target_pattern.store_auto_layout!
@@ -170,7 +170,11 @@ class PatternsController < ApplicationController
     attributes = {}
     pattern.attribute_constraints.each do |ac|
       attributes[ac.node.id] ||= []
-      attributes[ac.node.id] << static ? attribute_constraint_static_path(ac) : attribute_constraint_path(ac)
+      attributes[ac.node.id] << if static
+        attribute_constraint_static_path(ac)
+      else
+        attribute_constraint_path(ac)
+      end
     end
     return attributes, relations
   end

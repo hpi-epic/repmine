@@ -40,6 +40,20 @@ class OntologyMatcher
   def insert_statements!
     alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
     alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
+    create_correspondences!
+  end
+
+  def create_correspondences!
+    alignment_graph.query(all_correspondence_query) do |r|
+      next unless r[:cell].anonymous?
+      alignment_graph.delete([r[:cell]])
+      sc = SimpleCorrespondence.new(measure: r[:measure].to_f, relation: r[:relation].to_s)
+      sc.onto1 = source_ontology
+      sc.onto2 = target_ontology
+      sc.entity1 = r[:e1].to_s
+      sc.entity2 = r[:e2].to_s
+      sc.save
+    end
   end
 
   def call_matcher!
@@ -80,13 +94,24 @@ class OntologyMatcher
     return correspondences
   end
 
+  def all_correspondence_query
+    patterns = [
+      [:cell, Vocabularies::Alignment.entity1, :e1],
+      [:cell, Vocabularies::Alignment.entity2, :e2],
+      [:cell, Vocabularies::Alignment.relation, :relation],
+      [:cell, Vocabularies::Alignment.measure, :measure]
+    ]
+    return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
+  end
+
   def simple_correspondence_query(concept)
     e1, e2 = entities_in_order()
     patterns = [
       [:cell, e1, RDF::Resource.new(concept)],
       [:cell, e2, :target],
       [:cell, Vocabularies::Alignment.relation, :relation],
-      [:cell, Vocabularies::Alignment.measure, :measure]
+      [:cell, Vocabularies::Alignment.measure, :measure],
+      [:cell, Vocabularies::Alignment.db_id, :db_id]
     ]
     return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
   end
@@ -98,7 +123,8 @@ class OntologyMatcher
       [:cell, e1, :pattern],
       [:cell, e2, :target],
       [:cell, Vocabularies::Alignment.relation, :relation],
-      [:cell, Vocabularies::Alignment.measure, :measure]
+      [:cell, Vocabularies::Alignment.measure, :measure],
+      [:cell, Vocabularies::Alignment.db_id, :db_id]
     ]
 
     pattern_elements.each_with_index do |pe, i|
@@ -117,35 +143,14 @@ class OntologyMatcher
   end
 
   def create_correspondence(result, entity1)
-    # anonymous target -> input maps to pattern
-    # array as entity1 -> input was a list of pattern elements
-    if result[:target].anonymous? || entity1.is_a?(Array)
-      create_complex_correspondence(result, entity1)
+    correspondence = Correspondence.find(result[:db_id].to_i)
+    correspondence.entity1 = entity1
+    correspondence.entity2 = if result[:target].anonymous?
+      Pattern.from_graph(alignment_graph, result[:target], target_ontology)
     else
-      create_simple_correspondence(result, entity1)
+      result[:target].to_s
     end
-  end
-
-  def create_complex_correspondence(result, entity1)
-    return ComplexCorrespondence.construct(
-      result[:measure].to_f,
-      result[:relation].to_s,
-      entity1,
-      result[:target].anonymous? ? Pattern.from_graph(alignment_graph, result[:target], target_ontology) : result[:target].to_s,
-      inverted ? target_ontology : source_ontology,
-      inverted ? source_ontology : target_ontology
-    )
-  end
-
-  def create_simple_correspondence(result, entity1)
-    return SimpleCorrespondence.construct(
-      result[:measure].to_f,
-      result[:relation].to_s,
-      entity1,
-      result[:target].to_s,
-      inverted ? target_ontology : source_ontology,
-      inverted ? source_ontology : target_ontology
-    )
+    return correspondence
   end
 
   def print_alignment_graph!(ignore_gp = true)
