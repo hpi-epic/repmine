@@ -1,0 +1,10 @@
+<% if @next_unmatched_element.nil? %>
+
+<% else %>
+  toggleOMMode(true);
+  <% @matches.each do |match| %>
+    $("#<%= div_id(match.matched_element) %>").addClass("matched");
+  <% end %>
+  $("#<%= div_id(@next_unmatched_element) %>").click();
+  $.jGrowl("Select Matching elements and Save the correspondence when ready.", {theme: 'info'});
+<% end %>

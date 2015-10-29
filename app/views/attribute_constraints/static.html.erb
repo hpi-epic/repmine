@@ -1,3 +1,3 @@
-<div id="attribute_constraint_<%= @ac.id %>" class="attribute_constraint static graph_element"  data-id="<%= @ac.id %>"  style="<%= ac_position(@ac, true) %>" data-rdf-type="<%= @ac.rdf_type %>">
+<div id="<%= div_id(@ac) %>" class="attribute_constraint static ge"  data-id="<%= @ac.id %>"  style="<%= ac_position(@ac, true) %>" data-rdf-type="<%= @ac.rdf_type %>">
   <%= @ac.pretty_string %>
 </div>

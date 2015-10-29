@@ -3,10 +3,12 @@ RepMine::Application.routes.draw do
   resources :patterns do
     get :query
     post :query
-    get "translate/:ontology_id", :as => :translate, :to => "patterns#translate"
-    post :process_patterns, :on => :collection
+    get "translate/:target_id", :as => :translate, :to => "patterns#translate"
+    post :transmogrify, :on => :collection
     get :monitor, :on => :collection
-    post "/save_correspondence/:output_pattern_id", :to => "patterns#save_correspondence", :as => :save_correspondence
+    post :save_correspondence
+    get :unmatched_node
+
     get :autocomplete_tag_name, :on => :collection
     resources :nodes, :only => [:create]
   end

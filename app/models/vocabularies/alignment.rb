@@ -10,6 +10,7 @@ module Vocabularies
     property :map
     property :relation
     property :measure
+    property :part_of
     term :Cell
   end
 end

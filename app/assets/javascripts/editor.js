@@ -26,7 +26,7 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
 });
 
 var loadNodesAndConnections = function(){
-	$(".node").not(".immutable_node").each(function(index,node_div){
+	$(".node").not(".static").each(function(index,node_div){
 	  addNodeToGraph($(node_div));
 	});
 
@@ -262,7 +262,7 @@ var rdfTypeForNode = function(node_id) {
 
 // removes all unconnected Endpoints so users cannot somehow create new connections
 var removeExcessEndpoints = function(){
-  $("div.immutable_node").each(function(i,node){
+  $("div.node.static").each(function(i,node){
     $(jsPlumb.getEndpoints($(node).attr("id"))).each(function(ii,endpoint){
       if(endpoint.connections.length == 0){
         jsPlumb.deleteEndpoint(endpoint);

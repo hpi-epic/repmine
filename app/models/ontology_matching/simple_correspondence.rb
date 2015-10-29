@@ -1,17 +1,4 @@
-class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2, :onto1, :onto2)
-  include RdfSerialization
-
-  class UnsupportedCorrespondence < Exception;end
-
-  attr_accessor :node
-
-  def rdf_types
-    [Vocabularies::Alignment.Cell]
-  end
-
-  def resource
-    @resource ||= RDF::Node.new
-  end
+class SimpleCorrespondence < Correspondence
 
   def rdf_statements
     [
@@ -34,9 +21,5 @@ class SimpleCorrespondence < Struct.new(:measure, :relation, :entity1, :entity2,
     pe = onto2.element_class_for_rdf_type(entity2).new(:ontology_id => onto2.id)
     pe.rdf_type = entity2
     return [pe]
-  end
-
-  def add_to_alignment!()
-    OntologyMatcher.new(onto1, onto2).add_correspondence!(self)
   end
 end

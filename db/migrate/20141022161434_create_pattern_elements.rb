@@ -10,6 +10,7 @@ class CreatePatternElements < ActiveRecord::Migration
       t.references :node
       t.string :value
       t.string :operator
+      t.boolean :virtual, :default => false
       # relation constraint
       t.string :min_cardinality
       t.string :max_cardinality

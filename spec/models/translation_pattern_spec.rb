@@ -19,7 +19,7 @@ RSpec.describe TranslationPattern, :type => :model do
 
   it "should create corresponding elements for simple correspondences" do
     # let's translate the first node
-    correspondence = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence])
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}
     @pattern.nodes.first.rdf_type = correspondence.entity1
@@ -31,7 +31,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should create corresponding elements for complex correspondences" do
-    correspondence = FactoryGirl.build(:complex_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence = FactoryGirl.create(:complex_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence])
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}
     @pattern.nodes.first.rdf_type = correspondence.entity1
@@ -44,8 +44,8 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should raise an exception if one element could be mapped to two different target structures" do
-    correspondence1 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    correspondence2 = FactoryGirl.build(:complex_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence1 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence2 = FactoryGirl.create(:complex_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     @pattern.pattern_elements.first.rdf_type = correspondence1.entity1
     om = ontology_matcher([correspondence1, correspondence2])
     assert_equal 2, om.correspondences_for_concept(correspondence1.entity1).size
@@ -72,8 +72,8 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should be able to mix it up... " do
-    correspondence1 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    correspondence2 = FactoryGirl.build(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence1 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence2 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1, correspondence2])
     new_node = @pattern.create_node!(@pattern.ontologies.first)
     new_node.rdf_type = correspondence1.entity1
@@ -84,7 +84,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should properly attach elements to the translation pattern" do
-    correspondence = FactoryGirl.build(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -92,7 +92,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should properly set that elements have already been matched" do
-    correspondence = FactoryGirl.build(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    correspondence = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -100,7 +100,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should be able to adapt a translation pattern if we suddenly know of a new correspondence" do
-    correspondence1 = FactoryGirl.build(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex)
     om = ontology_matcher([correspondence1])
     new_node = @pattern.create_node!(@source_ontology)
     new_node.rdf_type = correspondence1.entity1
@@ -111,7 +111,7 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal 1, tp.pattern_elements.size
     assert_equal 1, @pattern.unmatched_elements([@target_ontology]).size
     # adding a new correspondence
-    corr2 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    corr2 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om.add_correspondence!(corr2)
     # now we change the rdf type on one node -> translation is deleted subsequently
     @pattern.unmatched_elements(@target_ontology).first.rdf_type = corr2.entity1
@@ -122,7 +122,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should throw away existing translation patterns if the original one was changed" do
-    correspondence1 = FactoryGirl.build(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -132,7 +132,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should throw away a translation if an existing element was remvoved" do
-    correspondence1 = FactoryGirl.build(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -142,11 +142,13 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should extend the translation pattern if the original one was extended" do
-    correspondence1 = FactoryGirl.build(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex)
     om = ontology_matcher([correspondence1])
+    om.print_alignment_graph!
+
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     assert_equal 1, TranslationPattern.count
-    corr2 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    corr2 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om.add_correspondence!(corr2)
     new_node = @pattern.create_node!(@source_ontology, corr2.entity1)
     assert_equal 1, TranslationPattern.count
@@ -155,8 +157,8 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should build a graph if we have simple mappings for node and attribute constraint" do
-    c1 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    c2 = FactoryGirl.build(:simple_attrib_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c1 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c2 = FactoryGirl.create(:simple_attrib_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
 
     @pattern = FactoryGirl.create(:empty_pattern)
     om = ontology_matcher([c1, c2])
@@ -177,8 +179,8 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should build a graph for simple mappings for node and relation constraints" do
-    c1 = FactoryGirl.build(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    c2 = FactoryGirl.build(:simple_relation_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c1 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c2 = FactoryGirl.create(:simple_relation_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
 
     @pattern = FactoryGirl.create(:empty_pattern)
     om = ontology_matcher([c1, c2])
@@ -209,6 +211,16 @@ RSpec.describe TranslationPattern, :type => :model do
     expect{TranslationPattern.new.check_for_ambiguous_mappings(too_many)}.to raise_error(TranslationPattern::AmbiguousTranslation)
     expect{TranslationPattern.new.check_for_ambiguous_mappings(ambiguous)}.to raise_error(TranslationPattern::AmbiguousTranslation)
     expect{TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)}.to raise_error(TranslationPattern::AmbiguousTranslation)
+  end
+
+  it "should throw away pattern element matches if an element of a translation pattern changes" do
+    correspondence1 = FactoryGirl.create(:hardway_complex)
+    om = ontology_matcher([correspondence1])
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    tp.prepare!
+    assert_equal 3, PatternElementMatch.count
+    tp.nodes.first.rdf_type = tp.nodes.first.rdf_type + "_new"
+    assert_equal 0, PatternElementMatch.count
   end
 
   def ontology_matcher(correspondences)

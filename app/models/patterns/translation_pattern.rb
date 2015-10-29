@@ -29,6 +29,10 @@ class TranslationPattern < Pattern
     return Pattern.model_name
   end
 
+  def unmatched_source_elements
+    source_pattern.unmatched_elements(ontologies)
+  end
+
   def input_elements
     return source_pattern.unmatched_elements(ontologies)
   end

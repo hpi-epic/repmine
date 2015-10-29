@@ -1,5 +1,5 @@
 <div>
-  <div class="relation graph_element" data-id="<%= @rc.id %>" id="relation_constraint_<%= @rc.id%>">
+  <div class="relation ge" data-id="<%= @rc.id %>" id="<%= div_id(@rc) %>">
     <%= form_for(@rc) do |f| %>
       <%= f.select(
             :rdf_type,

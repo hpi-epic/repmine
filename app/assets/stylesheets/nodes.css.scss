@@ -13,9 +13,14 @@ div.node {
   border-radius: 1em;
 }
 
-div.immutable_node {
+div.node.static {
   height: 2em;
   border: 2px solid #CACACA;
+}
+
+div.node.static.selected {
+  border: 2px solid #B22222;
+  height: 2em;
 }
 
 div.double-border {

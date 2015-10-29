@@ -128,6 +128,31 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract")
   end
 
+  it "should remove complex correspondences properly from the alignment graph" do
+    c1 = FactoryGirl.create(:complex_correspondence, :onto1 => @om.source_ontology, :onto2 => @om.target_ontology)
+    correspondences = @om.correspondences_for_concept(c1.entity1)
+    assert_equal 1, correspondences.size
+    @om.remove_correspondence!(c1)
+    assert_empty @om.alignment_graph
+  end
+
+  it "should only remove the desired one of similar correspondences" do
+    c1 = FactoryGirl.create(:complex_correspondence, :onto1 => @om.source_ontology, :onto2 => @om.target_ontology)
+    c2 = FactoryGirl.create(:complex_correspondence, :onto1 => @om.source_ontology, :onto2 => @om.target_ontology)
+    assert_equal 2, @om.correspondences_for_concept(c1.entity1).size
+    @om.remove_correspondence!(c1)
+    assert_not_empty @om.alignment_graph
+    assert_equal 1, @om.correspondences_for_concept(c1.entity1).size
+  end
+
+  it "should remove simple correspondences properly from the alignment graph" do
+    c1 = FactoryGirl.create(:simple_correspondence, :onto1 => @om.source_ontology, :onto2 => @om.target_ontology)
+    correspondences = @om.correspondences_for_concept(c1.entity1)
+    assert_equal 1, correspondences.size
+    @om.remove_correspondence!(c1)
+    assert_empty @om.alignment_graph
+  end
+
   it "should properly add a complex correspondence" do
     correspondence = FactoryGirl.build(:complex_correspondence)
     assert_empty @om.alignment_graph

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ComplexCorrespondence, :type => :model do
-  
+
   it "should anonymize entities" do
     ress = []
     3.times{|i| ress << RDF::Resource.new("http://example.org/res#{i}")}
@@ -19,7 +19,7 @@ RSpec.describe ComplexCorrespondence, :type => :model do
     assert_equal resource, cleaned_statements[2][1]
     assert cleaned_statements[3].all?{|el| el == resource}
   end
-  
+
   it "should anonymize patterns but leave resources intact" do
     correspondence = FactoryGirl.build(:complex_correspondence)
     ent1, stmts = correspondence.process_entity(correspondence.entity1)
@@ -29,7 +29,7 @@ RSpec.describe ComplexCorrespondence, :type => :model do
     assert ent2.anonymous?
     assert_not_empty stmts
   end
-  
+
   it "should store a complex correspondence if we only provide a list of pattern elements" do
     i_pattern = FactoryGirl.create(:pattern)
     o_pattern = FactoryGirl.create(:pattern)
@@ -42,15 +42,15 @@ RSpec.describe ComplexCorrespondence, :type => :model do
       end
     end
   end
-  
+
   it "should also work if we have simple -> complex mappings" do
     i_pattern = FactoryGirl.create(:pattern)
     o_node = FactoryGirl.create(:node_only_pattern).nodes.first
     cc = ComplexCorrespondence.from_elements(i_pattern.pattern_elements, [o_node])
     g = RDF::Graph.new
-    g.insert(*cc.rdf_statements)    
+    g.insert(*cc.rdf_statements)
   end
-  
+
   it "should determine that we try to fool it ;)" do
     i_node = FactoryGirl.create(:node)
     o_node = FactoryGirl.create(:node)

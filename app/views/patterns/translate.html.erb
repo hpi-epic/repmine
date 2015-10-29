@@ -17,21 +17,19 @@
 <%= form_tag(pattern_nodes_path(@target_pattern), :remote => true, :id => "new_pattern_node") do %>
   <div class="translation_controls" style="left: <%= @controls_offset %>px" />
     <div class="btn-group">
-      <%= button_tag 'Create Node', :class => "btn" %>
-      <%= select_tag(:ontology_id, options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space") %>
+      <%= button_tag 'Create Node', :class => "btn om-control" %>
+      <%= select_tag(:ontology_id, options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space om-control") %>
     </div>
 
-  <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success om-control" %>
-  <%= link_to 'Save Mapping', "#", :class => "btn btn-info hide om-control", :onclick => "saveCorrespondence();" %>
-  <%= link_to 'Next', "#", :class => "btn btn-primary hide om-control", :onclick => "selectNextElement();" %>
-  <%= link_to 'Match Concepts', "#", :class => "btn btn-danger om-control", :onclick => "toggleOntologyMatchingMode(true);" %>
-  <%= link_to 'Stop Matching', "#", :class => "btn btn-danger om-control hide", :onclick => "toggleOntologyMatchingMode(false);" %>
+  <%= link_to 'Save Pattern', "#", :onclick => "savePattern();",  :class => "btn btn-success om-control" %>
+  <%= link_to 'Save Mapping', "#", :onclick => "saveCorrespondence();", :class => "btn hide btn-info om-control" %>
+  <%= link_to 'Back to Edit', "#", :onclick => "toggleOMMode(false);", :class => "btn hide btn-warning om-control" %>
   </div>
 <% end %>
 
 <%= form_for(@target_pattern) do |f| %><% end %>
 
-<%= form_tag(pattern_save_correspondence_path(@source_pattern, @target_pattern), :id => "save_correspondence_form") do %>
+<%= form_tag(pattern_save_correspondence_path(@source_pattern), :id => "save_correspondence_form") do %>
   <%= hidden_field_tag "source_element_ids[]" %>
   <%= hidden_field_tag "target_element_ids[]" %>
 <% end %>

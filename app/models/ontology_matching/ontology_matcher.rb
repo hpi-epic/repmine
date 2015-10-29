@@ -38,8 +38,8 @@ class OntologyMatcher
   end
 
   def insert_statements!
-    alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
     alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
+    alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
   end
 
   def call_matcher!
@@ -47,7 +47,6 @@ class OntologyMatcher
     errors = nil
     Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml-jar")) do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
-      #raise MatchingError, errors unless errors.blank?
     end
   end
 
@@ -128,7 +127,7 @@ class OntologyMatcher
   end
 
   def create_complex_correspondence(result, entity1)
-    return ComplexCorrespondence.new(
+    return ComplexCorrespondence.construct(
       result[:measure].to_f,
       result[:relation].to_s,
       entity1,
@@ -139,7 +138,7 @@ class OntologyMatcher
   end
 
   def create_simple_correspondence(result, entity1)
-    return SimpleCorrespondence.new(
+    return SimpleCorrespondence.construct(
       result[:measure].to_f,
       result[:relation].to_s,
       entity1,
@@ -173,7 +172,18 @@ class OntologyMatcher
   def remove_correspondence!(correspondence)
     c_node = find_correspondence_node(correspondence)
     return if c_node.nil?
+    find_all_subnodes_of(c_node).each{|sn| alignment_graph.delete([sn])}
     alignment_graph.delete([c_node])
+  end
+
+  def find_all_subnodes_of(c_node)
+    subnodes = []
+    alignment_graph.build_query do |q|
+      q.pattern [:sn, Vocabularies::Alignment.part_of, c_node]
+    end.run do |res|
+      subnodes << res[:sn]
+    end
+    return subnodes
   end
 
   def find_correspondence_node(correspondence)

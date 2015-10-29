@@ -22,7 +22,10 @@ class PatternElement < ActiveRecord::Base
   end
 
   def invalidate_translations
+    # destroy all translation patterns if we are part of the original
     matching_elements.each{|me| me.pattern.destroy}
+    # otherwise just destroy the matchings
+    matchings.each{|matching| matching.destroy} if pattern.is_a?(TranslationPattern)
   end
 
   def url

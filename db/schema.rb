@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150924134336) do
+ActiveRecord::Schema.define(:version => 20151028164332) do
 
   create_table "aggregations", :force => true do |t|
     t.integer  "pattern_element_id"
@@ -25,6 +25,14 @@ ActiveRecord::Schema.define(:version => 20150924134336) do
 
   add_index "aggregations", ["metric_node_id"], :name => "index_aggregations_on_metric_node_id"
   add_index "aggregations", ["pattern_element_id"], :name => "index_aggregations_on_pattern_element_id"
+
+  create_table "correspondences", :force => true do |t|
+    t.string  "relation"
+    t.float   "measure"
+    t.integer "onto1_id"
+    t.integer "onto2_id"
+    t.string  "type"
+  end
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",         :default => 0, :null => false
@@ -107,22 +115,25 @@ ActiveRecord::Schema.define(:version => 20150924134336) do
   create_table "pattern_element_matches", :force => true do |t|
     t.integer  "matched_element_id"
     t.integer  "matching_element_id"
+    t.integer  "correspondence_id"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
   end
 
+  add_index "pattern_element_matches", ["correspondence_id"], :name => "index_pattern_element_matches_on_correspondence_id"
   add_index "pattern_element_matches", ["matched_element_id"], :name => "index_pattern_element_matches_on_matched_element_id"
   add_index "pattern_element_matches", ["matching_element_id"], :name => "index_pattern_element_matches_on_matching_element_id"
 
   create_table "pattern_elements", :force => true do |t|
     t.string   "type"
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.integer  "ontology_id"
     t.integer  "pattern_id"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"
+    t.boolean  "virtual",         :default => false
     t.string   "min_cardinality"
     t.string   "max_cardinality"
     t.string   "min_path_length"

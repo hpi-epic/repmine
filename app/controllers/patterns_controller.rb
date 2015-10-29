@@ -14,25 +14,30 @@ class PatternsController < ApplicationController
     @title = "'#{@pattern.name}' Pattern"
   end
 
+  def bootstrap_translation(source_pattern, target_ontology)
+    # no need to translate a pattern to one of its own ontologies
+    if source_pattern.ontologies.include?(target_ontology)
+      redirect_to patterns_path, :notice => "No self-translation necessary!" and return
+    end
+    target_pattern = TranslationPattern.for_pattern_and_ontologies(source_pattern, [target_ontology])
+    target_pattern.prepare!
+    redirect_to pattern_translate_path(source_pattern, target_pattern)
+  end
+
   def translate
     @source_pattern = Pattern.find(params[:pattern_id])
+    @target_pattern = TranslationPattern.find(params[:target_id])
     @source_pattern.auto_layout!
-    @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
 
-    @target_ontologies = Ontology.find(params[:ontology_id])
-    @target_pattern = TranslationPattern.for_pattern_and_ontologies(@source_pattern, [@target_ontologies])
-    @target_pattern.prepare!
-
-    @controls_offset = @source_pattern.node_offset - 30
-
+    controls_offset = @source_pattern.node_offset - 30
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
       @target_pattern.store_auto_layout!
-      @node_offset = @controls_offset
+      @node_offset = controls_offset
     end
 
+    @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
-    @matched_elements = @source_pattern.matched_elements(@target_ontologies).collect{|me| me.id.to_s}
     @title = "Translating '#{@source_pattern.name}'"
   end
 
@@ -69,11 +74,22 @@ class PatternsController < ApplicationController
     if @pattern.update_attributes(params[:pattern])
       @pattern.touch
       flash[:notice] = "Pattern successfully saved!"
-      render json: @pattern, :status => :ok
+      if @pattern.is_a?(TranslationPattern)
+        redirect_to pattern_unmatched_node_path(@pattern)
+      else
+        render json: {}, :status => :ok
+      end
     else
       flash[:error] = "Could not save pattern!"
       render json: @pattern.errors, :status => :unprocessable_entity
     end
+  end
+
+  def unmatched_node
+    translation_pattern = Pattern.find(params[:pattern_id])
+    @matches = translation_pattern.find_element_matches(translation_pattern.source_pattern.ontologies)
+    @next_unmatched_element = translation_pattern.unmatched_source_elements.first
+    respond_to :js
   end
 
   def destroy
@@ -84,7 +100,7 @@ class PatternsController < ApplicationController
     redirect_to patterns_path
   end
 
-  def process_patterns
+  def transmogrify
     if !params[:patterns]
       redirect_to patterns_path, :alert => "Please pick at least one target pattern!"
     else
@@ -92,7 +108,7 @@ class PatternsController < ApplicationController
         if params[:patterns].size > 1
           redirect_to patterns_path, :alert => "You can only translate one pattern at a time!"
         else
-          redirect_to pattern_translate_path(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
+          bootstrap_translation(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
         end
       elsif params[:monitor]
         task_ids = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
@@ -124,26 +140,18 @@ class PatternsController < ApplicationController
     matched_concepts = []
 
     if sources.blank? || targets.blank?
-      flash[:error] = "You forgot to specify in or output elements. Please, watch the notifications in the top right corner!"
+      flash[:error] = "Missing input/output elements!"
     else
       input_elements = PatternElement.find(sources.split(","))
       output_elements = PatternElement.find(targets.split(","))
       begin
-        @oc = ComplexCorrespondence.from_elements(input_elements, output_elements)
-        @oc.add_to_alignment!
-        input_elements.each{|ie|
-          output_elements.each{|oe|
-            PatternElementMatch.create(:matched_element => ie, :matching_element => oe)
-          }
-        }
-        flash[:notice] = "Thanks for the correspondence!"
-        matched_concepts = params[:source_element_ids].collect{|id| id.to_s}
-      rescue SimpleCorrespondence::UnsupportedCorrespondence => e
+        @oc = Correspondence.from_elements(input_elements, output_elements)
+        flash[:notice] = "Correspondence saved!"
+      rescue Correspondence::UnsupportedCorrespondence => e
         flash[:error] = "Could not save correspondence! #{e.message}"
       end
     end
-
-    render :json => matched_concepts
+    redirect_to :unmatched_node
   end
 
   private
@@ -162,11 +170,7 @@ class PatternsController < ApplicationController
     attributes = {}
     pattern.attribute_constraints.each do |ac|
       attributes[ac.node.id] ||= []
-      attributes[ac.node.id] << if static
-        attribute_constraint_static_path(ac)
-      else
-        attribute_constraint_path(ac)
-      end
+      attributes[ac.node.id] << static ? attribute_constraint_static_path(ac) : attribute_constraint_path(ac)
     end
     return attributes, relations
   end
