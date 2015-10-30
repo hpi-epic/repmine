@@ -25,9 +25,9 @@ class ConnectionFinder
   end
 
   def load_mappings_to_engine!(mappings)
-    mappings.each_pair do |originals, targets|
+    mappings.each_pair do |originals, correspondence|
       originals.each do |original_id|
-        targets.each do |target|
+        correspondence.pattern_elements.each do |target|
           engine << [original_id, "maps_to", target.id]
           engine << [target.id, "is_a", target.class.name]
         end

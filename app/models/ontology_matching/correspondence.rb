@@ -2,7 +2,7 @@ class Correspondence < ActiveRecord::Base
   include RdfSerialization
   class UnsupportedCorrespondence < Exception;end
 
-  attr_accessor :node, :entity1, :entity2
+  attr_accessor :node, :entity1, :entity2, :pattern_elements
   attr_accessible :measure, :relation
   belongs_to :onto1, :class_name => "Ontology"
   belongs_to :onto2, :class_name => "Ontology"

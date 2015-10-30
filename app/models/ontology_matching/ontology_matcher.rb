@@ -40,10 +40,10 @@ class OntologyMatcher
   def insert_statements!
     alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
     alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
-    create_correspondences!
+    deanonymize_correspondences!
   end
 
-  def create_correspondences!
+  def deanonymize_correspondences!
     alignment_graph.query(all_correspondence_query) do |r|
       next unless r[:cell].anonymous?
       alignment_graph.delete([r[:cell]])

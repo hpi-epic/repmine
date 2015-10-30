@@ -169,7 +169,6 @@ RSpec.describe OntologyMatcher, :type => :model do
     correspondence = FactoryGirl.create(:hardway_complex)
     pattern = FactoryGirl.create(:pattern)
     @om.insert_statements!
-    @om.print_alignment_graph!
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements)
     assert_not_empty corrs
     assert_equal ComplexCorrespondence, corrs.first.class
@@ -200,6 +199,16 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should create a new correspondence for an unnamed one created by the automated matcher" do
     @om.stub(:alignment_path => alignment_test_file)
     @om.match!
-    assert_equal 1, Correspondence.count
+    assert_equal 8, Correspondence.count
+  end
+
+  it "should not create a new correspondence for existing ones" do
+    @om.stub(:alignment_path => alignment_test_file)
+    @om.match!
+    corrs = @om.correspondences_for_concept(author)
+    assert_equal 1, corrs.size
+    assert_equal "http://ekaw/#Paper_Author", corrs.first.entity2
+    assert_equal author, corrs.first.entity1
+    assert_equal 8, Correspondence.count
   end
 end

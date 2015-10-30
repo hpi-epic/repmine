@@ -79,18 +79,18 @@ class TranslationPattern < Pattern
   end
 
   def create_matches(mappings)
-    mappings.each_pair do |input_elements, target_elements|
+    mappings.each_pair do |input_elements, correspondence|
       input_elements.each do |pe_id|
-        target_elements.each do |te|
-          PatternElementMatch.where(:matched_element_id => pe_id, :matching_element_id => te.id).first_or_create!
+        correspondence.pattern_elements.each do |te|
+          correspondence.pattern_element_matches.where(:matched_element_id => pe_id, :matching_element_id => te.id).first_or_create!
         end
       end
     end
   end
 
   def add_pattern_elements!(mappings)
-    mappings.values.each do |target_elements|
-      target_elements.each do |te|
+    mappings.each_pair do |input_element, correspondence|
+      correspondence.pattern_elements.each do |te|
         self.pattern_elements << te
         te.save!(validate: false)
       end
@@ -105,7 +105,7 @@ class TranslationPattern < Pattern
       raise AmbiguousTranslation.new("ambiguous mappings for element #{key}") if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
     end
     mappings.each_pair do |key, targets|
-      mappings[key] = targets.flatten
+      mappings[key] = targets.first
     end
   end
 
@@ -115,7 +115,7 @@ class TranslationPattern < Pattern
     input_elements.each do |pe|
       ontologies.collect{|ont| pe.correspondences_to(ont)}.flatten.each do |correspondence|
         mappings[[pe.id]] ||= []
-        mappings[[pe.id]] << correspondence.pattern_elements
+        mappings[[pe.id]] << correspondence
       end
     end
     return mappings
@@ -132,7 +132,7 @@ class TranslationPattern < Pattern
       ontology_matchers(elements.first.ontology).each do |om|
         om.correspondences_for_pattern_elements(elements).each do |correspondence|
           mappings[mapping_key] ||= []
-          mappings[mapping_key] << correspondence.pattern_elements
+          mappings[mapping_key] << correspondence
         end
       end
     end

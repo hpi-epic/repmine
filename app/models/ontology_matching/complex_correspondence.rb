@@ -32,6 +32,6 @@ class ComplexCorrespondence < SimpleCorrespondence
   end
 
   def pattern_elements
-    entity2.is_a?(Pattern) ? entity2.pattern_elements : super
+    @pattern_elements ||= entity2.is_a?(Pattern) ? entity2.pattern_elements : super
   end
 end

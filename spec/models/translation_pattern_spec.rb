@@ -100,16 +100,18 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should be able to adapt a translation pattern if we suddenly know of a new correspondence" do
-    correspondence1 = FactoryGirl.create(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     new_node = @pattern.create_node!(@source_ontology)
     new_node.rdf_type = correspondence1.entity1
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
+
     assert_equal 1, @pattern.unmatched_elements(@target_ontology).size
     assert_equal new_node, @pattern.unmatched_elements(@target_ontology).first
     assert_equal 1, tp.pattern_elements.size
     assert_equal 1, @pattern.unmatched_elements([@target_ontology]).size
+
     # adding a new correspondence
     corr2 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om.add_correspondence!(corr2)
@@ -122,7 +124,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should throw away existing translation patterns if the original one was changed" do
-    correspondence1 = FactoryGirl.create(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -132,7 +134,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should throw away a translation if an existing element was remvoved" do
-    correspondence1 = FactoryGirl.create(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -142,7 +144,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should extend the translation pattern if the original one was extended" do
-    correspondence1 = FactoryGirl.create(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
 
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
@@ -165,8 +167,8 @@ RSpec.describe TranslationPattern, :type => :model do
     node = FactoryGirl.create(:node, :ontology => @source_ontology, :rdf_type => c1.entity1, :pattern => @pattern)
     ac = FactoryGirl.create(:attribute_constraint, :node => node, :rdf_type => c2.entity1, :ontology => @source_ontology)
 
-    c1.onto2.ag_connection.stub(:element_class_for_rdf_type).with(c1.entity2){Node}
-    c1.onto2.ag_connection.stub(:element_class_for_rdf_type).with(c2.entity2){AttributeConstraint}
+    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c1.entity2){Node}
+    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c2.entity2){AttributeConstraint}
 
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -188,8 +190,8 @@ RSpec.describe TranslationPattern, :type => :model do
     node2 = FactoryGirl.create(:node, :ontology => @source_ontology, :rdf_type => c1.entity1, :pattern => @pattern)
     rc = FactoryGirl.create(:relation_constraint, :ontology => @source_ontology, :rdf_type => c2.entity1, :source => node, :target => node2)
 
-    c2.onto2.ag_connection.stub(:element_class_for_rdf_type).with(c2.entity2){RelationConstraint}
-    c1.onto2.ag_connection.stub(:element_class_for_rdf_type).with(c1.entity2){Node}
+    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c2.entity2){RelationConstraint}
+    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c1.entity2){Node}
 
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -213,7 +215,7 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should throw away pattern element matches if an element of a translation pattern changes" do
-    correspondence1 = FactoryGirl.create(:hardway_complex)
+    correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!

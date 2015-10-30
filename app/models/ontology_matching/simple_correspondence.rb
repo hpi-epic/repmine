@@ -19,8 +19,8 @@ class SimpleCorrespondence < Correspondence
   end
 
   def pattern_elements
-    pe = onto2.element_class_for_rdf_type(entity2).new(:ontology_id => onto2.id)
-    pe.rdf_type = entity2
-    return [pe]
+    @pattern_elements ||= onto2.element_class_for_rdf_type(entity2).new(:ontology_id => onto2.id)
+    @pattern_elements.rdf_type = entity2
+    return [@pattern_elements]
   end
 end
