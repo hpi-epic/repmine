@@ -33,7 +33,7 @@ class PatternsController < ApplicationController
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
       @target_pattern.store_auto_layout!
-      @node_offset = controls_offset
+      @node_offset = @controls_offset
     end
 
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
