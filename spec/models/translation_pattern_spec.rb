@@ -203,6 +203,24 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_not_equal tp.relation_constraints.first.source, tp.relation_constraints.first.target
   end
 
+  it "should not create additional nodes if we have unmatched ones within the TP" do
+    corr = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    om = ontology_matcher([corr])
+    p = FactoryGirl.create(:node_only_pattern, :ontologies => [@source_ontology])
+    n1 = p.create_node!(@source_ontology, corr.entity1)
+    n2 = p.create_node!(@source_ontology, corr.entity1)
+
+    tp = FactoryGirl.create(:translation_pattern, :pattern_id => p.id, :ontologies => [@target_ontology])
+    tn1 = tp.create_node!(@target_ontology, corr.entity2)
+    corr.pattern_element_matches.create(:matched_element => n1, :matching_element => tn1)
+
+    tn2 = tp.create_node!(@target_ontology, corr.entity2)
+    tp.prepare!
+
+    assert_equal 2, tp.nodes.size
+    assert_equal 2, PatternElementMatch.count
+  end
+
   it "should find ambigous mappings based on the found keys" do
     ok = {[1] => [[2]]}
     too_many = {[1] => [[2],[3]]}

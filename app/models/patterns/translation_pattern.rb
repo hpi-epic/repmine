@@ -18,11 +18,11 @@ class TranslationPattern < Pattern
   end
 
   def self.pattern_name(pattern, ontologies)
-    return "translation of '#{pattern.name}' to '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
+    return "'#{pattern.name}' on '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
   end
 
   def self.description(pattern, ontologies)
-    return "translates the pattern '#{pattern.name}' to the repository describe by ontology '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
+    return "Translates pattern '#{pattern.name}' to ontologies: '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'."
   end
 
   def self.model_name
@@ -30,10 +30,6 @@ class TranslationPattern < Pattern
   end
 
   def unmatched_source_elements
-    source_pattern.unmatched_elements(ontologies)
-  end
-
-  def input_elements
     return source_pattern.unmatched_elements(ontologies)
   end
 
@@ -58,9 +54,16 @@ class TranslationPattern < Pattern
 
   def process_mappings(mappings)
     check_for_ambiguous_mappings(mappings)
+    flatten_mappings(mappings)
     add_pattern_elements!(mappings)
     connect_pattern_elements!(mappings)
-    create_matches(mappings)
+  end
+
+  def flatten_mappings(mappings)
+    mappings.each_pair{|key, targets|
+      mappings[key] = targets.first
+      mappings[key].pattern_elements = unmatched_subgraph(mappings[key].pattern_elements)
+    }
   end
 
   def connect_pattern_elements!(mappings)
@@ -78,21 +81,18 @@ class TranslationPattern < Pattern
     end
   end
 
-  def create_matches(mappings)
-    mappings.each_pair do |input_elements, correspondence|
-      input_elements.each do |pe_id|
-        correspondence.pattern_elements.each do |te|
-          correspondence.pattern_element_matches.where(:matched_element_id => pe_id, :matching_element_id => te.id).first_or_create!
-        end
-      end
-    end
-  end
-
   def add_pattern_elements!(mappings)
-    mappings.each_pair do |input_element, correspondence|
+    # for each mapping pair
+    mappings.each_pair do |input_elements, correspondence|
+      # and the elements defined by the correspondence
       correspondence.pattern_elements.each do |te|
+        # we first store the element in the translation pattern
         self.pattern_elements << te
+        # save it (without validation)
         te.save!(validate: false)
+        input_elements.each do |ie_id|
+          correspondence.pattern_element_matches.where(:matched_element_id => ie_id, :matching_element_id => te.id).first_or_create!
+        end
       end
     end
   end
@@ -100,19 +100,30 @@ class TranslationPattern < Pattern
   def check_for_ambiguous_mappings(mappings)
     mappings.keys.sort_by{|key| key.size}.each_with_index do |key, index|
       # option 1: more than one possible output subgraphs
-      raise AmbiguousTranslation.new("too many mappings for element #{key}: #{mappings[key]}") if mappings[key].size > 1
+      if mappings[key].size > 1
+        raise AmbiguousTranslation.new("too many mappings for element #{key}: #{mappings[key]}")
+      end
       # option 2: the current key is included in at least one other mapping
-      raise AmbiguousTranslation.new("ambiguous mappings for element #{key}") if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
+      if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
+        raise AmbiguousTranslation.new("ambiguous mappings for element #{key}")
+      end
     end
-    mappings.each_pair do |key, targets|
-      mappings[key] = targets.first
+  end
+
+  # we check whether we find unmatched doppelgaengers of all the elements
+  def unmatched_subgraph(elements)
+    candidates = unmatched_elements(source_pattern.ontologies)
+    doppelgaengers = elements.collect{|el| candidates.find{|cand| cand.equal_to?(el)}}.compact
+    if doppelgaengers.uniq.size == elements.size
+      return doppelgaengers
+    else
+      return elements
     end
   end
 
   def get_simple_mappings
     mappings = {}
-    # first try the unmatched input elements one by one
-    input_elements.each do |pe|
+    unmatched_source_elements.each do |pe|
       ontologies.collect{|ont| pe.correspondences_to(ont)}.flatten.each do |correspondence|
         mappings[[pe.id]] ||= []
         mappings[[pe.id]] << correspondence
@@ -121,11 +132,10 @@ class TranslationPattern < Pattern
     return mappings
   end
 
-  # TODO: instead of getting mappings for all combinations, get all complex mappings and compare them to our combinations...
   def get_complex_mappings()
     mappings = {}
     # let's construct all possbile combinations of the input pattern's unmatched elements
-    (2..input_elements.size).flat_map{|size| input_elements.combination(size).to_a}.reverse.each do |elements|
+    (2..unmatched_source_elements.size).flat_map{|size| unmatched_source_elements.combination(size).to_a}.reverse.each do |elements|
       # only try to match combinations of the same ontology
       next if elements.collect{|pe| pe.ontology_id}.uniq.size != 1
       mapping_key = elements.collect{|pe| pe.id}
@@ -136,7 +146,6 @@ class TranslationPattern < Pattern
         end
       end
     end
-
     return mappings
   end
 end
