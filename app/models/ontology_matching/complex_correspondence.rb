@@ -13,9 +13,7 @@ class ComplexCorrespondence < SimpleCorrespondence
   end
 
   def process_entity(entity)
-    if entity.is_a?(Pattern)
-      return clean_rdf_statements(entity.rdf, entity.resource)
-    elsif entity.is_a?(Array)
+    if entity.is_a?(Array)
       element_statements = entity.collect{|element| element.rdf}.flatten(1)
       return clean_rdf_statements(element_statements, entity.first.pattern.resource)
     else
@@ -32,6 +30,6 @@ class ComplexCorrespondence < SimpleCorrespondence
   end
 
   def pattern_elements
-    @pattern_elements ||= entity2.is_a?(Pattern) ? entity2.pattern_elements : super
+    @pattern_elements ||= entity2.is_a?(Array) ? entity2 : super
   end
 end

@@ -37,7 +37,7 @@ RSpec.describe TranslationPattern, :type => :model do
     @pattern.nodes.first.rdf_type = correspondence.entity1
     @tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     @tp.prepare!
-    assert @tp.equal_to?(correspondence.entity2)
+    assert @tp.pattern_elements.all?{|pe| correspondence.entity2.any?{|ce| ce.equal_to?(pe)}}
     # rspec seems to not properly reload has_many relations so we have to do that manually...
     @tp.pattern_elements.reload
     @tp.pattern_elements.none?{|pe| pe.pattern.nil?}
@@ -99,38 +99,38 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal 3, @pattern.matched_elements([@target_ontology]).size
   end
 
-  it "should be able to adapt a translation pattern if we suddenly know of a new correspondence" do
+  it "should be able to extend if we suddenly know of a new correspondence" do
     correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     new_node = @pattern.create_node!(@source_ontology)
-    new_node.rdf_type = correspondence1.entity1
+    new_node.rdf_type = "unmatchable"
+
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
 
-    assert_equal 1, @pattern.unmatched_elements(@target_ontology).size
-    assert_equal new_node, @pattern.unmatched_elements(@target_ontology).first
-    assert_equal 1, tp.pattern_elements.size
+    # the unmatchable should not be matched
     assert_equal 1, @pattern.unmatched_elements([@target_ontology]).size
+    assert_equal new_node, @pattern.unmatched_elements([@target_ontology]).first
+    assert_equal 1, tp.pattern_elements.size
 
     # adding a new correspondence
     corr2 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    om.add_correspondence!(corr2)
-    # now we change the rdf type on one node -> translation is deleted subsequently
-    @pattern.unmatched_elements(@target_ontology).first.rdf_type = corr2.entity1
-    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    # now we change the rdf type on one node
+    @pattern.nodes.last.rdf_type = corr2.entity1
     tp.prepare!
+
     assert_empty @pattern.unmatched_elements([@target_ontology])
     assert_equal 2, tp.pattern_elements.size
   end
 
-  it "should throw away existing translation patterns if the original one was changed" do
+  it "should throw away elements of translation patterns if the original one was changed" do
     correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
-    assert_equal 1, TranslationPattern.count
+    assert_equal 1, tp.pattern_elements.size
     @pattern.nodes.first.rdf_type = @pattern.nodes.first.rdf_type + "_new"
-    assert_equal 0, TranslationPattern.count
+    assert_empty TranslationPattern.first.pattern_elements
   end
 
   it "should throw away a translation if an existing element was remvoved" do
@@ -138,9 +138,10 @@ RSpec.describe TranslationPattern, :type => :model do
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
-    assert_equal 1, TranslationPattern.count
+    assert_equal 1, tp.pattern_elements.size
     @pattern.nodes.first.destroy
-    assert_equal 0, TranslationPattern.count
+    assert_empty TranslationPattern.first.pattern_elements
+    assert_equal 0, PatternElementMatch.count
   end
 
   it "should extend the translation pattern if the original one was extended" do
@@ -232,7 +233,7 @@ RSpec.describe TranslationPattern, :type => :model do
     expect{TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)}.to raise_error(TranslationPattern::AmbiguousTranslation)
   end
 
-  it "should throw away pattern element matches if an element of a translation pattern changes" do
+  it "should throw away pattern element matches if an element changes" do
     correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
@@ -240,12 +241,13 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal 3, PatternElementMatch.count
     tp.nodes.first.rdf_type = tp.nodes.first.rdf_type + "_new"
     assert_equal 0, PatternElementMatch.count
+    assert_equal 3, Pattern.first.pattern_elements.size
   end
 
   def ontology_matcher(correspondences)
     om = OntologyMatcher.new(@source_ontology, @target_ontology)
     om.alignment_repo.clear!
-    om.insert_statements!
+    om.insert_graph_pattern_ontology!
     correspondences.each{|c| om.add_correspondence!(c)}
     return om
   end

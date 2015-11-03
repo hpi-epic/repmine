@@ -155,20 +155,20 @@ RSpec.describe OntologyMatcher, :type => :model do
     assert_equal ComplexCorrespondence, corrs.first.class
   end
 
-  it "should add a complex correspondence stemming from just sample elements and find it again" do
+  it "should add a complex correspondence stemming from sample elements and find it again" do
     p1 = FactoryGirl.create(:pattern)
     p2 = FactoryGirl.create(:pattern)
     cc = ComplexCorrespondence.from_elements(p1.pattern_elements, p2.pattern_elements)
-    @om.insert_statements!
+    @om.insert_graph_pattern_ontology!
     corrs = @om.correspondences_for_pattern_elements(p1.pattern_elements)
-    assert_not_empty corrs
+    assert_equal 1, corrs.size
     assert_equal p2.pattern_elements.size, corrs.first.pattern_elements.size
   end
 
   it "should find a complex correspondence based on provided elements" do
     correspondence = FactoryGirl.create(:hardway_complex)
     pattern = FactoryGirl.create(:pattern)
-    @om.insert_statements!
+    @om.insert_graph_pattern_ontology!
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements)
     assert_not_empty corrs
     assert_equal ComplexCorrespondence, corrs.first.class
@@ -176,7 +176,7 @@ RSpec.describe OntologyMatcher, :type => :model do
 
   it "should not return correspondences where the input graph only matches a real subgraph of entity1" do
     correspondence = FactoryGirl.create(:hardway_complex)
-    @om.insert_statements!
+    @om.insert_graph_pattern_ontology!
     pattern = FactoryGirl.create(:pattern)
     corrs = @om.correspondences_for_pattern_elements(pattern.pattern_elements[0..-2])
     assert_empty corrs
@@ -184,15 +184,15 @@ RSpec.describe OntologyMatcher, :type => :model do
 
   it "should be able to build complex correspondences" do
     correspondence = FactoryGirl.create(:complex_correspondence)
-    @om.insert_statements!
+    @om.insert_graph_pattern_ontology!
     corr = @om.correspondences_for_concept(correspondence.entity1).first
     assert_not_nil corr
     assert corr.is_a?(ComplexCorrespondence)
-    assert corr.entity2.is_a?(Pattern)
-    assert_equal correspondence.entity2.pattern_elements.size, corr.entity2.pattern_elements.size
+    assert corr.entity2.is_a?(Array)
+    assert_equal correspondence.entity2.size, corr.entity2.size
 
-    correspondence.entity2.pattern_elements.each do |pe|
-      assert corr.entity2.pattern_elements.any?{|pee| pe.equal_to?(pee)}, "no match found for #{pe.class} - #{pe.rdf_type}"
+    correspondence.entity2.each do |pe|
+      assert corr.entity2.any?{|pee| pe.equal_to?(pee)}, "no match found for #{pe.class} - #{pe.rdf_type}"
     end
   end
 

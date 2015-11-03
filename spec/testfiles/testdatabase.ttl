@@ -429,6 +429,13 @@
       rdfs:label "ontologies_id" ;
       rdfs:range xsd:integer .
 
+:correspondences_mapping_key
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "correspondences_mapping_key" ;
+      rdfs:range xsd:string .
+
 :monitoring_tasks_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :monitoring_tasks ;

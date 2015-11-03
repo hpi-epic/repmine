@@ -38,9 +38,13 @@ class OntologyMatcher
   end
 
   def insert_statements!
-    alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
+    insert_graph_pattern_ontology!
     alignment_repo.insert_file!(alignment_path) if File.exist?(alignment_path)
     deanonymize_correspondences!
+  end
+
+  def insert_graph_pattern_ontology!
+    alignment_repo.repository.insert(Vocabularies::GraphPattern.to_enum)
   end
 
   def deanonymize_correspondences!
@@ -86,8 +90,8 @@ class OntologyMatcher
   def correspondences_for_pattern_elements(elements)
     correspondences = []
     alignment_graph.query(complex_correspondence_query(elements)) do |result|
-      matching_pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)
-      if matching_pattern.pattern_elements.select{|pe| elements.none?{|el| el.equal_to?(pe)}}.empty?
+      pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)
+      if pattern.pattern_elements.select{|pe| elements.none?{|el| el.equal_to?(pe)}}.empty?
         correspondences << create_correspondence(result, elements)
       end
     end
@@ -106,6 +110,7 @@ class OntologyMatcher
 
   def simple_correspondence_query(concept)
     e1, e2 = entities_in_order()
+
     patterns = [
       [:cell, e1, RDF::Resource.new(concept)],
       [:cell, e2, :target],
@@ -113,7 +118,8 @@ class OntologyMatcher
       [:cell, Vocabularies::Alignment.measure, :measure],
       [:cell, Vocabularies::Alignment.db_id, :db_id]
     ]
-    return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
+    q = RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
+    return q
   end
 
   def complex_correspondence_query(pattern_elements)
@@ -146,7 +152,7 @@ class OntologyMatcher
     correspondence = Correspondence.find(result[:db_id].to_i)
     correspondence.entity1 = entity1
     correspondence.entity2 = if result[:target].anonymous?
-      Pattern.from_graph(alignment_graph, result[:target], target_ontology)
+      Pattern.from_graph(alignment_graph, result[:target], target_ontology).pattern_elements
     else
       result[:target].to_s
     end

@@ -88,12 +88,12 @@ RSpec.describe Pattern, :type => :model do
 
     om = OntologyMatcher.new(cc.onto1, cc.onto2)
     om.alignment_repo.clear!
-    om.insert_statements!
+    om.insert_graph_pattern_ontology!
     om.add_correspondence!(cc)
 
     pattern_node = nil
     om.alignment_graph.build_query() do |q|
-      q.pattern [:pattern, RDF.type, Vocabularies::GraphPattern.GraphPattern]
+      q.pattern [cc.resource, Vocabularies::Alignment.entity2, :pattern]
     end.run do |solution|
       pattern_node = solution[:pattern]
     end
@@ -105,6 +105,8 @@ RSpec.describe Pattern, :type => :model do
       assert pe.valid?, "#{pe.class} (#{pe.rdf_type}) is invalid: #{pe.errors.full_messages.join(", ")}"
     end
   end
+
+  it "should find matching elements for "
 
   def n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
     p = Pattern.create(name: name, description: "Generic")
