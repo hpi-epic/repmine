@@ -14,7 +14,9 @@ class Aggregation < ActiveRecord::Base
 
   def clone_for(repository)
     clonty = Aggregation.new(:operation => operation, :column_name => column_name, :alias_name => alias_name)
-    clonty.pattern_element = pattern_element.buddy_for_ontology(repository.ontology)
+    matchings = pattern_element.matching_elements.where(:ontology_id => repository.ontology.id)
+    raise "Someone should implement this for complex mappings" if matchings.size > 1
+    clonty.pattern_element = matchings.first
     return clonty
   end
 
