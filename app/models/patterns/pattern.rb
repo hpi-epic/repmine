@@ -63,19 +63,6 @@ class Pattern < Measurable
     ).collect{|pem| pem.matched_element_id}
   end
 
-  def find_matching_element(element, ont)
-    matches = PatternElementMatch.includes(:matching_element).where(
-      :matched_element_id => element,
-      :pattern_elements => {:ontology_id => ont}
-    ).collect{|pem| pem.matching_element_id}
-
-    if matches.size != 1
-      raise "handle complex correspondences ASAP!"
-    else
-      return PatternElement.find(matches.first)
-    end
-  end
-
   # some comparison
   def equal_to?(other)
     if self == other

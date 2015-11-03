@@ -146,11 +146,13 @@ class PatternsController < ApplicationController
       output_elements = PatternElement.find(targets.split(","))
       begin
         @oc = Correspondence.from_elements(input_elements, output_elements)
+        output_elements.first.pattern.prepare!
         flash[:notice] = "Correspondence saved!"
       rescue Correspondence::UnsupportedCorrespondence => e
         flash[:error] = "Could not save correspondence! #{e.message}"
       end
     end
+
     redirect_to :unmatched_node
   end
 
