@@ -5,6 +5,7 @@ class Ontology < ActiveRecord::Base
   attr_accessor :ag_connection, :rdf_graph, :type_hierarchy, :classes
 
   validates :url, :uniqueness => true, :presence => true
+  validate :can_be_downloaded, :if => :load_immediately?
 
   has_many :patterns
   has_one :repository
@@ -19,6 +20,14 @@ class Ontology < ActiveRecord::Base
 
   def set_short_name_if_empty!
     self.short_name = url.split("/").last.split("\.").first if short_name.blank?
+  end
+
+  def can_be_downloaded
+    begin
+      download!
+    rescue Exception => e
+      errors.add(:url, "could not be reached for download: #{e.message}")
+    end
   end
 
   def load_to_repository!(repo_name)

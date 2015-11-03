@@ -3,6 +3,11 @@ class PatternsController < ApplicationController
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
 
   def new
+    @ontologies = Ontology.all
+    if @ontologies.empty?
+      flash[:notice] = "No ontologies present. Create one or extract one from a repository."
+      redirect_to new_ontology_path
+    end
     @pattern = Pattern.new
     @title = "Create new pattern"
   end

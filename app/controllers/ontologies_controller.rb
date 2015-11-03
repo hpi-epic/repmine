@@ -4,11 +4,11 @@ class OntologiesController < ApplicationController
   # GET /ontologies.json
   def index
     @ontologies = Ontology.all
-    @title = "Ontology overview"
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @ontologies }
+    if @ontologies.empty?
+      flash[:notice] = "No ontologies present. Create one or extract one from a repository."
+      redirect_to new_ontology_path
     end
+    @title = "Ontology overview"
   end
 
   # GET /ontologies/new
@@ -32,15 +32,11 @@ class OntologiesController < ApplicationController
   # POST /ontologies.json
   def create
     @ontology = Ontology.new(params[:ontology])
-
-    respond_to do |format|
-      if @ontology.save
-        format.html { redirect_to ontologies_path, notice: 'Ontology was successfully created.' }
-        format.json { render json: @ontology, status: :created, location: @ontology }
-      else
-        format.html { render :new }
-        format.json { render json: @ontology.errors, status: :unprocessable_entity }
-      end
+    if @ontology.save
+      redirect_to ontologies_path, notice: 'Ontology was successfully created.'
+    else
+      flash[:error] = 'Could not create ontology. ' + @ontology.errors.full_messages.join(", ")
+      render :new
     end
   end
 
