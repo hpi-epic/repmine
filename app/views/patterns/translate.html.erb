@@ -29,7 +29,7 @@
 
 <%= form_for(@target_pattern) do |f| %><% end %>
 
-<%= form_tag(pattern_save_correspondence_path(@source_pattern), :id => "save_correspondence_form") do %>
+<%= form_tag(pattern_save_correspondence_path(@target_pattern), :id => "save_correspondence_form") do %>
   <%= hidden_field_tag "source_element_ids[]" %>
   <%= hidden_field_tag "target_element_ids[]" %>
 <% end %>

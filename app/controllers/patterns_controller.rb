@@ -91,7 +91,7 @@ class PatternsController < ApplicationController
   end
 
   def unmatched_node
-    translation_pattern = Pattern.find(params[:pattern_id])
+    translation_pattern = TranslationPattern.find(params[:pattern_id])
     @matches = translation_pattern.find_element_matches(translation_pattern.source_pattern.ontologies)
     @next_unmatched_element = translation_pattern.unmatched_source_elements.first
     respond_to :js
@@ -158,7 +158,7 @@ class PatternsController < ApplicationController
       end
     end
 
-    redirect_to :unmatched_node
+    redirect_to pattern_unmatched_node_path(Pattern.find(params[:pattern_id]))
   end
 
   private
