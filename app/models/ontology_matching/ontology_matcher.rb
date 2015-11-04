@@ -181,10 +181,8 @@ class OntologyMatcher
   end
 
   def remove_correspondence!(correspondence)
-    c_node = find_correspondence_node(correspondence)
-    return if c_node.nil?
-    find_all_subnodes_of(c_node).each{|sn| alignment_graph.delete([sn])}
-    alignment_graph.delete([c_node])
+    find_all_subnodes_of(correspondence.resource).each{|sn| alignment_graph.delete([sn])}
+    alignment_graph.delete([correspondence.resource])
   end
 
   def find_all_subnodes_of(c_node)
@@ -197,10 +195,7 @@ class OntologyMatcher
     return subnodes
   end
 
-  def find_correspondence_node(correspondence)
-    alignment_graph.query(RDF::Query.new(*correspondence.query_patterns)) do |res|
-      return res[:cell]
-    end
-    return nil
+  def has_correspondence_node?(correspondence)
+    alignment_graph.has_statement?(RDF::Statement.new(correspondence.resource, RDF.type, Vocabularies::Alignment.Cell))
   end
 end

@@ -16,6 +16,9 @@
 # my idealog
 /misc/*.*
 
+# everything in the agraph-vm folder
+/agraph-vm/*/
+
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*neo*/*

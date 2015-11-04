@@ -81,7 +81,7 @@ RSpec.describe OntologyMatcher, :type => :model do
 
   it "should properly insert a new correspondence" do
     correspondence = FactoryGirl.create(:simple_correspondence)
-    assert_not_nil @om.find_correspondence_node(correspondence)
+    assert @om.has_correspondence_node?(correspondence)
     assert_not_empty @om.correspondences_for_concept(correspondence.entity1)
   end
 
@@ -101,7 +101,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should find an existing correspondence within the graph" do
     correspondence = FactoryGirl.create(:simple_correspondence)
     assert_not_empty @om.alignment_graph
-    assert_not_nil @om.find_correspondence_node(correspondence)
+    assert @om.has_correspondence_node?(correspondence)
   end
 
   it "should remove an existing correspondence from the graph" do
@@ -117,7 +117,7 @@ RSpec.describe OntologyMatcher, :type => :model do
     @om.match!
     correspondences = @om.correspondences_for_concept("http://crs_dr/#abstract")
     assert_equal 1, correspondences.size
-    assert_not_nil @om.find_correspondence_node(correspondences.first)
+    assert @om.has_correspondence_node?(correspondences.first)
     @om.remove_correspondence!(correspondences.first)
     assert_empty @om.correspondences_for_concept("http://crs_dr/#abstract")
   end
