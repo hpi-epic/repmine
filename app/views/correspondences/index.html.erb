@@ -1,0 +1,13 @@
+<% unless @correspondences.blank? %>
+<table>
+  <th>
+    <td>From</td>
+    <td>To</td>
+  </th>
+  <% @correspondences.each do |correspondence| %>
+    <%= render :partial => "show", :locals => {:correspondence => correspondence} %>
+  <% end %>
+</table>
+<% else %>
+  <h3>No correspondences found.</h3>
+<% end %>

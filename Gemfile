@@ -45,6 +45,7 @@ group :development, :test do
   gem 'ruby-prof'
   gem 'quiet_safari'
   gem 'test-unit', '~> 3.0'
+  gem 'capybara', '~> 2.5'
 end
 
 # Gems used only for assets and not required

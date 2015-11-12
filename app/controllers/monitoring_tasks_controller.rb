@@ -44,7 +44,7 @@ class MonitoringTasksController < ApplicationController
 
     tasks.each do |task|
       unless task.executable?
-        redirect_to(pattern_translate_path(task.translate_this, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
+        redirect_to(pattern_prepare_translation_path(task.translate_this, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
       end
     end
 

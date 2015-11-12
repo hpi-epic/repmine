@@ -49,18 +49,18 @@ class Pattern < Measurable
   end
 
   def matched_elements(onts)
-    PatternElement.where(:id => find_element_matches(onts) & pattern_elements.pluck(:id))
+    PatternElement.where(:id => element_matches(onts).collect{|pem| pem.matched_element_id} & pattern_elements.pluck(:id))
   end
 
   def unmatched_elements(onts)
-    PatternElement.where(:id => pattern_elements.pluck(:id) - find_element_matches(onts))
+    PatternElement.where(:id => pattern_elements.pluck(:id) - element_matches(onts).collect{|pem| pem.matched_element_id})
   end
 
-  def find_element_matches(onts)
+  def element_matches(onts)
     return PatternElementMatch.includes(:matching_element).where(
       :matched_element_id => pattern_elements,
       :pattern_elements => {:ontology_id => onts}
-    ).collect{|pem| pem.matched_element_id}
+    )
   end
 
   # some comparison

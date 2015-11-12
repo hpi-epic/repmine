@@ -19,19 +19,35 @@ class PatternsController < ApplicationController
     @title = "'#{@pattern.name}' Pattern"
   end
 
-  def bootstrap_translation(source_pattern, target_ontology)
+  def prepare_translation
+    source_pattern = Pattern.find(params[:pattern_id])
+    target_ontology = Ontology.find(params[:ontology_id])
+    sel_corr = {}
+    (params[:correspondence_ids] || {}).each{|k,v| sel_corr[[k.to_i]] = Correspondence.where(id: v)}
+
     # no need to translate a pattern to one of its own ontologies
     if source_pattern.ontologies.include?(target_ontology)
       redirect_to patterns_path, :notice => "No self-translation necessary!" and return
     end
+
+    # otherwise, find (or create) the translation pattern and prepare it, again
     target_pattern = TranslationPattern.for_pattern_and_ontologies(source_pattern, [target_ontology])
-    target_pattern.prepare!
-    redirect_to pattern_translate_path(source_pattern, target_pattern)
+    begin
+      target_pattern.prepare!(sel_corr)
+      redirect_to pattern_translate_path(target_pattern)
+    rescue TranslationPattern::AmbiguousTranslation => e
+      redirect_to pattern_correspondence_selection_path(target_pattern)
+    end
+  end
+
+  def correspondence_selection
+    @pattern = TranslationPattern.find(params[:pattern_id])
+    @ambiguous_correspondences = @pattern.ambiguous_correspondences()
   end
 
   def translate
-    @source_pattern = Pattern.find(params[:pattern_id])
-    @target_pattern = TranslationPattern.find(params[:target_id])
+    @target_pattern = TranslationPattern.find(params[:pattern_id])
+    @source_pattern = @target_pattern.source_pattern
     @source_pattern.auto_layout!
 
     @controls_offset = @source_pattern.node_offset - 30
@@ -92,7 +108,7 @@ class PatternsController < ApplicationController
 
   def unmatched_node
     translation_pattern = TranslationPattern.find(params[:pattern_id])
-    @matches = translation_pattern.find_element_matches(translation_pattern.source_pattern.ontologies)
+    @matched_elements = translation_pattern.matched_source_elements
     @next_unmatched_element = translation_pattern.unmatched_source_elements.first
     respond_to :js
   end
@@ -113,7 +129,7 @@ class PatternsController < ApplicationController
         if params[:patterns].size > 1
           redirect_to patterns_path, :alert => "You can only translate one pattern at a time!"
         else
-          bootstrap_translation(Pattern.find(params[:patterns].first), Ontology.find(params[:ontology_ids]))
+          redirect_to pattern_prepare_translation_path(params[:patterns].first, params[:ontology_ids])
         end
       elsif params[:monitor]
         task_ids = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
@@ -137,28 +153,6 @@ class PatternsController < ApplicationController
     }
     @ontology_groups = Ontology.grouped
     @title = "Queries for '#{@pattern.name}'"
-  end
-
-  def save_correspondence
-    sources = (params[:source_element_ids] || []).reject{|x| x.blank?}.first
-    targets = (params[:target_element_ids] || []).reject{|x| x.blank?}.first
-    matched_concepts = []
-
-    if sources.blank? || targets.blank?
-      flash[:error] = "Missing input/output elements!"
-    else
-      input_elements = PatternElement.find(sources.split(","))
-      output_elements = PatternElement.find(targets.split(","))
-      begin
-        @oc = Correspondence.from_elements(input_elements, output_elements)
-        output_elements.first.pattern.prepare!
-        flash[:notice] = "Correspondence saved!"
-      rescue Correspondence::UnsupportedCorrespondence => e
-        flash[:error] = "Could not save correspondence! #{e.message}"
-      end
-    end
-
-    redirect_to pattern_unmatched_node_path(Pattern.find(params[:pattern_id]))
   end
 
   private

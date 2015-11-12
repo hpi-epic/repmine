@@ -23,11 +23,18 @@ var getSelectedElements = function(selector, exception){
 };
 
 // switches from pure translation to an interaction suitable for providing OM user input
-var toggleOMMode = function(on){
-  $("select").prop('disabled', on);
-  $(".om-control").each(function(i,el){$(el).toggle()});
-  $(".matched").each(function(i,el){$(el).toggleClass("matched_marked")});
-  on ? makeElementsClickable() : removeClickHandler();
+var startOmMode = function(){
+  $(".om-control").each(function(i,el){$(el).show()});
+  $(".p-control").each(function(i,el){$(el).hide()});
+  $(".matched").each(function(i,el){$(el).addClass("matched_marked")});
+  makeElementsClickable();
+};
+
+var stopOmMode = function(){
+  $(".om-control").each(function(i,el){$(el).hide()});
+  $(".p-control").each(function(i,el){$(el).show()});
+  $(".matched").each(function(i,el){$(el).removeClass("matched_marked")});
+  removeClickHandler();
 };
 
 var makeElementsClickable = function(){

@@ -3,14 +3,17 @@ RepMine::Application.routes.draw do
   resources :patterns do
     get :query
     post :query
-    get "translate/:target_id", :as => :translate, :to => "patterns#translate"
-    post :transmogrify, :on => :collection
-    get :monitor, :on => :collection
-    post :save_correspondence
+    match "prepare_translation/:ontology_id", to: "patterns#prepare_translation", as: :prepare_translation, via: [:get, :post]
+    get :translate
+    post :transmogrify, on: :collection
+    get :monitor, on: :collection
     get :unmatched_node
 
-    get :autocomplete_tag_name, :on => :collection
-    resources :nodes, :only => [:create]
+    resources :correspondences
+    get :correspondence_selection
+
+    get :autocomplete_tag_name, on: :collection
+    resources :nodes, only: [:create]
   end
 
   resources :relation_constraints do
@@ -36,12 +39,12 @@ RepMine::Application.routes.draw do
     post :create_node
     post :create_connection
     post :destroy_connection
-    post :monitor, :on => :collection
-    get :autocomplete_tag_name, :on => :collection
+    post :monitor, on: :collection
+    get :autocomplete_tag_name, on: :collection
   end
 
-  resources :metric_nodes, :only => [:update, :destroy, :show] do
-    resources :aggregations, :only => [:create, :destroy]
+  resources :metric_nodes, only: [:update, :destroy, :show] do
+    resources :aggregations, only: [:create, :destroy]
   end
 
   resources :repositories do
@@ -49,17 +52,17 @@ RepMine::Application.routes.draw do
   end
 
   resources :ontologies do
-    get :autocomplete_ontology_group, :on => :collection
+    get :autocomplete_ontology_group, on: :collection
   end
 
   resources :monitoring_tasks do
     get :csv_results
     get :show_results
     post :run
-    get :check, :on => :collection
+    get :check, on: :collection
   end
 
   resources :services
 
-  root :to => "patterns#index"
+  root to: "patterns#index"
 end

@@ -18,19 +18,31 @@ class TranslationPattern < Pattern
   end
 
   def self.pattern_name(pattern, ontologies)
-    return "'#{pattern.name}' on '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
+    "'#{pattern.name}' on '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
   end
 
   def self.description(pattern, ontologies)
-    return "Translates pattern '#{pattern.name}' to ontologies: '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'."
+    "Translates pattern '#{pattern.name}' to ontologies: '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'."
   end
 
   def self.model_name
-    return Pattern.model_name
+    Pattern.model_name
+  end
+
+  def all_correspondences
+    source_pattern.element_matches(ontologies).collect{|pem| pem.correspondence}.uniq
   end
 
   def unmatched_source_elements
-    return source_pattern.unmatched_elements(ontologies)
+    source_pattern.unmatched_elements(ontologies)
+  end
+
+  def ambiguous_correspondences
+    check_for_ambiguous_mappings(all_mappings)
+  end
+
+  def matched_source_elements
+    source_pattern.matched_elements(ontologies)
   end
 
   def ontology_matchers(source_ont)
@@ -46,17 +58,33 @@ class TranslationPattern < Pattern
   end
 
   # return correspondences for a given pattern
-  def prepare!()
+  def prepare!(selected_correspondences = [])
     match!
-    process_mappings(get_simple_mappings)
-    process_mappings(get_complex_mappings)
-  end
-
-  def process_mappings(mappings)
-    check_for_ambiguous_mappings(mappings)
+    mappings = all_mappings()
+    resolve_ambiguities(mappings, selected_correspondences)
+    ambiguities = check_for_ambiguous_mappings(mappings)
+    raise AmbiguousTranslation.new unless ambiguities.empty?
     flatten_mappings(mappings)
     add_pattern_elements!(mappings)
     connect_pattern_elements!(mappings)
+  end
+
+  def resolve_ambiguities(mappings, selected_correspondences)
+    if selected_correspondences.empty?
+      return mappings
+    else
+      selected_correspondences.each_pair do |element_ids, correspondences|
+        # the first step removes the ambiguity for single elements
+        mappings[element_ids] = correspondences
+        # the second removes all sub and supersets
+        el_ids = element_ids.collect{|eid| eid.to_i}
+        mappings.reject!{|k,v| k != el_ids && !(k & el_ids).empty?}
+      end
+    end
+  end
+
+  def all_mappings()
+    get_simple_mappings.merge(get_complex_mappings){|k, val1, val2| val1.concat(val2)}
   end
 
   def flatten_mappings(mappings)
@@ -98,16 +126,17 @@ class TranslationPattern < Pattern
   end
 
   def check_for_ambiguous_mappings(mappings)
+    ambiguities = {}
     mappings.keys.sort_by{|key| key.size}.each_with_index do |key, index|
       # option 1: more than one possible output subgraphs
-      if mappings[key].size > 1
-        raise AmbiguousTranslation.new("too many mappings for element #{key}: #{mappings[key]}")
-      end
+      ambiguities[key] = mappings[key] if mappings[key].size > 1
       # option 2: the current key is included in at least one other mapping
-      if mappings.keys[index+1..-1].any?{|other_key| (key - other_key).empty?}
-        raise AmbiguousTranslation.new("ambiguous mappings for element #{key}")
+      mappings.keys[index+1..-1].select{|other_key| (key - other_key).empty?}.each do |alt_key|
+        ambiguities[key] ||= mappings[key]
+        ambiguities[key].concat(mappings[alt_key])
       end
     end
+    return ambiguities
   end
 
   # we check whether we find unmatched doppelgaengers of all the elements

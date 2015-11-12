@@ -29,15 +29,19 @@ class PatternElement < ActiveRecord::Base
   end
 
   def url
-    return pattern.url + "/#{self.class.name.underscore.pluralize}/#{id}"
+    pattern.url + "/#{self.class.name.underscore.pluralize}/#{id}"
   end
 
   def rdf_type
-    return type_expression.nil? ? "" : type_expression.fancy_string
+    type_expression.nil? ? "" : type_expression.fancy_string
   end
 
   def short_rdf_type
-    return type_expression.nil? ? "" : type_expression.fancy_string(true)
+    type_expression.nil? ? "" : type_expression.fancy_string(true)
+  end
+
+  def qualified_type(short = true)
+    type_expression.nil? ? "" : (ontology.short_name + "#" + type_expression.fancy_string(short))
   end
 
   # this method allows overwriting an existing type expression with a SIMPLE rdf type

@@ -1,0 +1,16 @@
+<h3>Translation is ambiguous. Please select between alternatives!</h3>
+
+<%= form_tag(pattern_prepare_translation_path(@pattern.source_pattern, @pattern.ontologies.first)) do %>
+  <% @ambiguous_correspondences.each_pair do |input_elements, correspondences| %>
+    <fieldset>
+      <legend>Elements: <%= input_elements.to_s %></legend>
+      <% correspondences.each do |correspondence| %>
+        <%= check_box_tag "correspondence_ids[#{input_elements.join("_")}][]", correspondence.id %>
+        <%= correspondence.mapping_key %>
+        <br />
+      <% end %>
+    </fieldset>
+  <% end %>
+  <br />
+  <%= submit_tag("Prepare!", :class => "btn btn-info") %>
+<% end%>

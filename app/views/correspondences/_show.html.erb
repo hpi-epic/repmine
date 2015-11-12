@@ -1,0 +1,6 @@
+<% sources = correspondence.pattern_element_matches.collect{|pem| pem.matched_element.qualified_type}%>
+<% targets = correspondence.pattern_element_matches.collect{|pem| pem.matching_element.qualified_type}%>
+
+<%= sources.join(" + ") %>
+<%= fa_icon("minus") %>
+<%= targets.join(" + ") %>

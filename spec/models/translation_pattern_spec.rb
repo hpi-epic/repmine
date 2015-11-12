@@ -44,12 +44,11 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should raise an exception if one element could be mapped to two different target structures" do
-    correspondence1 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    correspondence2 = FactoryGirl.create(:complex_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    @pattern.pattern_elements.first.rdf_type = correspondence1.entity1
+    correspondence1 = FactoryGirl.create(:simple_correspondence, onto1: @source_ontology, onto2: @target_ontology, entity1: @pattern.nodes.first.rdf_type)
+    correspondence2 = FactoryGirl.create(:hardway_complex, onto1: @source_ontology, onto2: @target_ontology)
     om = ontology_matcher([correspondence1, correspondence2])
-    assert_equal 2, om.correspondences_for_concept(correspondence1.entity1).size
-    expect{TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology]).prepare!}.to raise_error(TranslationPattern::AmbiguousTranslation)
+    tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
+    expect{tp.prepare!}.to raise_error(TranslationPattern::AmbiguousTranslation)
   end
 
   it "should determine whether a requested translation already exists and return that instead of a new one" do
@@ -227,10 +226,29 @@ RSpec.describe TranslationPattern, :type => :model do
     too_many = {[1] => [[2],[3]]}
     ambiguous = {[1] => [[2]], [1,3] => [[4]]}
     ambiguous_2 = {[1,2] => [[2]], [4,5,1,6,2] => [[4]]}
-    TranslationPattern.new.check_for_ambiguous_mappings(ok)
-    expect{TranslationPattern.new.check_for_ambiguous_mappings(too_many)}.to raise_error(TranslationPattern::AmbiguousTranslation)
-    expect{TranslationPattern.new.check_for_ambiguous_mappings(ambiguous)}.to raise_error(TranslationPattern::AmbiguousTranslation)
-    expect{TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)}.to raise_error(TranslationPattern::AmbiguousTranslation)
+    assert_empty TranslationPattern.new.check_for_ambiguous_mappings(ok)
+    assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(too_many)
+    assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(ambiguous)
+    assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)
+  end
+
+  it "should properly remove subsets" do
+    mapping = {[1] => [2,3], [1,2] => [4], [2,3] => [5], [4] => [5]}
+    choice1 = {[1,2] => [4]}
+    TranslationPattern.new.resolve_ambiguities(mapping, choice1)
+    assert_equal [4], mapping[[1,2]]
+    assert_nil mapping[1]
+    assert_nil mapping[[2,3]]
+  end
+
+  it "should properly remove supersets adn replace the original" do
+    mapping = {[1] => [2,3], [1,2] => [4], [2,3] => [5], [4] => [5]}
+    choice1 = {[1] => [4,3]}
+    TranslationPattern.new.resolve_ambiguities(mapping, choice1)
+    assert_equal [4,3], mapping[[1]]
+    assert_nil mapping[[1,2]]
+    assert_not_nil mapping[[2,3]]
+    assert_not_nil mapping[[4]]
   end
 
   it "should throw away pattern element matches if an element changes" do
