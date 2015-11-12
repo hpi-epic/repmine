@@ -232,23 +232,34 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)
   end
 
-  it "should properly remove subsets" do
-    mapping = {[1] => [2,3], [1,2] => [4], [2,3] => [5], [4] => [5]}
-    choice1 = {[1,2] => [4]}
+  it "should properly remove supersets" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    c1 = FactoryGirl.create(:simple_correspondence, entity1: "http://example1", onto2: o2, onto1: o1)
+    c2 = FactoryGirl.create(:simple_correspondence, entity1: "http://example2", onto2: o2, onto1: o1)
+    c3 = FactoryGirl.create(:simple_correspondence, entity1: "http://example3", onto2: o2, onto1: o1)
+
+    mapping = {[1] => [c1], [1,2] => [c2], [2,3] => [c2], [4] => [c3]}
+    choice1 = {[1] => c1.id}
     TranslationPattern.new.resolve_ambiguities(mapping, choice1)
-    assert_equal [4], mapping[[1,2]]
-    assert_nil mapping[1]
-    assert_nil mapping[[2,3]]
+    assert_equal [c1], mapping[[1]]
+    assert_nil mapping[[1,2]]
+    assert_equal [c2], mapping[[2,3]]
   end
 
-  it "should properly remove supersets adn replace the original" do
-    mapping = {[1] => [2,3], [1,2] => [4], [2,3] => [5], [4] => [5]}
-    choice1 = {[1] => [4,3]}
+  it "should properly remove subsets" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    c1 = FactoryGirl.create(:simple_correspondence, entity1: "http://example1", onto2: o2, onto1: o1)
+    c2 = FactoryGirl.create(:simple_correspondence, entity1: "http://example2", onto2: o2, onto1: o1)
+    c3 = FactoryGirl.create(:simple_correspondence, entity1: "http://example3", onto2: o2, onto1: o1)
+
+    mapping = {[1] => [c2], [1,2] => [c1], [2,3] => [c3], [4] => [c3]}
+    choice1 = {[1] => c1.id}
     TranslationPattern.new.resolve_ambiguities(mapping, choice1)
-    assert_equal [4,3], mapping[[1]]
-    assert_nil mapping[[1,2]]
-    assert_not_nil mapping[[2,3]]
-    assert_not_nil mapping[[4]]
+    assert_equal [c1], mapping[[1,2]]
+    assert_nil mapping[[1]]
+    assert_equal [c3], mapping[[2,3]]
   end
 
   it "should throw away pattern element matches if an element changes" do

@@ -73,12 +73,10 @@ class TranslationPattern < Pattern
     if selected_correspondences.empty?
       return mappings
     else
-      selected_correspondences.each_pair do |element_ids, correspondences|
-        # the first step removes the ambiguity for single elements
-        mappings[element_ids] = correspondences
-        # the second removes all sub and supersets
-        el_ids = element_ids.collect{|eid| eid.to_i}
-        mappings.reject!{|k,v| k != el_ids && !(k & el_ids).empty?}
+      selected_correspondences.each_pair do |element_ids, correspondence_id|
+        mappings.reject! do |el_ids, correspondences|
+          !(el_ids & element_ids).empty? && mappings[el_ids].none?{|corr| corr.id == correspondence_id}
+        end
       end
     end
   end

@@ -23,7 +23,7 @@ class PatternsController < ApplicationController
     source_pattern = Pattern.find(params[:pattern_id])
     target_ontology = Ontology.find(params[:ontology_id])
     sel_corr = {}
-    (params[:correspondence_ids] || {}).each{|k,v| sel_corr[[k.to_i]] = Correspondence.where(id: v)}
+    (params[:correspondence_id] || {}).each_pair{|k,v| sel_corr[[k.to_i]] = v.to_i}
 
     # no need to translate a pattern to one of its own ontologies
     if source_pattern.ontologies.include?(target_ontology)

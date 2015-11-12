@@ -15,6 +15,9 @@ describe "Selecting Correspondences", :type => :feature do
     find(:xpath, "//input[@type='checkbox'][@value='#{@c2.id}']").set(true)
     click_button("Prepare!")
     expect(current_path).to eq(pattern_translate_path(TranslationPattern.first))
+    target_node = TranslationPattern.first.pattern_elements.first
+    expect(target_node).to_not be_nil
+    expect(target_node.rdf_type).to eq(@c2.entity2)
   end
 
   def create_conflict()

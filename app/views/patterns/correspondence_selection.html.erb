@@ -5,7 +5,7 @@
     <fieldset>
       <legend>Elements: <%= input_elements.to_s %></legend>
       <% correspondences.each do |correspondence| %>
-        <%= check_box_tag "correspondence_ids[#{input_elements.join("_")}][]", correspondence.id %>
+        <%= check_box_tag "correspondence_id[#{input_elements.join("_")}]", correspondence.id %>
         <%= correspondence.mapping_key %>
         <br />
       <% end %>
