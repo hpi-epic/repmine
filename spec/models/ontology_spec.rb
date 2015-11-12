@@ -6,6 +6,8 @@ RSpec.describe Ontology, :type => :model do
     Ontology.any_instance.unstub(:load_to_dedicated_repository!)
     ont = Ontology.new(url: "http://example.org")
     ont.stub(:repository_name => "__XX__TEST__")
+    ont.stub(:download!).and_raise("something is wrong ...")
     assert !ont.save
+    assert_not_empty ont.errors[:url]
   end
 end
