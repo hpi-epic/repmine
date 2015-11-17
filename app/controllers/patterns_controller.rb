@@ -42,7 +42,11 @@ class PatternsController < ApplicationController
 
   def correspondence_selection
     @pattern = TranslationPattern.find(params[:pattern_id])
-    @ambiguous_correspondences = @pattern.ambiguous_correspondences()
+    @acs = @pattern.ambiguous_correspondences()
+    # we collect all intersections of each key with other keys
+    @groups = @acs.keys.collect{|key| @acs.keys.select{|kk| !(key & kk).empty?}}.uniq
+    # but throw those away, whose elements are not entirely mutually exclusive
+    @groups.reject!{|key| key.inject(:&).empty?}
   end
 
   def translate

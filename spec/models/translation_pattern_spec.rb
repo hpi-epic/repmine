@@ -223,43 +223,62 @@ RSpec.describe TranslationPattern, :type => :model do
 
   it "should find ambigous mappings based on the found keys" do
     ok = {[1] => [[2]]}
-    too_many = {[1] => [[2],[3]]}
-    ambiguous = {[1] => [[2]], [1,3] => [[4]]}
-    ambiguous_2 = {[1,2] => [[2]], [4,5,1,6,2] => [[4]]}
+    too_many = {[1] => [2,3]}
+    ambiguous = {[1] => [2], [1,3] => [4]}
+    ambiguous_2 = {[1,2] => [2], [4,5,1,6,2] => [4]}
     assert_empty TranslationPattern.new.check_for_ambiguous_mappings(ok)
-    assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(too_many)
-    assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(ambiguous)
-    assert_not_empty TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)
+    tm = TranslationPattern.new.check_for_ambiguous_mappings(too_many)
+    assert_equal [2,3], tm[[1]]
+    tm = TranslationPattern.new.check_for_ambiguous_mappings(ambiguous)
+    assert_equal [2], tm[[1]]
+    assert_equal [4], tm[[1,3]]
+    tm = TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)
+    assert_equal [2], tm[[1,2]]
+    assert_equal [4], tm[[4,5,1,6,2]]
   end
 
-  it "should properly remove supersets" do
+  it "should properly select the chosen correspondences" do
     o1 = FactoryGirl.create(:ontology)
     o2 = FactoryGirl.create(:ontology)
     c1 = FactoryGirl.create(:simple_correspondence, entity1: "http://example1", onto2: o2, onto1: o1)
     c2 = FactoryGirl.create(:simple_correspondence, entity1: "http://example2", onto2: o2, onto1: o1)
     c3 = FactoryGirl.create(:simple_correspondence, entity1: "http://example3", onto2: o2, onto1: o1)
 
-    mapping = {[1] => [c1], [1,2] => [c2], [2,3] => [c2], [4] => [c3]}
+    mapping = {[1] => [c1, c3], [1,2] => [c2], [2,3] => [c2]}
     choice1 = {[1] => c1.id}
     TranslationPattern.new.resolve_ambiguities(mapping, choice1)
     assert_equal [c1], mapping[[1]]
     assert_nil mapping[[1,2]]
     assert_equal [c2], mapping[[2,3]]
+
+    mapping = {[1] => [c1], [1,2] => [c2], [2,3] => [c3]}
+    choice2 = {[1,2] => c2.id}
+    TranslationPattern.new.resolve_ambiguities(mapping, choice2)
+    assert_nil mapping[[1]]
+    assert_equal [c2], mapping[[1,2]]
+    assert_nil mapping[[2,3]]
+
+    mapping = {[1] => [c1], [1,2] => [c2], [2,3] => [c3]}
+    choice2 = {[1] => c2.id}
+    TranslationPattern.new.resolve_ambiguities(mapping, choice2)
+    assert_nil mapping[[1]]
+    assert_equal [c2], mapping[[1,2]]
+    assert_nil mapping[[2,3]]
   end
 
-  it "should properly remove subsets" do
+  it "should ignore stuff we want to do manually" do
     o1 = FactoryGirl.create(:ontology)
     o2 = FactoryGirl.create(:ontology)
     c1 = FactoryGirl.create(:simple_correspondence, entity1: "http://example1", onto2: o2, onto1: o1)
     c2 = FactoryGirl.create(:simple_correspondence, entity1: "http://example2", onto2: o2, onto1: o1)
     c3 = FactoryGirl.create(:simple_correspondence, entity1: "http://example3", onto2: o2, onto1: o1)
 
-    mapping = {[1] => [c2], [1,2] => [c1], [2,3] => [c3], [4] => [c3]}
-    choice1 = {[1] => c1.id}
+    mapping = {[1] => [c1], [2] => [c3], [1,2] => [c2]}
+    choice1 = {[1] => c1.id, [2] => 0}
     TranslationPattern.new.resolve_ambiguities(mapping, choice1)
-    assert_equal [c1], mapping[[1,2]]
-    assert_nil mapping[[1]]
-    assert_equal [c3], mapping[[2,3]]
+    assert_equal [c1], mapping[[1]]
+    assert_nil mapping[[1,2]]
+    assert_nil mapping[[2]]
   end
 
   it "should throw away pattern element matches if an element changes" do

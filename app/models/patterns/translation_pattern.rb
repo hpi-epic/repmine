@@ -74,8 +74,12 @@ class TranslationPattern < Pattern
       return mappings
     else
       selected_correspondences.each_pair do |element_ids, correspondence_id|
-        mappings.reject! do |el_ids, correspondences|
-          !(el_ids & element_ids).empty? && mappings[el_ids].none?{|corr| corr.id == correspondence_id}
+        real_target = (mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?} || [element_ids]).first
+        mappings.each do |el_ids, correspondences|
+          if !(el_ids & real_target).empty?
+            mappings[el_ids] = mappings[el_ids].select{|corr| corr.id == correspondence_id}
+            mappings.delete(el_ids) if mappings[el_ids].empty?
+          end
         end
       end
     end
@@ -130,8 +134,8 @@ class TranslationPattern < Pattern
       ambiguities[key] = mappings[key] if mappings[key].size > 1
       # option 2: the current key is included in at least one other mapping
       mappings.keys[index+1..-1].select{|other_key| (key - other_key).empty?}.each do |alt_key|
-        ambiguities[key] ||= mappings[key]
-        ambiguities[key].concat(mappings[alt_key])
+        ambiguities[alt_key] = mappings[alt_key]
+        ambiguities[key] = mappings[key]
       end
     end
     return ambiguities
