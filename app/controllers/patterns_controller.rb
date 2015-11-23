@@ -2,6 +2,18 @@ class PatternsController < ApplicationController
 
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
 
+  def index
+    if Pattern.count == 0
+      flash[:notice] = "No Patterns available. Please create a new one!"
+      redirect_to new_pattern_path
+    else
+      @pattern_groups = Pattern.grouped
+      @ontology_groups = Ontology.grouped
+      @repositories = Repository.all
+    end
+    @title = "Pattern Overview"
+  end
+
   def new
     @ontologies = Ontology.all
     if @ontologies.empty?
@@ -80,18 +92,6 @@ class PatternsController < ApplicationController
         format.html {render :new}
       end
     end
-  end
-
-  def index
-    if Pattern.count == 0
-      flash[:notice] = "No Patterns available. Please create a new one!"
-      redirect_to new_pattern_path
-    else
-      @pattern_groups = Pattern.grouped
-      @ontology_groups = Ontology.grouped
-      @repositories = Repository.all
-    end
-    @title = "Pattern Overview"
   end
 
   def update

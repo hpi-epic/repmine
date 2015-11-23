@@ -9,6 +9,8 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require font-awesome
+ *= require select2
+ *= require select2-bootstrap
  *= require_tree .
  *= require_self
  */
@@ -18,21 +20,11 @@
  margin: 0 0 0 0;
 }
 
-select {
-  width: 150px;
-}
-
 .left-boarder {
 	padding-left: 5px;
 	border-left: 1px solid grey;
 }
 
-.bs-searchbox input{
-	padding-right: 0px;
-	padding-left: 0px;
-}
-
-.dropdown-header span {
-	padding-left: 5px;
-	font-weight: bold;
+.select2-container--bootstrap{
+  display: inline-block;
 }

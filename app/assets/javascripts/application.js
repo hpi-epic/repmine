@@ -12,11 +12,12 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery.jgrowl.min
+//= require jquery-ui-1.9.2-min
+//= require jquery.jsPlumb-1.5.5-min
 //= require twitter/bootstrap
 //= require bootstrap
-//= require jquery-ui-1.9.2-min
 //= require autocomplete-rails
-//= require jquery.jsPlumb-1.5.5-min
-//= require jquery.jgrowl.min
-//= require bootstrap-select
+//= require select2
+//= require searchable_selects
 //= require_self

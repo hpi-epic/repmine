@@ -37,15 +37,18 @@ gem "dentaku"
 # calling external services
 gem "rest-client"
 
-group :development, :test do
+group :test do
   gem "rspec"
   gem "rspec-rails"
-  gem 'factory_girl_rails'
   gem 'simplecov'
-  gem 'ruby-prof'
-  gem 'quiet_safari'
+  gem 'factory_girl_rails'
   gem 'test-unit', '~> 3.0'
   gem 'capybara', '~> 2.5'
+end
+
+group :development do
+  gem 'ruby-prof'
+  gem 'quiet_safari'
 end
 
 # Gems used only for assets and not required
@@ -74,6 +77,7 @@ gem "validate_url"
 # fancy ui
 gem "twitter-bootstrap-rails"
 gem "font-awesome-rails"
+gem "select2-rails"
 
 # logging...
 gem "logging"
