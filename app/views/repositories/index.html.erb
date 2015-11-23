@@ -1,5 +1,5 @@
 <% unless @repositories.empty? %>
-<table style="width:40%" class="table table-bordered">
+<table style="width:50%" class="table table-bordered">
   <thead>
     <tr>
       <th>Name</th>
@@ -25,6 +25,6 @@
 <hr />
 <p>Create new Repository</p>
 <%= form_tag(new_repository_path, :method => :get) do |f| %>
-  <%= select_tag(:type, options_from_collection_for_select(Repository::TYPES, "classify", "classify"), {:class => "needs_no_space"})%>
+  <%= select_tag(:type, options_from_collection_for_select(Repository::TYPES.keys, "to_s", "to_s"), {:class => "needs_no_space"})%>
   <%= submit_tag "Create Repository", :class => "btn success"%>
 <% end %>

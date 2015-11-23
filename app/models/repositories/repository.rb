@@ -7,7 +7,11 @@ class Repository < ActiveRecord::Base
   # this is meant to temporarily hold a job object that loggin happens in...
   attr_accessor :job
 
-  TYPES = ["RdfRepository", "RdbmsRepository", "Neo4jRepository"]
+  TYPES = {
+    "RDF" => "RdfRepository",
+    "RDBMS" => "RdbmsRepository",
+    "Neo4j" => "Neo4jRepository"
+  }
 
   # custom error class for ontology extraction
   class OntologyExtractionError < StandardError
@@ -25,8 +29,8 @@ class Repository < ActiveRecord::Base
   end
 
   def self.for_type(type, params = {})
-    if TYPES.include?(type)
-      return class_eval(type).new(params)
+    if TYPES.keys.include?(type)
+      return class_eval(TYPES[type]).new(params)
     end
   end
 
