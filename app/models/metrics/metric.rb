@@ -74,7 +74,8 @@ class Metric < Measurable
     hfh = old_headers.clone
     leaf_nodes.each do |ln|
       ln.translated_aggregations(repository).each do |agg|
-        index = old_headers.index("#{ln.id}_#{agg.underscored_speaking_name}")
+        usn = agg.underscored_speaking_name
+        index = old_headers.index("#{ln.id}_#{usn}") || old_headers.index(usn)
         hfh[index] = agg.name_in_result unless index.nil?
       end
     end
