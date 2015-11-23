@@ -25,7 +25,7 @@
     <tr>
       <% @headers.each do |header|%>
       <td>
-        <%= res_row[header] =~ URI::regexp ? link_to(res_row[header]) : res_row[header] %>
+        <%= res_row[header] =~ URI::regexp ? link_to(res_row[header], res_row[header]) : res_row[header] %>
       </td>
       <% end %>
     </tr>
