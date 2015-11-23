@@ -1,5 +1,3 @@
-require 'vocabularies/schema_extraction.rb'
-
 class ExtractedOntology < Ontology
 
   include RdfSerialization
