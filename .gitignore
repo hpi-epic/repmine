@@ -17,7 +17,7 @@
 /misc/*.*
 
 # everything in the agraph-vm folder
-/agraph-vm/*/
+/vm-agraph/*/
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
