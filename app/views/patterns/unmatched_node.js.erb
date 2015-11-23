@@ -1,5 +1,5 @@
+stopOmMode();
 <% if @next_unmatched_element.nil? %>
-  stopOmMode();
   $.jGrowl("All elements matched!.", {theme: 'info'});
 <% else %>
   <% @matched_elements.each do |match| %>

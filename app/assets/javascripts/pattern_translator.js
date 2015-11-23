@@ -27,6 +27,7 @@ var startOmMode = function(){
   $(".om-control").each(function(i,el){$(el).show()});
   $(".p-control").each(function(i,el){$(el).hide()});
   $(".matched").each(function(i,el){$(el).addClass("matched_marked")});
+  $(".selected").each(function(i,el){$(el).removeClass("selected")});
   makeElementsClickable();
 };
 
