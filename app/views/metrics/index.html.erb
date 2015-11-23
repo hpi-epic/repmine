@@ -6,11 +6,7 @@
   </div>
   <div class="btn-group left-boarder">
     <%= button_tag("Monitor selected on:", :class => "btn btn-warning", :name => "monitor") %>
-    <%= select_tag(
-      "repository_id",
-      options_from_collection_for_select(@repositories, "id", "name"),
-      {:class => "selectpicker", "data-live-search" => "true"})
-    %>
+    <%= select_tag("repository_id", options_from_collection_for_select(@repositories, "id", "name")) %>
   </div>
 </div>
 

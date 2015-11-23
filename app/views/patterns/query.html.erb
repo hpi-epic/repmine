@@ -1,11 +1,7 @@
 <%= form_tag(pattern_query_path) do %>
   <div class="btn-group">
     <%= button_tag("Translate queries to:", :class => "btn btn-info", :name => "translate") %>
-    <%= select_tag(
-      :ontology_id,
-      grouped_options_for_select(@ontology_groups),
-      {:class => "selectpicker", "data-live-search" => "true"})
-    %>
+    <%= select_tag(:ontology_id, grouped_options_for_select(@ontology_groups)) %>
   </div>
 <% end %>
 
