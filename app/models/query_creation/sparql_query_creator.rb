@@ -51,7 +51,7 @@ class SparqlQueryCreator < QueryCreator
       @groupings << pe_variable(pe) unless aggregation.nil?
       pe_variable(pe)
     else
-      "(#{aggregation.operation.upcase}(?#{pe_variable(pe)}) AS ?#{aggregation.underscored_speaking_name})"
+      "(#{aggregation.operation.upcase}(DISTINCT ?#{pe_variable(pe)}) AS ?#{aggregation.underscored_speaking_name})"
     end
   end
 
