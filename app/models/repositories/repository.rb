@@ -31,6 +31,8 @@ class Repository < ActiveRecord::Base
   def self.for_type(type, params = {})
     if TYPES.keys.include?(type)
       return class_eval(TYPES[type]).new(params)
+    else
+      raise "#{type} is not a valid Repository type"
     end
   end
 
@@ -85,7 +87,7 @@ class Repository < ActiveRecord::Base
   end
 
   def query_for_pattern(pattern, aggregations)
-    return self.class.query_creator_class.new(pattern, aggregations).query_string
+    return self.class.query_creator_class.new(pattern.translated_to(self), aggregations).query_string
   end
 
   def create_ontology!
@@ -102,8 +104,8 @@ class Repository < ActiveRecord::Base
 
   def csv_data(results)
     CSV.generate do |csv|
-      csv << results["columns"]
-      results["data"].each{|data_row| csv << data_row}
+      csv << results.first.keys
+      results.each{|date| csv << date.values}
     end
   end
 

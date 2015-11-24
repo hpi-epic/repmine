@@ -32,4 +32,12 @@ class Measurable < ActiveRecord::Base
   def first_unexecutable_pattern(repository)
     return self
   end
+
+  def translated_to(repository)
+    if translation_unnecessary?(repository)
+      return self
+    else
+      return TranslationPattern.existing_translation_pattern(self, [repository.ontology])
+    end
+  end
 end

@@ -17,7 +17,7 @@ class MetricNode < ActiveRecord::Base
   end
 
   def results_on(repository)
-    repository.results_for_pattern(measurable_for(repository), translated_aggregations(repository), false)
+    repository.results_for_pattern(measurable.translated_to(repository), translated_aggregations(repository), false)
   end
 
   def translated_aggregations(repository)
@@ -28,14 +28,6 @@ class MetricNode < ActiveRecord::Base
   def aggregation_for(repository)
     return aggregation if repository.nil? || aggregation.pattern_element.ontology == repository.ontology
     aggregation.clone_for(repository)
-  end
-
-  def measurable_for(repository)
-    if measurable.translation_unnecessary?(repository)
-      return measurable
-    else
-      return TranslationPattern.existing_translation_pattern(measurable, [repository.ontology])
-    end
   end
 
   def aggregation_options

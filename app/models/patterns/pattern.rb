@@ -177,6 +177,6 @@ class Pattern < Measurable
   end
 
   def run_on_repository(repository)
-    return repository.results_for_pattern(self, [])
+    repository.results_for_pattern(self, [])
   end
 end
