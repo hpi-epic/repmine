@@ -6,6 +6,7 @@ class CreateAggregations < ActiveRecord::Migration
       t.string :column_name
       t.integer :operation_cd
       t.string :alias_name
+      t.boolean :distinct, default: false
       t.timestamps
     end
 

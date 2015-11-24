@@ -1,5 +1,5 @@
 class Aggregation < ActiveRecord::Base
-  attr_accessible :operation, :column_name, :alias_name, :pattern_element_id
+  attr_accessible :operation, :column_name, :alias_name, :pattern_element_id, :distinct
   as_enum :operation, %i{group_by count sum avg}
   belongs_to :pattern_element
   belongs_to :metric_node
@@ -7,7 +7,9 @@ class Aggregation < ActiveRecord::Base
   validate :alias_name, :presence => true, :unless => :is_grouping?
 
   def speaking_name
-    str = operation.to_s + " (#{column_name.blank? ? pattern_element.speaking_name : column_name})"
+    str = operation.to_s + " ("
+    str += "#{distinct ? "DISTINCT " : ""}"
+    str += "#{column_name.blank? ? pattern_element.speaking_name : column_name})"
     str += " AS #{alias_name}" unless alias_name.blank? || is_grouping?
     return str
   end
@@ -21,7 +23,7 @@ class Aggregation < ActiveRecord::Base
   end
 
   def is_grouping?
-    return operation == :group_by
+    operation == :group_by
   end
 
   def name_in_result

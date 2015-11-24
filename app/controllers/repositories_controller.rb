@@ -52,7 +52,6 @@ class RepositoriesController < ApplicationController
   # POST /repositories.json
   def create
     @repository = Repository.for_type(params[:repository].delete(:type), params[:repository])
-
     respond_to do |format|
       if @repository.save
         format.html { redirect_to @repository, :notice => 'Repository was successfully created.' }

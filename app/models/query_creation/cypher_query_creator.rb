@@ -51,15 +51,15 @@ class CypherQueryCreator < QueryCreator
 
   def aggregated_variable(pe)
     str = pe_variable(pe)
-    aggregation = aggregation_for_element(pe)
+    agg = aggregation_for_element(pe)
 
-    if !aggregation.nil? && !aggregation.is_grouping?
-      str = aggregation.operation.to_s + "(distinct #{str}) AS #{aggregation.underscored_speaking_name}"
-    elsif aggregation.nil? && pe.is_variable? && pe.is_a?(AttributeConstraint)
+    if !agg.nil? && !agg.is_grouping?
+      str = agg.operation.to_s + "(#{agg.distinct ? "distinct " : ""}#{str}) AS #{agg.underscored_speaking_name}"
+    elsif agg.nil? && pe.is_variable? && pe.is_a?(AttributeConstraint)
       str = "#{attribute_reference(pe)} AS #{pe.variable_name}"
     elsif pe.is_a?(Node)
       str = "id(#{str})"
-      str += " AS #{aggregation.underscored_speaking_name}" if !aggregation.nil?
+      str += " AS #{agg.underscored_speaking_name}" if !agg.nil?
     end
 
     return str

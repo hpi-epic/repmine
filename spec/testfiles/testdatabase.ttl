@@ -422,6 +422,13 @@
       rdfs:label "pattern_elements_value" ;
       rdfs:range xsd:string .
 
+:aggregations_distinct
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :aggregations ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "aggregations_distinct" ;
+      rdfs:range xsd:integer .
+
 :ontologies_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies ;
