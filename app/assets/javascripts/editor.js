@@ -23,6 +23,7 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   var node = $(xhr.responseText);
   node.appendTo($("#drawing_canvas"));
   addNodeToGraph(node);
+  $(".node select").select2({width: '90%'});
 });
 
 var loadNodesAndConnections = function(){
