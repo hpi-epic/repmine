@@ -37,16 +37,13 @@ gem "dentaku"
 # calling external services
 gem "rest-client"
 
-group :test do
+group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem 'simplecov'
   gem 'factory_girl_rails'
   gem 'test-unit', '~> 3.0'
   gem 'capybara', '~> 2.5'
-end
-
-group :development do
   gem 'ruby-prof'
   gem 'quiet_safari'
 end
