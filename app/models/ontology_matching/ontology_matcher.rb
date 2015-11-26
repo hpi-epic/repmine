@@ -6,7 +6,7 @@ class OntologyMatcher
 
   class MatchingError < StandardError;end
 
-  def initialize(source_ontology, target_ontology, use_speaking_names = false)
+  def initialize(source_ontology, target_ontology)
     @source_ontology, @target_ontology = [source_ontology, target_ontology].sort{|a,b| a.id <=> b.id}
     @inverted = @source_ontology != source_ontology
     @alignment_repo = AgraphConnection.new(repo_name)
@@ -75,27 +75,32 @@ class OntologyMatcher
 
   # gets correspondences for a single ontology element (class, attribute, relation)
   # if called with nil as a concept, all correspondences will be returned
-  def correspondences_for_concept(concept)
-    correspondences = []
-    alignment_graph.query(simple_correspondence_query(concept)) do |result|
-      correspondences << create_correspondence(result, concept)
-    end
-    return correspondences
-  end
-
-  # gets a bunch of pattern elements (=< the entire pattern) and returns correspondences for that
-  # 1. create a query that looks for patterns as entity1, which contain all the given elements
-  # 2. execute that query
-  # 3. return the correspondence
-  def correspondences_for_pattern_elements(elements)
-    correspondences = []
-    alignment_graph.query(complex_correspondence_query(elements)) do |result|
-      pattern = Pattern.from_graph(alignment_graph, result[:pattern], target_ontology)
-      if pattern.pattern_elements.select{|pe| elements.none?{|el| el.equal_to?(pe)}}.empty?
-        correspondences << create_correspondence(result, elements)
+  def correspondences_for(elements)
+    corr_map = Correspondence.candidates_for(source_ontology, target_ontology, elements, inverted)
+    corr_map.each do |elements, correspondences|
+      correspondences.each do |correspondence|
+        correspondence.pattern_elements = build_target_graph(correspondence)
+        correspondence.entity1 = elements
       end
     end
-    return correspondences
+    return corr_map
+  end
+
+  def build_target_graph(correspondence)
+    e1 = inverted ? Vocabularies::Alignment.entity2 : Vocabularies::Alignment.entity1
+    e2 = inverted ? Vocabularies::Alignment.entity1 : Vocabularies::Alignment.entity2
+    query_pattern = [[correspondence.resource, e1, :entity1], [correspondence.resource, e2, :entity2]]
+    query = RDF::Query.new(*query_pattern.collect{|pat| RDF::Query::Pattern.new(*pat)})
+
+    alignment_graph.query(query) do |result|
+      if result[:entity2].anonymous?
+        return Pattern.from_graph(alignment_graph, result[:entity2], target_ontology).pattern_elements
+      else
+        element = target_ontology.element_class_for_rdf_type(result[:entity2].to_s).new(:ontology_id => target_ontology.id)
+        element.rdf_type = result[:entity2].to_s
+        return [element]
+      end
+    end
   end
 
   def all_correspondence_query
@@ -106,57 +111,6 @@ class OntologyMatcher
       [:cell, Vocabularies::Alignment.measure, :measure]
     ]
     return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
-  end
-
-  def simple_correspondence_query(concept)
-    e1, e2 = entities_in_order()
-
-    patterns = [
-      [:cell, e1, RDF::Resource.new(concept)],
-      [:cell, e2, :target],
-      [:cell, Vocabularies::Alignment.relation, :relation],
-      [:cell, Vocabularies::Alignment.measure, :measure],
-      [:cell, Vocabularies::Alignment.db_id, :db_id]
-    ]
-    q = RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
-    return q
-  end
-
-  def complex_correspondence_query(pattern_elements)
-    e1,e2 = entities_in_order
-
-    patterns = [
-      [:cell, e1, :pattern],
-      [:cell, e2, :target],
-      [:cell, Vocabularies::Alignment.relation, :relation],
-      [:cell, Vocabularies::Alignment.measure, :measure],
-      [:cell, Vocabularies::Alignment.db_id, :db_id]
-    ]
-
-    pattern_elements.each_with_index do |pe, i|
-      qv = "pe#{i}".to_sym
-      patterns << [qv, Vocabularies::GraphPattern.belongsTo, :pattern]
-      patterns << [qv, Vocabularies::GraphPattern.elementType, pe.type_expression.resource]
-    end
-
-    return RDF::Query.new(*patterns.collect{|pat| RDF::Query::Pattern.new(*pat)})
-  end
-
-  def entities_in_order
-    e1 = inverted ? Vocabularies::Alignment.entity2 : Vocabularies::Alignment.entity1
-    e2 = inverted ? Vocabularies::Alignment.entity1 : Vocabularies::Alignment.entity2
-    return [e1,e2]
-  end
-
-  def create_correspondence(result, entity1)
-    correspondence = Correspondence.find(result[:db_id].to_i)
-    correspondence.entity1 = entity1
-    correspondence.entity2 = if result[:target].anonymous?
-      Pattern.from_graph(alignment_graph, result[:target], target_ontology).pattern_elements
-    else
-      result[:target].to_s
-    end
-    return correspondence
   end
 
   def print_alignment_graph!(ignore_gp = true)

@@ -32,7 +32,8 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
     t.float   "measure"
     t.integer "onto1_id"
     t.integer "onto2_id"
-    t.text    "mapping_key"
+    t.text    "source_key"
+    t.text    "target_key"
     t.string  "type"
   end
 

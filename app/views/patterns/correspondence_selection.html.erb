@@ -2,13 +2,13 @@
 
 <%= form_tag(pattern_prepare_translation_path(@pattern.source_pattern, @pattern.ontologies.first)) do %>
   <% @groups.each do |group| %>
-    <% common = group.inject(:&) %>
+    <% common = group.inject(:&).collect{|el| el.id} %>
     <legend>Possible Mappings for Element <%= common.first %></legend>
     <fieldset>
     <% group.each do |keys| %>
       <% @acs[keys].each do |correspondence| %>
         <%= radio_button_tag "correspondence_id[#{common}]", correspondence.id %>
-        <%= correspondence.mapping_key %>
+        <%= correspondence.source_key %> -- <%= correspondence.target_key %>
       <br />
       <% end %>
     <% end %>

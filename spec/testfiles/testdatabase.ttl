@@ -169,6 +169,13 @@
       rdfs:label "ontologies_created_at" ;
       rdfs:range xsd:string .
 
+:correspondences_source_key
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "correspondences_source_key" ;
+      rdfs:range xsd:string .
+
 :ontologies_patterns_ontology_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :ontologies_patterns ;
@@ -435,13 +442,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_id" ;
       rdfs:range xsd:integer .
-
-:correspondences_mapping_key
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :correspondences ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "correspondences_mapping_key" ;
-      rdfs:range xsd:string .
 
 :monitoring_tasks_updated_at
       a       owl:DatatypeProperty , rdf:Property ;
@@ -779,6 +779,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "repositories_ontology_id" ;
       rdfs:range xsd:integer .
+
+:correspondences_target_key
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "correspondences_target_key" ;
+      rdfs:range xsd:string .
 
 :service_calls_pattern_id
       a       owl:DatatypeProperty , rdf:Property ;

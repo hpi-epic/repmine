@@ -97,10 +97,6 @@ class PatternElement < ActiveRecord::Base
     ontology.label_for_resource(rdf_type)
   end
 
-  def correspondences_to(ont)
-    return OntologyMatcher.new(ontology, ont).correspondences_for_concept(rdf_type)
-  end
-
   def rebuild!(queryable)
     rebuild_element_type!(queryable, self.rdf_node)
     rebuild_element_properties!(queryable, self.rdf_node)

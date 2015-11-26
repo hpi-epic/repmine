@@ -240,30 +240,32 @@ RSpec.describe TranslationPattern, :type => :model do
   it "should properly select the chosen correspondences" do
     o1 = FactoryGirl.create(:ontology)
     o2 = FactoryGirl.create(:ontology)
+    o3 = FactoryGirl.create(:ontology)
+
     c1 = FactoryGirl.create(:simple_correspondence, entity1: "http://example1", onto2: o2, onto1: o1)
     c2 = FactoryGirl.create(:simple_correspondence, entity1: "http://example2", onto2: o2, onto1: o1)
     c3 = FactoryGirl.create(:simple_correspondence, entity1: "http://example3", onto2: o2, onto1: o1)
 
-    mapping = {[1] => [c1, c3], [1,2] => [c2], [2,3] => [c2]}
-    choice1 = {[1] => c1.id}
+    mapping = {[o1] => [c1, c3], [o1,o2] => [c2], [o2,o3] => [c2]}
+    choice1 = {[o1.id] => c1.id}
     TranslationPattern.new.resolve_ambiguities(mapping, choice1)
-    assert_equal [c1], mapping[[1]]
-    assert_nil mapping[[1,2]]
-    assert_equal [c2], mapping[[2,3]]
+    assert_equal [c1], mapping[[o1]]
+    assert_nil mapping[[o1,o2]]
+    assert_equal [c2], mapping[[o2,o3]]
 
-    mapping = {[1] => [c1], [1,2] => [c2], [2,3] => [c3]}
-    choice2 = {[1,2] => c2.id}
+    mapping = {[o1] => [c1], [o1,o2] => [c2], [o2,o3] => [c3]}
+    choice2 = {[o1.id,o2.id] => c2.id}
     TranslationPattern.new.resolve_ambiguities(mapping, choice2)
-    assert_nil mapping[[1]]
-    assert_equal [c2], mapping[[1,2]]
-    assert_nil mapping[[2,3]]
+    assert_nil mapping[[o1]]
+    assert_equal [c2], mapping[[o1,o2]]
+    assert_nil mapping[[o2,o3]]
 
-    mapping = {[1] => [c1], [1,2] => [c2], [2,3] => [c3]}
-    choice2 = {[1] => c2.id}
+    mapping = {[o1] => [c1], [o1,o2] => [c2], [o2,o3] => [c3]}
+    choice2 = {[o1.id] => c2.id}
     TranslationPattern.new.resolve_ambiguities(mapping, choice2)
-    assert_nil mapping[[1]]
-    assert_equal [c2], mapping[[1,2]]
-    assert_nil mapping[[2,3]]
+    assert_nil mapping[[o2]]
+    assert_equal [c2], mapping[[o1,o2]]
+    assert_nil mapping[[o2,o3]]
   end
 
   it "should ignore stuff we want to do manually" do
@@ -273,12 +275,12 @@ RSpec.describe TranslationPattern, :type => :model do
     c2 = FactoryGirl.create(:simple_correspondence, entity1: "http://example2", onto2: o2, onto1: o1)
     c3 = FactoryGirl.create(:simple_correspondence, entity1: "http://example3", onto2: o2, onto1: o1)
 
-    mapping = {[1] => [c1], [2] => [c3], [1,2] => [c2]}
-    choice1 = {[1] => c1.id, [2] => 0}
+    mapping = {[o1] => [c1], [o2] => [c3], [o1,o2] => [c2]}
+    choice1 = {[o1.id] => c1.id, [o2.id] => 0}
     TranslationPattern.new.resolve_ambiguities(mapping, choice1)
-    assert_equal [c1], mapping[[1]]
-    assert_nil mapping[[1,2]]
-    assert_nil mapping[[2]]
+    assert_equal [c1], mapping[[o1]]
+    assert_nil mapping[[o1,o2]]
+    assert_nil mapping[[o2]]
   end
 
   it "should throw away pattern element matches if an element changes" do

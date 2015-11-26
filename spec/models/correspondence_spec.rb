@@ -39,4 +39,71 @@ RSpec.describe Correspondence, :type => :model do
     assert_equal c1,c2
     assert_equal 1, Correspondence.count
   end
+
+  it "should find candidates with exact matches" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    sc = FactoryGirl.create(:simple_correspondence, onto1: o1, onto2: o2)
+    cc = FactoryGirl.create(:complex_correspondence, onto1: o1, onto2: o2)
+    hc = FactoryGirl.create(:hardway_complex, onto1: o1, onto2: o2)
+    node = FactoryGirl.create(:node, rdf_type: sc.entity1)
+    candidates = Correspondence.candidates_for(o1,o2,[node])
+    expect(candidates[[node]]).to include(sc)
+    expect(candidates[[node]]).to include(cc)
+    expect(candidates[[node]]).to_not include(hc)
+    expect(candidates.size).to eq(1)
+
+    candidates = Correspondence.candidates_for(o1,o2,hc.entity1)
+    expect(candidates[hc.entity1]).to_not include(sc)
+    expect(candidates[hc.entity1]).to_not include(cc)
+    expect(candidates[hc.entity1]).to include(hc)
+    expect(candidates.size).to eq(1)
+  end
+
+  it "should ignore superset matches" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    sc = FactoryGirl.create(:simple_correspondence, onto1: o1, onto2: o2)
+    cc = FactoryGirl.create(:complex_correspondence, onto1: o1, onto2: o2)
+    hc = FactoryGirl.create(:hardway_complex, onto1: o1, onto2: o2)
+    node = FactoryGirl.create(:node, rdf_type: sc.entity1)
+
+    candidates = Correspondence.candidates_for(o1,o2,[node])
+    expect(candidates[[node]]).to include(sc)
+    expect(candidates[[node]]).to include(cc)
+    expect(candidates[[node]]).to_not include(hc)
+    expect(candidates.size).to eq(1)
+  end
+
+  it "should include subset matches" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    sc = FactoryGirl.create(:simple_correspondence, onto1: o1, onto2: o2)
+    cc = FactoryGirl.create(:complex_correspondence, onto1: o1, onto2: o2)
+    hc = FactoryGirl.create(:hardway_complex, onto1: o1, onto2: o2)
+    node = FactoryGirl.create(:node, rdf_type: sc.entity1)
+
+    # subset matches
+    candidates = Correspondence.candidates_for(o1,o2,hc.entity1 + [node])
+    expect(candidates.values.flatten).to include(sc)
+    expect(candidates.values.flatten).to include(cc)
+    expect(candidates.values.flatten).to include(hc)
+    expect(candidates.size).to eq(2)
+
+    candidates = Correspondence.candidates_for(o1,o2,hc.entity1.select{|el| el.is_a?(RelationConstraint)})
+    expect(candidates).to be_empty
+  end
+
+  it "should provide the same candidates for multiple subnodes" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    pattern = FactoryGirl.create(:n_r_n_pattern)
+    hc = FactoryGirl.create(:hardway_complex, onto1: o1, onto2: o2, entity1: pattern.pattern_elements)
+    sc = FactoryGirl.create(:simple_correspondence, onto1: o1, onto2: o2, entity1: pattern.nodes.first.rdf_type)
+    candidates = Correspondence.candidates_for(o1,o2,pattern.pattern_elements)
+    expect(candidates[[pattern.nodes.first]]).to include(sc)
+    expect(candidates[[pattern.nodes.last]]).to include(sc)
+    expect(candidates[pattern.pattern_elements]).to include(hc)
+    expect(candidates.size).to eq(3)
+  end
 end

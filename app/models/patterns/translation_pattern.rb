@@ -74,11 +74,12 @@ class TranslationPattern < Pattern
       return mappings
     else
       selected_correspondences.each_pair do |element_ids, correspondence_id|
-        real_target = (mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?} || [element_ids]).first
-        mappings.each do |el_ids, correspondences|
-          if !(el_ids & real_target).empty?
-            mappings[el_ids] = mappings[el_ids].select{|corr| corr.id == correspondence_id}
-            mappings.delete(el_ids) if mappings[el_ids].empty?
+        real_target = mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?}
+        real_target = real_target.nil? ? element_ids : real_target.first.collect{|el| el.id}
+        mappings.each do |elements, correspondences|
+          if !(elements.collect{|el| el.id} & real_target).empty?
+            mappings[elements] = mappings[elements].select{|corr| corr.id == correspondence_id}
+            mappings.delete(elements) if mappings[elements].empty?
           end
         end
       end
@@ -86,7 +87,16 @@ class TranslationPattern < Pattern
   end
 
   def all_mappings()
-    get_simple_mappings.merge(get_complex_mappings){|k, val1, val2| val1.concat(val2)}
+    mappings = {}
+    unmatched_source_elements.group_by{|el| el.ontology}.each_pair do |ontology, elements|
+      ontology_matchers(ontology).each do |om|
+        om.correspondences_for(elements).each_pair do |matched_elements, correspondences|
+          mappings[matched_elements] ||= []
+          mappings[matched_elements].concat(correspondences)
+        end
+      end
+    end
+    return mappings
   end
 
   def flatten_mappings(mappings)
@@ -129,11 +139,12 @@ class TranslationPattern < Pattern
 
   def check_for_ambiguous_mappings(mappings)
     ambiguities = {}
-    mappings.keys.sort_by{|key| key.size}.each_with_index do |key, index|
+    sorted_keys = mappings.keys.sort_by{|key| key.size}
+    sorted_keys.each_with_index do |key, index|
       # option 1: more than one possible output subgraphs
       ambiguities[key] = mappings[key] if mappings[key].size > 1
       # option 2: the current key is included in at least one other mapping
-      mappings.keys[index+1..-1].select{|other_key| (key - other_key).empty?}.each do |alt_key|
+      sorted_keys[index+1..-1].select{|other_key| (key - other_key).empty?}.each do |alt_key|
         ambiguities[alt_key] = mappings[alt_key]
         ambiguities[key] = mappings[key]
       end
@@ -150,33 +161,5 @@ class TranslationPattern < Pattern
     else
       return elements
     end
-  end
-
-  def get_simple_mappings
-    mappings = {}
-    unmatched_source_elements.each do |pe|
-      ontologies.collect{|ont| pe.correspondences_to(ont)}.flatten.each do |correspondence|
-        mappings[[pe.id]] ||= []
-        mappings[[pe.id]] << correspondence
-      end
-    end
-    return mappings
-  end
-
-  def get_complex_mappings()
-    mappings = {}
-    # let's construct all possbile combinations of the input pattern's unmatched elements
-    (2..unmatched_source_elements.size).flat_map{|size| unmatched_source_elements.combination(size).to_a}.reverse.each do |elements|
-      # only try to match combinations of the same ontology
-      next if elements.collect{|pe| pe.ontology_id}.uniq.size != 1
-      mapping_key = elements.collect{|pe| pe.id}
-      ontology_matchers(elements.first.ontology).each do |om|
-        om.correspondences_for_pattern_elements(elements).each do |correspondence|
-          mappings[mapping_key] ||= []
-          mappings[mapping_key] << correspondence
-        end
-      end
-    end
-    return mappings
   end
 end

@@ -8,9 +8,12 @@ class Correspondence < ActiveRecord::Base
   belongs_to :onto2, :class_name => "Ontology"
   has_many :pattern_element_matches, dependent: :destroy
 
-  before_save :set_mapping_key
+  before_save :set_mapping_keys
   after_save :add_to_alignment
   after_destroy :remove_from_alignment
+
+  scope :between, ->(o1,o2) { where(onto1_id: o1.id, onto2_id: o2.id)}
+  SEPARATOR = "||"
 
   def self.construct(measure, relation, entity1, entity2, onto1, onto2)
     c = self.new(measure: measure, relation: relation)
@@ -42,15 +45,16 @@ class Correspondence < ActiveRecord::Base
     ontology_matcher.remove_correspondence!(self)
   end
 
-  def set_mapping_key
-    self.mapping_key = self.class.key_for_entity(entity1) + "==" + self.class.key_for_entity(entity2)
+  def set_mapping_keys
+    self.source_key = self.class.key_for_entity(entity1)
+    self.target_key = self.class.key_for_entity(entity2)
   end
 
   # uses a set of elements provided by a user and creates a complex or simple correspondence
-  # this method also checks whether this ontology previously existed.
+  # this method also checks whether this ontology previously existed through the mapping keys
   def self.from_elements(input_elements, output_elements)
-    mapping_key = correspondence_key(input_elements, output_elements)
-    corr = find_by_mapping_key(mapping_key) || construct_from_elements(input_elements, output_elements)
+    corr = where(source_key: key_for_entity(input_elements), target_key: key_for_entity(output_elements)).first
+    corr ||= construct_from_elements(input_elements, output_elements)
 
     input_elements.each do |ie|
       output_elements.each do |oe|
@@ -76,12 +80,26 @@ class Correspondence < ActiveRecord::Base
     end
   end
 
-  # don't ask ... we just need a key to determine whether two of them are the same without loading everything, again
-  def self.correspondence_key(input_elements, output_elements)
-    key_for_entity(input_elements) + "==" + key_for_entity(output_elements)
+  def self.key_for_entity(thingy)
+    thingy.is_a?(Array) ? thingy.collect{|ie| ie.rdf_type}.sort.join(SEPARATOR) : thingy
   end
 
-  def self.key_for_entity(thingy)
-    thingy.is_a?(Array) ? thingy.collect{|ie| ie.rdf_type}.join("&") : thingy
+  def self.candidates_for(o1, o2, elements, inverted = false)
+    matches = {}
+    combo_keys = {}
+    # get all combinations of input elements and their according correspondence keys
+    combinations = (1..elements.size).flat_map{|size| elements.combination(size).to_a}
+    combinations.each{|combo| combo_keys[combo] = combo.collect{|el| el.rdf_type}.sort.join(SEPARATOR)}
+    # determine which direction should we query
+    target_key = inverted ? :target_key : :source_key
+    Correspondence.between(o1,o2).where(target_key => combo_keys.values).each do |correspondence|
+      # if we map two nodes of identical types, they have to get different correspondence instances
+      comp_val = inverted ? correspondence.target_key : correspondence.source_key
+      combo_keys.map{ |k,v| v==comp_val ? k : nil }.compact.each do |elements|
+        matches[elements] ||= []
+        matches[elements] << Correspondence.find(correspondence.id)
+      end
+    end
+    return matches
   end
 end

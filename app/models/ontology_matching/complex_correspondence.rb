@@ -29,7 +29,4 @@ class ComplexCorrespondence < SimpleCorrespondence
     return [entity_cache[res], anonymized_stmts + claims]
   end
 
-  def pattern_elements
-    @pattern_elements ||= entity2.is_a?(Array) ? entity2 : super
-  end
 end
