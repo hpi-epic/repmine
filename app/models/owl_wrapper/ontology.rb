@@ -81,7 +81,7 @@ class Ontology < ActiveRecord::Base
     imps = Set.new()
     rdf_graph.query(:predicate => RDF::OWL.imports).each do |res|
       imp_url = res.object.to_s
-      imps << Ontology.where("url = ?", imp_url).first_or_create unless imp_url == Vocabularies::SchemaExtraction.to_s
+      imps << Ontology.where("url = ?", imp_url).first_or_create
     end
     return imps
   end

@@ -34,6 +34,6 @@ namespace :db do
 
   def remove_all_files_from(folder_name)
     puts "= clearing #{folder_name} ="
-    FileUtils.rm_rf("#{folder_name}/*.*", secure: true)
+    FileUtils.rm_rf(Dir.glob("#{folder_name}/*"))
   end
 end

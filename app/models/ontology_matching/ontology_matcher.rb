@@ -61,10 +61,11 @@ class OntologyMatcher
   end
 
   def call_matcher!
-    cmd = "java -jar AgreementMakerLightCLI.jar -m -s #{source_ontology.local_file_path} -t #{target_ontology.local_file_path} -o #{alignment_path}"
+    cmd = "java -jar AgreementMakerLight.jar -m -s #{source_ontology.local_file_path} -t #{target_ontology.local_file_path} -o #{alignment_path}"
     errors = nil
     Open3.popen3(cmd, :chdir => Rails.root.join("externals", "aml-jar")) do |stdin, stdout, stderr, wait_thr|
       errors = stderr.read
+      puts errors unless errors.blank?
     end
   end
 
