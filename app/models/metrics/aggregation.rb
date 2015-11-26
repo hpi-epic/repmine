@@ -10,16 +10,21 @@ class Aggregation < ActiveRecord::Base
     str = operation.to_s + " ("
     str += "#{distinct ? "DISTINCT " : ""}"
     str += "#{column_name.blank? ? pattern_element.speaking_name : column_name})"
-    str += " AS #{alias_name}" unless alias_name.blank? || is_grouping?
+    str += " AS #{alias_name}" unless alias_name.blank? # || is_grouping?
     return str
   end
 
-  def clone_for(repository)
+  def translated_to(repository)
     clonty = Aggregation.new(:operation => operation, :column_name => column_name, :alias_name => alias_name)
     matchings = pattern_element.matching_elements.where(:ontology_id => repository.ontology.id)
-    raise "Someone should implement this for complex mappings" if matchings.size > 1
-    clonty.pattern_element = matchings.first
+    clonty.pattern_element = matchings.size > 1 ? aggregation_translator(matchings).substitute : matchings.first
     return clonty
+  end
+
+  def aggregation_translator(matchings)
+    agg_trans = AggregationTranslator.new()
+    agg_trans.load_to_engine!(pattern_element, matchings)
+    return agg_trans
   end
 
   def is_grouping?
@@ -27,7 +32,7 @@ class Aggregation < ActiveRecord::Base
   end
 
   def name_in_result
-    if alias_name.blank? || is_grouping?
+    if alias_name.blank? # || is_grouping?
       if column_name.blank?
         return pattern_element.speaking_name
       else

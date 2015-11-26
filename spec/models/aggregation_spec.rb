@@ -7,7 +7,17 @@ RSpec.describe Aggregation, :type => :model do
     target_node = FactoryGirl.create(:node, ontology: repo.ontology)
     PatternElementMatch.create(:matched_element => aggr.pattern_element, :matching_element => target_node)
 
-    aggr_clone = aggr.clone_for(repo)
+    aggr_clone = aggr.translated_to(repo)
     assert_equal target_node, aggr_clone.pattern_element
+  end
+
+  it "should call the substitutor" do
+    aggr = FactoryGirl.create(:aggregation)
+    repo = FactoryGirl.create(:repository)
+    target_node = FactoryGirl.create(:node, ontology: repo.ontology)
+    attr_constr = FactoryGirl.create(:attribute_constraint, ontology: repo.ontology, node: target_node)
+    PatternElementMatch.create(:matched_element => aggr.pattern_element, :matching_element => target_node)
+    PatternElementMatch.create(:matched_element => aggr.pattern_element, :matching_element => attr_constr)
+    assert_equal target_node, aggr.translated_to(repo).pattern_element
   end
 end

@@ -22,12 +22,12 @@ class MetricNode < ActiveRecord::Base
 
   def translated_aggregations(repository)
     return aggregations if repository.nil? || aggregations.all?{|agg| agg.pattern_element.ontology == repository.ontology}
-    aggregations.collect{|agg| agg.clone_for(repository)}
+    aggregations.collect{|agg| agg.translated_to(repository)}
   end
 
   def aggregation_for(repository)
     return aggregation if repository.nil? || aggregation.pattern_element.ontology == repository.ontology
-    aggregation.clone_for(repository)
+    aggregation.translated_to(repository)
   end
 
   def aggregation_options
