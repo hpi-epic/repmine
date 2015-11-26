@@ -7,7 +7,8 @@ RSpec.describe Repository, :type => :model do
   end
 
   it "should return nil for unknown types" do
-    assert_nil Repository.for_type(Repository::TYPES.keys.first + "NOT!")
+    wrong = Repository::TYPES.keys.first + "NOT!"
+    expect{Repository.for_type(wrong)}.to raise_error(Regexp.new(wrong))
   end
 
 end
