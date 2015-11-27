@@ -180,18 +180,16 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should build a graph for simple mappings for node and relation constraints" do
-    c1 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    c2 = FactoryGirl.create(:simple_relation_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    @pattern = FactoryGirl.create(:n_r_n_pattern, ontologies: [@source_ontology])
 
-    @pattern = FactoryGirl.create(:empty_pattern)
-    om = ontology_matcher([c1, c2])
+    c1 = FactoryGirl.create(:simple_correspondence, entity1: @pattern.nodes.first.rdf_type, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c2 = FactoryGirl.create(:simple_correspondence, entity1: @pattern.nodes.last.rdf_type, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    c3 = FactoryGirl.create(:simple_relation_correspondence, entity1: @pattern.relation_constraints.first.rdf_type, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    om = ontology_matcher([c1, c2, c3])
 
-    node = FactoryGirl.create(:node, :ontology => @source_ontology, :rdf_type => c1.entity1, :pattern => @pattern)
-    node2 = FactoryGirl.create(:node, :ontology => @source_ontology, :rdf_type => c1.entity1, :pattern => @pattern)
-    rc = FactoryGirl.create(:relation_constraint, :ontology => @source_ontology, :rdf_type => c2.entity1, :source => node, :target => node2)
-
-    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c2.entity2){RelationConstraint}
     AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c1.entity2){Node}
+    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c2.entity2){Node}
+    AgraphConnection.any_instance.stub(:element_class_for_rdf_type).with(c3.entity2){RelationConstraint}
 
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -226,6 +224,7 @@ RSpec.describe TranslationPattern, :type => :model do
     too_many = {[1] => [2,3]}
     ambiguous = {[1] => [2], [1,3] => [4]}
     ambiguous_2 = {[1,2] => [2], [4,5,1,6,2] => [4]}
+    intersecting = {[1,3] => [1], [3,4] => [1], [4,1] => [1]}
     assert_empty TranslationPattern.new.check_for_ambiguous_mappings(ok)
     tm = TranslationPattern.new.check_for_ambiguous_mappings(too_many)
     assert_equal [2,3], tm[[1]]
@@ -235,6 +234,10 @@ RSpec.describe TranslationPattern, :type => :model do
     tm = TranslationPattern.new.check_for_ambiguous_mappings(ambiguous_2)
     assert_equal [2], tm[[1,2]]
     assert_equal [4], tm[[4,5,1,6,2]]
+    tm = TranslationPattern.new.check_for_ambiguous_mappings(intersecting)
+    assert_equal [1], tm[[1,3]]
+    assert_equal [1], tm[[3,4]]
+    assert_equal [1], tm[[4,1]]
   end
 
   it "should properly select the chosen correspondences" do
@@ -284,14 +287,31 @@ RSpec.describe TranslationPattern, :type => :model do
   end
 
   it "should throw away pattern element matches if an element changes" do
-    correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
-    om = ontology_matcher([correspondence1])
+    c1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
+    om = ontology_matcher([c1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
+
     assert_equal 3, PatternElementMatch.count
     tp.nodes.first.rdf_type = tp.nodes.first.rdf_type + "_new"
     assert_equal 0, PatternElementMatch.count
     assert_equal 3, Pattern.first.pattern_elements.size
+  end
+
+  it "should allow tracing the implementation of a correspondence" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    pattern = FactoryGirl.create(:n_r_n_pattern, ontologies: [o1])
+    pattern2 = FactoryGirl.create(:n_r_n_pattern, ontologies: [o1])
+    pattern2.pattern_elements.each{|pe| pattern.pattern_elements << pe}
+
+    mtn = FactoryGirl.create(:m_to_n_complex, onto1: o1, onto2: o2)
+    tp = TranslationPattern.for_pattern_and_ontologies(pattern, [o2])
+
+    tp.prepare!
+    assert_equal 6, tp.pattern_elements.size
+    expect(PatternElementMatch.count).to eq(18)
+    expect(tp.matching_groups.size).to eq(2)
   end
 
   def ontology_matcher(correspondences)

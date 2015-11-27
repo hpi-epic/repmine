@@ -1,6 +1,6 @@
-<% sources = correspondence.pattern_element_matches.collect{|pem| pem.matched_element.qualified_type}%>
-<% targets = correspondence.pattern_element_matches.collect{|pem| pem.matching_element.qualified_type}%>
-
-<%= sources.join(" + ") %>
-<%= fa_icon("minus") %>
-<%= targets.join(" + ") %>
+<div style="float: right;"><%= link_to((fa_icon("times-circle"))) %></div>
+<div>
+<%= sources.map(&:qualified_type).join("<br/>") %><br />
+<%= fa_icon("minus") %><br />
+<%= targets.map(&:qualified_type).join("<br/>") %>
+</div>

@@ -29,10 +29,6 @@ class TranslationPattern < Pattern
     Pattern.model_name
   end
 
-  def all_correspondences
-    source_pattern.element_matches(ontologies).collect{|pem| pem.correspondence}.uniq
-  end
-
   def unmatched_source_elements
     source_pattern.unmatched_elements(ontologies)
   end
@@ -47,6 +43,10 @@ class TranslationPattern < Pattern
 
   def ontology_matchers(source_ont)
     ontologies.collect{|target_ont| OntologyMatcher.new(source_ont, target_ont)}
+  end
+
+  def matching_groups
+    PatternElementMatch.matching_groups(pattern_elements.map(& :id))
   end
 
   def match!()
@@ -67,23 +67,6 @@ class TranslationPattern < Pattern
     flatten_mappings(mappings)
     add_pattern_elements!(mappings)
     connect_pattern_elements!(mappings)
-  end
-
-  def resolve_ambiguities(mappings, selected_correspondences)
-    if selected_correspondences.empty?
-      return mappings
-    else
-      selected_correspondences.each_pair do |element_ids, correspondence_id|
-        real_target = mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?}
-        real_target = real_target.nil? ? element_ids : real_target.first.collect{|el| el.id}
-        mappings.each do |elements, correspondences|
-          if !(elements.collect{|el| el.id} & real_target).empty?
-            mappings[elements] = mappings[elements].select{|corr| corr.id == correspondence_id}
-            mappings.delete(elements) if mappings[elements].empty?
-          end
-        end
-      end
-    end
   end
 
   def all_mappings()
@@ -143,13 +126,30 @@ class TranslationPattern < Pattern
     sorted_keys.each_with_index do |key, index|
       # option 1: more than one possible output subgraphs
       ambiguities[key] = mappings[key] if mappings[key].size > 1
-      # option 2: the current key is included in at least one other mapping
-      sorted_keys[index+1..-1].select{|other_key| (key - other_key).empty?}.each do |alt_key|
+      # option 2: the current key or parts of it is included in at least one other mapping
+      sorted_keys[index+1..-1].select{|other_key| (key - other_key).size != key.size}.each do |alt_key|
         ambiguities[alt_key] = mappings[alt_key]
         ambiguities[key] = mappings[key]
       end
     end
     return ambiguities
+  end
+
+  def resolve_ambiguities(mappings, selected_correspondences)
+    if selected_correspondences.empty?
+      return mappings
+    else
+      selected_correspondences.each_pair do |element_ids, correspondence_id|
+        real_target = mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?}
+        real_target = real_target.nil? ? element_ids : real_target.first.collect{|el| el.id}
+        mappings.each do |elements, correspondences|
+          if !(elements.collect{|el| el.id} & real_target).empty?
+            mappings[elements] = mappings[elements].select{|corr| corr.id == correspondence_id}
+            mappings.delete(elements) if mappings[elements].empty?
+          end
+        end
+      end
+    end
   end
 
   # we check whether we find unmatched doppelgaengers of all the elements

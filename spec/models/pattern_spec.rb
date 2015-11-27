@@ -106,8 +106,6 @@ RSpec.describe Pattern, :type => :model do
     end
   end
 
-  it "should find matching elements for "
-
   def n_r_n_pattern(ontology, source_class, relation_type, target_class, name = "Generic N_R_N")
     p = Pattern.create(name: name, description: "Generic")
     p.ontologies << ontology

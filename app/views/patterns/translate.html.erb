@@ -24,7 +24,7 @@
   <%= link_to 'Save Pattern', "#", :onclick => "savePattern();",  :class => "btn btn-success p-control" %>
   <%= link_to 'Save Mapping', "#", :onclick => "saveCorrespondence();", :class => "btn hide btn-info om-control" %>
   <%= link_to 'Back to Edit', "#", :onclick => "stopOmMode();", :class => "btn hide btn-warning om-control" %>
-  <%= link_to 'Show Correspondences', pattern_correspondences_path(@target_pattern), remote: true, class: "btn btn-danger" %>
+  <%= link_to 'Show Correspondences', pattern_correspondences_path(@target_pattern), remote: true, id: "toggle_correspondences" , class: "btn btn-danger" %>
   </div>
 <% end %>
 
@@ -45,4 +45,4 @@
   <% end %>
 </div>
 
-<div class="correspondence-overview hide" id="correspondences"></div>
+<div class="correspondence-overview hide" id="correspondences">Correspondences</div>

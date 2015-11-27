@@ -7,5 +7,5 @@ stopOmMode();
   <% end %>
   startOmMode();
   $("#<%= div_id(@next_unmatched_element) %>").click();
-  $.jGrowl("Select Matching elements and Save the correspondence when ready.", {theme: 'info'});
+  $.jGrowl("Select Matching elements and Save the correspondence when ready.", {theme: 'info', sticky: true});
 <% end %>

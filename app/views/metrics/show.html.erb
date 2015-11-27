@@ -51,6 +51,6 @@
 
 <div id="drawing_canvas" class="canvas">
   <% @metric.metric_nodes.each do |metric_node| %>
-    <%= render :partial => "metric_nodes/show", :locals => {:node => metric_node} %>
+    <%= render :partial => "metric_nodes/show", :locals => {:node => metric_node} %
   <% end %>
 </div>

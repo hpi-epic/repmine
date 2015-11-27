@@ -85,6 +85,10 @@ class PatternElement < ActiveRecord::Base
     ]
   end
 
+  def graph_strings(elements = [])
+    []
+  end
+
   def rdf_types
     [Vocabularies::GraphPattern.PatternElement]
   end

@@ -62,4 +62,5 @@ RSpec.describe ComplexCorrespondence, :type => :model do
     cc = ComplexCorrespondence.from_elements([i_node], [o_node])
     assert cc.is_a?(SimpleCorrespondence)
   end
+
 end

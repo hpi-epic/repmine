@@ -1,13 +1,9 @@
 <% unless @correspondences.blank? %>
-<table>
-  <th>
-    <td>From</td>
-    <td>To</td>
-  </th>
-  <% @correspondences.each do |correspondence| %>
-    <%= render :partial => "show", :locals => {:correspondence => correspondence} %>
+  <ul class="correspondence-list">
+  <% @correspondences.each_pair do |source_elements, target_elements| %>
+    <li class="correspondence-details">
+      <%= render :partial => "show", :locals => {sources: source_elements, targets: target_elements} %>
+    </li>
   <% end %>
-</table>
-<% else %>
-  <h3>No correspondences found.</h3>
+  </ul>
 <% end %>

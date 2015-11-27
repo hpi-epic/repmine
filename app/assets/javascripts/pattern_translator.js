@@ -78,3 +78,14 @@ var saveCorrespondence = function(){
     data : form.serialize()
   });
 };
+
+// handler for pressing the 'create node' button
+$("#toggle_correspondences").on("ajax:success", function(e, data, status, xhr){
+  $("#correspondences").html(xhr.responseText);
+  $("#correspondences").toggle();
+  e.stopPropagation();
+});
+
+$(document).on("mouseenter", ".correspondence-details", function () {
+  console.log("rein");
+});

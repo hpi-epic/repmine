@@ -81,6 +81,11 @@ class AttributeConstraint < PatternElement
     "#{type_expression.fancy_string(true)} #{operator} #{value}"
   end
 
+  def graph_strings(elements = [])
+    str = elements.include?(node) ? "#{node.rdf_type}->" : ""
+    str += rdf_type
+  end
+
   def virtual?
     false
   end

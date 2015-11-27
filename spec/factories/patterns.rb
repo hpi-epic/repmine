@@ -5,7 +5,9 @@ FactoryGirl.define do
     transient{node_count 1}
     ontologies{[FactoryGirl.create(:ontology)]}
     after(:create) do |pattern, evaluator|
-      create_list(:node, evaluator.node_count, pattern: pattern, ontology: pattern.ontologies.first)
+      evaluator.node_count.times do |nc|
+        FactoryGirl.create(:node, pattern: pattern, ontology: pattern.ontologies.first, rdf_type: "http://example.org/node#{nc}")
+      end
     end
   end
 
@@ -15,7 +17,9 @@ FactoryGirl.define do
     ontologies{[FactoryGirl.create(:ontology)]}
     transient{node_count 1}
     after(:create) do |pattern, evaluator|
-      create_list(:plain_node, evaluator.node_count, pattern: pattern, ontology: pattern.ontologies.first)
+      evaluator.node_count.times do |nc|
+        FactoryGirl.create(:plain_node, pattern: pattern, ontology: pattern.ontologies.first, rdf_type: "http://example.org/node#{nc}")
+      end
     end
   end
 
@@ -29,9 +33,10 @@ FactoryGirl.define do
     name "n-r-n"
     description "node-relation-node, that's it"
     ontologies{[FactoryGirl.create(:ontology)]}
-    pattern_elements{create_list :plain_node, 2}
     after(:create) do |pattern, evaluator|
-      FactoryGirl.create(:relation_constraint, :source => pattern.nodes.first, :target => pattern.nodes.last, ontology: pattern.ontologies.first)
+      FactoryGirl.create(:plain_node, pattern: pattern, ontology: pattern.ontologies.first, rdf_type: "http://example.org/node1")
+      FactoryGirl.create(:plain_node, pattern: pattern, ontology: pattern.ontologies.first, rdf_type: "http://example.org/node2")
+      FactoryGirl.create(:relation_constraint, source: pattern.nodes.first, target: pattern.nodes.last, ontology: pattern.ontologies.first)
     end
   end
 end

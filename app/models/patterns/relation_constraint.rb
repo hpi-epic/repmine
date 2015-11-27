@@ -41,6 +41,12 @@ class RelationConstraint < PatternElement
     [Vocabularies::GraphPattern.PatternElement, Vocabularies::GraphPattern.RelationConstraint]
   end
 
+  def graph_strings(elements = [])
+    str = elements.include?(source) ? "#{source.rdf_type}-" : ""
+    str += rdf_type
+    str += elements.include?(target) ? "->#{target.rdf_type}" : ""
+  end
+
   def possible_relations(source_type = nil, target_type = nil)
     return ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
   end

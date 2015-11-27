@@ -44,6 +44,14 @@ class Node < PatternElement
     end
   end
 
+  def graph_strings(elements = [])
+    if (elements & (attribute_constraints + source_relation_constraints + target_relation_constraints)).empty?
+      return [rdf_type]
+    else
+      return []
+    end
+  end
+
   # checks whether each of our elements has exactly one twin. Does NOT check whether "other" has more elements
   def check_ac_and_rc_similarity(other)
     equal = source_relation_constraints.none?{|src| other.source_relation_constraints.select{|osrc| src.equal_to?(osrc)}.size != 1}

@@ -89,3 +89,24 @@ div.center_everything {
 .ge {
   z-index: 59;
 }
+
+.correspondence-overview {
+  position: fixed;
+  top: 60px;
+  right: 0;
+  width: 300px;
+  overflow: scroll;
+  padding: 5px;
+  border-top-left-radius: 1em;
+}
+
+.correspondence-list {
+  list-style-type: none;
+  margin-left: 10px;
+}
+
+.correspondence-list li {
+  background-color: #17B3E3;
+  padding: 5px 10px 5px 10px;
+  border-radius: 5px;
+}

@@ -52,4 +52,14 @@ RSpec.describe Node, :type => :model do
     ac2.rdf_type = ac1.rdf_type + "stuff"
     assert !n1.equal_to?(n2)
   end
+
+  it "should provide the right graph strings" do
+    p = FactoryGirl.create(:n_r_n_pattern)
+    n1 = p.nodes.first
+    n2 = p.nodes.last
+    r1 = p.relation_constraints.first
+    expect(n1.graph_strings(p.pattern_elements)).to be_empty
+    expect(n1.graph_strings([n1,n2])).to include("#{n1.rdf_type}")
+    expect(n1.graph_strings([n1,n2]).size).to eq(1)
+  end
 end

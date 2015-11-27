@@ -94,16 +94,38 @@ RSpec.describe Correspondence, :type => :model do
     expect(candidates).to be_empty
   end
 
+  it "should not be fooled by two identical subsets" do
+    o1 = FactoryGirl.create(:ontology)
+    o2 = FactoryGirl.create(:ontology)
+    sc = FactoryGirl.create(:simple_correspondence, onto1: o1, onto2: o2)
+    node1 = FactoryGirl.create(:node, rdf_type: sc.entity1)
+    node2 = FactoryGirl.create(:node, rdf_type: sc.entity1)
+    candidates = Correspondence.candidates_for(o1,o2,[node1, node2])
+    expect(candidates[[node1, node2]]).to be_nil
+    expect(candidates.size).to eq(2)
+  end
+
+  it "should create proper strings for different input elements" do
+    nrnp = FactoryGirl.create(:n_r_n_pattern)
+    nrnp.nodes.last.rdf_type += "2"
+    string = Correspondence.key_for_entity(nrnp.pattern_elements)
+    expect(string).to eq("#{nrnp.nodes.first.rdf_type}-#{nrnp.relation_constraints.first.rdf_type}->#{nrnp.nodes.last.rdf_type}")
+    string2 = Correspondence.key_for_entity(nrnp.nodes)
+    expect(string2).to eq("#{nrnp.nodes.first.rdf_type}||#{nrnp.nodes.last.rdf_type}")
+    string3 = Correspondence.key_for_entity([nrnp.nodes.first, nrnp.relation_constraints.first])
+    expect(string3).to eq("#{nrnp.nodes.first.rdf_type}-#{nrnp.relation_constraints.first.rdf_type}")
+  end
+
   it "should provide the same candidates for multiple subnodes" do
     o1 = FactoryGirl.create(:ontology)
     o2 = FactoryGirl.create(:ontology)
     pattern = FactoryGirl.create(:n_r_n_pattern)
+    pattern.nodes.last.rdf_type += "2"
     hc = FactoryGirl.create(:hardway_complex, onto1: o1, onto2: o2, entity1: pattern.pattern_elements)
     sc = FactoryGirl.create(:simple_correspondence, onto1: o1, onto2: o2, entity1: pattern.nodes.first.rdf_type)
     candidates = Correspondence.candidates_for(o1,o2,pattern.pattern_elements)
     expect(candidates[[pattern.nodes.first]]).to include(sc)
-    expect(candidates[[pattern.nodes.last]]).to include(sc)
     expect(candidates[pattern.pattern_elements]).to include(hc)
-    expect(candidates.size).to eq(3)
+    expect(candidates.size).to eq(2)
   end
 end

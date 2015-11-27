@@ -80,8 +80,12 @@ class Correspondence < ActiveRecord::Base
     end
   end
 
-  def self.key_for_entity(thingy)
-    thingy.is_a?(Array) ? thingy.collect{|ie| ie.rdf_type}.sort.join(SEPARATOR) : thingy
+  def self.key_for_entity(elements)
+    if elements.is_a?(String)
+      return elements
+    else
+      return elements.collect{|el| el.graph_strings(elements)}.flatten.sort.join(SEPARATOR)
+    end
   end
 
   def self.candidates_for(o1, o2, elements, inverted = false)
@@ -89,7 +93,7 @@ class Correspondence < ActiveRecord::Base
     combo_keys = {}
     # get all combinations of input elements and their according correspondence keys
     combinations = (1..elements.size).flat_map{|size| elements.combination(size).to_a}
-    combinations.each{|combo| combo_keys[combo] = combo.collect{|el| el.rdf_type}.sort.join(SEPARATOR)}
+    combinations.each{|combo| combo_keys[combo] = key_for_entity(combo)}
     # determine which direction should we query
     target_key = inverted ? :target_key : :source_key
     Correspondence.between(o1,o2).where(target_key => combo_keys.values).each do |correspondence|
