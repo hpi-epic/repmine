@@ -6,13 +6,7 @@ class PatternElementMatch < ActiveRecord::Base
 
   # determines which groups of matches belong together
   def self.matching_groups(matching_element_ids)
-    matches = self.where(matching_element_id: matching_element_ids)
-    groups = {}
-    matches.group_by{|el| el.matching_element}.each_pair do |matching, matches|
-      matched_elements = matches.map(&:matched_element)
-      groups[matched_elements] ||= []
-      groups[matched_elements] << matching
-    end
-    return groups
+    matches = self.where(matching_element_id: matching_element_ids).group_by{|el| el.matching_element}
+    return matches.values.group_by{|match| match.map(&:matched_element)}
   end
 end
