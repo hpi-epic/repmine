@@ -1,8 +1,9 @@
 class Aggregation < ActiveRecord::Base
-  attr_accessible :operation, :column_name, :alias_name, :pattern_element_id, :distinct
+  attr_accessible :operation, :column_name, :alias_name, :distinct, :pattern_element_id
   as_enum :operation, %i{group_by count sum avg}
   belongs_to :pattern_element
   belongs_to :metric_node
+  belongs_to :repository
 
   validate :alias_name, :presence => true, :unless => :is_grouping?
 
@@ -10,15 +11,21 @@ class Aggregation < ActiveRecord::Base
     str = operation.to_s + " ("
     str += "#{distinct ? "DISTINCT " : ""}"
     str += "#{column_name.blank? ? pattern_element.speaking_name : column_name})"
-    str += " AS #{alias_name}" unless alias_name.blank? # || is_grouping?
+    str += " AS #{alias_name}" unless alias_name.blank?
     return str
   end
 
-  def translated_to(repository)
-    clonty = Aggregation.new(:operation => operation, :column_name => column_name, :alias_name => alias_name)
-    matchings = pattern_element.matching_elements.where(:ontology_id => repository.ontology.id)
-    clonty.pattern_element = matchings.size > 1 ? aggregation_translator(matchings).substitute : matchings.first
-    return clonty
+  def translated_to(repo)
+    clone = Aggregation.where(repository_id: repo.id, metric_node_id: metric_node_id).first
+    if clone.nil?
+      clone = self.dup
+      matchings = pattern_element.matching_elements.where(:ontology_id => repo.ontology.id)
+      clone.pattern_element = matchings.size > 1 ? aggregation_translator(matchings).substitute : matchings.first
+      clone.repository = repo
+      clone.metric_node = metric_node
+      clone.save
+    end
+    return clone
   end
 
   def aggregation_translator(matchings)
@@ -32,7 +39,7 @@ class Aggregation < ActiveRecord::Base
   end
 
   def name_in_result
-    if alias_name.blank? # || is_grouping?
+    if alias_name.blank?
       if column_name.blank?
         return pattern_element.speaking_name
       else

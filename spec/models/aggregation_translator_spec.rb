@@ -23,4 +23,14 @@ RSpec.describe AggregationTranslator, :type => :model do
     assert_equal n1, agg_trans.substitute
   end
 
+  it "should simply return nil if it is unable to find something (read: not crash!)" do
+    aggr = FactoryGirl.create(:aggregation)
+    repo = FactoryGirl.create(:repository)
+    target_node = FactoryGirl.create(:node, ontology: repo.ontology)
+    also_target = FactoryGirl.create(:node, ontology: repo.ontology)
+    agg_trans = AggregationTranslator.new
+    agg_trans.load_to_engine!(aggr.pattern_element, [target_node, also_target])
+    assert_equal nil, agg_trans.substitute
+  end
+
 end

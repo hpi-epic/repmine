@@ -11,6 +11,19 @@ RSpec.describe Aggregation, :type => :model do
     assert_equal target_node, aggr_clone.pattern_element
   end
 
+  it "should store translated aggregations in the DB" do
+    aggr = FactoryGirl.create(:aggregation)
+    repo = FactoryGirl.create(:repository)
+    target_node = FactoryGirl.create(:node, ontology: repo.ontology)
+
+    PatternElementMatch.create(:matched_element => aggr.pattern_element, :matching_element => target_node)
+
+    first_clone = aggr.translated_to(repo)
+    expect(first_clone).to_not eq(aggr)
+    second_clone = aggr.translated_to(repo)
+    expect(second_clone).to eq(first_clone)
+  end
+
   it "should call the substitutor" do
     aggr = FactoryGirl.create(:aggregation)
     repo = FactoryGirl.create(:repository)
@@ -20,4 +33,5 @@ RSpec.describe Aggregation, :type => :model do
     PatternElementMatch.create(:matched_element => aggr.pattern_element, :matching_element => attr_constr)
     assert_equal target_node, aggr.translated_to(repo).pattern_element
   end
+
 end

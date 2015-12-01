@@ -251,6 +251,13 @@
       rdfs:label "delayed_jobs_progress_max" ;
       rdfs:range xsd:integer .
 
+:aggregations_repository_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :aggregations ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "aggregations_repository_id" ;
+      rdfs:range xsd:integer .
+
 :pattern_elements_source_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :pattern_elements ;

@@ -35,6 +35,6 @@ class MetricNode < ActiveRecord::Base
   end
 
   def qualified_name(repository)
-    @qualified_name ||= "#{id}_#{aggregation_for(repository).underscored_speaking_name}"
+    "#{id}_#{aggregation_for(repository).underscored_speaking_name}"
   end
 end

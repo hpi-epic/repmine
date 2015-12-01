@@ -52,8 +52,10 @@ class AggregationTranslator
       target_nodes << token[ :ElOut2 ]
     end
 
-    raise "No unambiguous target found!" if target_nodes.size != 1
-    return PatternElement.find(target_nodes.first)
+    if target_nodes.size != 1
+      return nil
+    else
+      return PatternElement.find(target_nodes.first)
+    end
   end
-
 end
