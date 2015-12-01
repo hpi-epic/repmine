@@ -25,15 +25,13 @@ class CorrespondencesController < ApplicationController
   end
 
   def index
-    pattern = TranslationPattern.find(params[:pattern_id])
-    matches = pattern.source_pattern.element_matches(pattern.ontologies)
-    @correspondences = pattern.matching_groups
+    @pattern = TranslationPattern.find(params[:pattern_id])
+    @matching_groups = @pattern.matching_groups
   end
 
-  def destroy
-    pattern = TranslationPattern.find(params[:pattern_id])
-    PatternElementMatch.where(matching_element_id: params[:matching_elements], matched_element_id: params[:matched_elements]).destroy_all
-    redirect_to pattern_translate_path(pattern)
+  def remove_matches
+    PatternElementMatch.where(matched_element_id: params[:source_elements], matching_element_id: params[:target_elements]).destroy_all
+    redirect_to pattern_translate_path(params[:pattern_id])
   end
 
 end

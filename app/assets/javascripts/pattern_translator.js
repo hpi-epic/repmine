@@ -79,13 +79,15 @@ var saveCorrespondence = function(){
   });
 };
 
-// handler for pressing the 'create node' button
+// handler for pressing the 'Show Correspondences' button
 $("#toggle_correspondences").on("ajax:success", function(e, data, status, xhr){
   $("#correspondences").html(xhr.responseText);
   $("#correspondences").toggle();
   e.stopPropagation();
 });
 
-$(document).on("mouseenter", ".correspondence-details", function () {
-  console.log("rein");
+$(document).on("click", ".highlight-correspondence", function () {
+  $(this).closest("form").find(".highlight-id").each(function(){
+    $("#" + $(this).val()).effect("highlight", {}, 2000);
+  })
 });

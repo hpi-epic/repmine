@@ -1,6 +1,20 @@
-<div style="float: right;"><%= link_to((fa_icon("times-circle"))) %></div>
-<div>
-<%= sources.map(&:qualified_type).join("<br/>") %><br />
-<%= fa_icon("minus") %><br />
-<%= targets.map(&:qualified_type).join("<br/>") %>
-</div>
+<%= form_tag(pattern_remove_matches_path(pattern), class: "needs_no_space") do %>
+  <div style="float: right;">
+    <%= button_tag(fa_icon("search"), class: "btn btn-info btn-mini highlight-correspondence", type: "button") %>
+    <%= button_tag(fa_icon("times-circle"), class: "btn btn-warning btn-mini")%>
+  </div>
+  <% sources.each do |source|%>
+    <%= hidden_field_tag "source_elements[]", source.id %>
+    <%= hidden_field_tag "source_element_ids[]", div_id(source), class: "highlight-id" %>
+  <%end%>
+  <% targets.each do |target|%>
+    <%= hidden_field_tag "target_elements[]", target.id %>
+    <%= hidden_field_tag "target_element_ids[]", div_id(target), class: "highlight-id" %>
+  <%end%>
+
+  <div>
+  <%= sources.map(&:qualified_type).join("<br/>").html_safe %><br />
+  <div style="padding: 0 auto;"><%= fa_icon("exchange") %></div>
+  <%= targets.map(&:qualified_type).join("<br/>").html_safe %>
+  </div>
+<% end %>

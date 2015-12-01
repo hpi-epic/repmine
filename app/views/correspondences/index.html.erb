@@ -1,8 +1,8 @@
-<% unless @correspondences.blank? %>
+<% unless @matching_groups.blank? %>
   <ul class="correspondence-list">
-  <% @correspondences.each_pair do |source_elements, target_elements| %>
+  <% @matching_groups.each_pair do |source_elements, target_elements| %>
     <li class="correspondence-details">
-      <%= render :partial => "show", :locals => {sources: source_elements, targets: target_elements} %>
+      <%= render :partial => "show", :locals => {sources: source_elements, targets: target_elements, pattern: @pattern} %>
     </li>
   <% end %>
   </ul>

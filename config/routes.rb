@@ -8,6 +8,7 @@ RepMine::Application.routes.draw do
     post :transmogrify, on: :collection
     get :monitor, on: :collection
     get :unmatched_node
+    post :remove_matches, to: "correspondences#remove_matches", as: :remove_matches
 
     resources :correspondences
     get :correspondence_selection
