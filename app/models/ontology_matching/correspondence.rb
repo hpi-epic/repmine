@@ -2,7 +2,7 @@ class Correspondence < ActiveRecord::Base
   include RdfSerialization
   class UnsupportedCorrespondence < Exception;end
 
-  attr_accessor :node, :entity1, :entity2, :pattern_elements
+  attr_accessor :node, :entity1, :entity2, :pattern_elements, :ontology_matcher
   attr_accessible :measure, :relation
   belongs_to :onto1, :class_name => "Ontology"
   belongs_to :onto2, :class_name => "Ontology"
@@ -34,7 +34,7 @@ class Correspondence < ActiveRecord::Base
   end
 
   def ontology_matcher()
-    OntologyMatcher.new(onto1, onto2)
+    @ontology_matcher ||= OntologyMatcher.new(onto1, onto2)
   end
 
   def add_to_alignment()
