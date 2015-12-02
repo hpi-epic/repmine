@@ -14,17 +14,20 @@
 ActiveRecord::Schema.define(:version => 20151028164332) do
 
   create_table "aggregations", :force => true do |t|
+    t.boolean  "distinct",           :default => false
     t.integer  "pattern_element_id"
     t.integer  "metric_node_id"
     t.integer  "repository_id"
-    t.string   "column_name"
+    t.integer  "aggregation_id"
     t.integer  "operation_cd"
+    t.string   "column_name"
     t.string   "alias_name"
-    t.boolean  "distinct",           :default => false
+    t.string   "type"
     t.datetime "created_at",                            :null => false
     t.datetime "updated_at",                            :null => false
   end
 
+  add_index "aggregations", ["aggregation_id"], :name => "index_aggregations_on_aggregation_id"
   add_index "aggregations", ["metric_node_id"], :name => "index_aggregations_on_metric_node_id"
   add_index "aggregations", ["pattern_element_id"], :name => "index_aggregations_on_pattern_element_id"
   add_index "aggregations", ["repository_id"], :name => "index_aggregations_on_repository_id"

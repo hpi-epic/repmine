@@ -3,9 +3,20 @@ class Aggregation < ActiveRecord::Base
   as_enum :operation, %i{group_by count sum avg}
   belongs_to :pattern_element
   belongs_to :metric_node
-  belongs_to :repository
+  has_many :translated_aggregations, class_name: "TranslatedAggregation"
 
   validate :alias_name, :presence => true, :unless => :is_grouping?
+
+  after_update :update_translations
+
+  def update_translations
+    if self.pattern_element_id_changed?
+      translated_aggregations.each do |ta|
+        ta.set_pattern_element
+        ta.save
+      end
+    end
+  end
 
   def speaking_name
     str = operation.to_s + " ("
@@ -16,22 +27,7 @@ class Aggregation < ActiveRecord::Base
   end
 
   def translated_to(repo)
-    clone = Aggregation.where(repository_id: repo.id, metric_node_id: metric_node_id).first
-    if clone.nil?
-      clone = self.dup
-      matchings = pattern_element.matching_elements.where(:ontology_id => repo.ontology.id)
-      clone.pattern_element = matchings.size > 1 ? aggregation_translator(matchings).substitute : matchings.first
-      clone.repository = repo
-      clone.metric_node = metric_node
-      clone.save
-    end
-    return clone
-  end
-
-  def aggregation_translator(matchings)
-    agg_trans = AggregationTranslator.new()
-    agg_trans.load_to_engine!(pattern_element, matchings)
-    return agg_trans
+    translated_aggregations.where(repository_id: repo.id).first_or_create
   end
 
   def is_grouping?
