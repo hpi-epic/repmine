@@ -72,28 +72,28 @@ RSpec.describe CypherQueryCreator, :type => :model do
 
   it "should include aggregations" do
     pattern = FactoryGirl.create(:n_r_n_pattern)
-    agg = FactoryGirl.create(:count_aggregation, :pattern_element => pattern.nodes.last)
+    agg = FactoryGirl.create(:count_aggregation, :pattern_element => pattern.nodes.last, alias_name: "NodeCount")
     qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN count(#{qv["nv2"]}) AS count_node2", qc.query_string
+    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN count(#{qv["nv2"]}) AS NodeCount", qc.query_string
   end
 
   it "should use alias names for group by" do
     pattern = FactoryGirl.create(:n_r_n_pattern)
-    agg = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.last)
+    agg = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.last, alias_name: "NodeGroup")
     qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN id(#{qv["nv2"]}) AS node2", qc.query_string
+    assert_equal "MATCH #{qv["nr1"]}-#{qv["rel1"]}->#{qv["nr2"]} RETURN id(#{qv["nv2"]}) AS NodeGroup", qc.query_string
   end
 
   it "should incorporate self-introduced variables" do
     pattern = FactoryGirl.create(:empty_pattern)
     n1 = FactoryGirl.create(:plain_node, :pattern => pattern)
     var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => n1, :value => "?name")
-    agg = FactoryGirl.create(:aggregation, :operation => :sum, :pattern_element => var_ac1)
+    agg = FactoryGirl.create(:aggregation, :operation => :sum, :pattern_element => var_ac1, alias_name: "SumName")
     qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN sum(#{var_ac1.variable_name}) AS sum_name"
+    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN sum(#{var_ac1.variable_name}) AS SumName"
     assert_equal expected, qc.query_string
   end
 
@@ -101,10 +101,10 @@ RSpec.describe CypherQueryCreator, :type => :model do
     pattern = FactoryGirl.create(:empty_pattern)
     n1 = FactoryGirl.create(:plain_node, :pattern => pattern)
     var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => n1, :value => "?name")
-    agg = FactoryGirl.create(:aggregation, :pattern_element => var_ac1)
+    agg = FactoryGirl.create(:aggregation, :pattern_element => var_ac1, alias_name: "NodeGroup")
     qc = CypherQueryCreator.new(pattern, [agg])
     qv = query_variables(pattern, qc)
-    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN name"
+    expected = "MATCH #{qv["nr1"]} WITH #{qv["nv1"]}, #{qv["att1"]} AS name RETURN name AS NodeGroup"
     assert_equal expected, qc.query_string
   end
 

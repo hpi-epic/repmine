@@ -65,7 +65,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
 
   it "should include aggregations" do
     pattern = FactoryGirl.create(:n_r_n_pattern)
-    agg = FactoryGirl.create(:count_aggregation, :pattern_element => pattern.nodes.last)
+    agg = FactoryGirl.create(:count_aggregation, :pattern_element => pattern.nodes.last, alias_name: "NodeCount")
     qc = SparqlQueryCreator.new(pattern, [agg])
     n1 = pattern.nodes.first
     n2 = pattern.nodes.last
@@ -73,11 +73,11 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     nv1 = qc.pe_variable(n1)
     nv2 = qc.pe_variable(n2)
 
-    expected = "SELECT (COUNT(?#{nv2}) AS ?count_node2) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . }"
+    expected = "SELECT (COUNT(?#{nv2}) AS ?NodeCount) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . }"
     assert_equal expected, qc.query_string
 
-    agg2 = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.first)
-    expected = "SELECT ?#{nv1} (COUNT(?#{nv2}) AS ?count_node2) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . } GROUP BY ?#{nv1}"
+    agg2 = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.first, alias_name: "NodeGroup")
+    expected = "SELECT ?#{nv1} AS ?NodeGroup (COUNT(?#{nv2}) AS ?NodeCount) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . } GROUP BY ?#{nv1}"
     qc = SparqlQueryCreator.new(pattern, [agg2, agg])
     assert_equal expected, qc.query_string
   end

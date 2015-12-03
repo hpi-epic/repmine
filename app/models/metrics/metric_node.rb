@@ -13,7 +13,7 @@ class MetricNode < ActiveRecord::Base
   has_ancestry(:orphan_strategy => :rootify)
 
   def calculation_template(repository)
-    qualified_name(repository)
+    qualified_name()
   end
 
   def results_on(repository)
@@ -25,16 +25,11 @@ class MetricNode < ActiveRecord::Base
     aggregations.collect{|agg| agg.translated_to(repository)}
   end
 
-  def aggregation_for(repository)
-    return aggregation if repository.nil? || aggregation.pattern_element.ontology == repository.ontology
-    aggregation.translated_to(repository)
-  end
-
   def aggregation_options
     measurable.returnable_elements([]).collect{|pe| [pe.speaking_name, pe.id]}
   end
 
-  def qualified_name(repository)
-    "#{id}_#{aggregation_for(repository).underscored_speaking_name}"
+  def qualified_name()
+    "#{id}_#{aggregation.alias_name}"
   end
 end

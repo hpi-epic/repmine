@@ -47,11 +47,13 @@ class SparqlQueryCreator < QueryCreator
 
   def return_variable(pe)
     agg = aggregation_for_element(pe)
-    if agg.nil? || agg.operation == :group_by
-      @groupings << pe_variable(pe) unless agg.nil?
+    if agg.nil?
       pe_variable(pe)
+    elsif agg.is_grouping?
+      @groupings << pe_variable(pe) unless agg.nil?
+      "#{pe_variable(pe)} AS ?#{agg.alias_name}"
     else
-      "(#{agg.operation.upcase}(#{agg.distinct ? "DISTINCT " : ""}?#{pe_variable(pe)}) AS ?#{agg.underscored_speaking_name})"
+      "(#{agg.operation.upcase}(#{agg.distinct ? "DISTINCT " : ""}?#{pe_variable(pe)}) AS ?#{agg.alias_name})"
     end
   end
 

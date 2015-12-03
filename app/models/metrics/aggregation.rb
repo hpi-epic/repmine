@@ -5,7 +5,7 @@ class Aggregation < ActiveRecord::Base
   belongs_to :metric_node
   has_many :translated_aggregations, class_name: "TranslatedAggregation"
 
-  validate :alias_name, :presence => true, :unless => :is_grouping?
+  validates :alias_name, presence: true, length: {minimum: 2}, format: { without: /\s/ }
 
   after_update :update_translations
 
@@ -22,7 +22,7 @@ class Aggregation < ActiveRecord::Base
     str = operation.to_s + " ("
     str += "#{distinct ? "DISTINCT " : ""}"
     str += "#{column_name.blank? ? pattern_element.speaking_name : column_name})"
-    str += " AS #{alias_name}" unless alias_name.blank?
+    str += " AS #{alias_name}"
     return str
   end
 
@@ -34,21 +34,9 @@ class Aggregation < ActiveRecord::Base
     operation == :group_by
   end
 
-  def name_in_result
-    if alias_name.blank?
-      if column_name.blank?
-        return pattern_element.speaking_name
-      else
-        return column_name
-      end
-    else
-      return alias_name
-    end
-  end
-
   def underscored_speaking_name
     if is_grouping?
-      return name_in_result
+      return alias_name
     else
       return operation.to_s + "_" + (column_name.blank? ? pattern_element.speaking_name : column_name)
     end

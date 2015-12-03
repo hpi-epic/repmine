@@ -1,5 +1,6 @@
 class Metric < Measurable
   has_many :metric_nodes
+  validates :name, presence: true
 
   def create_node(measurable)
     node = if measurable.is_a?(Pattern)
@@ -11,6 +12,7 @@ class Metric < Measurable
     return node
   end
 
+  # creates the query for each pattern and executes it with the aggregations specified for each metric node
   def run_on_repository(repository)
     results = {}
     threads = []
@@ -21,27 +23,34 @@ class Metric < Measurable
     return process_results(results, repository)
   end
 
+  # combines the results by merging overlapping headers and adding the aggregations from both sides
   def process_results(results, repository)
-    overlapping_res_headers = results.values.collect{|res| res.collect{|val| val.keys}.flatten.uniq}.inject(:&)
-    combined_results = combine_results(results, overlapping_res_headers - all_aggregations(repository))
+    combined_results = combine_results(results, overlapping_result_headers(results) - all_aggregations(repository))
     complete_results = compute_metrics(combined_results, repository)
     return prepare_results(complete_results, repository)
   end
 
+  # basically finds identical entries in multiple arrays of hashes contained as values in a hash
+  def overlapping_result_headers(results)
+    results.values.collect{|res| res.collect{|val| val.keys}.flatten.uniq}.inject(:&)
+  end
+
+  # calculates metrics for all operator nodes
   def compute_metrics(complete_results, repository)
     root_nodes = operator_nodes.select{|on| on.is_root?}
     return complete_results if root_nodes.empty?
 
-    calculator = Dentaku::Calculator.new
-    calculation_template = root_nodes.first.calculation_template(repository)
-    required_values = leaf_nodes.collect{|ln| ln.qualified_name(repository)}
-
-    complete_results.each do |res_object|
-      required_values.each{|rv| calculator.store(rv => res_object[rv].to_f)}
-      res_object["#{name}"] = begin
-        calculator.evaluate(calculation_template).to_f
-      rescue Exception => e
-        0
+    root_nodes.each do |root_node|
+      calculator = Dentaku::Calculator.new
+      calculation_template = root_node.calculation_template(repository)
+      required_values = leaf_nodes.collect{|ln| ln.qualified_name}
+      complete_results.each do |res_object|
+        required_values.each{|rv| calculator.store(rv => res_object[rv].to_f)}
+        res_object["#{name}"] = begin
+          calculator.evaluate(calculation_template).to_f
+        rescue Exception => e
+          0
+        end
       end
     end
 
@@ -50,13 +59,12 @@ class Metric < Measurable
 
   def prepare_results(complete_results, repository)
     headers = complete_results.collect{|val| val.keys}.flatten.uniq
-    hf_headers = human_friendly_headers(headers, repository)
 
     csv_results = CSV.generate do |csv|
-      csv << hf_headers
+      csv << headers
       complete_results.collect do |res_hash|
         res_row = []
-        hf_headers.each_with_index do |header,i|
+        headers.each_with_index do |header,i|
           if !res_hash.has_key?(header)
             res_hash[header] = res_hash[headers[i]]
             res_hash.delete(headers[i])
@@ -70,18 +78,7 @@ class Metric < Measurable
     return complete_results, csv_results
   end
 
-  def human_friendly_headers(old_headers, repository)
-    hfh = old_headers.clone
-    leaf_nodes.each do |ln|
-      ln.translated_aggregations(repository).each do |agg|
-        usn = agg.underscored_speaking_name
-        index = old_headers.index("#{ln.id}_#{usn}") || old_headers.index(usn)
-        hfh[index] = agg.name_in_result unless index.nil?
-      end
-    end
-    return hfh
-  end
-
+  #
   def combine_results(results, join_headers)
     complete_result = {}
     results.each_pair do |metric_node, values|
@@ -140,15 +137,10 @@ class Metric < Measurable
   end
 
   def result_columns(repository = nil)
-    leaf_nodes.collect{|ln| ln.translated_aggregations(repository).collect{|agg| agg.name_in_result}}.flatten.uniq + [name]
-  end
-
-  def is_ambiguous?
-    aliases = leaf_nodes.collect{|ln| ln.aggregations.collect{|agg| agg.alias_name}}.flatten.compact
-    return aliases.uniq.size != aliases.size
+    leaf_nodes.collect{|ln| ln.aggregations.collect{|agg| agg.alias_name}}.flatten.uniq + [name]
   end
 
   def all_aggregations(repository)
-    leaf_nodes.collect{|ln| ln.aggregation_for(repository).underscored_speaking_name}.flatten.compact
+    leaf_nodes.collect{|ln| ln.aggregation.alias_name}.flatten.compact
   end
 end
