@@ -48,13 +48,13 @@ RSpec.describe Metric, :type => :model do
 
     results = {
       @mn1 => [{"NodeGroup" => "node1","AcSum" => 5},{"NodeGroup" => "node2","AcSum" => 10}],
-      @mn2 => [{"NodeGroup" => "node1","AcAvg" => 2.5},{"NodeGroup" => "node2","AcAvg" => 7.5}]
+      @mn2 => [{"NodeGroup" => "node1","AcAvg" => 2.5},{"NodeGroup" => "node2","AcAvg" => 0}]
     }
 
     complete_results, csv = @metric.process_results(results)
     expect(complete_results.size).to eq(2)
-    expect(complete_results.first[@metric.name]).to eq(12.5)
-    expect(complete_results.last[@metric.name]).to eq(75.0)
+    expect(complete_results.first[@metric.name]).to eq(2)
+    expect(complete_results.last[@metric.name]).to eq(0)
   end
 
   it "should detect overlapping headers in the results" do
@@ -106,6 +106,20 @@ RSpec.describe Metric, :type => :model do
     expect(complete_results.all?{|res| res.size == 4}).to be(true)
   end
 
+  it "should ask all its leaf nodes whether it is executable" do
+    build_simple_metric()
+    Pattern.any_instance.stub(:executable_on?){false}
+    expect(@metric.executable_on?(@repo)).to be(false)
+  end
+
+  it "should start threads for all leaf nodes and call process results for the created hash" do
+    build_simple_metric()
+    MetricNode.any_instance.stub(:results_on){[{"happy" => "hunting"}]}
+    @metric.stub(:process_results){|input| input}
+    results = @metric.run_on_repository(@repo)
+    expect(results.size).to eq(2)
+  end
+
   def build_simple_metric
     @repo = FactoryGirl.create(:repository)
     @pattern = FactoryGirl.create(:pattern, ontologies: [@repo.ontology])
@@ -115,7 +129,7 @@ RSpec.describe Metric, :type => :model do
     @mn1.aggregation = @mn1.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: :sum, alias_name: "AcSum")
     @agg2 = @mn2.aggregations.create!(:pattern_element_id => @pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
     @mn2.aggregation = @mn2.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: :avg, alias_name: "AcAvg")
-    @mon = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:multiply])
+    @mon = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:divide])
 
     @mn1.parent = @mon
     @mn2.parent = @mon

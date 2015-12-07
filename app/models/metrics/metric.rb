@@ -16,7 +16,7 @@ class Metric < Measurable
   def run_on_repository(repository)
     results = {}
     threads = []
-    metric_nodes.where("aggregation_id IS NOT NULL").each do |metric_node|
+    metric_nodes.aggregating.each do |metric_node|
       threads << Thread.new{results[metric_node] = metric_node.results_on(repository)}
     end
     threads.each { |thr| thr.join }
@@ -64,15 +64,7 @@ class Metric < Measurable
     csv_results = CSV.generate do |csv|
       csv << headers
       complete_results.collect do |res_hash|
-        res_row = []
-        headers.each_with_index do |header,i|
-          if !res_hash.has_key?(header)
-            res_hash[header] = res_hash[headers[i]]
-            res_hash.delete(headers[i])
-          end
-          res_row << res_hash[header]
-        end
-        csv << res_row
+        csv << headers.collect{|header| res_hash[header]}
       end
     end
 
@@ -143,6 +135,6 @@ class Metric < Measurable
   end
 
   def all_aggregations()
-    leaf_nodes.collect{|ln| ln.aggregation.nil? ? nil : ln.aggregation.alias_name}.flatten.compact
+    leaf_nodes.aggregating.collect{|ln| ln.aggregation.alias_name}.flatten.compact
   end
 end

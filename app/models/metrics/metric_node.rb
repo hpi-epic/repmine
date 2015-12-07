@@ -11,6 +11,7 @@ class MetricNode < ActiveRecord::Base
   attr_accessor :qualified_name
 
   validates :aggregation, presence: true, :unless => :root?
+  scope :aggregating, where("aggregation_id IS NOT NULL")
 
   has_ancestry(:orphan_strategy => :rootify)
 
