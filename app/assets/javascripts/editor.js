@@ -284,15 +284,6 @@ var highlightSelector = function(element) {
   element.addClass("highlighted");
 };
 
-// takes a jqXHR object and if it has the X-Message header set, displays a growl message
-var showGrowlNotification = function(request){
-  var msg = request.getResponseHeader('X-Message');
-  var msg_type = request.getResponseHeader('X-Message-Type');
-  if(msg){
-    $.jGrowl(msg, { theme: msg_type});
-  }
-};
-
 // adds a type expression above, below, or on the same level as the selected_element (determined by url)
 // for simplicity, we simply redraw the entire tree instead of fiddling with the DOM
 var addTypeExpression = function(url,selected_element, list, operator){

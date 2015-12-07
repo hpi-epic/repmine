@@ -36,7 +36,7 @@ $("#new_operator").on("ajax:success", function(e, data, status, xhr){
 });
 
 $(".edit_metric").on("ajax:success", function(e, data, status, xhr){
-	$("form.edit_metric_node").each(function(i,form){
+	$("form[id*='edit_metric_node']").each(function(i,form){
 		var position = $(form).parent().position();
 		$(form).find("input[id$=_x]").val(position.left);
 		$(form).find("input[id$=_y]").val(position.top);
@@ -46,7 +46,11 @@ $(".edit_metric").on("ajax:success", function(e, data, status, xhr){
 			data : $(form).serialize()
 		});
 	});
-	$.jGrowl("Successfully saved metric!");
+  showGrowlNotification(xhr);
+});
+
+$(".edit_metric").on("ajax:error", function(e, data, status, xhr){
+  showGrowlNotification(data);
 });
 
 var makeEverythingDraggable = function(){
