@@ -10,10 +10,16 @@ class MetricNode < ActiveRecord::Base
   has_many :aggregations
   attr_accessor :qualified_name
 
+  validates :aggregation, presence: true, :unless => :root?
+
   has_ancestry(:orphan_strategy => :rootify)
 
-  def calculation_template(repository)
+  def calculation_template()
     qualified_name()
+  end
+
+  def qualified_name()
+    "#{id}_#{aggregation.alias_name}"
   end
 
   def results_on(repository)
@@ -27,9 +33,5 @@ class MetricNode < ActiveRecord::Base
 
   def aggregation_options
     measurable.returnable_elements([]).collect{|pe| [pe.speaking_name, pe.id]}
-  end
-
-  def qualified_name()
-    "#{id}_#{aggregation.alias_name}"
   end
 end

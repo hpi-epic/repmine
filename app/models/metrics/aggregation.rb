@@ -7,6 +7,9 @@ class Aggregation < ActiveRecord::Base
 
   validates :alias_name, presence: true, length: {minimum: 2}, format: { without: /\s/ }
 
+  scope :grouping, where(:operation_cd => Aggregation.operations[:group_by])
+  scope :non_grouping, where('operation_cd != ?', Aggregation.operations[:group_by])
+
   after_update :update_translations
 
   def update_translations

@@ -56,7 +56,11 @@ class MonitoringTask < ActiveRecord::Base
   end
 
   def pretty_csv_name
-    return "#{measurable.name.underscore}-on-#{repository.name.underscore}.csv"
+    return "#{fancy_name(measurable.name)}-on-#{fancy_name(repository.name)}.csv"
+  end
+
+  def fancy_name(thingy)
+    return thingy.underscore.gsub(/\s/, "_")
   end
 
   def results

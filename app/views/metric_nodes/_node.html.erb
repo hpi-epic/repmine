@@ -18,7 +18,8 @@
   <%= form_tag(metric_node_aggregations_path(node), :remote => true, :id => "new_aggregation", :class => "needs_no_space") do %>
     <div class="controls">
       <%= select_tag(:operation, options_for_select(Aggregation.operations.keys), :class => "span4") %>
-      <%= select_tag(:pattern_element_id, options_for_select(node.aggregation_options), :class => "span6") %>
+      <% set_name = node.is_a?(MetricMetricNode) ? :column_name : :pattern_element_id %>
+      <%= select_tag(set_name, options_for_select(node.aggregation_options), :class => "span6") %>
     </div>
     <div class="input-append">
       <label class="checkbox inline span4"><%= check_box_tag(:distinct)%>Distinct?</label>

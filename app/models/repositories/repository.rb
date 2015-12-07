@@ -123,11 +123,11 @@ class Repository < ActiveRecord::Base
   end
 
   def log_status(msg, step)
-    job.nil? ? puts(msg) : job.update_stage_progress(msg, :step => step)
+    job.update_stage_progress(msg, :step => step) unless job.nil?
   end
 
   def log_msg(msg)
-    job.nil? ? puts(msg) : job.update_stage(msg)
+    job.update_stage(msg) unless job.nil?
   end
 
   def database_type

@@ -44,28 +44,14 @@ RSpec.describe Metric, :type => :model do
   end
 
   it "should properly combine results from two different metric nodes" do
-    repo = FactoryGirl.create(:repository)
-    pattern = FactoryGirl.create(:pattern, ontologies: [repo.ontology])
-    mn1 = MetricNode.create(:measurable_id => pattern.id)
-    mn2 = MetricNode.create(:measurable_id => pattern.id)
-    agg1 = mn1.aggregations.create!(:pattern_element_id => pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
-    mn1.aggregation = mn1.aggregations.create!(:pattern_element_id => pattern.attribute_constraints.first.id, operation: :sum, alias_name: "AcSum")
-    agg2 = mn2.aggregations.create!(:pattern_element_id => pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
-    mn2.aggregation = mn2.aggregations.create!(:pattern_element_id => pattern.attribute_constraints.first.id, operation: :avg, alias_name: "AcAvg")
-    mon = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:multiply])
-
-    mn1.parent = mon
-    mn2.parent = mon
-    mn1.save
-    mn2.save
-    @metric.metric_nodes = [mon,mn1,mn2]
+    build_simple_metric()
 
     results = {
-      mn1 => [{"NodeGroup" => "node1","AcSum" => 5},{"NodeGroup" => "node2","AcSum" => 10}],
-      mn2 => [{"NodeGroup" => "node1","AcAvg" => 2.5},{"NodeGroup" => "node2","AcAvg" => 7.5}]
+      @mn1 => [{"NodeGroup" => "node1","AcSum" => 5},{"NodeGroup" => "node2","AcSum" => 10}],
+      @mn2 => [{"NodeGroup" => "node1","AcAvg" => 2.5},{"NodeGroup" => "node2","AcAvg" => 7.5}]
     }
 
-    complete_results, csv = @metric.process_results(results, repo)
+    complete_results, csv = @metric.process_results(results)
     expect(complete_results.size).to eq(2)
     expect(complete_results.first[@metric.name]).to eq(12.5)
     expect(complete_results.last[@metric.name]).to eq(75.0)
@@ -74,5 +60,67 @@ RSpec.describe Metric, :type => :model do
   it "should detect overlapping headers in the results" do
     expect(@metric.overlapping_result_headers({a: [{:b => 2, :c => 3}], :b => [{:b => 5, :f => 4}]})).to eq([:b])
     expect(@metric.overlapping_result_headers({a: [{:d => 2, :c => 3}], :b => [{:b => 5, :f => 4}]})).to be_empty
+    expect(@metric.overlapping_result_headers({a: [{x1: 2, y: 3, z: 4}, {x1: 4, y: 34, z: 34}], b: [{x1: 2, x2: 3}, {x1: 4, x2: 5}]})).to eq([:x1])
+  end
+
+  it "should properly combine results from metrics with other stuff" do
+    build_simple_metric()
+    mmn = MetricMetricNode.create!(:measurable_id => @metric.id)
+    meta_metric = FactoryGirl.create(:metric, name: "AdvancedOwnership")
+    mmn2 = MetricNode.create!(:measurable_id => @pattern.id)
+    agg3 = mmn2.aggregations.create!(:pattern_element_id => @pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
+    mmn2.aggregation = mmn2.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: :sum, alias_name: "AcSummm")
+
+    meta_metric.metric_nodes = [mmn, mmn2]
+
+    results = {
+      mmn => [{"NodeGroup" => "node1","#{@mn1.id}_AcSum" => 5, "#{@mn2.id}_AcAvg" => 10, "Ownership" => 50}],
+      mmn2 => [{"NodeGroup" => "node1","AcSummm" => 2.5}]
+    }
+
+    complete_results, csv = meta_metric.process_results(results)
+    expect(complete_results.size).to eq(1)
+    expect(complete_results.first["AdvancedOwnership"]).to be_nil
+    expect(complete_results.first["NodeGroup"]).to eq("node1")
+    expect(complete_results.first["#{mmn.id}_Ownership"]).to eq(50)
+
+    # now let's add a calculation
+    mopn = MetricOperatorNode.create(:operator_cd => MetricOperatorNode.operators[:add])
+    mmn.parent = mopn
+    mmn.aggregation = mmn.aggregations.create!(column_name: "Ownership", operation: :avg, alias_name: "AvgOwnership")
+    mmn.save!
+    mmn2.parent = mopn
+    mmn2.save
+    meta_metric.metric_nodes << mopn
+
+    results[mmn] << {"NodeGroup" => "node2","#{@mn1.id}_AcSum" => 10, "#{@mn2.id}_AcAvg" => 20, "Ownership" => 100}
+    results[mmn2] << {"NodeGroup" => "node2","AcSummm" => 5}
+    results[mmn] = mmn.get_aggregates(mmn.group_results(results[mmn]))
+    complete_results, csv = meta_metric.process_results(results)
+    # one result per "NodeGroup"
+    expect(complete_results.size).to eq(2)
+    # once 75 + 2.5 and the second is 75 + 5
+    expect(complete_results.first["AdvancedOwnership"]).to eq(77.5)
+    expect(complete_results.last["AdvancedOwnership"]).to eq(80)
+    # 4 elements per result: NodeGroup, AcSumm, AvgOwnership, AdvancedOwnership
+    expect(complete_results.all?{|res| res.size == 4}).to be(true)
+  end
+
+  def build_simple_metric
+    @repo = FactoryGirl.create(:repository)
+    @pattern = FactoryGirl.create(:pattern, ontologies: [@repo.ontology])
+    @mn1 = MetricNode.create(:measurable_id => @pattern.id)
+    @mn2 = MetricNode.create(:measurable_id => @pattern.id)
+    @agg1 = @mn1.aggregations.create!(:pattern_element_id => @pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
+    @mn1.aggregation = @mn1.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: :sum, alias_name: "AcSum")
+    @agg2 = @mn2.aggregations.create!(:pattern_element_id => @pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
+    @mn2.aggregation = @mn2.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: :avg, alias_name: "AcAvg")
+    @mon = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:multiply])
+
+    @mn1.parent = @mon
+    @mn2.parent = @mon
+    @mn1.save
+    @mn2.save
+    @metric.metric_nodes = [@mon,@mn1,@mn2]
   end
 end

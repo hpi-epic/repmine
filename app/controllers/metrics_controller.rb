@@ -2,13 +2,14 @@ class MetricsController < ApplicationController
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
 
   def create
-    @metric = Metric.create
+    @metric = Metric.new
+    @metric.save(validate: false)
     redirect_to metric_path(@metric)
   end
 
   def show
     @metric = Metric.find(params[:id])
-    @pattern_groups = Pattern.grouped(true, true).merge(Metric.grouped(true, true, [@metric])){|key, val1, val2| val1 + val2}
+    @measurable_groups = Metric.grouped([@metric]).merge(Pattern.grouped){|key, val1, val2| val1 + val2}
     @existing_connections = []
     @metric.metric_nodes.each do |node|
       node.children.each do |child|
@@ -20,8 +21,13 @@ class MetricsController < ApplicationController
 
   def update
     metric = Metric.find(params[:id])
-    metric.update_attributes(params[:metric])
-    render :nothing => true, :status => 200, :content_type => 'text/html'
+    if metric.update_attributes(params[:metric])
+      flash[:notice] = "Successfully saved metric!"
+      render json: {}
+    else
+      flash[:error] = "Could not save metric! <br/> #{metric.errors.full_messages.join("<br />")}"
+      render json: {}, :status => :unprocessable_entity
+    end
   end
 
   def destroy

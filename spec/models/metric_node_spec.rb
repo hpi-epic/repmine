@@ -34,6 +34,14 @@ RSpec.describe MetricNode, :type => :model do
     mn2.parent = op_node
     mn2.save
     expect(op_node.children.size).to eq(2)
-    expect(op_node.calculation_template(@repo)).to eq("(#{@mn.qualified_name}*#{mn2.qualified_name})")
+    expect(op_node.calculation_template()).to eq("(#{@mn.qualified_name}*#{mn2.qualified_name})")
+  end
+
+  it "should raise a validation error if we do not have an aggregation but a parent" do
+    @mn.aggregation = nil
+    expect(@mn.save).to be(true)
+    @mn.parent = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:add])
+    expect(@mn.save).to be(false)
+    expect(@mn.errors[:aggregation]).to_not be_nil
   end
 end

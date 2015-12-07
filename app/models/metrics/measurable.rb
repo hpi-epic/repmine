@@ -12,20 +12,18 @@ class Measurable < ActiveRecord::Base
     raise "implement 'executable_on?' in #{self.class.name}"
   end
 
-  def self.grouped(nice_display = false, include_class = false, exceptions = [])
+  def self.grouped(excluded_instances = [])
     measurable_groups = {}
-    where(:type => self.name).each do |measurable|
-      next if exceptions.include?(measurable)
+
+    where(type: self.name).each do |measurable|
+      next if excluded_instances.include?(measurable)
       tag_list = measurable.tag_list.empty? ? ["Uncategorized"] : measurable.tag_list
       tag_list.each do |tag|
         measurable_groups[tag] ||= []
-        if nice_display
-          measurable_groups[tag] << [(measurable.name || "#{measurable.id}") + "#{include_class ? " (#{self.name})" : ""}", measurable.id]
-        else
-          measurable_groups[tag] << measurable
-        end
+        measurable_groups[tag] << measurable
       end
     end
+
     return measurable_groups
   end
 

@@ -13,36 +13,27 @@ class MetricMetricNode < MetricNode
   def results_on(repository)
     mt = MonitoringTask.where(:repository_id => repository.id, :measurable_id => measurable.id).first_or_create
     mt.run unless mt.has_latest_results?
-    translate_column_names!(repository)
     return get_aggregates(group_results(mt.results))
-  end
-
-  def translate_column_names!(repository)
-    aggregate_headers(repository)
-    group_headers(repository)
   end
 
   def translated_aggregations(repository)
     return aggregations
   end
 
-  def aggregation_for(repository)
-    return aggregation
-  end
-
   def get_aggregates(grouped_results)
-    non_grouping_aggregations.each_with_index do |agg, i|
+    aggregations.non_grouping.each_with_index do |agg|
       grouped_results.each do |res_hash|
-        res_hash[agg.name_in_result] = agg.compute(res_hash[aggregate_headers[i]])
+        res_hash[agg.alias_name] = agg.compute(res_hash[agg.column_name])
+        res_hash.delete(agg.column_name)
       end
     end
-    aggregate_headers.each{|header| grouped_results.each{|res| res.delete(header)}}
     return grouped_results
   end
 
   def group_results(results)
     grouped_results = {}
 
+    # basically just stores either the value (group criteria) or an array of values
     results.each do |res_hash|
       g_hash = group_headers.collect{|gh| res_hash[gh].to_s}.join("_")
       if grouped_results[g_hash].nil?
@@ -57,15 +48,11 @@ class MetricMetricNode < MetricNode
     return grouped_results.values
   end
 
-  def non_grouping_aggregations
-    aggregations.where('operation_cd != ?', 0)
+  def aggregate_headers()
+    @aggregate_headers ||= aggregations.non_grouping.collect{|agg| agg.column_name}
   end
 
-  def aggregate_headers(repository = nil)
-    @aggregate_headers ||= non_grouping_aggregations.collect{|agg| measurable.translate_column(agg.column_name, repository)}
-  end
-
-  def group_headers(repository = nil)
-    @group_headers ||= aggregations.where(:operation_cd => 0).collect{|agg| measurable.translate_column(agg.name_in_result, repository)}
+  def group_headers()
+    @group_headers ||= aggregations.grouping.collect{|agg| agg.column_name}
   end
 end

@@ -1,6 +1,6 @@
 class Metric < Measurable
   has_many :metric_nodes
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: true
 
   def create_node(measurable)
     node = if measurable.is_a?(Pattern)
@@ -20,14 +20,15 @@ class Metric < Measurable
       threads << Thread.new{results[metric_node] = metric_node.results_on(repository)}
     end
     threads.each { |thr| thr.join }
-    return process_results(results, repository)
+    return process_results(results)
   end
 
   # combines the results by merging overlapping headers and adding the aggregations from both sides
-  def process_results(results, repository)
-    combined_results = combine_results(results, overlapping_result_headers(results) - all_aggregations(repository))
-    complete_results = compute_metrics(combined_results, repository)
-    return prepare_results(complete_results, repository)
+  def process_results(results)
+    join_headers = overlapping_result_headers(results) - all_aggregations()
+    combined_results = combine_results(results, join_headers)
+    complete_results = compute_metrics(combined_results)
+    return prepare_results(complete_results)
   end
 
   # basically finds identical entries in multiple arrays of hashes contained as values in a hash
@@ -36,14 +37,14 @@ class Metric < Measurable
   end
 
   # calculates metrics for all operator nodes
-  def compute_metrics(complete_results, repository)
+  def compute_metrics(complete_results)
     root_nodes = operator_nodes.select{|on| on.is_root?}
     return complete_results if root_nodes.empty?
 
     root_nodes.each do |root_node|
       calculator = Dentaku::Calculator.new
-      calculation_template = root_node.calculation_template(repository)
-      required_values = leaf_nodes.collect{|ln| ln.qualified_name}
+      calculation_template = root_node.calculation_template()
+      required_values = root_node.descendants.collect{|ln| ln.qualified_name}
       complete_results.each do |res_object|
         required_values.each{|rv| calculator.store(rv => res_object[rv].to_f)}
         res_object["#{name}"] = begin
@@ -57,7 +58,7 @@ class Metric < Measurable
     return complete_results
   end
 
-  def prepare_results(complete_results, repository)
+  def prepare_results(complete_results)
     headers = complete_results.collect{|val| val.keys}.flatten.uniq
 
     csv_results = CSV.generate do |csv|
@@ -81,11 +82,16 @@ class Metric < Measurable
   #
   def combine_results(results, join_headers)
     complete_result = {}
+
     results.each_pair do |metric_node, values|
+      # keys that are not joined need to be made unique
       make_them_unique = values.collect{|val| val.keys}.flatten.uniq - join_headers
+      # and should not be overwritten
       do_not_overwrite = make_them_unique.collect{|uh|"#{metric_node.id}_#{uh}"}
 
-      values.each_with_index do |res_hash|
+      values.each_with_index do |original_res_hash|
+        # prevent the method from destroying the original input
+        res_hash = original_res_hash.clone
         # replace the keys which would be overwritten
         make_them_unique.each do |uh|
           res_hash["#{metric_node.id}_#{uh}"] = res_hash[uh]
@@ -111,10 +117,6 @@ class Metric < Measurable
     return complete_result.values.flatten
   end
 
-  def translate_column(column_name, repository)
-    result_columns(repository)[result_columns.index(column_name)]
-  end
-
   def operator_nodes
     metric_nodes.where(:type => "MetricOperatorNode")
   end
@@ -136,11 +138,11 @@ class Metric < Measurable
     end
   end
 
-  def result_columns(repository = nil)
+  def result_columns()
     leaf_nodes.collect{|ln| ln.aggregations.collect{|agg| agg.alias_name}}.flatten.uniq + [name]
   end
 
-  def all_aggregations(repository)
-    leaf_nodes.collect{|ln| ln.aggregation.alias_name}.flatten.compact
+  def all_aggregations()
+    leaf_nodes.collect{|ln| ln.aggregation.nil? ? nil : ln.aggregation.alias_name}.flatten.compact
   end
 end
