@@ -1,6 +1,7 @@
 class Aggregation < ActiveRecord::Base
   attr_accessible :operation, :column_name, :alias_name, :distinct, :pattern_element_id
   as_enum :operation, %i{group_by count sum avg}
+
   belongs_to :pattern_element
   belongs_to :metric_node
   has_many :translated_aggregations, class_name: "TranslatedAggregation"

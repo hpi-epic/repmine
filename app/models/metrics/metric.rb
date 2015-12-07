@@ -44,7 +44,7 @@ class Metric < Measurable
     root_nodes.each do |root_node|
       calculator = Dentaku::Calculator.new
       calculation_template = root_node.calculation_template()
-      required_values = root_node.descendants.collect{|ln| ln.qualified_name}
+      required_values = root_node.descendants.collect{|ln| ln.qualified_name}.compact
       complete_results.each do |res_object|
         required_values.each{|rv| calculator.store(rv => res_object[rv].to_f)}
         res_object["#{name}"] = begin

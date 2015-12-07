@@ -10,13 +10,17 @@ class MetricNode < ActiveRecord::Base
   has_many :aggregations
   attr_accessor :qualified_name
 
-  validates :aggregation, presence: true, :unless => :root?
+  validates :aggregation, presence: true, :if => :needs_aggregation?
   scope :aggregating, where("aggregation_id IS NOT NULL")
 
   has_ancestry(:orphan_strategy => :rootify)
 
   def calculation_template()
     qualified_name()
+  end
+
+  def needs_aggregation?
+    !root?
   end
 
   def qualified_name()

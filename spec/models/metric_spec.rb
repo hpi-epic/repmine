@@ -120,6 +120,32 @@ RSpec.describe Metric, :type => :model do
     expect(results.size).to eq(2)
   end
 
+  it "should allow for value driver trees ;)" do
+    build_simple_metric
+    second_op = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:add])
+    second_op.parent = @mon
+    second_op.save!
+
+    @mn2.parent = second_op
+    @mn2.save
+    @mn3 = MetricNode.create(:measurable_id => @pattern.id)
+    @agg3 = @mn3.aggregations.create!(:pattern_element_id => @pattern.nodes.first.id, operation: :group_by, alias_name: "NodeGroup")
+    @mn3.aggregation = @mn3.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: :count, alias_name: "AcCount")
+    @mn3.parent = second_op
+    @mn3.save!
+
+    results = {
+      @mn1 => [{"NodeGroup" => "node1","AcSum" => 5},{"NodeGroup" => "node2","AcSum" => 10}],
+      @mn2 => [{"NodeGroup" => "node1","AcAvg" => 2.5},{"NodeGroup" => "node2","AcAvg" => 0}],
+      @mn3 => [{"NodeGroup" => "node1","AcCount" => 2.5},{"NodeGroup" => "node2","AcCount" => 0}]
+    }
+
+    complete_results, csv = @metric.process_results(results)
+    expect(complete_results.size).to eq(2)
+    expect(complete_results.first[@metric.name]).to eq(1.0) # 5 / (2.5 + 2.5)
+    expect(complete_results.last[@metric.name]).to eq(0) # 10 / (0 + 0)
+  end
+
   def build_simple_metric
     @repo = FactoryGirl.create(:repository)
     @pattern = FactoryGirl.create(:pattern, ontologies: [@repo.ontology])

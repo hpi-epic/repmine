@@ -9,6 +9,14 @@ class MetricOperatorNode < MetricNode
     return MetricNode.model_name
   end
 
+  def needs_aggregation?
+    false
+  end
+
+  def qualified_name
+    nil
+  end
+
   def calculation_template()
     return "(#{children.sort{|c1,c2| c1.x <=> c2.x}.collect{|child| child.calculation_template()}.join(math_op)})"
   end
