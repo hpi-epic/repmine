@@ -5,6 +5,7 @@ module AggregationsHelper
       when :sum then "&sum; #{aggregation.speaking_name}"
       when :avg then "<span style='text-decoration: overline;'>#{aggregation.speaking_name}</span>"
       when :count then fa_icon("plus-circle", :text => aggregation.speaking_name)
+      else "#{aggregation.speaking_name}"
     end
   end
 end

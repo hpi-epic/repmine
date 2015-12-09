@@ -15,6 +15,6 @@ class AggregationsController < ApplicationController
 
   def destroy
     Aggregation.destroy(params[:id])
-    render json: {}
+    head :no_content
   end
 end

@@ -23,9 +23,9 @@ class Aggregation < ActiveRecord::Base
   end
 
   def speaking_name
-    str = operation.to_s + " ("
-    str += "#{distinct ? "DISTINCT " : ""}"
-    str += "#{column_name.blank? ? pattern_element.speaking_name : column_name})"
+    str = "#{distinct ? "DISTINCT " : ""}"
+    str += "#{column_name.blank? ? pattern_element.speaking_name : column_name}"
+    str = "#{operation.to_s} (#{str})" unless operation.nil?
     str += " AS #{alias_name}"
     return str
   end
