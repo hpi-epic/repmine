@@ -16,6 +16,7 @@ var updateConnection = function(url, connection){
 	var source_id = $(connection.source).attr("data-id");
 	var target_id = $(connection.target).attr("data-id");
 	$.ajax({url: url, type: "POST", data: {source_id: source_id,target_id: target_id}});
+  $(connection.target).find("form.mn_agg").show();
 }
 
 $("#new_node").on("ajax:success", function(e, data, status, xhr){
@@ -43,7 +44,8 @@ $(".edit_metric").on("ajax:success", function(e, data, status, xhr){
 		$.ajax({
 			url : $(form).attr("action"),
 			type: "POST",
-			data : $(form).serialize()
+			data : $(form).serialize(),
+      error: function(jqXHR, textStatus, errorThrown){showGrowlNotification(jqXHR)}
 		});
 	});
   showGrowlNotification(xhr);
@@ -94,6 +96,7 @@ var loadExistingConnections = function(){
 		var sourceEndpoint = jsPlumb.selectEndpoints({source: source.attr("id")}).get(0);
 		var targetEndpoint = jsPlumb.selectEndpoints({target: target.attr("id")}).get(0);
 		jsPlumb.connect({source: sourceEndpoint, target: targetEndpoint, fireEvent:false});
+    target.find("form.mn_agg").show();
 	});
 }
 

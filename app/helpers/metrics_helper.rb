@@ -18,6 +18,6 @@ module MetricsHelper
   end
 
   def measurable_select(mg)
-    grouped_options_for_select(mg.collect{|k,v| [k, v.collect{|el| "#{el.name || el.id} (#{el.class.name})"}]})
+    grouped_options_for_select(mg.collect{|k,v| [k, v.collect{|el| ["#{el.name || el.id} (#{el.class.name})", el.id]}]})
   end
 end

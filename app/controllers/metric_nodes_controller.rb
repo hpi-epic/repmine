@@ -4,8 +4,12 @@ class MetricNodesController < ApplicationController
 
   def update
     mn = MetricNode.find(params[:id])
-    mn.update_attributes(params[:metric_node])
-    render :nothing => true, :status => 200, :content_type => 'text/html'
+    if mn.update_attributes(params[:metric_node])
+      render :nothing => true, :status => 200, :content_type => 'text/html'
+    else
+      flash[:error] = "Could not save metric node! <br/> #{mn.errors.full_messages.join("<br />")}"
+      render json: {}, :status => :unprocessable_entity
+    end
   end
 
   def destroy

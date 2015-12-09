@@ -2,7 +2,7 @@
   <strong><%= link_to(node.measurable.name, node.measurable) %></strong>
   <hr style = "margin-top: 0px; margin-bottom: 10px" />
 
-  <%= form_for(node, :html => {:class => "#{node.aggregations.empty? ? 'hide needs_no_space' : 'needs_no_space'}"}) do |f| %>
+  <%= form_for(node, :html => {:class => "mn_agg " + "#{node.aggregations.empty? ? 'hide needs_no_space' : 'needs_no_space'}"}) do |f| %>
     <span>Returns:</span>
     <%= f.hidden_field :x %>
     <%= f.hidden_field :y %>

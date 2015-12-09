@@ -39,7 +39,7 @@ class MetricsController < ApplicationController
     source = MetricNode.find(params[:source_id])
     target = MetricNode.find(params[:target_id])
     target.parent = source
-    target.save
+    target.save(validate: false )
     render :nothing => true, :status => 200, :content_type => 'text/html'
   end
 
