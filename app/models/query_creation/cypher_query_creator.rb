@@ -54,7 +54,11 @@ class CypherQueryCreator < QueryCreator
     agg = aggregation_for_element(pe)
 
     if !agg.nil? && !agg.is_grouping?
-      str = "#{agg.operation.to_s}(#{agg.distinct ? "distinct " : ""}#{pe_variable(pe)})"
+      str = unless agg.operation.nil?
+        "#{agg.operation.to_s}(#{agg.distinct ? "distinct " : ""}#{pe_variable(pe)})"
+      else
+        "#{agg.distinct ? "distinct " : ""}#{pe_variable(pe)}"
+      end
     elsif agg.nil? && pe.is_variable? && pe.is_a?(AttributeConstraint)
       str = "#{attribute_reference(pe)} AS #{pe.variable_name}"
     end
