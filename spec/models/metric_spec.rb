@@ -120,7 +120,7 @@ RSpec.describe Metric, :type => :model do
     expect(results.size).to eq(2)
   end
 
-  it "should allow for value driver trees ;)" do
+  it "should allow for multi level metric calculations" do
     build_simple_metric
     second_op = MetricOperatorNode.create(operator_cd: MetricOperatorNode.operators[:add])
     second_op.parent = @mon

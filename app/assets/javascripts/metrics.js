@@ -142,6 +142,10 @@ $(document).on("ajax:success", "#new_aggregation", function(e, data, status, xhr
 	updateAggregationSelections(aggregation.attr("data-node-id"));
 });
 
+$(document).on("ajax:error", "#new_aggregation", function(e, data, status, xhr){
+  showGrowlNotification(data);
+});
+
 $(document).on("ajax:success", ".delete_aggregation", function(event){
 	updateAggregationSelections($(this).closest('span').attr("data-node-id"));
 });
