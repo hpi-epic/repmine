@@ -81,4 +81,18 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     qc = SparqlQueryCreator.new(pattern, [agg2, agg])
     assert_equal expected, qc.query_string
   end
+
+  it "should include pass-through aggregations" do
+    pattern = FactoryGirl.create(:n_r_n_pattern)
+    agg = FactoryGirl.create(:count_aggregation, :pattern_element => pattern.nodes.last, alias_name: "NodeCount", operation: nil)
+    qc = SparqlQueryCreator.new(pattern, [agg])
+    n1 = pattern.nodes.first
+    n2 = pattern.nodes.last
+    r1 = pattern.relation_constraints.first
+    nv1 = qc.pe_variable(n1)
+    nv2 = qc.pe_variable(n2)
+
+    expected = "SELECT ?#{nv2} AS ?NodeCount WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . }"
+    assert_equal expected, qc.query_string
+  end
 end
