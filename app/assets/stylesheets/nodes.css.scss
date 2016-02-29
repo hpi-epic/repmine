@@ -16,6 +16,13 @@ div.node {
 div.node.static {
   height: 2em;
   border: 2px solid #CACACA;
+  font-size: 0.75em;
+  width: auto;
+  min-width: 8em;
+}
+
+div.node a.wicked {
+  color: #8800cc;
 }
 
 div.node.static.selected {
@@ -55,12 +62,6 @@ div.node .select2-container .select2-selection--single {
 #select2-node_rdf_type-results .select2-results__option{
   font-size: 0.75em;
   line-height: 10px;
-}
-
-div.node.static{
-  font-size: 0.75em;
-  width: auto;
-  min-width: 8em;
 }
 
 div.node form{

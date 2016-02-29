@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
     t.integer  "target_id"
     t.integer  "x",               :default => 0
     t.integer  "y",               :default => 0
+    t.boolean  "is_group",        :default => false
   end
 
   add_index "pattern_elements", ["ontology_id"], :name => "index_pattern_elements_on_ontology_id"

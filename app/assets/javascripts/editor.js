@@ -128,6 +128,13 @@ var updateConnectionsAndAttributes = function(node){
   })
 };
 
+var toggleNodeGroup = function(button, node_id){
+  button.toggleClass("wicked");
+  $("#" + node_id).toggleClass("double-border");
+  var field = $("form[id='edit_" + node_id + "'] input[id='node_is_group']");
+  field.val(field.val() === "true" ? "false" : "true");
+};
+
 var buildDraggedConnection = function(connection, rebuild_endpoints){
   var source_id = $(connection.source).attr("data-id");
   var target_id = $(connection.target).attr("data-id");
