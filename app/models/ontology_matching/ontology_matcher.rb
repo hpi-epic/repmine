@@ -131,6 +131,26 @@ class OntologyMatcher
     alignment_repo.repository
   end
 
+  def unmatched_elements
+    unmatched = {}
+    matched = matched_elements
+    [source_ontology, target_ontology].each do |ont|
+      ont.all_elements.each_pair do |ttype, concepts|
+        unmatched[ttype] ||= {}
+        unmatched[ttype][ont] = concepts - matched
+      end
+    end
+    return unmatched
+  end
+
+  def matched_elements
+    all_correspondences.collect{|corr| corr.involved_concepts}.flatten.uniq
+  end
+
+  def all_correspondences
+    simple_correspondences + complex_correspondences
+  end
+
   def add_correspondence!(correspondence)
     alignment_graph.insert(*correspondence.rdf)
   end
@@ -138,6 +158,14 @@ class OntologyMatcher
   def remove_correspondence!(correspondence)
     find_all_subnodes_of(correspondence.resource).each{|sn| alignment_graph.delete([sn])}
     alignment_graph.delete([correspondence.resource])
+  end
+
+  def simple_correspondences
+    SimpleCorrespondence.between(source_ontology, target_ontology)
+  end
+
+  def complex_correspondences
+    ComplexCorrespondence.between(source_ontology, target_ontology)
   end
 
   def find_all_subnodes_of(c_node)

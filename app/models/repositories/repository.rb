@@ -1,5 +1,5 @@
 class Repository < ActiveRecord::Base
-  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
+  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password, :ontology_id
   belongs_to :ontology
   has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
@@ -44,7 +44,7 @@ class Repository < ActiveRecord::Base
     ont_url = ONT_CONFIG[:ontology_base_url] + ONT_CONFIG[:extracted_ontologies_path] + name_url_safe
     self.ontology = ExtractedOntology.create(:short_name => self.name, :does_exist => false, :group => "Extracted", :url => ont_url)
     self.ontology.repository = self
-    self.ontology.save
+    self.ontology.save!
   end
 
   def name_url_safe
@@ -70,6 +70,7 @@ class Repository < ActiveRecord::Base
   def extract_ontology!
     ontology.remove_local_copy!
     ontology.update_attributes({:does_exist => false})
+
     errors = create_ontology!
 
     if File.exist?(ontology.local_file_path)
@@ -104,7 +105,7 @@ class Repository < ActiveRecord::Base
 
   def csv_data(results)
     CSV.generate do |csv|
-      csv << results.first.keys
+      csv << results.first.keys unless results.empty?
       results.each{|date| csv << date.values}
     end
   end

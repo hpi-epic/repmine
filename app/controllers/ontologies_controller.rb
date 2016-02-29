@@ -72,4 +72,20 @@ class OntologiesController < ApplicationController
     groups = Ontology.pluck(:group).uniq.compact.select{|gr| gr.downcase.match(params[:term].downcase)}
     render :json => groups.collect{|group| {:value => group, :label => group}}
   end
+
+  def match
+    @ontologies = begin
+      Ontology.find(params[:ontology_ids])
+    rescue Exception => e
+      redirect_to ontologies_path and return
+    end
+
+    if @ontologies.size != 2
+      flash[:error] = "You have to choose exactly two ontologies for matching."
+      redirect_to ontologies_path and return
+    else
+      @om = OntologyMatcher.new(@ontologies.first, @ontologies.last)
+      @om.match!
+    end
+  end
 end

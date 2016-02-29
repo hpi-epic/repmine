@@ -70,7 +70,7 @@ class PatternsController < ApplicationController
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
       @target_pattern.store_auto_layout!
-      @node_offset = @controls_offset
+      @node_offset = @controls_offset + 100
     end
 
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
@@ -136,8 +136,9 @@ class PatternsController < ApplicationController
           redirect_to pattern_prepare_translation_path(params[:patterns].first, params[:ontology_ids])
         end
       elsif params[:monitor]
-        task_ids = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
-        redirect_to check_monitoring_tasks_path(:task_ids => task_ids)
+        tasks = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
+        tasks.each{|task| task.run}
+        redirect_to check_monitoring_tasks_path(:task_ids => tasks.map(&:id))
       else
         redirect_to patterns_path, :alert => "How did you get here, anyway?"
       end
@@ -146,17 +147,14 @@ class PatternsController < ApplicationController
 
   def query
     @pattern = Pattern.find(params[:pattern_id])
-    unless params[:ontology_id].nil?
-      @ontology = Ontology.find(params[:ontology_id])
-      @t_pattern = TranslationPattern.existing_translation_pattern(@pattern, [@ontology])
-      flash[:error] = "No translation available, yet, for #{@pattern.name} to #{@ontology.short_name}" if @t_pattern.nil?
+    @repositories = Repository.where(ontology_id: @pattern.ontologies.map(&:id))
+    @queries = if @repositories.any?{|repo| repo.is_a?(Neo4jRepository)}
+      {"Neo4j" => CypherQueryCreator.new(@pattern).query_string}
+    else
+      {"Sparql" => SparqlQueryCreator.new(@pattern).query_string}
     end
-    @queries = {
-      "Cypher" => CypherQueryCreator.new(@t_pattern || @pattern).query_string,
-      "Sparql" => SparqlQueryCreator.new(@t_pattern || @pattern).query_string
-    }
-    @ontology_groups = Ontology.grouped
     @title = "Queries for '#{@pattern.name}'"
+    render layout: false
   end
 
   private

@@ -1,7 +1,8 @@
-<%= form_tag(pattern_query_path) do %>
+<%= form_tag(transmogrify_patterns_path()) do %>
   <div class="btn-group">
-    <%= button_tag("Translate queries to:", :class => "btn btn-info", :name => "translate") %>
-    <%= select_tag(:ontology_id, grouped_options_for_select(@ontology_groups)) %>
+    <%= hidden_field_tag("patterns[]", [@pattern.id])%>
+    <%= button_tag("Run on:", :class => "btn btn-info", :name => "monitor") %>
+    <%= select_tag(:repository_id, options_from_collection_for_select(@repositories, "id", "name")) %>
   </div>
 <% end %>
 
@@ -9,5 +10,3 @@
   <legend><%= language %></legend>
   <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%>
 <% end %>
-<%= link_to("Overview", patterns_path(), :class => "btn")%>
-<%= link_to("Pattern", pattern_path(@pattern), :class => "btn btn-success")%>

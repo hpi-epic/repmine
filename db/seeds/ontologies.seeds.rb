@@ -2,6 +2,8 @@ puts "Creating SEON ontology"
 Ontology.where(
   url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl",
   short_name: "seon.owl",
+  does_exist: true,
+  description: "Software Evolution Ontologies created by the University of Zurich, s.e.a.l Team."
   group: "Software Repositories"
 ).first_or_create
 

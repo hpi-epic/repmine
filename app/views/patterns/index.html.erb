@@ -35,7 +35,9 @@
     <% patterns.each do |pattern|%>
       <tr>
         <td>
-          <label class="checkbox"><%= check_box_tag("patterns[]", pattern.id)%><%= link_to(pattern.name, pattern_path(pattern)) %></label>
+          <label class="checkbox">
+            <%= check_box_tag("patterns[]", pattern.id)%><%= link_to(pattern.name, pattern_path(pattern)) %>
+          </label>
         </td>
         <td class="span8"><%= pattern.description %></td>
         <td><%= pattern.pattern_elements.size %></td>

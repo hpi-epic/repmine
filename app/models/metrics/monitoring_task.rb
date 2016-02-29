@@ -4,10 +4,17 @@ class MonitoringTask < ActiveRecord::Base
   belongs_to :repository
   belongs_to :measurable
 
+  before_destroy :remove_results
+
   def self.create_multiple(measurable_ids, repository_id)
     return measurable_ids.collect do |m_id|
-      self.where(:measurable_id => m_id,  :repository_id => repository_id).first_or_create!.id
+      self.where(:measurable_id => m_id,  :repository_id => repository_id).first_or_create!
     end.uniq
+  end
+
+  def remove_results
+    FileUtils.rm_rf(results_file("yml"))
+    FileUtils.rm_rf(results_file("csv"))
   end
 
   def has_latest_results?

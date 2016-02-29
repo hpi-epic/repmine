@@ -88,6 +88,10 @@ class Correspondence < ActiveRecord::Base
     end
   end
 
+  def involved_concepts
+    source_key.split(SEPARATOR) + target_key.split(SEPARATOR)
+  end
+
   def self.candidates_for(o1, o2, elements, inverted = false)
     matches = {}
     combo_keys = {}

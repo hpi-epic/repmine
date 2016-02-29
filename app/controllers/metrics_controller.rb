@@ -57,7 +57,7 @@ class MetricsController < ApplicationController
   def index
     @metrics_groups = Metric.grouped
     flash[:info] = "No metrics available! Please create a new one." if @metrics_groups.empty?
-    @repositories = Repository.all()
+    @repositories = Repository.includes(:ontology).where(:ontologies => {:does_exist => true})
     @title = "Metric overview"
   end
 

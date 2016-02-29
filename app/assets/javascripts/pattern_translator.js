@@ -3,6 +3,7 @@ jsPlumb.ready(function() {
   jsPlumb.importDefaults({Container: "drawing_canvas"});
   $(".node.static").each(function(index, node_div){
     addNodeEndpoints($(node_div).attr("id"));
+    jsPlumb.draggable($(node_div).attr("id"));
   });
 
 	var requests = loadExistingConnections(connect_these_static_nodes, load_static_attribute_constraints, true);

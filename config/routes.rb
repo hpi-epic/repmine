@@ -8,6 +8,7 @@ RepMine::Application.routes.draw do
     post :transmogrify, on: :collection
     get :monitor, on: :collection
     get :unmatched_node
+    post :run_on_repository
     post :remove_matches, to: "correspondences#remove_matches", as: :remove_matches
 
     resources :correspondences
@@ -54,6 +55,7 @@ RepMine::Application.routes.draw do
 
   resources :ontologies do
     get :autocomplete_ontology_group, on: :collection
+    post :match, on: :collection
   end
 
   resources :monitoring_tasks do
@@ -64,6 +66,8 @@ RepMine::Application.routes.draw do
   end
 
   resources :services
+
+  resources :correspondences
 
   root to: "patterns#index"
 end

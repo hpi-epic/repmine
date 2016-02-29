@@ -26,6 +26,12 @@ $("#new_pattern_node").on("ajax:success", function(e, data, status, xhr){
   $(".node select").select2({width: '90%'});
 });
 
+$("#show_query").on("ajax:success", function(e, data, status, xhr){
+  var modal = $("#query_modal");
+  modal.html(xhr.responseText);
+  modal.modal('show');
+});
+
 var loadNodesAndConnections = function(){
 	$(".node").not(".static").each(function(index,node_div){
 	  addNodeToGraph($(node_div));

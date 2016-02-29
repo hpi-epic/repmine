@@ -106,6 +106,30 @@ RSpec.describe Metric, :type => :model do
     expect(complete_results.all?{|res| res.size == 4}).to be(true)
   end
 
+  it "should pass through results from other metrics" do
+    build_simple_metric()
+    meta_metric = FactoryGirl.create(:metric, name: "AdvancedOwnership")
+
+    mmn = MetricMetricNode.create!(:measurable_id => @metric.id)
+
+    mmn2 = MetricNode.create!(:measurable_id => @pattern.id)
+    agg3 = mmn2.aggregations.create!(:pattern_element_id => @pattern.nodes.first.id, operation: nil, alias_name: "NodeGroup")
+    mmn2.aggregation = mmn2.aggregations.create!(:pattern_element_id => @pattern.attribute_constraints.first.id, operation: nil, alias_name: "AcSummm")
+
+    meta_metric.metric_nodes = [mmn, mmn2]
+
+    results = {
+      mmn => [{"NodeGroup" => "node1","#{@mn1.id}_AcSum" => 5, "#{@mn2.id}_AcAvg" => 10, "Ownership" => 50}],
+      mmn2 => [{"NodeGroup" => "node1","AcSummm" => 2.5}]
+    }
+
+    complete_results, csv = meta_metric.process_results(results)
+    expect(complete_results.size).to eq(1)
+    expect(complete_results.first["AdvancedOwnership"]).to be_nil
+    expect(complete_results.first["NodeGroup"]).to eq("node1")
+    expect(complete_results.first["#{mmn.id}_Ownership"]).to eq(50)
+  end
+
   it "should ask all its leaf nodes whether it is executable" do
     build_simple_metric()
     Pattern.any_instance.stub(:executable_on?){false}

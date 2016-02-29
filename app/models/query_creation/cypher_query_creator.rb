@@ -50,7 +50,8 @@ class CypherQueryCreator < QueryCreator
 
 
   def aggregated_variable(pe)
-    str = pe.is_a?(Node) ? "id(#{pe_variable(pe)})" : "#{pe_variable(pe)}"
+    #str = pe.is_a?(Node) ? "id(#{pe_variable(pe)})" : "#{pe_variable(pe)}"
+    str = pe.is_a?(Node) ? "#{pe_variable(pe)}.url" : "#{pe_variable(pe)}"
     agg = aggregation_for_element(pe)
 
     if !agg.nil? && !agg.is_grouping?

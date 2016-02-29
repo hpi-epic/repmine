@@ -112,7 +112,7 @@ class Pattern < Measurable
 
   # Layouting
   def graphviz_graph
-    g = GraphViz.new("#{id}", {:type => :digraph, :splines => true})
+    g = GraphViz.new("#{id}", {:type => :digraph, :splines => :line})
     node_cache = {}
     nodes.each do |node|
       node_cache[node] = g.add_node(node.id.to_s, {:label => node.pretty_string})

@@ -1,0 +1,46 @@
+<h4>Matching '<%= @om.source_ontology.short_name%>' and '<%= @om.target_ontology.short_name %>'</h4>
+<table class="table table-striped table-bordered">
+  <tr class="success">
+    <td colspan="4">Simple Correspondences (<%= @om.simple_correspondences.count %>)</td>
+  </tr>
+  <% @om.simple_correspondences.each do |sc| %>
+    <tr>
+      <td><%= sc.source_key %></td>
+      <td><%= sc.relation %></td>
+      <td><%= sc.target_key %></td>
+      <td><%= link_to("Delete", correspondence_path(sc), method: :delete, class: "btn btn-danger")%></td>
+    </tr>
+  <% end %>
+</table>
+
+<table class="table table-striped table-bordered">
+  <tr class="info">
+    <td colspan="4">Complex Correspondences (<%= @om.complex_correspondences.count %>)</td>
+  </tr>
+  <% @om.complex_correspondences.each do |sc| %>
+    <tr>
+      <td><%= sc.source_key.split(Correspondence::SEPARATOR).join("<br />").html_safe %></td>
+      <td><%= sc.relation %></td>
+      <td><%= sc.target_key.split(Correspondence::SEPARATOR).join("<br />").html_safe %></td>
+    </tr>
+  <% end %>
+</table>
+
+<table class="table table-striped table-bordered">
+  <tr class="error">
+    <td colspan="2">Unmatched Elements</td>
+  </tr>
+  <tr>
+    <td><%= @om.source_ontology.short_name %></td>
+    <td><%= @om.target_ontology.short_name %></td>
+  </tr>
+  <% @om.unmatched_elements.each_pair do |ttype, ont_hash| %>
+    <tr class="warning">
+      <td colspan="2"><%= ttype %></td>
+    </tr>
+    <tr>
+      <td><%= ont_hash[@om.source_ontology].to_a.sort.join("<br />").html_safe %></td>
+      <td><%= ont_hash[@om.target_ontology].to_a.sort.join("<br />").html_safe %></td>
+    </tr>
+  <% end %>
+</table>

@@ -32,8 +32,7 @@
     <% end %>
   </div>
 
-  <%= link_to 'Query', pattern_query_path(@pattern), :class => "btn btn-danger" %>
-
+  <%= link_to 'Query', pattern_query_path(@pattern), remote: true, id: "show_query", class: "btn btn-inverse"%>
 </div>
 
 <hr />
@@ -45,3 +44,4 @@
   <% end %>
 
 </div>
+<div id="query_modal" class="modal hide node_modal"></div>

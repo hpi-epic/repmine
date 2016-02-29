@@ -105,14 +105,25 @@ class AgraphConnection
     return attribs
   end
 
+  # gets all superclasses for a given rdf_class
   def get_all_superclasses(rdf_class)
     superclasses = Set.new
-
     repository.build_query(:infer => true) do |q|
       q.pattern([RDF::Resource.new(rdf_class), RDF::RDFS.subClassOf, :clazz])
     end.run{|res| superclasses << res.clazz.to_s}
-
     return superclasses.to_a
+  end
+
+  # gets the concepts of an ontology grouped by their type
+  def all_elements()
+    results = {}
+    [RDF::RDFS.Class, RDF::OWL.DatatypeProperty, RDF::OWL.ObjectProperty].each do |ttype|
+      results[ttype.to_s] = Set.new
+      repository.build_query(:infer => true) do |q|
+        q.pattern([:thing, RDF.type, ttype])
+      end.run{|res| results[ttype.to_s] << res[:thing].to_s}
+    end
+    return results
   end
 
   def element_class_for_rdf_type(rdf_type)

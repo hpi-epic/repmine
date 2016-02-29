@@ -34,4 +34,10 @@ class CorrespondencesController < ApplicationController
     redirect_to pattern_translate_path(params[:pattern_id])
   end
 
+  def destroy
+    correspondence = Correspondence.find(params[:id])
+    correspondence.destroy
+    redirect_to(request.referer)
+  end
+
 end

@@ -51,9 +51,9 @@ class SparqlQueryCreator < QueryCreator
       pe_variable(pe)
     elsif agg.is_grouping?
       @groupings << pe_variable(pe)
-      "#{pe_variable(pe)} AS ?#{agg.alias_name}"
+      "(?#{pe_variable(pe)} AS ?#{agg.alias_name})"
     elsif agg.operation.nil?
-      "#{pe_variable(pe)} AS ?#{agg.alias_name}"
+      "(?#{pe_variable(pe)} AS ?#{agg.alias_name})"
     else
       "(#{agg.operation.upcase}(#{agg.distinct ? "DISTINCT " : ""}?#{pe_variable(pe)}) AS ?#{agg.alias_name})"
     end
