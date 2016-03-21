@@ -31,6 +31,10 @@ class MetricNode < ActiveRecord::Base
     repository.results_for_pattern(measurable.translated_to(repository), translated_aggregations(repository), false)
   end
 
+  def query_for(repository)
+    repository.query_for_pattern(measurable.translated_to(repository), translated_aggregations(repository))
+  end
+
   def translated_aggregations(repository)
     return aggregations if repository.nil? || aggregations.all?{|agg| agg.pattern_element.ontology == repository.ontology}
     aggregations.collect{|agg| agg.translated_to(repository)}

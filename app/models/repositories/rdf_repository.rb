@@ -3,10 +3,6 @@ class RdfRepository < Repository
   attr_accessible :ontology_url
   attr_accessor :sparql_client
 
-  def self.model_name
-    return Repository.model_name
-  end
-
   def self.default_port
     10035
   end
@@ -21,7 +17,7 @@ class RdfRepository < Repository
     self.save
   end
 
-  def create_ontology!
+  def analyze_repository
     return true
   end
 

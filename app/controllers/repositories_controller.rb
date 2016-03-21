@@ -99,15 +99,7 @@ class RepositoriesController < ApplicationController
 
   def extract_schema
     @repository = Repository.find(params[:repository_id])
-    errors = @repository.extract_ontology!
-    if @repository.ontology.does_exist
-      if errors.blank?
-        redirect_to @repository, :notice => "Successfully extracted ontology from the repository!"
-      else
-        redirect_to @repository, :alert => "Created ontology with warnings: #{errors}"
-      end
-    else
-      redirect_to @repository, :notice => "Started analyzing the repository in a background thread."
-    end
+    @repository.extract_ontology!(true)
+    redirect_to @repository, :notice => "Started analyzing the repository in a background thread."
   end
 end

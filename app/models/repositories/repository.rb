@@ -1,5 +1,5 @@
 class Repository < ActiveRecord::Base
-  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password, :ontology_id
+  attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
   belongs_to :ontology
   has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
@@ -18,6 +18,10 @@ class Repository < ActiveRecord::Base
   end
 
   after_create :build_ontology
+
+  def self.model_name
+    ActiveModel::Name.new(Repository)
+  end
 
   # overwrite this if you need a different format
   def self.rdf_format
@@ -67,18 +71,15 @@ class Repository < ActiveRecord::Base
     Delayed::Job.find_all_by_queue(query_queue)
   end
 
-  def extract_ontology!
+  def extract_ontology!(in_background = false)
     ontology.remove_local_copy!
     ontology.update_attributes({:does_exist => false})
-
-    errors = create_ontology!
+    create_ontology!(in_background)
 
     if File.exist?(ontology.local_file_path)
       ontology.update_attributes({:does_exist => true})
       ontology.load_to_dedicated_repository!
     end
-
-    return errors
   end
 
   def results_for_pattern(pattern, aggregations, generate_csv = true)
@@ -91,11 +92,16 @@ class Repository < ActiveRecord::Base
     return self.class.query_creator_class.new(pattern.translated_to(self), aggregations).query_string
   end
 
-  def create_ontology!
-    raise "implement #{create_ontology} for #{self.class.name} to create a RDFS+OWL ontology file for our repository"
+  def create_ontology!(in_background)
+    if in_background && ontology_creation_job.nil?
+      j = OntologyExtractionJob.new(progress_max: 100, repository_id: self.id)
+      Delayed::Job.enqueue(j, :queue => ont_creation_queue)
+    else
+      analyze_repository
+    end
   end
 
-  def analyze_repository(job = nil)
+  def analyze_repository
     raise "implement 'analyze_repository' in #{self.class.name}"
   end
 
@@ -124,11 +130,11 @@ class Repository < ActiveRecord::Base
   end
 
   def log_status(msg, step)
-    job.update_stage_progress(msg, :step => step) unless job.nil?
+    job.nil? ? puts(msg) : job.update_stage_progress(msg, :step => step)
   end
 
   def log_msg(msg)
-    job.update_stage(msg) unless job.nil?
+    job.nil? ? puts(msg) : job.update_stage(msg)
   end
 
   def database_type

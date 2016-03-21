@@ -9,11 +9,7 @@ class RdbmsRepository < Repository
   validates :db_name, :presence => true
   validates :port, numericality: true, allow_blank: true
 
-  def self.model_name
-    return Repository.model_name
-  end
-
-  def create_ontology!
+  def analyze_repository
     cmd = Rails.root.join("externals", "d2rq", "generate-mapping").to_s
     options = ["-v", "-o #{ontology.local_file_path}"]
     options += ["-u #{db_username}"] unless db_username.blank?
@@ -30,6 +26,7 @@ class RdbmsRepository < Repository
     # these errors are mainly warnings telling you that certain fields are ambiguous or so
     # if there are none, just return nil...
     add_ontology_namespace! if File.exists?(ontology.local_file_path)
+
     return errors
   end
 

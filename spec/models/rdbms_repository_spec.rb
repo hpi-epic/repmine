@@ -6,8 +6,7 @@ RSpec.describe RdbmsRepository, :type => :model do
     repo = test_repository
     assert_not_nil repo.ontology
     repo.ontology.stub(:local_file_path => testfile)
-    errors = repo.extract_ontology!
-    puts "Errors during exceution: #{errors}" unless errors.blank?
+    repo.extract_ontology!
     assert File.exists?(testfile)
     graph = RDF::Graph.load(testfile)
     assert_not_empty graph
