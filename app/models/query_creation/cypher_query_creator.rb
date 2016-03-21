@@ -1,5 +1,9 @@
 class CypherQueryCreator < QueryCreator
 
+  DIFFERING_OPERATORS = {
+    AttributeConstraint::OPERATORS[:not] => "<>"
+  }
+
   def build_query
     "MATCH #{match} #{parameters}#{with} RETURN #{return_values}".strip.gsub(/\s\s+/, ' ')
   end
@@ -50,8 +54,7 @@ class CypherQueryCreator < QueryCreator
 
 
   def aggregated_variable(pe)
-    #str = pe.is_a?(Node) ? "id(#{pe_variable(pe)})" : "#{pe_variable(pe)}"
-    str = pe.is_a?(Node) ? "#{pe_variable(pe)}.url" : "#{pe_variable(pe)}"
+    str = pe.is_a?(Node) ? "id(#{pe_variable(pe)})" : "#{pe_variable(pe)}"
     agg = aggregation_for_element(pe)
 
     if !agg.nil? && !agg.is_grouping?
@@ -69,8 +72,8 @@ class CypherQueryCreator < QueryCreator
   end
 
   # we mainly use the sames ones as cypher...this is just in case, I forgot something...
-  def cypher_operator(our_operator)
-    return our_operator
+  def cypher_operator(operator)
+    return DIFFERING_OPERATORS[operator] || operator
   end
 
   def escaped_value(ac)
