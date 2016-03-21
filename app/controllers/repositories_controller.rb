@@ -17,7 +17,12 @@ class RepositoriesController < ApplicationController
   def show
     @repository = Repository.find(params[:id])
     @stats = [["Item Type", "Occurrences in Repository"]]
-    @stats.concat(@repository.type_statistics)
+    begin
+      @stats.concat(@repository.type_statistics)
+    rescue Exception => e
+      flash[:error] = e.message
+    end
+
     @job = @repository.ontology_creation_job
     @title = "Repository '#{@repository.name}'"
 
