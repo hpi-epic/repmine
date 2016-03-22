@@ -153,7 +153,7 @@ class Pattern < Measurable
   # determines which elements of a pattern will be returned by a query. No select *
   def returnable_elements(aggregations)
     if aggregations.blank?
-      return nodes + attribute_constraints.select{|ac| ac.is_variable?}
+      return nodes + attribute_constraints
     else
       return aggregations.collect{|agg| agg.pattern_element}
     end

@@ -61,7 +61,7 @@ class SparqlQueryCreator < QueryCreator
   def pattern_for_ac_equals(node, ac)
     if ac.refers_to_variable?
       where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
-      filter << "?#{pe_variable(ac)} = #{ac.value}"
+      filter << "?#{pe_variable(ac)} = ?#{pe_variable(ac.referenced_element)}"
     else
       where << [pe_variable(node), ac.type_expression.resource, ac.value]
     end
@@ -73,6 +73,6 @@ class SparqlQueryCreator < QueryCreator
   end
 
   def pattern_for_ac_var(node, ac)
-    where << [pe_variable(node), ac.type_expression.resource, ac.variable_name.to_sym]
+    where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
   end
 end

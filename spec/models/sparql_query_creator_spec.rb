@@ -19,7 +19,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     r1 = pattern.relation_constraints.first
     ac1 = pattern.attribute_constraints.first
     nv = qc.pe_variable(n1)
-    assert_equal "SELECT ?#{nv} WHERE { ?#{nv} a <#{n1.rdf_type}> . ?#{nv} <#{r1.rdf_type}> ?#{nv} . ?#{nv} <#{ac1.rdf_type}> \"hello world\" . }", qs
+    assert_equal "SELECT ?#{nv} ?#{qc.pe_variable(ac1)} WHERE { ?#{nv} a <#{n1.rdf_type}> . ?#{nv} <#{r1.rdf_type}> ?#{nv} . ?#{nv} <#{ac1.rdf_type}> \"hello world\" . }", qs
   end
 
   it "should create a query for a node - relation - node pattern" do
@@ -43,14 +43,14 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     n1 = pattern.nodes.first
     nv = qc.pe_variable(n1)
     acv = qc.pe_variable(regex_ac)
-    expected = "SELECT ?#{nv} WHERE { ?#{nv} a <#{n1.rdf_type}> . ?#{nv} <#{regex_ac.rdf_type}> ?#{acv} . FILTER(regex(?#{acv}, \"hello world\")) }"
+    expected = "SELECT ?#{nv} ?#{acv} WHERE { ?#{nv} a <#{n1.rdf_type}> . ?#{nv} <#{regex_ac.rdf_type}> ?#{acv} . FILTER(regex(?#{acv}, \"hello world\")) }"
     assert_equal expected, qs
   end
 
   it "should incorporate self-introduced variables" do
     pattern = FactoryGirl.create(:empty_pattern)
     pattern.pattern_elements << FactoryGirl.create(:plain_node)
-    var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "?name")
+    var_ac1 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:var], :node => pattern.nodes.first, :value => "name")
     var_ac2 = FactoryGirl.create(:attribute_constraint, :operator => AttributeConstraint::OPERATORS[:equals], :node => pattern.nodes.first, :value => "?name")
     qc = SparqlQueryCreator.new(pattern)
     qs = qc.query_string
@@ -59,7 +59,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     nv2 = qc.pe_variable(pattern.attribute_constraints.first)
     ac1v = qc.pe_variable(var_ac1)
     ac2v = qc.pe_variable(var_ac2)
-    expected = "SELECT ?#{nv} ?#{nv2} WHERE { ?#{nv} a <#{n1.rdf_type}> . ?#{nv} <#{var_ac1.rdf_type}> ?name . ?#{nv} <#{var_ac2.rdf_type}> ?#{ac2v} . FILTER(?#{ac2v} = ?name) }"
+    expected = "SELECT ?#{nv} ?#{ac1v} ?#{ac2v} WHERE { ?#{nv} a <#{n1.rdf_type}> . ?#{nv} <#{var_ac1.rdf_type}> ?#{ac1v} . ?#{nv} <#{var_ac2.rdf_type}> ?#{ac2v} . FILTER(?#{ac2v} = ?#{ac1v}) }"
     assert_equal expected, qs
   end
 
@@ -77,7 +77,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     assert_equal expected, qc.query_string
 
     agg2 = FactoryGirl.create(:aggregation, :pattern_element => pattern.nodes.first, alias_name: "NodeGroup")
-    expected = "SELECT ?#{nv1} AS ?NodeGroup (COUNT(?#{nv2}) AS ?NodeCount) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . } GROUP BY ?#{nv1}"
+    expected = "SELECT (?#{nv1} AS ?NodeGroup) (COUNT(?#{nv2}) AS ?NodeCount) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . } GROUP BY ?#{nv1}"
     qc = SparqlQueryCreator.new(pattern, [agg2, agg])
     assert_equal expected, qc.query_string
   end
@@ -92,7 +92,7 @@ RSpec.describe SparqlQueryCreator, :type => :model do
     nv1 = qc.pe_variable(n1)
     nv2 = qc.pe_variable(n2)
 
-    expected = "SELECT ?#{nv2} AS ?NodeCount WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . }"
+    expected = "SELECT (?#{nv2} AS ?NodeCount) WHERE { ?#{nv1} a <#{n1.rdf_type}> . ?#{nv2} a <#{n2.rdf_type}> . ?#{nv1} <#{r1.rdf_type}> ?#{nv2} . }"
     assert_equal expected, qc.query_string
   end
 end

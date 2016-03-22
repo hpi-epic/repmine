@@ -54,23 +54,7 @@ class AttributeConstraint < PatternElement
   end
 
   def referenced_element
-    pattern.pattern_elements.find{|pe| pe.is_variable? && (("?" + pe.variable_name) == self.value)}
-  end
-
-  def variable_name
-    if value.blank? || !is_variable?
-      return super
-    else
-      value.start_with?("?") ? value[1..-1] : value
-    end
-  end
-
-  def speaking_name
-    if !is_variable?
-      super
-    else
-      variable_name
-    end
+    pattern.attribute_constraints.find{|ac| ac.is_variable? && ("?#{ac.value}" == self.value)}
   end
 
   def rdf_types

@@ -5,7 +5,7 @@ class CypherQueryCreator < QueryCreator
   }
 
   def build_query
-    "MATCH #{match} #{parameters}#{with} RETURN #{return_values}".strip.gsub(/\s\s+/, ' ')
+    "MATCH #{match} #{parameters} RETURN #{return_values}".strip.gsub(/\s\s+/, ' ')
   end
 
   def match
@@ -36,7 +36,7 @@ class CypherQueryCreator < QueryCreator
   end
 
   def return_values
-    pattern.returnable_elements(aggregations).collect{|pe| aggregated_variable(pe)}.join(", ")
+    pattern.returnable_elements(aggregations).collect{|pe| return_variable(pe)}.join(", ")
   end
 
   def parameters
@@ -52,23 +52,41 @@ class CypherQueryCreator < QueryCreator
     return str.empty? ? "" : "WHERE #{str}"
   end
 
+  # for a given pattern element, we have to say how it is returned. This needs to ba vastly simplified...
+  def return_variable(pe)
+    unless aggregation_for_element(pe).nil?
+      aggregated_variable(pe)
+    else
+      simple_variable(pe)
+    end
+  end
+
+  def pe_variable(pe)
+    pe.is_a?(AttributeConstraint) ? attribute_reference(pe) : super
+  end
+
+  def simple_variable(pe)
+    pe.is_a?(Node) ? "id(#{pe_variable(pe)})" : pe_variable(pe)
+  end
 
   def aggregated_variable(pe)
-    str = pe.is_a?(Node) ? "id(#{pe_variable(pe)})" : "#{pe_variable(pe)}"
     agg = aggregation_for_element(pe)
 
-    if !agg.nil? && !agg.is_grouping?
-      str = unless agg.operation.nil?
-        "#{agg.operation.to_s}(#{agg.distinct ? "distinct " : ""}#{pe_variable(pe)})"
+    str = if agg.is_grouping?
+      simple_variable(pe)
+    else
+      if agg.operation.nil?
+        "#{distinct(agg)}#{pe_variable(pe)}"
       else
-        "#{agg.distinct ? "distinct " : ""}#{pe_variable(pe)}"
+        "#{agg.operation.to_s}(#{distinct(agg)}#{pe_variable(pe)})"
       end
-    elsif agg.nil? && pe.is_variable? && pe.is_a?(AttributeConstraint)
-      str = "#{attribute_reference(pe)} AS #{pe.variable_name}"
     end
 
-    str += " AS #{agg.alias_name}" unless agg.nil?
-    return str
+    str + " AS #{agg.alias_name}"
+  end
+
+  def distinct(agg)
+    agg.distinct ? "distinct " : ""
   end
 
   # we mainly use the sames ones as cypher...this is just in case, I forgot something...
@@ -93,22 +111,4 @@ class CypherQueryCreator < QueryCreator
       return ac.value
     end
   end
-
-  # needed in case of subqueries and aliased variables
-  def with
-    if pattern.pattern_elements.any?{|pe| pe.is_variable? && !aggregation_for_element(pe).nil?}
-      str = " WITH #{(plain_vars + aliased_vars).join(", ")}"
-    else
-      return ""
-    end
-  end
-
-  def aliased_vars
-    pattern.pattern_elements.select{|pe| pe.is_variable?}.collect{|pe| "#{attribute_reference(pe)} AS #{pe_variable(pe)}"}.compact
-  end
-
-  def plain_vars
-    pattern.pattern_elements.select{|pe| !pe.is_variable?}.collect{|pe| pe_variable(pe) unless pe.is_a?(AttributeConstraint)}.compact
-  end
-
 end
