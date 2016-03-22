@@ -137,7 +137,7 @@ class PatternsController < ApplicationController
         end
       elsif params[:monitor]
         tasks = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
-        tasks.each{|task| task.run}
+        tasks.each{|task| task.enqueue}
         redirect_to check_monitoring_tasks_path(:task_ids => tasks.map(&:id))
       else
         redirect_to patterns_path, :alert => "How did you get here, anyway?"
