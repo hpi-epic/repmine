@@ -13,12 +13,11 @@ class MonitoringTask < ActiveRecord::Base
   end
 
   def remove_results
-    FileUtils.rm_rf(results_file("yml"))
-    FileUtils.rm_rf(results_file("csv"))
+    FileUtils.rm_rf(result_file)
   end
 
   def has_latest_results?
-    return File.exist?(results_file("yml")) && File.exist?(results_file("csv"))
+    File.exist?(result_file)
   end
 
   def enqueue
@@ -28,10 +27,9 @@ class MonitoringTask < ActiveRecord::Base
 
   def run(job = nil)
     repository.job = job
-    res, csv = measurable.run_on_repository(repository)
+    res = measurable.run_on_repository(repository)
     repository.job = nil
-    File.open(results_file("yml"), "w+"){|f| f.puts res.to_yaml}
-    File.open(results_file("csv"), "w+"){|f| f.puts csv}
+    File.open(result_file, "wb"){|f| f.puts Oj.dump(res)}
   end
 
   def executable?
@@ -46,10 +44,6 @@ class MonitoringTask < ActiveRecord::Base
     end
   end
 
-  def short_name
-    "'#{measurable.name}' on '#{repository.name}'"
-  end
-
   def results_file(ending)
     return Rails.root.join("public","data","#{filename}.#{ending}").to_s
   end
@@ -58,19 +52,19 @@ class MonitoringTask < ActiveRecord::Base
     "#{measurable.class.name}_#{measurable_id}_repo_#{repository.id}"
   end
 
-  def csv_result
-    return File.open(results_file("csv")).read
-  end
-
-  def pretty_csv_name
-    return "#{fancy_name(measurable.name)}-on-#{fancy_name(repository.name)}.csv"
-  end
-
   def fancy_name(thingy)
     return thingy.underscore.gsub(/\s/, "_")
   end
 
+  def result_file
+    results_file("json")
+  end
+
   def results
-    return YAML::load(File.open(results_file("yml")).read)
+    return Oj.load(File.open(result_file).read)
+  end
+
+  def queries
+    measurable.queries_on(repository)
   end
 end

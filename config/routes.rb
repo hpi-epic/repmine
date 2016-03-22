@@ -59,9 +59,8 @@ RepMine::Application.routes.draw do
   end
 
   resources :monitoring_tasks do
-    get :csv_results
-    get :show_results
-    post :run
+    get :results
+    get :query
     get :check, on: :collection
   end
 

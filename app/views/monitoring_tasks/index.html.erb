@@ -12,24 +12,24 @@
 <% @repos_with_tasks.each do |repo| %>
   <table class="table table-bordered">
     <tr class="info">
-      <td colspan="5"><strong><%= repo.name %></strong> (<%= repo.monitoring_tasks.size%>)</td>
+      <td colspan="2"><strong><%= link_to(repo.name, repo) %></strong></td>
+      <td>Running Queries</td>
     </tr>
     <% repo.monitoring_tasks.each_with_index do |mt, i| %>
     <tr>
       <td><%= link_to(mt.measurable.name, mt.measurable) %></td>
       <td>
-        <% if mt.has_latest_results? %>
-          <%= link_to("CSV", monitoring_task_csv_results_path(mt), :class => "btn btn-success")%>
-          <%= link_to("Webview", monitoring_task_show_results_path(mt), :class => "btn btn-success")%>
-        <% else %>
-          <strong>No results present:</strong>
-        <% end %>
         <% if mt.executable? %>
-          <%= link_to("Update!", monitoring_task_run_path(mt), :class => "btn btn-info", :method => :post) %>
+          <%= link_to("Results", monitoring_task_results_path(mt), class: "btn btn-success") %>
+          <%= link_to("Query", monitoring_task_query_path(mt), class: "btn btn-info") %>
         <% else %>
-          <%= link_to("Translate!", pattern_prepare_translation_path(mt.translate_this, mt.repository.ontology), :class => "btn btn-warning") %>
+          <%= link_to("Translate",
+            pattern_prepare_translation_path(mt.translate_this, mt.repository.ontology),
+            :class => "btn btn-warning")
+          %>
         <% end %>
-        <%= link_to("Stop Monitoring",
+
+        <%= link_to("Delete",
               monitoring_task_path(mt),
               :method => :delete,
               :class => "btn btn-danger",
@@ -39,7 +39,6 @@
       </td>
       <% if i == 0 %>
       <td rowspan="<%= repo.monitoring_tasks.size %>" class="span7">
-        <em>Running Queries:</em><br />
         <% repo.query_jobs.each_with_index do |qj, ii| %>
           <%= render :partial => "stuff/progress_bar", :locals => {:job_id => qj.id} %>
         <% end %>

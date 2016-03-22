@@ -82,6 +82,9 @@ gem "logging"
 # query generation
 gem 'sql-maker'
 
+# result storage
+gem 'oj'
+
 # general convenience
 platforms :ruby do
   gem 'thin'

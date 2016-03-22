@@ -843,6 +843,13 @@
       rdfs:label "measurables_name" ;
       rdfs:range xsd:string .
 
+:pattern_elements_is_group
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_is_group" ;
+      rdfs:range xsd:integer .
+
 :sessions_created_at
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :sessions ;

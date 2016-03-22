@@ -51,7 +51,7 @@ RSpec.describe Metric, :type => :model do
       @mn2 => [{"NodeGroup" => "node1","AcAvg" => 2.5},{"NodeGroup" => "node2","AcAvg" => 0}]
     }
 
-    complete_results, csv = @metric.process_results(results)
+    complete_results = @metric.process_results(results)
     expect(complete_results.size).to eq(2)
     expect(complete_results.first[@metric.name]).to eq(2)
     expect(complete_results.last[@metric.name]).to eq(0)
@@ -78,7 +78,7 @@ RSpec.describe Metric, :type => :model do
       mmn2 => [{"NodeGroup" => "node1","AcSummm" => 2.5}]
     }
 
-    complete_results, csv = meta_metric.process_results(results)
+    complete_results = meta_metric.process_results(results)
     expect(complete_results.size).to eq(1)
     expect(complete_results.first["AdvancedOwnership"]).to be_nil
     expect(complete_results.first["NodeGroup"]).to eq("node1")
@@ -96,7 +96,7 @@ RSpec.describe Metric, :type => :model do
     results[mmn] << {"NodeGroup" => "node2","#{@mn1.id}_AcSum" => 10, "#{@mn2.id}_AcAvg" => 20, "Ownership" => 100}
     results[mmn2] << {"NodeGroup" => "node2","AcSummm" => 5}
     results[mmn] = mmn.get_aggregates(mmn.group_results(results[mmn]))
-    complete_results, csv = meta_metric.process_results(results)
+    complete_results = meta_metric.process_results(results)
     # one result per "NodeGroup"
     expect(complete_results.size).to eq(2)
     # once 75 + 2.5 and the second is 75 + 5
@@ -123,7 +123,7 @@ RSpec.describe Metric, :type => :model do
       mmn2 => [{"NodeGroup" => "node1","AcSummm" => 2.5}]
     }
 
-    complete_results, csv = meta_metric.process_results(results)
+    complete_results = meta_metric.process_results(results)
     expect(complete_results.size).to eq(1)
     expect(complete_results.first["AdvancedOwnership"]).to be_nil
     expect(complete_results.first["NodeGroup"]).to eq("node1")
@@ -164,7 +164,7 @@ RSpec.describe Metric, :type => :model do
       @mn3 => [{"NodeGroup" => "node1","AcCount" => 2.5},{"NodeGroup" => "node2","AcCount" => 0}]
     }
 
-    complete_results, csv = @metric.process_results(results)
+    complete_results = @metric.process_results(results)
     expect(complete_results.size).to eq(2)
     expect(complete_results.first[@metric.name]).to eq(1.0) # 5 / (2.5 + 2.5)
     expect(complete_results.last[@metric.name]).to eq(0) # 10 / (0 + 0)

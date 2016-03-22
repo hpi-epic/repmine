@@ -4,7 +4,7 @@ class Repository < ActiveRecord::Base
   has_many :monitoring_tasks, :dependent => :destroy
   validates :name, :presence => true
 
-  # this is meant to temporarily hold a job object that loggin happens in...
+  # job object for logging purposes
   attr_accessor :job
 
   TYPES = {
@@ -12,10 +12,6 @@ class Repository < ActiveRecord::Base
     "RDBMS" => "RdbmsRepository",
     "Neo4j" => "Neo4jRepository"
   }
-
-  # custom error class for ontology extraction
-  class OntologyExtractionError < StandardError
-  end
 
   after_create :build_ontology
 
@@ -75,17 +71,16 @@ class Repository < ActiveRecord::Base
     ontology.remove_local_copy!
     ontology.update_attributes({:does_exist => false})
     create_ontology!(in_background)
-
     if File.exist?(ontology.local_file_path)
       ontology.update_attributes({:does_exist => true})
       ontology.load_to_dedicated_repository!
     end
   end
 
-  def results_for_pattern(pattern, aggregations, generate_csv = true)
+  def results_for_pattern(pattern, aggregations)
     qs = query_for_pattern(pattern, aggregations)
     puts "Executing query: #{qs}"
-    res, csv = execute(query_for_pattern(pattern, aggregations), generate_csv)
+    results_for_query(query_for_pattern(pattern, aggregations))
   end
 
   def query_for_pattern(pattern, aggregations)
@@ -107,22 +102,6 @@ class Repository < ActiveRecord::Base
 
   def type_statistics
     raise "implement 'type_statistics' in #{self.class.name}"
-  end
-
-  def csv_data(results)
-    CSV.generate do |csv|
-      csv << results.first.keys unless results.empty?
-      results.each{|date| csv << date.values}
-    end
-  end
-
-  def execute(query, generate_csv)
-    results = results_for_query(query)
-    if generate_csv
-      return results, csv_data(results)
-    else
-      return results
-    end
   end
 
   def results_for_query(query)

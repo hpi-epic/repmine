@@ -10,11 +10,10 @@ RSpec.describe MonitoringTask, :type => :model do
 
   it "should determine whether to run the task" do
     expect(@mt.filename).to eq("Pattern_#{@pattern.id}_repo_#{@repo.id}")
-    File.stub(:exist?).with(@mt.results_file("yml")){true}
-    File.stub(:exist?).with(@mt.results_file("csv")){false}
-    expect(@mt.has_latest_results?).to eq(false)
-    File.stub(:exist?).with(@mt.results_file("csv")){true}
+    File.stub(:exist?).with(@mt.results_file("json")){true}
     expect(@mt.has_latest_results?).to eq(true)
+    File.stub(:exist?).with(@mt.results_file("json")){false}
+    expect(@mt.has_latest_results?).to eq(false)
   end
 
   it "should create mutliple ones without building duplicates" do
@@ -24,18 +23,12 @@ RSpec.describe MonitoringTask, :type => :model do
   end
 
   it "should call the measurable and store the results" do
-    FileUtils.rm_rf(yml_file)
-    FileUtils.rm_rf(csv_file)
-    @mt.stub(:results_file).with("yml"){yml_file()}
-    @mt.stub(:results_file).with("csv"){csv_file()}
-    @pattern.stub(:run_on_repository){[[{"hello" => "world"}], "hello\r\nworld"]}
+    FileUtils.rm_rf(json_file)
+    @mt.stub(:results_file).with("json"){json_file()}
+    @pattern.stub(:run_on_repository){[{"hello" => "world"}]}
     @mt.run()
-    expect(File.exist?(yml_file)).to be(true)
-    expect(File.exist?(csv_file)).to be(true)
+    expect(File.exist?(json_file)).to be(true)
     expect(@mt.results.first["hello"]).to eq("world")
-    expect(@mt.csv_result.start_with?("hello")).to be(true)
-    expect(@mt.pretty_csv_name).to eq("sample_pattern-on-sample_repo.csv")
-    expect(@mt.short_name).to eq("'#{@pattern.name}' on '#{@repo.name}'")
   end
 
   it "should enqueue a task" do
@@ -44,11 +37,7 @@ RSpec.describe MonitoringTask, :type => :model do
     expect(Delayed::Job.count).to eq(1)
   end
 
-  def yml_file
-    Rails.root.join("spec", "testfiles", "mt.yml").to_s
-  end
-
-  def csv_file
-    Rails.root.join("spec", "testfiles", "mt.csv").to_s
+  def json_file
+    Rails.root.join("spec", "testfiles", "mt.json").to_s
   end
 end

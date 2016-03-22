@@ -15,22 +15,21 @@ class MonitoringTasksController < ApplicationController
     @title = "Monitoring Task Overview"
   end
 
-  def csv_results
-    mt = MonitoringTask.find(params[:monitoring_task_id])
-    send_data(mt.csv_result, :type => 'text/csv; charset=utf-8; header=present', :filename => mt.pretty_csv_name)
+  def results
+    @task = MonitoringTask.find(params[:monitoring_task_id])
+    if @task.has_latest_results?
+      @results = @task.results
+      @headers = @results.collect{|res| res.keys}.flatten.uniq
+      @title = "Results for '#{@task.measurable.name}' on #{@task.repository.name}"
+      @task.enqueue
+    else
+      @task.enqueue
+      redirect_to monitoring_tasks_path, notice: "Results are being generate in the background."
+    end
   end
 
-  def run
+  def query
     @task = MonitoringTask.find(params[:monitoring_task_id])
-    @task.enqueue
-    redirect_to monitoring_tasks_path, :notice => "Enqueued monitoring task! Results will show up, soon..."
-  end
-
-  def show_results
-    @task = MonitoringTask.find(params[:monitoring_task_id])
-    @results = @task.results
-    @headers = @results.collect{|res| res.keys}.flatten.uniq
-    @title = "Results for '#{@task.measurable.name}' on #{@task.repository.name}"
   end
 
   def destroy
@@ -41,13 +40,11 @@ class MonitoringTasksController < ApplicationController
 
   def check
     tasks = MonitoringTask.find(params[:task_ids])
-
     tasks.each do |task|
       unless task.executable?
         redirect_to(pattern_prepare_translation_path(task.translate_this, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
       end
     end
-
     redirect_to monitoring_tasks_path(:new_tasks => params[:task_ids]), :notice => "Successfully added monitoring tasks!"
   end
 

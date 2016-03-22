@@ -27,8 +27,7 @@ class Metric < Measurable
   def process_results(results)
     join_headers = overlapping_result_headers(results) - all_aggregations()
     combined_results = combine_results(results, join_headers)
-    complete_results = compute_metrics(combined_results)
-    return prepare_results(complete_results)
+    return compute_metrics(combined_results)
   end
 
   # basically finds identical entries in multiple arrays of hashes contained as values in a hash
@@ -58,20 +57,6 @@ class Metric < Measurable
     return complete_results
   end
 
-  def prepare_results(complete_results)
-    headers = complete_results.collect{|val| val.keys}.flatten.uniq
-
-    csv_results = CSV.generate do |csv|
-      csv << headers
-      complete_results.collect do |res_hash|
-        csv << headers.collect{|header| res_hash[header]}
-      end
-    end
-
-    return complete_results, csv_results
-  end
-
-  #
   def combine_results(results, join_headers)
     complete_result = {}
 
