@@ -19,9 +19,8 @@
     <tr>
       <th>Name</th>
       <th>Description</th>
-      <th>Elements</th>
       <th>Ontology</th>
-      <th>Actions</th>
+      <th></th>
     </tr>
   </thead>
 
@@ -40,10 +39,8 @@
           </label>
         </td>
         <td class="span8"><%= pattern.description %></td>
-        <td><%= pattern.pattern_elements.size %></td>
         <td><%= pattern.ontologies.collect{|ont| ont.short_name}.join(", ") %>
         <td>
-          <%= link_to("Query", pattern_query_path(pattern), :class => "btn btn-success btn-mini") %>
           <%= link_to(
             "Delete",
             pattern_path(pattern),
