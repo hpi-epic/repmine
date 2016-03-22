@@ -12,7 +12,7 @@ class Pattern < Measurable
   # validations
   validates :name, :presence => true
   validates :description, :presence => true
-  validates :ontologies, :length => {:minimum => 1, :message=>"At least one ontology is required!" }
+  validates :ontologies, :length => {:minimum => 1, :message=> "At least one ontology is required!"}
 
   # polymorphic finders....
   def nodes
@@ -178,5 +178,9 @@ class Pattern < Measurable
 
   def run_on_repository(repository)
     repository.results_for_pattern(self, [])
+  end
+
+  def queries_on(repository)
+    [repository.query_for_pattern(self,[])]
   end
 end

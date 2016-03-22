@@ -31,7 +31,7 @@ class MetricNode < ActiveRecord::Base
     repository.results_for_pattern(measurable.translated_to(repository), translated_aggregations(repository))
   end
 
-  def query_for(repository)
+  def query_on(repository)
     repository.query_for_pattern(measurable.translated_to(repository), translated_aggregations(repository))
   end
 

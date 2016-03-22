@@ -122,4 +122,8 @@ class Metric < Measurable
   def all_aggregations()
     leaf_nodes.aggregating.collect{|ln| ln.aggregation.alias_name}.flatten.compact
   end
+
+  def queries_on(repository)
+    leaf_nodes.collect{|leaf_node| leaf_node.query_on(repository)}
+  end
 end

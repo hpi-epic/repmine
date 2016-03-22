@@ -23,7 +23,6 @@ class Measurable < ActiveRecord::Base
         measurable_groups[tag] << measurable
       end
     end
-
     return measurable_groups
   end
 
@@ -37,5 +36,9 @@ class Measurable < ActiveRecord::Base
     else
       return TranslationPattern.existing_translation_pattern(self, [repository.ontology])
     end
+  end
+
+  def queries_on(repository)
+    []
   end
 end
