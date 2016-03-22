@@ -15,7 +15,7 @@ class Neo4jRepository < Repository
   end
 
   def neo
-    @neo ||= Neography::Rest.new("http://#{host}:#{port}")
+    @neo ||= Neography::Rest.new("http://#{db_username}:#{db_password}@#{host}:#{port}")
   end
 
   # queries the graph in order to create an ontology that describes it...
