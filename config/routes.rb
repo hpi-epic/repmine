@@ -5,8 +5,6 @@ RepMine::Application.routes.draw do
     post :query
     match "prepare_translation/:ontology_id", to: "patterns#prepare_translation", as: :prepare_translation, via: [:get, :post]
     get :translate
-    post :transmogrify, on: :collection
-    get :monitor, on: :collection
     get :unmatched_node
     post :run_on_repository
     post :remove_matches, to: "correspondences#remove_matches", as: :remove_matches
@@ -20,6 +18,10 @@ RepMine::Application.routes.draw do
 
   resources :pattern_elements do
     post :set_name
+  end
+
+  resources :measurables do
+    post :monitor, on: :collection
   end
 
   resources :relation_constraints do
@@ -71,5 +73,5 @@ RepMine::Application.routes.draw do
   resources :services
   resources :correspondences
 
-  root to: "patterns#index"
+  root to: "measurables#index"
 end

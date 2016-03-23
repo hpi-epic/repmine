@@ -1,0 +1,38 @@
+<%= form_tag(monitor_measurables_path) do %>
+
+<div class="btn-toolbar">
+  <div class="btn-group">
+    <%= link_to "New Pattern", new_pattern_path, :class => "btn btn-success"%>
+    <%= link_to "New Metric", metrics_path, :class => "btn btn-primary", :method => :post %>
+  </div>
+  <div class="btn-group left-boarder">
+    <%= button_tag("Monitor selected on:", :class => "btn", :name => "monitor") %>
+    <%= select_tag("repository_id", options_from_collection_for_select(@repositories, "id", "name")) %>
+  </div>
+</div>
+
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Elements</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+  <% @measurable_groups.each_pair do |tag, measurables| %>
+    <% next if measurables.empty? %>
+    <tr>
+      <td colspan="5"><strong><%= tag %></strong> (<%= measurables.size%>)</td>
+    </tr>
+    <% measurables.each do |measurable|%>
+      <%= render partial: "row", locals: {measurable: measurable} %>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>
+
+<% end %>

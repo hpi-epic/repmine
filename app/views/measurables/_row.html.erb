@@ -1,0 +1,28 @@
+<tr class="<%= measurable.is_a?(Pattern) ? 'success' : 'info' %>">
+  <td>
+    <label class="checkbox">
+      <%= check_box_tag("measurables[]", measurable.id)%><%= link_to(measurable.name, measurable) %>
+    </label>
+  </td>
+  <td class="span8"><%= measurable.description %></td>
+  <td>
+    <% if measurable.is_a?(Pattern) %>
+      <% measurable.ontologies.each do |ont| %>
+        <%= link_to(ont.short_name, edit_ontology_path(ont)) %>
+      <% end %>
+    <% else %>
+      <% measurable.metric_nodes.collect{|mn| mn.measurable}.compact.uniq.each do |pattern| %>
+        <%= link_to(pattern.name, pattern) %>
+      <% end %>
+    <% end %>
+  </td>
+  <td>
+    <%= link_to(
+      "Delete",
+      measurable_path(measurable),
+      :method => :delete,
+      :class => "btn btn-danger btn-mini",
+      :confirm => "Really delete #{measurable.name}?")
+    %>
+  </td>
+</tr>

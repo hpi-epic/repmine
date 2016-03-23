@@ -1,6 +1,6 @@
-<%= form_tag(transmogrify_patterns_path()) do %>
+<%= form_tag(monitor_measurables_path()) do %>
   <div class="btn-group">
-    <%= hidden_field_tag("patterns[]", [@pattern.id])%>
+    <%= hidden_field_tag("measurables[]", [@pattern.id])%>
     <%= button_tag("Run on:", :class => "btn btn-info", :name => "monitor") %>
     <%= select_tag(:repository_id, options_from_collection_for_select(@repositories, "id", "name")) %>
   </div>

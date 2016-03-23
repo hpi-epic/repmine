@@ -2,18 +2,6 @@ class PatternsController < ApplicationController
 
   autocomplete :tag, :name, :class_name => 'ActsAsTaggableOn::Tag'
 
-  def index
-    if Pattern.count == 0
-      flash[:notice] = "No Patterns available. Please create a new one!"
-      redirect_to new_pattern_path
-    else
-      @pattern_groups = Pattern.grouped
-      @ontology_groups = Ontology.grouped
-      @repositories = Repository.all
-    end
-    @title = "Pattern Overview"
-  end
-
   def new
     @ontologies = Ontology.all
     if @ontologies.empty?
@@ -75,7 +63,7 @@ class PatternsController < ApplicationController
 
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
-    @title = "Translating '#{@source_pattern.name}'"
+    @title = @target_pattern.name
   end
 
   def create
@@ -115,34 +103,6 @@ class PatternsController < ApplicationController
     @matched_elements = translation_pattern.matched_source_elements
     @next_unmatched_element = translation_pattern.unmatched_source_elements.first
     respond_to :js
-  end
-
-  def destroy
-    @pattern = Pattern.find(params[:id])
-    qn = @pattern.name
-    @pattern.destroy
-    flash[:notice] = "Destroyed Pattern '#{qn}'"
-    redirect_to patterns_path
-  end
-
-  def transmogrify
-    if !params[:patterns]
-      redirect_to patterns_path, :alert => "Please pick at least one target pattern!"
-    else
-      if params[:translate]
-        if params[:patterns].size > 1
-          redirect_to patterns_path, :alert => "You can only translate one pattern at a time!"
-        else
-          redirect_to pattern_prepare_translation_path(params[:patterns].first, params[:ontology_ids])
-        end
-      elsif params[:monitor]
-        tasks = MonitoringTask.create_multiple(params[:patterns], params[:repository_id])
-        tasks.each{|task| task.enqueue}
-        redirect_to check_monitoring_tasks_path(:task_ids => tasks.map(&:id))
-      else
-        redirect_to patterns_path, :alert => "How did you get here, anyway?"
-      end
-    end
   end
 
   def query

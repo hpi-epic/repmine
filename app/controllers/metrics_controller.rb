@@ -30,11 +30,6 @@ class MetricsController < ApplicationController
     end
   end
 
-  def destroy
-    Metric.find(params[:id]).destroy
-    redirect_to metrics_path
-  end
-
   def create_connection
     source = MetricNode.find(params[:source_id])
     target = MetricNode.find(params[:target_id])
@@ -52,18 +47,6 @@ class MetricsController < ApplicationController
     rescue Exception => e
     end
     render :nothing => true, :status => 200, :content_type => 'text/html'
-  end
-
-  def index
-    @metrics_groups = Metric.grouped
-    flash[:info] = "No metrics available! Please create a new one." if @metrics_groups.empty?
-    @repositories = Repository.includes(:ontology).where(:ontologies => {:does_exist => true})
-    @title = "Metric overview"
-  end
-
-  def monitor
-    task_ids = MonitoringTask.create_multiple(params[:metrics], params[:repository_id])
-    redirect_to check_monitoring_tasks_path(:task_ids => task_ids)
   end
 
   def download_csv

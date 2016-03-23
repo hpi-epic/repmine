@@ -18,7 +18,13 @@
   <div class="translation_controls" style="left: <%= @controls_offset %>px" />
     <div class="btn-group">
       <%= button_tag 'Create Node', :class => "btn p-control" %>
-      <%= select_tag(:ontology_id, options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}), :class => "needs_no_space p-control") %>
+      <% if @target_pattern.ontologies.size != 1 %>
+        <%= select_tag(
+              :ontology_id,
+              options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}),
+              :class => "needs_no_space p-control")
+        %>
+      <% end %>
     </div>
   <% end %>
   <%= link_to 'Save Pattern', "#", :onclick => "savePattern();",  :class => "btn btn-success p-control" %>

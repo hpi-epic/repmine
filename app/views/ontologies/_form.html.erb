@@ -9,6 +9,6 @@
   <%= f.input :group, :url => autocomplete_ontology_group_ontologies_path, :as => :autocomplete %>
 
   <div class="actions">
-    <%= f.submit("Create Ontology", :class => "btn btn-success") %>
+    <%= f.submit(@ontology.new_record? ? "Create Ontology" : "Save Ontology", :class => "btn btn-success") %>
   </div>
 <% end %>

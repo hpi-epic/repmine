@@ -18,7 +18,7 @@ class TranslationPattern < Pattern
   end
 
   def self.pattern_name(pattern, ontologies)
-    "'#{pattern.name}' on '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
+    "Translation of '#{pattern.name}' to '#{ontologies.collect{|ont| ont.short_name}.join(", ")}'"
   end
 
   def self.description(pattern, ontologies)
