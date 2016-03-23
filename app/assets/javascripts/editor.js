@@ -16,6 +16,7 @@ var addNodeToGraph = function(node){
   node.find("#node_rdf_type").change(function(event){
     updateConnectionsAndAttributes($(this).closest("div"));
   });
+  $(".inplace").editable();
 };
 
 // handler for pressing the 'create node' button
@@ -44,6 +45,8 @@ var loadNodesAndConnections = function(){
 		  buildDraggedConnection(info.connection, true);
 	  }
 	});
+
+  $(".inplace").editable();
 }
 
 // adds only the endpoints to a given node without making it draggable or registering callbacks
@@ -225,7 +228,8 @@ var addAttributeFilter = function(node_id, url) {
     return $.ajax({
       url: url,
       success: function(data) {
-        insertAttributeConstraint(node_id, data)
+        insertAttributeConstraint(node_id, data);
+        $(".inplace").editable();
       }
     })
   } else {
@@ -234,7 +238,8 @@ var addAttributeFilter = function(node_id, url) {
       type: "POST",
       data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
       success: function(data) {
-        insertAttributeConstraint(node_id, data)
+        insertAttributeConstraint(node_id, data);
+        $(".inplace").editable();
       }
     });
   }

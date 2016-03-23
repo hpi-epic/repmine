@@ -20,6 +20,7 @@
 //= require autocomplete-rails
 //= require select2
 //= require searchable_selects
+//= require bootstrap-editable.min
 //= require_self
 
 // takes a jqXHR object and if it has the X-Message header set, displays a growl message

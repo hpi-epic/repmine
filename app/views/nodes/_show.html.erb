@@ -1,5 +1,6 @@
 <div class="node ge" style="<%= node_position(node, false, offset) %>" id="<%=div_id(node)%>" data-id="<%= node.id %>">
 <%= simple_form_for(node) do |f| %>
+  <%= name_field(node) %>
   <%= f.hidden_field :x %>
   <%= f.hidden_field :y %>
   <%= f.select(:rdf_type, type_select(node.type_hierarchy, node), :class => "classSelector") %>

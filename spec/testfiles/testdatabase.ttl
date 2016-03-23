@@ -52,6 +52,13 @@
       rdfs:label "repositories_description" ;
       rdfs:range xsd:string .
 
+:pattern_elements_name
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_name" ;
+      rdfs:range xsd:string .
+
 :metric_nodes_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :metric_nodes ;

@@ -138,6 +138,7 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
     t.datetime "updated_at",                         :null => false
     t.integer  "ontology_id"
     t.integer  "pattern_id"
+    t.string   "name"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"

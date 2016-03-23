@@ -16,7 +16,6 @@ class QueryCreator < Struct.new(:pattern, :aggregations)
 
   # override if your query language does not support underscores
   def pe_variable(pe)
-    return pe.variable_name.to_sym
+    pe.name.underscore.to_sym
   end
-
 end

@@ -41,6 +41,6 @@ class MetricNode < ActiveRecord::Base
   end
 
   def aggregation_options
-    measurable.returnable_elements([]).collect{|pe| [pe.speaking_name, pe.id]}
+    measurable.returnable_elements([]).collect{|pe| [pe.name, pe.id]}
   end
 end

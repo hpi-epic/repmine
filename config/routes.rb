@@ -18,6 +18,10 @@ RepMine::Application.routes.draw do
     resources :nodes, only: [:create]
   end
 
+  resources :pattern_elements do
+    post :set_name
+  end
+
   resources :relation_constraints do
     get :static
   end
@@ -65,7 +69,6 @@ RepMine::Application.routes.draw do
   end
 
   resources :services
-
   resources :correspondences
 
   root to: "patterns#index"

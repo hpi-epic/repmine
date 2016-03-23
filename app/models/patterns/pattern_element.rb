@@ -1,6 +1,6 @@
 class PatternElement < ActiveRecord::Base
   # explicitly allows setting the rdf type of an element and the ontology
-  attr_accessible :rdf_type, :ontology_id
+  attr_accessible :rdf_type, :ontology_id, :name
 
   # allows to access the rdf node, in case this pattern stems from an rdf graph
   attr_accessor :rdf_node
@@ -16,6 +16,9 @@ class PatternElement < ActiveRecord::Base
   has_one :type_expression, :dependent => :destroy
   before_destroy :invalidate_translations, prepend: true
 
+  after_save :set_name
+  validates :name, :uniqueness => {scope: :pattern_id}, length: {minimum: 3}, unless: :new_record?
+
   include RdfSerialization
 
   class ComparisonError < Error
@@ -26,6 +29,10 @@ class PatternElement < ActiveRecord::Base
     matching_elements.each{|me| me.destroy}
     # and all relations where we are the matching elements
     matchings.each{|match| match.destroy}
+  end
+
+  def set_name
+    update_attributes(name: "#{type || self.class.name} #{self.id}") if self.name.blank?
   end
 
   def url
@@ -106,10 +113,6 @@ class PatternElement < ActiveRecord::Base
     rebuild_element_properties!(queryable, self.rdf_node)
   end
 
-  def variable_name
-    return "#{self.class.name.underscore}_#{id}"
-  end
-
   def speaking_name
     str = short_rdf_type
     if pattern.pattern_elements.any?{|pe| pe.id != id && pe.rdf_type == rdf_type}
@@ -118,7 +121,7 @@ class PatternElement < ActiveRecord::Base
     return str
   end
 
-  # TODO: also become able to rebuild complex expressions (universal, someOf, and schmutz like that)
+  # TODO: also become able to rebuild complex expressions (universal, someOf, and stuff like that)
   # P.S.: that is also why this is currently a separate method...
   def rebuild_element_type!(queryable, node)
     queryable.query(:subject => node, :predicate => Vocabularies::GraphPattern.elementType) do |res|

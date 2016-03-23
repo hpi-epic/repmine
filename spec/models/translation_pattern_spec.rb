@@ -197,7 +197,7 @@ RSpec.describe TranslationPattern, :type => :model do
     assert_equal 3, tp.pattern_elements.size
     assert_equal 2, tp.nodes.size
     assert_equal 1, tp.relation_constraints.size
-    assert tp.relation_constraints.first.valid?
+    assert tp.pattern_elements.all?{|pe| pe.valid?}
     assert_not_equal tp.relation_constraints.first.source, tp.relation_constraints.first.target
   end
 

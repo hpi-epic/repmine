@@ -83,10 +83,10 @@ class TranslationPattern < Pattern
   end
 
   def flatten_mappings(mappings)
-    mappings.each_pair{|key, targets|
+    mappings.each_pair do |key, targets|
       mappings[key] = targets.first
       mappings[key].pattern_elements = unmatched_subgraph(mappings[key].pattern_elements)
-    }
+    end
   end
 
   def connect_pattern_elements!(mappings)
