@@ -128,9 +128,10 @@ class Ontology < ActiveRecord::Base
   end
 
   def self.grouped
-    pluck(:group).uniq.map do |group|
+    groups = pluck(:group).uniq.map do |group|
       [group, where(:does_exist => true, :group => group).collect{|ont| [ont.short_name, ont.id]}]
     end
+    groups.reject{|group| group[1].empty?}
   end
 end
 

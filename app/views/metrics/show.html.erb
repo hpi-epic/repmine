@@ -37,7 +37,7 @@
     <% end %>
   </div>
 
-  <div class="btn-group left-boarder">
+  <div class="btn-group left-border">
     <%= form_tag(metric_create_node_path(@metric), :remote => true, :class => "needs_no_space", :id => "new_node") do %>
       <%= select_tag(:pattern_id, measurable_select(@measurable_groups), {:class => "needs_no_space"}) %>
       <%= submit_tag("New Node", :class => "btn btn-info") %>

@@ -3,7 +3,7 @@ RepMine::Application.routes.draw do
   resources :patterns do
     get :query
     post :query
-    match "prepare_translation/:ontology_id", to: "patterns#prepare_translation", as: :prepare_translation, via: [:get, :post]
+    post :prepare_translation
     get :translate
     get :unmatched_node
     post :run_on_repository

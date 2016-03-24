@@ -15,24 +15,27 @@
     <%= form_tag(pattern_nodes_path(@pattern), :remote => true, :id => "new_pattern_node", :class => "needs_no_space") do %>
       <%= button_tag 'Create Node', :class => "btn" %>
       <% if @pattern.ontologies.size != 1 %>
-        <%= select_tag(
-          :ontology_id,
-          options_for_select(@pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}),
-          :class => "needs_no_space")
-        %>
+        <%= ontology_select(@pattern.ontologies)%>
       <% else %>
         <%= hidden_field_tag(:ontology_id, @pattern.ontologies.first.id) %>
       <% end %>
     <% end %>
   </div>
 
-  <div class="btn-group left-boarder">
+  <div class="btn-group left-border">
     <%= form_for(@pattern, :html => {:class => "needs_no_space edit_pattern"}) do |f| %>
       <%= link_to 'Save', "#", :onclick => "savePattern();",  :class => "btn btn-success" %>
     <% end %>
   </div>
 
   <%= link_to 'Query', pattern_query_path(@pattern), remote: true, id: "show_query", class: "btn btn-inverse"%>
+
+  <div class="btn-group left-border">
+    <%= form_tag(pattern_prepare_translation_path(@pattern.id), class: "form-horizontal needs_no_space") do %>
+      <%= submit_tag("Translate to:", class: "btn btn-warning", name: "translate")%>
+      <%= select_tag(:ontology_ids, grouped_options_for_select(Ontology.grouped), class: "needs-no-space") %>
+    <% end %>
+  </div>
 </div>
 
 <hr />

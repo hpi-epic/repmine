@@ -4,10 +4,9 @@ describe "Selecting Correspondences", :type => :feature do
 
   it "should redirect users to a correspondence selection containing all of their possible options" do
     create_conflict()
-    visit(patterns_path)
+    visit(pattern_path(@pattern))
     select(@onto.short_name, :from => "ontology_ids")
-    find(:css, "#patterns_[value='#{@pattern.id}']").set(true)
-    find(:xpath, "//button[contains(@name, 'translate')]").click()
+    find(:xpath, "//input[contains(@name, 'translate')]").click()
     expect(TranslationPattern.count).to eq(1)
     expect(current_path).to eq(pattern_correspondence_selection_path(TranslationPattern.first))
     expect(page).to have_xpath("//input[@value='#{@c1.id}']")
@@ -27,7 +26,6 @@ describe "Selecting Correspondences", :type => :feature do
     create_conflict()
     prepare_tp()
     visit(pattern_correspondence_selection_path(@tp))
-    #print page.html
     expect(page).to have_xpath("//input[@name='correspondence_id[[#{@pattern.nodes.first.id}]]'][@value='0']")
     find(:xpath, "//input[@name='correspondence_id[[#{@pattern.nodes.first.id}]]'][@value='0']").set(true)
     find(:xpath, "//input[@name='correspondence_id[[#{@pattern.attribute_constraints.first.id}]]'][@value='0']").set(true)

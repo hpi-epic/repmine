@@ -1,6 +1,7 @@
 <h3>Translation is ambiguous. Please select between alternatives!</h3>
 
-<%= form_tag(pattern_prepare_translation_path(@pattern.source_pattern, @pattern.ontologies.first)) do %>
+<%= form_tag(pattern_prepare_translation_path(@pattern.source_pattern)) do %>
+  <%= hidden_field_tag(:ontology_ids, @pattern.ontologies.first.id) %>
   <% @groups.each do |group| %>
     <% common = group.inject(:&).collect{|el| el.id} %>
     <legend>Possible Mappings for Element <%= common.first %></legend>

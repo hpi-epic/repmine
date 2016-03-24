@@ -5,7 +5,7 @@
     <%= link_to "New Pattern", new_pattern_path, :class => "btn btn-success"%>
     <%= link_to "New Metric", metrics_path, :class => "btn btn-primary", :method => :post %>
   </div>
-  <div class="btn-group left-boarder">
+  <div class="btn-group left-border">
     <%= button_tag("Monitor selected on:", :class => "btn", :name => "monitor") %>
     <%= select_tag("repository_id", options_from_collection_for_select(@repositories, "id", "name")) %>
   </div>

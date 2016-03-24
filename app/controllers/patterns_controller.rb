@@ -14,26 +14,24 @@ class PatternsController < ApplicationController
 
   def show
     @pattern = Pattern.find(params[:id])
-    # little performance tweak, only load the hierarchy, if we have nodes that go with it
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
     @title = "'#{@pattern.name}' Pattern"
   end
 
   def prepare_translation
     source_pattern = Pattern.find(params[:pattern_id])
-    target_ontology = Ontology.find(params[:ontology_id])
-    sel_corr = {}
-    (params[:correspondence_id] || {}).each_pair{|k,v| sel_corr[[k.to_i]] = v.to_i}
-
+    target_ontology = Ontology.find(params[:ontology_ids])
     # no need to translate a pattern to one of its own ontologies
     if source_pattern.ontologies.include?(target_ontology)
-      redirect_to patterns_path, :notice => "No self-translation necessary!" and return
+      redirect_to source_pattern, :notice => "No self-translation necessary!" and return
     end
 
     # otherwise, find (or create) the translation pattern and prepare it, again
     target_pattern = TranslationPattern.for_pattern_and_ontologies(source_pattern, [target_ontology])
     begin
-      target_pattern.prepare!(sel_corr)
+      selected_correspondences = {}
+      (params[:correspondence_id] || {}).each_pair{|k,v| selected_correspondences[[k.to_i]] = v.to_i}
+      target_pattern.prepare!(selected_correspondences)
       redirect_to pattern_translate_path(target_pattern)
     rescue TranslationPattern::AmbiguousTranslation => e
       redirect_to pattern_correspondence_selection_path(target_pattern)
@@ -50,10 +48,12 @@ class PatternsController < ApplicationController
   end
 
   def translate
+    # find the pattern and auto layout the source pattern
     @target_pattern = TranslationPattern.find(params[:pattern_id])
     @source_pattern = @target_pattern.source_pattern
     @source_pattern.auto_layout!
 
+    # get the control and node offsets so we don't have overlapping patterns
     @controls_offset = @source_pattern.node_offset - 30
     @node_offset = 0
     if @target_pattern.pattern_elements.all?{|pe| pe.x == 0 && pe.y == 0}
@@ -61,6 +61,7 @@ class PatternsController < ApplicationController
       @node_offset = @controls_offset + 100
     end
 
+    # finally, load the elements of both pattern
     @source_attributes, @source_relations = load_attributes_and_constraints!(@source_pattern, true)
     @target_attributes, @target_relations = load_attributes_and_constraints!(@target_pattern)
     @title = @target_pattern.name
@@ -85,7 +86,6 @@ class PatternsController < ApplicationController
   def update
     @pattern = Pattern.find(params[:id])
     if @pattern.update_attributes(params[:pattern])
-      @pattern.touch
       flash[:notice] = "Pattern successfully saved!"
       if @pattern.is_a?(TranslationPattern)
         redirect_to pattern_unmatched_node_path(@pattern)
