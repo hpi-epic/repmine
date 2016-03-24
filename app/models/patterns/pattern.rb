@@ -6,7 +6,7 @@ class Pattern < Measurable
   attr_accessor :ag_connection, :layouted_graph
 
   has_and_belongs_to_many :ontologies
-  has_many :pattern_elements, :dependent => :destroy
+  has_many :pattern_elements, :dependent => :destroy, :conditions => {monitoring_task_id: nil}
   has_many :target_patterns, :class_name => "Pattern", :foreign_key => "pattern_id"
 
   # validations
@@ -16,15 +16,16 @@ class Pattern < Measurable
 
   # polymorphic finders....
   def nodes
-    pattern_elements.where(:type => "Node")
+    pattern_elements.where(type: "Node")
   end
 
-  def attribute_constraints
-    pattern_elements.where(:type => "AttributeConstraint")
+  # only attribute constraints are affected by that monitoring task bypass
+  def attribute_constraints(mt_id = nil)
+    PatternElement.where(:pattern_id => self.id, monitoring_task_id: [nil, mt_id], type: "AttributeConstraint")
   end
 
   def relation_constraints
-    pattern_elements.where(:type => "RelationConstraint")
+    pattern_elements.where(type: "RelationConstraint")
   end
 
   # determines whether a pattern can already be executed on a given repository

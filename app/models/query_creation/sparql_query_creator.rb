@@ -34,7 +34,7 @@ class SparqlQueryCreator < QueryCreator
       where << [pe_variable(rc.source), rc.type_expression.resource, pe_variable(rc.target)]
     end
 
-    pattern.attribute_constraints.each do |ac|
+    pattern.attribute_constraints(monitoring_task_id).each do |ac|
       meth = "pattern_for_ac_#{AttributeConstraint::OPERATORS.key(ac.operator)}".to_sym
       self.send(meth, ac.node, ac) unless !self.respond_to?(meth) || ac.value.nil?
     end

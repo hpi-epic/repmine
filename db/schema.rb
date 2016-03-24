@@ -134,26 +134,27 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
 
   create_table "pattern_elements", :force => true do |t|
     t.string   "type"
-    t.datetime "created_at",                         :null => false
-    t.datetime "updated_at",                         :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
     t.integer  "ontology_id"
     t.integer  "pattern_id"
     t.string   "name"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"
-    t.boolean  "virtual",         :default => false
+    t.integer  "monitoring_task_id"
     t.string   "min_cardinality"
     t.string   "max_cardinality"
     t.string   "min_path_length"
     t.string   "max_path_length"
     t.integer  "source_id"
     t.integer  "target_id"
-    t.integer  "x",               :default => 0
-    t.integer  "y",               :default => 0
-    t.boolean  "is_group",        :default => false
+    t.integer  "x",                  :default => 0
+    t.integer  "y",                  :default => 0
+    t.boolean  "is_group",           :default => false
   end
 
+  add_index "pattern_elements", ["monitoring_task_id"], :name => "index_pattern_elements_on_monitoring_task_id"
   add_index "pattern_elements", ["ontology_id"], :name => "index_pattern_elements_on_ontology_id"
   add_index "pattern_elements", ["pattern_id"], :name => "index_pattern_elements_on_pattern_id"
 

@@ -759,6 +759,13 @@
       rdfs:label "monitoring_tasks_measurable_id" ;
       rdfs:range xsd:integer .
 
+:pattern_elements_monitoring_task_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_monitoring_task_id" ;
+      rdfs:range xsd:integer .
+
 :delayed_jobs_handler
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :delayed_jobs ;
@@ -877,13 +884,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "ontologies_short_name" ;
       rdfs:range xsd:string .
-
-:pattern_elements_virtual
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :pattern_elements ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "pattern_elements_virtual" ;
-      rdfs:range xsd:integer .
 
 :aggregations
       a       owl:Class , rdfs:Class ;

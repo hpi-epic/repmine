@@ -34,17 +34,13 @@ class MonitoringTasksController < ApplicationController
 
   def destroy
     @task = MonitoringTask.find(params[:id])
+    name = @task.name
     @task.destroy
-    redirect_to monitoring_tasks_path, :notice => "Stopped monitoring pattern on repository."
+    redirect_to monitoring_tasks_path, :notice => "Deleted Monitoring task '#{name}'."
   end
 
   def check
     tasks = MonitoringTask.find(params[:task_ids])
-    tasks.each do |task|
-      unless task.executable?
-        redirect_to(pattern_prepare_translation_path(task.translate_this, task.repository.ontology), :notice => "Please translate the pattern, first!") and return
-      end
-    end
     redirect_to monitoring_tasks_path(:new_tasks => params[:task_ids]), :notice => "Successfully added monitoring tasks!"
   end
 

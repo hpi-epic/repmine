@@ -23,17 +23,17 @@
           <%= link_to("Results", monitoring_task_results_path(mt), class: "btn btn-success") %>
           <%= link_to("Query", monitoring_task_query_path(mt), class: "btn btn-info") %>
         <% else %>
-          <%= link_to("Translate",
-            pattern_prepare_translation_path(mt.translate_this, mt.repository.ontology),
-            :class => "btn btn-warning")
-          %>
+          <%= form_tag(pattern_prepare_translation_path(mt.translate_this), class: "needs_no_space") do %>
+            <%= hidden_field_tag(:ontology_ids, mt.repository.ontology.id)%>
+            <%= submit_tag("Translate",class: "btn btn-warning") %>
+          <% end %>
         <% end %>
 
         <%= link_to("Delete",
               monitoring_task_path(mt),
-              :method => :delete,
-              :class => "btn btn-danger",
-              :confirm => "Really stop monitoring #{mt.measurable.name} on #{repo.name}?"
+              method: :delete,
+              class: "btn btn-danger",
+              confirm: "Delete #{mt.name}?"
             )
         %>
       </td>

@@ -40,7 +40,7 @@ class CypherQueryCreator < QueryCreator
   end
 
   def parameters
-    str = pattern.attribute_constraints.collect do |ac|
+    str = pattern.attribute_constraints(monitoring_task_id).collect do |ac|
       unless ac.operator == AttributeConstraint::OPERATORS[:var]
         if ac.operator == AttributeConstraint::OPERATORS[:not] && ac.value.blank?
           "has(#{attribute_reference(ac)})"

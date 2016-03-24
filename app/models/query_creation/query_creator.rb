@@ -1,4 +1,4 @@
-class QueryCreator < Struct.new(:pattern, :aggregations)
+class QueryCreator < Struct.new(:pattern, :aggregations, :monitoring_task_id)
 
   attr_accessor :query_string
 

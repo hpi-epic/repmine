@@ -2,6 +2,7 @@ class AttributeConstraint < PatternElement
   attr_accessible :value, :operator, :node, :x, :y
   belongs_to :node, :class_name => "PatternElement"
   validates :node, :presence => true
+  belongs_to :monitoring_task
   before_save :assign_to_pattern!, :assign_ontology!
 
   OPERATORS = {
@@ -68,9 +69,5 @@ class AttributeConstraint < PatternElement
   def graph_strings(elements = [])
     str = elements.include?(node) ? "#{node.rdf_type}->" : ""
     str += rdf_type
-  end
-
-  def virtual?
-    false
   end
 end

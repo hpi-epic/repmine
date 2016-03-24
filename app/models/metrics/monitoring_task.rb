@@ -1,6 +1,7 @@
 class MonitoringTask < ActiveRecord::Base
   attr_accessible :repository_id, :measurable_id
 
+  has_many :attribute_constraints, dependent: :destroy
   belongs_to :repository
   belongs_to :measurable
 
@@ -18,6 +19,26 @@ class MonitoringTask < ActiveRecord::Base
 
   def has_latest_results?
     File.exist?(result_file)
+  end
+
+  def results_file(ending)
+    return Rails.root.join("public","data","#{filename}.#{ending}").to_s
+  end
+
+  def filename
+    "#{measurable.class.name}_#{measurable_id}_repo_#{repository.id}"
+  end
+
+  def fancy_name(thingy)
+    return thingy.underscore.gsub(/\s/, "_")
+  end
+
+  def result_file
+    results_file("json")
+  end
+
+  def results
+    return Oj.load(File.open(result_file).read)
   end
 
   def enqueue
@@ -44,24 +65,8 @@ class MonitoringTask < ActiveRecord::Base
     end
   end
 
-  def results_file(ending)
-    return Rails.root.join("public","data","#{filename}.#{ending}").to_s
-  end
-
-  def filename
-    "#{measurable.class.name}_#{measurable_id}_repo_#{repository.id}"
-  end
-
-  def fancy_name(thingy)
-    return thingy.underscore.gsub(/\s/, "_")
-  end
-
-  def result_file
-    results_file("json")
-  end
-
-  def results
-    return Oj.load(File.open(result_file).read)
+  def name
+    "'#{measurable.name}' on '#{repository.name}'"
   end
 
   def queries
