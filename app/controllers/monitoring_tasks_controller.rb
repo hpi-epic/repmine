@@ -39,9 +39,8 @@ class MonitoringTasksController < ApplicationController
     redirect_to monitoring_tasks_path, :notice => "Deleted Monitoring task '#{name}'."
   end
 
-  def check
-    tasks = MonitoringTask.find(params[:task_ids])
-    redirect_to monitoring_tasks_path(:new_tasks => params[:task_ids]), :notice => "Successfully added monitoring tasks!"
+  def parameters
+    @task = MonitoringTask.find(params[:monitoring_task_id])
   end
 
 end

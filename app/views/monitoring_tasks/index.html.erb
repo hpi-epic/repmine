@@ -12,15 +12,17 @@
 <% @repos_with_tasks.each do |repo| %>
   <table class="table table-bordered">
     <tr class="info">
-      <td colspan="2"><strong><%= link_to(repo.name, repo) %></strong></td>
+      <td><strong><%= link_to(repo.name, repo) %></strong></td>
       <td>Running Queries</td>
+      <td></td>
     </tr>
     <% repo.monitoring_tasks.each_with_index do |mt, i| %>
     <tr>
-      <td><%= link_to(mt.measurable.name, mt.measurable) %></td>
       <td>
+        <%= link_to(mt.measurable.name, mt.measurable) %>
         <% if mt.executable? %>
           <%= link_to("Results", monitoring_task_results_path(mt), class: "btn btn-success") %>
+          <%= link_to("Parameters", monitoring_task_parameters_path(mt), class: "btn btn-primary")%>
           <%= link_to("Query", monitoring_task_query_path(mt), class: "btn btn-info") %>
         <% else %>
           <%= form_tag(pattern_prepare_translation_path(mt.translate_this), class: "needs_no_space") do %>
@@ -28,22 +30,17 @@
             <%= submit_tag("Translate",class: "btn btn-warning") %>
           <% end %>
         <% end %>
+        <%= link_to("Delete", monitoring_task_path(mt), method: :delete, class: "btn btn-danger") %>
 
-        <%= link_to("Delete",
-              monitoring_task_path(mt),
-              method: :delete,
-              class: "btn btn-danger",
-              confirm: "Delete #{mt.name}?"
-            )
-        %>
-      </td>
       <% if i == 0 %>
+      </td>
       <td rowspan="<%= repo.monitoring_tasks.size %>" class="span7">
         <% repo.query_jobs.each_with_index do |qj, ii| %>
           <%= render :partial => "stuff/progress_bar", :locals => {:job_id => qj.id} %>
         <% end %>
       </td>
       <% end %>
+
     </tr>
     <% end %>
   </table>

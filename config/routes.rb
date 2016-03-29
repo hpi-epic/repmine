@@ -68,6 +68,7 @@ RepMine::Application.routes.draw do
     get :results
     get :query
     get :check, on: :collection
+    get :parameters
   end
 
   resources :services

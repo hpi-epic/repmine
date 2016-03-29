@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe MonitoringTask, :type => :model do
 
   before(:each) do
-    @pattern = FactoryGirl.create(:pattern)
     @repo = FactoryGirl.create(:repository)
+    @pattern = FactoryGirl.create(:pattern, ontologies: [@repo.ontology])
     @mt = FactoryGirl.create(:monitoring_task, measurable: @pattern, repository: @repo)
   end
 
@@ -35,6 +35,15 @@ RSpec.describe MonitoringTask, :type => :model do
     expect(Delayed::Job.count).to eq(0)
     @mt.enqueue
     expect(Delayed::Job.count).to eq(1)
+  end
+
+  it "should pass custom attributes all the way to query creation" do
+    before = @pattern.attribute_constraints.size
+    ac = FactoryGirl.create(:attribute_constraint, monitoring_task_id: @mt.id, node: @pattern.nodes.first)
+    expect(@pattern.attribute_constraints.size).to eq(before)
+    expect(@pattern.attribute_constraints(@mt.id).size).to eq(before + 1)
+
+    expect(@pattern.queries_on(@repo)).to_not eq(@mt.queries)
   end
 
   def json_file

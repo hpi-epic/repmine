@@ -1,5 +1,5 @@
 class AttributeConstraint < PatternElement
-  attr_accessible :value, :operator, :node, :x, :y
+  attr_accessible :value, :operator, :node, :x, :y, :monitoring_task_id
   belongs_to :node, :class_name => "PatternElement"
   validates :node, :presence => true
   belongs_to :monitoring_task
