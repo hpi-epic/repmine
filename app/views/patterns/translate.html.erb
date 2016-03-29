@@ -19,11 +19,9 @@
     <div class="btn-group">
       <%= button_tag 'Create Node', :class => "btn p-control" %>
       <% if @target_pattern.ontologies.size != 1 %>
-        <%= select_tag(
-              :ontology_id,
-              options_for_select(@target_pattern.ontologies.collect{|ont| [ont.short_name, ont.id]}),
-              :class => "needs_no_space p-control")
-        %>
+        <%= ontology_select(@target_pattern.ontologies)%>
+      <% else %>
+        <%= hidden_field_tag(:ontology_id, @target_pattern.ontologies.first.id) %>
       <% end %>
     </div>
   <% end %>

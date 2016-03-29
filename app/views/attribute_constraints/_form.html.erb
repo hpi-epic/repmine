@@ -1,9 +1,8 @@
 <%= form_for(ac, :html => {:class => "needs_no_space edit_attribute_constraint"}) do |f| %>
-  <% if ac.virtual? %>
-    <%= render :partial => "magic", :locals => {:ac => ac, :f => f}%>
-  <% else %>
-    <%= link_to(fa_icon("magic"), attribute_constraint_magic_path(ac), :remote => true) %>
-    <%= render :partial => "reality", :locals => {:ac => ac, :f => f, :possible => possible}%>
-  <% end %>
+  <%= f.select(:rdf_type, attrib_selector(possible, ac), {}, {:class => "just_right"}) %>
+  <%= f.select(:operator,options_for_select(AttributeConstraint::OPERATORS.values, ac.operator),{},{:class => "very_narrow"})%>
+  <%= f.text_field(:value, {:class => "just_right"}) %>
+  <%= f.hidden_field :x %>
+  <%= f.hidden_field :y %>
   <%= link_to(fa_icon("times-circle"), attribute_constraint_path(ac), :remote => true, :method => :delete) %>
 <% end %>

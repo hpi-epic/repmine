@@ -1,5 +1,0 @@
-<%= f.select(:rdf_type, attrib_selector(possible, ac), {}, {:class => "just_right"}) %>
-<%= f.select(:operator,options_for_select(AttributeConstraint::OPERATORS.values, ac.operator),{},{:class => "very_narrow"})%>
-<%= f.text_field(:value, {:class => "just_right"}) %>
-<%= f.hidden_field :x %>
-<%= f.hidden_field :y %>

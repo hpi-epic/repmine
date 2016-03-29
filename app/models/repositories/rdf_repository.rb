@@ -3,6 +3,8 @@ class RdfRepository < Repository
   attr_accessible :ontology_url
   attr_accessor :sparql_client
 
+  validates :ontology_url, presence: true
+
   def self.default_port
     10035
   end

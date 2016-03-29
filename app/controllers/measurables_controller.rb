@@ -19,7 +19,6 @@ class MeasurablesController < ApplicationController
 
   def monitor
     task_ids = MonitoringTask.create_multiple(params[:measurables], params[:repository_id])
-    redirect_to check_monitoring_tasks_path(:task_ids => task_ids)
+    redirect_to monitoring_tasks_path, :notice => "Successfully added #{task_ids.size} monitoring tasks!"
   end
-
 end
