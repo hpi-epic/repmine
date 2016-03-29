@@ -10,13 +10,13 @@ class MetricMetricNode < MetricNode
     measurable.result_columns()
   end
 
-  def results_on(repository)
-    mt = MonitoringTask.where(:repository_id => repository.id, :measurable_id => measurable.id).first_or_create
-    mt.run unless mt.has_latest_results?
-    return get_aggregates(group_results(mt.results))
+  def results(mt)
+    mtn = MonitoringTask.where(:repository_id => mt.repository.id, :measurable_id => measurable.id).first_or_create
+    mtn.run unless mtn.has_latest_results?
+    return get_aggregates(group_results(mtn.results))
   end
 
-  def translated_aggregations(repository)
+  def translated_aggregations(ontology)
     return aggregations
   end
 

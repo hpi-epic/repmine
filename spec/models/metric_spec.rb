@@ -25,17 +25,15 @@ RSpec.describe Metric, :type => :model do
   end
 
   it "should determine which pattern a user needs to translate next to run this metric" do
-    expect(@metric.first_unexecutable_pattern(nil)).to be_nil
+    expect(@metric.first_untranslated_pattern(nil)).to be_nil
     pattern = FactoryGirl.create(:pattern)
     mn1 = MetricNode.create(:measurable_id => pattern.id)
     @metric.metric_nodes = [mn1]
-    Pattern.any_instance.stub(:executable_on?).with(anything()){true}
-    expect(@metric.first_unexecutable_pattern(nil)).to be_nil
     repo = FactoryGirl.create(:repository)
-    Pattern.any_instance.stub(:executable_on?).with(repo){false}
-    expect(@metric.first_unexecutable_pattern(repo)).to eq(pattern)
-    Pattern.any_instance.stub(:executable_on?).with(repo){true}
-    expect(@metric.first_unexecutable_pattern(repo)).to be_nil
+    Pattern.any_instance.stub(:executable_on?).with(repo.ontology){false}
+    expect(@metric.first_untranslated_pattern(repo.ontology)).to eq(pattern)
+    Pattern.any_instance.stub(:executable_on?).with(repo.ontology){true}
+    expect(@metric.first_untranslated_pattern(repo.ontology)).to be_nil
   end
 
   it "should create the proper node type" do
@@ -133,14 +131,14 @@ RSpec.describe Metric, :type => :model do
   it "should ask all its leaf nodes whether it is executable" do
     build_simple_metric()
     Pattern.any_instance.stub(:executable_on?){false}
-    expect(@metric.executable_on?(@repo)).to be(false)
+    expect(@metric.executable_on?(@mt)).to be(false)
   end
 
   it "should start threads for all leaf nodes and call process results for the created hash" do
     build_simple_metric()
-    MetricNode.any_instance.stub(:results_on){[{"happy" => "hunting"}]}
+    MetricNode.any_instance.stub(:results){[{"happy" => "hunting"}]}
     @metric.stub(:process_results){|input| input}
-    results = @metric.run_on_repository(@repo)
+    results = @metric.run(@mt)
     expect(results.size).to eq(2)
   end
 
@@ -186,5 +184,6 @@ RSpec.describe Metric, :type => :model do
     @mn1.save
     @mn2.save
     @metric.metric_nodes = [@mon,@mn1,@mn2]
+    @mt = MonitoringTask.create(repository_id: @repo.id, measurable_id: @metric.id)
   end
 end

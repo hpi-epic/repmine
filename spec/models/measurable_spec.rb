@@ -1,18 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Measurable, :type => :model do
-  it "should remind developers of their duties" do
-    ms = FactoryGirl.create(:measurable)
-    repo = FactoryGirl.build(:repository)
-    expect{ms.run_on_repository(repo)}.to raise_error(/implement/i)
-    expect{ms.executable_on?(repo)}.to raise_error(/implement/i)
-  end
-
-  it "should provide meaningful defaults for patterns" do
-    ms = FactoryGirl.create(:measurable)
-    repo = FactoryGirl.build(:repository)
-    expect(ms.first_unexecutable_pattern(repo)).to be(ms)
-  end
 
   it "should group stuff in the desired manner" do
     m1 = FactoryGirl.create(:pattern)

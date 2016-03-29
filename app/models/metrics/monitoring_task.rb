@@ -29,10 +29,6 @@ class MonitoringTask < ActiveRecord::Base
     "#{measurable.class.name}_#{measurable_id}_repo_#{repository.id}"
   end
 
-  def fancy_name(thingy)
-    return thingy.underscore.gsub(/\s/, "_")
-  end
-
   def result_file
     results_file("json")
   end
@@ -48,28 +44,32 @@ class MonitoringTask < ActiveRecord::Base
 
   def run(job = nil)
     repository.job = job
-    res = measurable.run_on_repository(repository)
+    res = measurable.run(self)
     repository.job = nil
     File.open(result_file, "wb"){|f| f.puts Oj.dump(res)}
   end
 
   def executable?
-    measurable.executable_on?(repository)
+    measurable.executable_on?(target_ontology)
   end
 
   def translate_this
-    if measurable.is_a?(Pattern)
-      return measurable
-    else
-      return measurable.first_unexecutable_pattern(repository)
-    end
+    return measurable.first_untranslated_pattern(target_ontology)
   end
 
   def name
     "'#{measurable.name}' on '#{repository.name}'"
   end
 
-  def queries
-    measurable.queries_on(repository)
+  def target_ontology
+    repository.ontology
+  end
+
+  def execute_query(q)
+    repository.results_for_query(q)
+  end
+
+  def query(pattern, aggregations = [])
+    repository.query_creator_class.new(pattern, aggregations, self).query_string
   end
 end

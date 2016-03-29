@@ -27,20 +27,20 @@ class MetricNode < ActiveRecord::Base
     "#{id}_#{aggregation.alias_name}"
   end
 
-  def results_on(repository)
-    repository.results_for_pattern(measurable.translated_to(repository), translated_aggregations(repository))
+  def results(mt)
+    mt.execute_query(query(mt))
   end
 
-  def query_on(repository)
-    repository.query_for_pattern(measurable.translated_to(repository), translated_aggregations(repository))
+  def query(mt)
+    mt.query(measurable.translated_to(mt.target_ontology), translated_aggregations(mt.target_ontology))
   end
 
-  def translated_aggregations(repository)
-    return aggregations if repository.nil? || aggregations.all?{|agg| agg.pattern_element.ontology == repository.ontology}
-    aggregations.collect{|agg| agg.translated_to(repository)}
+  def translated_aggregations(ontology)
+    return aggregations if ontology.nil? || aggregations.all?{|agg| agg.pattern_element.ontology == ontology}
+    aggregations.collect{|agg| agg.translated_to(ontology)}
   end
 
   def aggregation_options
-    measurable.returnable_elements([]).collect{|pe| [pe.name, pe.id]}
+    measurable.returnable_elements.collect{|pe| [pe.name, pe.id]}
   end
 end

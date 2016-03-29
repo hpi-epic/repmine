@@ -13,11 +13,11 @@ class Metric < Measurable
   end
 
   # creates the query for each pattern and executes it with the aggregations specified for each metric node
-  def run_on_repository(repository)
+  def run(monitoring_task)
     results = {}
     threads = []
     metric_nodes.aggregating.each do |metric_node|
-      threads << Thread.new{results[metric_node] = metric_node.results_on(repository)}
+      threads << Thread.new{results[metric_node] = metric_node.results(monitoring_task)}
     end
     threads.each { |thr| thr.join }
     return process_results(results)
@@ -102,17 +102,13 @@ class Metric < Measurable
     metric_nodes.where(:type => [nil, "MetricMetricNode"])
   end
 
-  def executable_on?(repository)
-    leaf_nodes.collect{|leaf_node| leaf_node.measurable.executable_on?(repository)}.inject(:&)
+  def executable_on?(ontology)
+    leaf_nodes.collect{|leaf_node| leaf_node.measurable.executable_on?(ontology)}.inject(:&)
   end
 
-  def first_unexecutable_pattern(repository)
-    ln = leaf_nodes.find{|leaf_node| !leaf_node.measurable.executable_on?(repository)}
-    if ln.nil?
-      return nil
-    else
-      return ln.measurable.first_unexecutable_pattern(repository)
-    end
+  def first_untranslated_pattern(ontology)
+    ln = leaf_nodes.find{|leaf_node| !leaf_node.measurable.executable_on?(ontology)}
+    ln.nil? ? nil : ln.measurable.first_untranslated_pattern(ontology)
   end
 
   def result_columns()
@@ -123,7 +119,7 @@ class Metric < Measurable
     leaf_nodes.aggregating.collect{|ln| ln.aggregation.alias_name}.flatten.compact
   end
 
-  def queries_on(repository)
-    leaf_nodes.collect{|leaf_node| leaf_node.query_on(repository)}
+  def queries(monitoring_task)
+    leaf_nodes.collect{|leaf_node| leaf_node.query(monitoring_task)}
   end
 end

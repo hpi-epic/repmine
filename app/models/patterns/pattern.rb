@@ -31,16 +31,20 @@ class Pattern < Measurable
   # determines whether a pattern can already be executed on a given repository
   # case1: no element used in the pattern is from another ontology than the repository one
   # case2: a translation pattern exists and all input elements are matched to an output element
-  def executable_on?(repository)
-    return translation_unnecessary?(repository) || (translation_exists?(repository) && unmatched_elements([repository.ontology]).empty?)
+  def executable_on?(ontology)
+    translation_unnecessary?(ontology) || (translation_exists?(ontology) && unmatched_elements([ontology]).empty?)
   end
 
-  def translation_unnecessary?(repository)
-    (pattern_elements.collect{|pe| pe.ontology}.uniq - [repository.ontology]).empty?
+  def translated_to(ontology)
+    translation_unnecessary?(ontology) ? self : TranslationPattern.existing_translation_pattern(self, [ontology])
   end
 
-  def translation_exists?(repository)
-    !TranslationPattern.existing_translation_pattern(self, [repository.ontology]).nil?
+  def translation_unnecessary?(ontology)
+    (pattern_elements.collect{|pe| pe.ontology}.uniq - [ontology]).empty?
+  end
+
+  def translation_exists?(ontology)
+    !TranslationPattern.existing_translation_pattern(self, [ontology]).nil?
   end
 
   def create_node!(ontology, rdf_type = "")
@@ -64,7 +68,7 @@ class Pattern < Measurable
     )
   end
 
-  # some comparison
+  # comparison
   def equal_to?(other)
     if self == other
       return true
@@ -152,7 +156,7 @@ class Pattern < Measurable
   end
 
   # determines which elements of a pattern will be returned by a query. No select *
-  def returnable_elements(aggregations)
+  def returnable_elements(aggregations = [])
     if aggregations.blank?
       return nodes + attribute_constraints
     else
@@ -177,11 +181,11 @@ class Pattern < Measurable
     [Vocabularies::GraphPattern.GraphPattern]
   end
 
-  def run_on_repository(repository)
-    repository.results_for_pattern(self, [])
+  def run(mt)
+    mt.execute_query(mt.query(self))
   end
 
-  def queries_on(repository)
-    [repository.query_for_pattern(self,[])]
+  def queries(monitoring_task)
+    [monitoring_task.query(self)]
   end
 end

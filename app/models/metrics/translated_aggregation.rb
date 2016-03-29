@@ -1,6 +1,6 @@
 class TranslatedAggregation < Aggregation
   belongs_to :aggregation
-  belongs_to :repository
+  belongs_to :ontology
 
   before_save :set_pattern_element
 
@@ -9,7 +9,7 @@ class TranslatedAggregation < Aggregation
   end
 
   def matchings()
-    aggregation.pattern_element.matching_elements.where(:ontology_id => repository.ontology.id)
+    aggregation.pattern_element.matching_elements.where(:ontology_id => self.ontology_id)
   end
 
   def aggregation_translator()

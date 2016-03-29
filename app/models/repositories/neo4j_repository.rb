@@ -10,7 +10,7 @@ class Neo4jRepository < Repository
     7474
   end
 
-  def self.query_creator_class
+  def query_creator_class
     CypherQueryCreator
   end
 

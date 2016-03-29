@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
     t.boolean  "distinct",           :default => false
     t.integer  "pattern_element_id"
     t.integer  "metric_node_id"
-    t.integer  "repository_id"
+    t.integer  "ontology_id"
     t.integer  "aggregation_id"
     t.integer  "operation_cd"
     t.string   "column_name"
@@ -29,8 +29,8 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
 
   add_index "aggregations", ["aggregation_id"], :name => "index_aggregations_on_aggregation_id"
   add_index "aggregations", ["metric_node_id"], :name => "index_aggregations_on_metric_node_id"
+  add_index "aggregations", ["ontology_id"], :name => "index_aggregations_on_ontology_id"
   add_index "aggregations", ["pattern_element_id"], :name => "index_aggregations_on_pattern_element_id"
-  add_index "aggregations", ["repository_id"], :name => "index_aggregations_on_repository_id"
 
   create_table "correspondences", :force => true do |t|
     t.string  "relation"

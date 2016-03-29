@@ -30,8 +30,8 @@ class Aggregation < ActiveRecord::Base
     return str
   end
 
-  def translated_to(repo)
-    translated_aggregations.where(repository_id: repo.id).first_or_create
+  def translated_to(ontology)
+    translated_aggregations.where(ontology_id: ontology.id).first_or_create
   end
 
   def is_grouping?

@@ -77,16 +77,6 @@ class Repository < ActiveRecord::Base
     end
   end
 
-  def results_for_pattern(pattern, aggregations)
-    qs = query_for_pattern(pattern, aggregations)
-    puts "Executing query: #{qs}"
-    results_for_query(query_for_pattern(pattern, aggregations))
-  end
-
-  def query_for_pattern(pattern, aggregations)
-    return self.class.query_creator_class.new(pattern.translated_to(self), aggregations).query_string
-  end
-
   def create_ontology!(in_background)
     if in_background && ontology_creation_job.nil?
       j = OntologyExtractionJob.new(progress_max: 100, repository_id: self.id)
@@ -124,7 +114,7 @@ class Repository < ActiveRecord::Base
     return "1.0"
   end
 
-  def self.query_creator_class
+  def query_creator_class
     SparqlQueryCreator
   end
 

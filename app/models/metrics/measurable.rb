@@ -4,12 +4,20 @@ class Measurable < ActiveRecord::Base
 
   has_many :monitoring_tasks, :dependent => :destroy
 
-  def run_on_repository(repository)
-    raise "implement 'run_on_repository' in #{self.class.name}"
+  def run(monitoring_task)
+    raise "implement 'run(monitoring_task)' in #{self.class.name}"
   end
 
-  def executable_on?(repository)
+  def executable_on?(ontology)
     raise "implement 'executable_on?' in #{self.class.name}"
+  end
+
+  def untranslated_patterns(ontology)
+    raise "implement 'untranslated_patterns(ontology)' in #{self.class.name}"
+  end
+
+  def queries(monitoring_task)
+    raise "implement 'queries(monitoring_task)' in #{self.class.name}"
   end
 
   def self.grouped(excluded_instances = [])
@@ -26,19 +34,7 @@ class Measurable < ActiveRecord::Base
     return measurable_groups
   end
 
-  def first_unexecutable_pattern(repository)
-    return self
-  end
-
-  def translated_to(repository)
-    if translation_unnecessary?(repository)
-      return self
-    else
-      return TranslationPattern.existing_translation_pattern(self, [repository.ontology])
-    end
-  end
-
-  def queries_on(repository)
-    []
+  def first_untranslated_pattern(ontology)
+    self
   end
 end

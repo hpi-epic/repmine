@@ -10,31 +10,31 @@ RSpec.describe Aggregation, :type => :model do
   end
 
   it "should be able to create a clone for a different repository" do
-    aggr_clone = @aggr.translated_to(@repo)
+    aggr_clone = @aggr.translated_to(@repo.ontology)
     assert_equal @target_node, aggr_clone.pattern_element
   end
 
   it "should store translated aggregations in the DB" do
-    first_clone = @aggr.translated_to(@repo)
+    first_clone = @aggr.translated_to(@repo.ontology)
     expect(first_clone).to_not eq(@aggr)
-    second_clone = @aggr.translated_to(@repo)
+    second_clone = @aggr.translated_to(@repo.ontology)
     expect(second_clone).to eq(first_clone)
   end
 
   it "should call the substitutor" do
-    assert_equal @target_node, @aggr.translated_to(@repo).pattern_element
+    assert_equal @target_node, @aggr.translated_to(@repo.ontology).pattern_element
   end
 
   it "should simply pass through the fixed stuff" do
-    clone_old = @aggr.translated_to(@repo)
+    clone_old = @aggr.translated_to(@repo.ontology)
     @aggr.operation = :sum
     @aggr.save
-    clone_new = @aggr.translated_to(@repo)
+    clone_new = @aggr.translated_to(@repo.ontology)
     expect(clone_new.operation).to eq(:sum)
   end
 
   it "should adapt if we changed the pattern element of the original aggregation" do
-    clone_old = @aggr.translated_to(@repo)
+    clone_old = @aggr.translated_to(@repo.ontology)
     expect(clone_old.pattern_element).to eq(@target_node)
     new_target = FactoryGirl.create(:node, ontology: @repo.ontology)
     new_source = FactoryGirl.create(:node, ontology: @aggr.pattern_element.ontology)
@@ -43,7 +43,7 @@ RSpec.describe Aggregation, :type => :model do
     @aggr.pattern_element = new_source
     @aggr.save
 
-    clone_new = @aggr.translated_to(@repo)
+    clone_new = @aggr.translated_to(@repo.ontology)
     expect(clone_new).to eq(clone_old)
     expect(clone_new.operation).to eq(:sum)
     expect(clone_new.pattern_element).to eq(new_target)
