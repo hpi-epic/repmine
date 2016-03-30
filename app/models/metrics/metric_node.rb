@@ -31,6 +31,10 @@ class MetricNode < ActiveRecord::Base
     mt.execute_query(query(mt))
   end
 
+  def parameters(mt)
+    measurable.translated_to(mt.target_ontology).parameters(mt)
+  end
+
   def query(mt)
     mt.query(measurable.translated_to(mt.target_ontology), translated_aggregations(mt.target_ontology))
   end

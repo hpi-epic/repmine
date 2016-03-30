@@ -188,4 +188,8 @@ class Pattern < Measurable
   def queries(monitoring_task)
     [monitoring_task.query(self)]
   end
+
+  def parameters(mt)
+    {self => nodes.collect{|node| {node => node.attribute_constraints.where(:monitoring_task_id => mt.id)}}.reduce({}, :merge)}
+  end
 end

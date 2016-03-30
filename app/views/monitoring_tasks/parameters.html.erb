@@ -1,0 +1,21 @@
+<% @task.parameters.each_pair do |pattern, nodes| %>
+  <%= pattern.name %>
+  <hr />
+  <% nodes.each_pair do |node, attribute_constraints| %>
+    <%= node.name %> (<%= node.rdf_type %>)
+    <br />
+    <% attribute_constraints.each do |ac|%>
+      <%= ac.pretty_string %>
+      <%= link_to(fa_icon("times-circle"), attribute_constraint_path(ac), :method => :delete) %>
+    <% end %>
+
+    <%= form_tag(attribute_constraints_path) do %>
+      <%= hidden_field_tag(:node_id, node.id)%>
+      <%= hidden_field_tag("attribute_constraint[monitoring_task_id]", @task.id)%>
+      <%= select_tag("attribute_constraint[rdf_type]", attrib_selector(node.possible_attribute_constraints), {:class => "just_right"}) %>
+      <%= select_tag("attribute_constraint[operator]", options_for_select(AttributeConstraint::OPERATORS.values), {:class => "very_narrow"})%>
+      <%= text_field_tag("attribute_constraint[value]", "", {:class => "just_right"}) %>
+      <%= submit_tag("Add", class: "btn btn-success")%>
+    <% end %>
+  <% end %>
+<% end %>

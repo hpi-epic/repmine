@@ -72,4 +72,12 @@ class MonitoringTask < ActiveRecord::Base
   def query(pattern, aggregations = [])
     repository.query_creator_class.new(pattern, aggregations, self).query_string
   end
+
+  def queries()
+    measurable.queries(self)
+  end
+
+  def parameters()
+    measurable.parameters(self)
+  end
 end

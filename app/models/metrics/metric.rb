@@ -122,4 +122,8 @@ class Metric < Measurable
   def queries(monitoring_task)
     leaf_nodes.collect{|leaf_node| leaf_node.query(monitoring_task)}
   end
+
+  def parameters(monitoring_task)
+    leaf_nodes.collect{|leaf_node| leaf_node.parameters(monitoring_task)}.reduce({}, :merge)
+  end
 end

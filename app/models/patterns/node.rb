@@ -59,4 +59,8 @@ class Node < PatternElement
     equal &&= attribute_constraints.none?{|ac| other.attribute_constraints.select{|oac| ac.equal_to?(oac)}.size != 1}
     return equal
   end
+
+  def possible_attribute_constraints
+    ontology.attributes_for(rdf_type)
+  end
 end

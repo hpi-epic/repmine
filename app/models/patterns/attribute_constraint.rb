@@ -42,8 +42,8 @@ class AttributeConstraint < PatternElement
     self.ontology = node.ontology if ontology.nil?
   end
 
-  def possible_attributes(rdf_type = nil)
-    return ontology.attributes_for(rdf_type || node.rdf_type)
+  def possible_attributes()
+    return node.possible_attribute_constraints
   end
 
   def refers_to_variable?

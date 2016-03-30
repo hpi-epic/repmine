@@ -1,6 +1,7 @@
 module AttributeConstraintsHelper
-  def attrib_selector(possible_attributes, ac)
-    options_from_collection_for_select(possible_attributes.sort{|a,b| a.name <=> b.name}, "attribute_url", "name", ac.rdf_type)
+  def attrib_selector(possible_attributes, ac = nil)
+    attrs = possible_attributes.sort{|a,b| a.name <=> b.name}
+    options_from_collection_for_select(attrs, "attribute_url", "name", ac.nil? ? nil : ac.rdf_type)
   end
 
   def ac_position(ac, relayout = false)

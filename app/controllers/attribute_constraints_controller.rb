@@ -4,14 +4,17 @@ class AttributeConstraintsController < ApplicationController
 
   def create
     @node = Node.find(params[:node_id])
-    @ac = AttributeConstraint.create(:node => @node)
-    @possible = @ac.possible_attributes(params[:rdf_type])
-    render :show
+    if params[:attribute_constraint].nil?
+      @ac = AttributeConstraint.create({:node => @node})
+      render :show
+    else
+      AttributeConstraint.create({:node => @node}.merge(params[:attribute_constraint]))
+      redirect_to(:back)
+    end
   end
 
   def show
     @ac = AttributeConstraint.find(params[:id])
-    @possible ||= @ac.possible_attributes()
   end
 
   def update
@@ -35,6 +38,7 @@ class AttributeConstraintsController < ApplicationController
     respond_to do |format|
       @ac.destroy
       format.js
+      format.html{redirect_to(:back)}
     end
   end
 
