@@ -5,7 +5,7 @@ class MeasurablesController < ApplicationController
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
     else
-      @measurable_groups = Pattern.grouped.merge(Metric.grouped)
+      @measurable_groups = Pattern.grouped.merge(Metric.grouped){|key, patterns, metrics| patterns+metrics}
       @ontology_groups = Ontology.grouped
       @repositories = Repository.all
     end
