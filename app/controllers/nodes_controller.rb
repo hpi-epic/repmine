@@ -5,7 +5,9 @@ class NodesController < ApplicationController
 
   def create
     @pattern = Pattern.find(params[:pattern_id])
-    @node = @pattern.create_node!(Ontology.find(params[:ontology_id]))
+    @ontology = Ontology.find(params[:ontology_id])
+    default_type = @ontology.type_hierarchy.first
+    @node = @pattern.create_node!(@ontology, default_type.nil? ? "" : default_type.url)
     render :show
   end
 
