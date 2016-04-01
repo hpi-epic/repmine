@@ -47,6 +47,17 @@ class MonitoringTask < ActiveRecord::Base
     res = measurable.run(self)
     repository.job = nil
     File.open(result_file, "wb"){|f| f.puts Oj.dump(res)}
+    return res
+  end
+
+  # this could also set the value back to the original one, but meh...
+  # receives an array of {ac_id: x, value: 42} hashes
+  def run_with(params)
+    params.each do |arg|
+      ac = attribute_constraints.where(id: arg[:ac_id]).first
+      ac.update_attributes(value: arg[:value]) unless ac.nil?
+    end
+    run()
   end
 
   def executable?
