@@ -43,4 +43,9 @@ class MonitoringTasksController < ApplicationController
     @task = MonitoringTask.find(params[:monitoring_task_id])
   end
 
+  def run
+    @task = MonitoringTask.find(params[:monitoring_task_id])
+    render json: @task.run_with(params[:task_parameters] || [])
+  end
+
 end

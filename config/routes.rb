@@ -67,8 +67,8 @@ RepMine::Application.routes.draw do
   resources :monitoring_tasks do
     get :results
     get :query
-    get :check, on: :collection
     get :parameters
+    post :run
   end
 
   resources :services

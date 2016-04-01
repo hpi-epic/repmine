@@ -44,7 +44,11 @@ class MonitoringTask < ActiveRecord::Base
 
   def run(job = nil)
     repository.job = job
-    res = measurable.run(self)
+    res = begin
+      measurable.run(self)
+    rescue Exception => e
+      return []
+    end
     repository.job = nil
     File.open(result_file, "wb"){|f| f.puts Oj.dump(res)}
     return res
