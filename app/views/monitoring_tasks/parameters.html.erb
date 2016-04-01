@@ -1,13 +1,15 @@
 <% @task.parameters.each_pair do |pattern, nodes| %>
-  <%= pattern.name %>
+  <h3><%= pattern.name %></h3>
   <hr />
   <% nodes.each_pair do |node, attribute_constraints| %>
-    <%= node.name %> (<%= node.rdf_type %>)
+    <h4><%= node.name %> (<%= node.rdf_type %>)</h4>
     <br />
     <% attribute_constraints.each do |ac|%>
       <%= ac.pretty_string %>
       <%= link_to(fa_icon("times-circle"), attribute_constraint_path(ac), :method => :delete) %>
+      <br />
     <% end %>
+    <hr />
 
     <%= form_tag(attribute_constraints_path) do %>
       <%= hidden_field_tag(:node_id, node.id)%>
