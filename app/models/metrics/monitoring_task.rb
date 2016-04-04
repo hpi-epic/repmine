@@ -57,11 +57,20 @@ class MonitoringTask < ActiveRecord::Base
   # this could also set the value back to the original one, but meh...
   # receives an array of {ac_id: x, value: 42} hashes
   def run_with(params)
+    param_changed = false
     params.each do |arg|
       ac = attribute_constraints.where(id: arg[:ac_id]).first
-      ac.update_attributes(value: arg[:value]) unless ac.nil?
+      next if ac.nil?
+      ac.update_attributes(value: arg[:value], operator: arg[:operator] || ac.operator)
+      param_changed ||= !ac.previous_changes().empty?
     end
-    run()
+
+    if param_changed || !has_latest_results?
+      return run
+    else
+      enqueue
+      return results
+    end
   end
 
   def executable?

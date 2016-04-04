@@ -53,6 +53,27 @@ RSpec.describe MonitoringTask, :type => :model do
     expect(@mt.query(@pattern)).to include(cp_rdf)
   end
 
+  it "should determine whether to run or enqueue a job when asked through the API" do
+    before = @pattern.attribute_constraints.size
+    ac = create_custom_parameter()
+    allow(@mt).to receive(:results){[]}
+
+    # no parameter changed, but we do not have latest results -> run
+    allow(@mt).to receive(:has_latest_results?){false}
+    expect(@mt).to receive(:run)
+    @mt.run_with([{ac_id: ac.id, value: ac.value}])
+
+    # no parameter changed and we have latest results -> enqueue
+    allow(@mt).to receive(:has_latest_results?){true}
+    expect(@mt).to receive(:enqueue)
+    @mt.run_with([{ac_id: ac.id, value: ac.value}])
+
+    # a parameter changed and even if we have latest results, we should run
+    expect(@mt).to receive(:run)
+    allow(@mt).to receive(:has_latest_results?){true}
+    @mt.run_with([{ac_id: ac.id, value: ac.value + "xyz"}])
+  end
+
   def create_custom_parameter()
     ac = FactoryGirl.create(:attribute_constraint, monitoring_task_id: @mt.id, node: @pattern.nodes.first, rdf_type: cp_rdf)
   end
