@@ -1,5 +1,7 @@
 class MonitoringTasksController < ApplicationController
 
+  skip_before_filter :verify_authenticity_token, :only => [:run]
+
   def index
     @repos_with_tasks = Repository.find(MonitoringTask.pluck(:repository_id).uniq)
     if @repos_with_tasks.empty?
@@ -45,7 +47,7 @@ class MonitoringTasksController < ApplicationController
 
   def run
     @task = MonitoringTask.find(params[:monitoring_task_id])
+    headers['Access-Control-Allow-Origin'] = '*'
     render json: @task.run_with(params[:task_parameters] || [])
   end
-
 end
