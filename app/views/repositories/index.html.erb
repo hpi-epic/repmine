@@ -1,9 +1,10 @@
 <% unless @repositories.empty? %>
-<table style="width:50%" class="table table-bordered">
+<table class="table table-bordered">
   <thead>
     <tr>
       <th>Name</th>
       <th>Actions</th>
+      <th>Value Computation</th>
     </tr>
   </thead>
   <tbody>
@@ -16,6 +17,12 @@
       <%= link_to "Edit", edit_repository_path(repository), {:class => "btn btn-warning"} %>
       <%= link_to "Delete", repository, {:method => :delete, :confirm => "Really?", :class => "btn btn-danger"} %>
     </td>
+    <td>
+      <%= form_tag(repository_prepare_service_path(repository)) do %>
+        <%= select_tag(:service_id, options_from_collection_for_select(Service.all, "id", "name"), {class: "needs_no_space"})%>
+        <%= submit_tag("Configure Service", class: "btn btn-primary")%>
+      <% end %>
+    </th>
   </tr>
   <% end %>
   <tbody>

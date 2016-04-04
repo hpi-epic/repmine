@@ -1,0 +1,11 @@
+<%= form_for(@service_call) do |f| %>
+
+  <%= f.fields_for(:service_call_parameters) do |ff| %>
+    <%= ff.object.service_parameter.name %>:
+    <%= ff.select(:rdf_type, @service_call.input_values) %>
+    <br />
+  <% end %>
+
+<%= submit_tag("Set Parameters", class: "btn")%>
+<%= link_to("Run Service", service_call_run_path(@service_call), class: "btn btn-success", method: :post)%>
+<% end %>

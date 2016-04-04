@@ -1,7 +1,8 @@
 class Repository < ActiveRecord::Base
   attr_accessible :name, :description, :host, :port, :db_name, :db_username, :db_password
   belongs_to :ontology
-  has_many :monitoring_tasks, :dependent => :destroy
+  has_many :monitoring_tasks, dependent: :destroy
+  has_many :service_calls, dependent: :destroy
   validates :name, :presence => true
 
   # job object for logging purposes

@@ -118,11 +118,16 @@ class AgraphConnection
   def all_elements()
     results = {}
     [RDF::RDFS.Class, RDF::OWL.DatatypeProperty, RDF::OWL.ObjectProperty].each do |ttype|
-      results[ttype.to_s] = Set.new
-      repository.build_query(:infer => true) do |q|
-        q.pattern([:thing, RDF.type, ttype])
-      end.run{|res| results[ttype.to_s] << res[:thing].to_s}
+      results[ttype.to_s] = elements_of_type(ttype)
     end
+    return results
+  end
+
+  def elements_of_type(ttype)
+    results = Set.new
+    repository.build_query(:infer => true) do |q|
+      q.pattern([:thing, RDF.type, ttype])
+    end.run{|res| results << res[:thing].to_s}
     return results
   end
 

@@ -57,6 +57,7 @@ RepMine::Application.routes.draw do
 
   resources :repositories do
     get :extract_schema
+    post :prepare_service
   end
 
   resources :ontologies do
@@ -71,7 +72,10 @@ RepMine::Application.routes.draw do
     post :run
   end
 
-  resources :services
+  resources :service_calls, only: [:show, :destroy] do
+    post :run
+  end
+
   resources :correspondences
 
   root to: "measurables#index"

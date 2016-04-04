@@ -1,0 +1,3 @@
+class InputParameter < ServiceParameter
+
+end

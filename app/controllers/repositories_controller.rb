@@ -102,4 +102,11 @@ class RepositoriesController < ApplicationController
     @repository.extract_ontology!(true)
     redirect_to @repository, :notice => "Started analyzing the repository in a background thread."
   end
+
+  def prepare_service
+    service = Service.find(params[:service_id])
+    repository = Repository.find(params[:repository_id])
+    service_call = ServiceCall.for_service_and_repository(service, repository)
+    redirect_to service_call_path(service_call)
+  end
 end

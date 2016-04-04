@@ -3,8 +3,8 @@ class CreateServiceParameters < ActiveRecord::Migration
     create_table :service_parameters do |t|
       t.string :name
       t.integer :datatype_cd
-      t.boolean :is_collection, :default => true
       t.references :service
+      t.string :type
       t.timestamps
     end
   end
