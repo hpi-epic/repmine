@@ -18,4 +18,8 @@ class QueryCreator < Struct.new(:pattern, :aggregations, :monitoring_task_id)
   def pe_variable(pe)
     pe.name.squish.downcase.tr(" ","_").to_sym
   end
+
+  def update_query(filters, values, ontology)
+    raise "implement an update query with simple attribute value filters and target values to write"
+  end
 end

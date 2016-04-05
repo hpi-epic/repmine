@@ -111,4 +111,10 @@ class CypherQueryCreator < QueryCreator
       return ac.value
     end
   end
+
+  def update_query(filters, target_values, ontology)
+    query = "MATCH (n {" + filters.collect{|key,val| "#{ontology.label_for_resource(key)}:'#{val}'"}.join(", ")  + "}) "
+    query += "SET " + target_values.collect{|key, val| "n.#{ontology.label_for_resource(key)} = '#{val}'"}.join(", ") + " "
+    query + "RETURN n"
+  end
 end

@@ -45,14 +45,24 @@ class ServiceCall < ActiveRecord::Base
   end
 
   def invoke
-    repository.results_for_query(attribute_query())
-    # get unique input value combinations
-    # invoke service for each of them
-    # write the results through the repository
+    results = repository.results_for_query(attribute_query()).collect do |values|
+      next if values.values.any?{|val| val.blank?}
+      {values => JSON.parse(RestClient.post(service.url, values))}
+    end.compact
+
+    results.each_pair do |parameters, result|
+      real_params = {}
+      parameters.each_pair{|param_name, value| real_params[input_parameter(param_name)] = value}
+      repository.query_creator_class.new.insert_query(real_params, result)
+    end
   end
 
   def attribute_query()
     repository.query_creator_class.new(pattern, aggregations).query_string
+  end
+
+  def input_parameter(name)
+    input_parameters.find{|ip| ip.name == name}
   end
 
   def input_parameters
