@@ -1,9 +1,13 @@
 <%= form_for(@service_call) do |f| %>
 
   <%= f.fields_for(:service_call_parameters) do |ff| %>
-    <%= ff.object.service_parameter.name %>:
-    <%= ff.select(:rdf_type, @service_call.input_values) %>
-    <br />
+    <% if ff.object.service_parameter.is_a?(InputParameter)%>
+      <p>Use <%= ff.select(:rdf_type, @service_call.input_values) %> as input for
+        <strong><%= ff.object.service_parameter.name %></strong>
+      </p>
+    <% else %>
+      <p>Store <strong><%= ff.object.service_parameter.name %></strong> as attribute <%= ff.text_field(:rdf_type) %></p>
+    <% end %>
   <% end %>
 
 <%= submit_tag("Set Parameters", class: "btn")%>

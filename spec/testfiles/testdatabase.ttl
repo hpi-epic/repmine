@@ -136,13 +136,6 @@
       rdfs:label "ontologies_updated_at" ;
       rdfs:range xsd:string .
 
-:service_call_parameters_pattern_element_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_call_parameters ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "service_call_parameters_pattern_element_id" ;
-      rdfs:range xsd:integer .
-
 :monitoring_tasks
       a       owl:Class , rdfs:Class ;
       rdfs:isDefinedBy : ;
@@ -228,6 +221,13 @@
       rdfs:domain :delayed_jobs ;
       rdfs:isDefinedBy : ;
       rdfs:label "delayed_jobs_queue" ;
+      rdfs:range xsd:string .
+
+:service_parameters_type
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_parameters_type" ;
       rdfs:range xsd:string .
 
 :repositories_db_username
@@ -543,6 +543,13 @@
       rdfs:label "metric_nodes_type" ;
       rdfs:range xsd:string .
 
+:service_call_parameters_service_parameter_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_call_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters_service_parameter_id" ;
+      rdfs:range xsd:integer .
+
 :metric_nodes_metric_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :metric_nodes ;
@@ -815,13 +822,6 @@
       rdfs:label "correspondences_target_key" ;
       rdfs:range xsd:string .
 
-:service_calls_pattern_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_calls ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "service_calls_pattern_id" ;
-      rdfs:range xsd:integer .
-
 :repositories_db_password
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
@@ -888,19 +888,19 @@
       rdfs:isDefinedBy : ;
       rdfs:label "taggings" .
 
+:service_call_parameters_rdf_type
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_call_parameters ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_call_parameters_rdf_type" ;
+      rdfs:range xsd:string .
+
 :pattern_elements_min_cardinality
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :pattern_elements ;
       rdfs:isDefinedBy : ;
       rdfs:label "pattern_elements_min_cardinality" ;
       rdfs:range xsd:string .
-
-:service_parameters_is_collection
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :service_parameters ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "service_parameters_is_collection" ;
-      rdfs:range xsd:integer .
 
 :aggregations_ontology_id
       a       owl:DatatypeProperty , rdf:Property ;
@@ -1124,6 +1124,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "type_expressions_rdf_type" ;
       rdfs:range xsd:string .
+
+:service_calls_repository_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_calls ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls_repository_id" ;
+      rdfs:range xsd:integer .
 
 :service_calls_id
       a       owl:DatatypeProperty , rdf:Property ;

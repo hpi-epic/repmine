@@ -51,10 +51,18 @@ class AgraphConnection
   end
 
   def attribute_range(attrib)
+    thing_for_thing(attrib, RDF::RDFS.range)
+  end
+
+  def attribute_domain(attrib)
+    thing_for_thing(attrib, RDF::RDFS.domain)
+  end
+
+  def thing_for_thing(thing_in, thing_out)
     repository.build_query() do |q|
-      q.pattern([RDF::Resource.new(attrib), RDF::RDFS.range, :range])
+      q.pattern([RDF::Resource.new(thing_in), thing_out, :thing])
     end.run do |res|
-      return res[:range].to_s
+      return res[:thing].to_s
     end
     return nil
   end

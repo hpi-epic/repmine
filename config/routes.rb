@@ -72,7 +72,7 @@ RepMine::Application.routes.draw do
     post :run
   end
 
-  resources :service_calls, only: [:show, :destroy] do
+  resources :service_calls, only: [:show, :destroy, :update] do
     post :run
   end
 

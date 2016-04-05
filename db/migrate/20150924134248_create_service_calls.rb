@@ -3,6 +3,7 @@ class CreateServiceCalls < ActiveRecord::Migration
     create_table :service_calls do |t|
       t.references :service
       t.references :repository
+      t.references :pattern
       t.timestamps
     end
   end

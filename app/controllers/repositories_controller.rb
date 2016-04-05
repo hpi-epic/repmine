@@ -106,7 +106,7 @@ class RepositoriesController < ApplicationController
   def prepare_service
     service = Service.find(params[:service_id])
     repository = Repository.find(params[:repository_id])
-    service_call = ServiceCall.for_service_and_repository(service, repository)
+    service_call = repository.service_calls.where(service_id: service.id).first_or_create
     redirect_to service_call_path(service_call)
   end
 end

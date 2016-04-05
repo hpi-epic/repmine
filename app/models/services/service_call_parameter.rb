@@ -3,4 +3,8 @@ class ServiceCallParameter < ActiveRecord::Base
   belongs_to :service_parameter
 
   attr_accessible :rdf_type, :service_parameter_id
+
+  def name
+    service_parameter.name
+  end
 end

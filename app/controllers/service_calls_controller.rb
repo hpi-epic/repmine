@@ -9,4 +9,13 @@ class ServiceCallsController < ApplicationController
     @service_call.invoke
   end
 
+  def update
+    @service_call = ServiceCall.find(params[:id])
+    if @service_call.update_attributes(params[:service_call])
+      redirect_to service_call_path(@service_call, notice: "Could not save service call.")
+    else
+      redirect_to service_call_path(@service_call, info: "Successfully saved the service call.")
+    end
+  end
+
 end

@@ -186,6 +186,7 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
   create_table "service_calls", :force => true do |t|
     t.integer  "service_id"
     t.integer  "repository_id"
+    t.integer  "pattern_id"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
   end

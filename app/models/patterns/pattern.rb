@@ -2,7 +2,7 @@ class Pattern < Measurable
 
   include RdfSerialization
 
-  attr_accessible :ontology_id
+  attr_accessible :ontologies
   attr_accessor :ag_connection, :layouted_graph
 
   has_and_belongs_to_many :ontologies
