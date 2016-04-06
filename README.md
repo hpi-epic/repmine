@@ -4,21 +4,23 @@ RepMine
 This project distributes the problem of matching two ontologies on query level. To this end, the following workflow is implemented:
 
 * Creation of Graphical Representations of SPARQL, Cypher, and SQL queries
+* Graphical definition of aggregations and calculations on the returned data
 * Automated ontology matching between the source and the target ontology using AML https://github.com/AgreementMakerLight
-* Manual translation of remaining query elements with simultaneous extraction of ontology correspondences 
+* Guided, manual translation of remaining query elements
 
 Currently Supported
 ===
 * Data Sources
-  * RDBMS: Postgresql and Mysql
-  * GraphDBs: Neo4j and RDF Triple Stores with OWL ontologies
+  * RDBMS are Mapped via d2rq (http://d2rq.org)
+  * Neo4j 
+  * RDF Triple Stores
 * Query Languages
-  * SQL
   * Cypher
-  * SPARQL 1.1
+  * SPARQL
+  * SQL (via SPARQL and OWL <-> RDBMS mappings)
 * Service Integration
-  * WE-BPEL services
-  * Ruby Scripts operating on properties as input elements
+  * REST Services with JSON responses
+  * Service responses are persisted withing the source database
 
 Contact
 ===
