@@ -1,11 +1,13 @@
 class MeasurablesController < ApplicationController
 
   def index
-    if Pattern.count == 0
+    excluded = ServiceCall.pluck(:pattern_id)
+    @measurable_groups = Pattern.grouped(excluded).merge(Metric.grouped){|key, patterns, metrics| patterns+metrics}
+
+    if @measurable_groups.empty?
       flash[:notice] = "No Patterns available. Please create a new one!"
       redirect_to new_pattern_path
     else
-      @measurable_groups = Pattern.grouped.merge(Metric.grouped){|key, patterns, metrics| patterns+metrics}
       @ontology_groups = Ontology.grouped
       @repositories = Repository.all
     end

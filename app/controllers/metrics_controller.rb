@@ -9,7 +9,7 @@ class MetricsController < ApplicationController
 
   def show
     @metric = Metric.find(params[:id])
-    @measurable_groups = Metric.grouped([@metric]).merge(Pattern.grouped){|key, val1, val2| val1 + val2}
+    @measurable_groups = Metric.grouped([@metric.id]).merge(Pattern.grouped){|key, val1, val2| val1 + val2}
     @existing_connections = []
     @metric.metric_nodes.each do |node|
       node.children.each do |child|

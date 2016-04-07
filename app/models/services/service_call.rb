@@ -1,18 +1,20 @@
 class ServiceCall < ActiveRecord::Base
   belongs_to :repository
   belongs_to :service
-  belongs_to :pattern
+  belongs_to :pattern, dependent: :destroy
 
   has_many :service_call_parameters, dependent: :destroy
   accepts_nested_attributes_for :service_call_parameters
 
+  attr_accessor :param_hash
+
   attr_accessible :service_id, :service_call_parameters_attributes
   after_create :copy_parameters, :create_pattern
-  after_save :update_pattern
+  after_save :update_pattern_and_parameters
 
   def copy_parameters
     service.input_parameters.each{|ip| service_call_parameters.where(service_parameter_id: ip.id).first_or_create}
-    service.output_parameters.each{|op| service_call_parameters.where(service_parameter_id: op.id).first_or_create}
+    service.output_parameters.each{|op| service_call_parameters.where(service_parameter_id: op.id, rdf_type: op.name).first_or_create}
   end
 
   def create_pattern
@@ -28,11 +30,19 @@ class ServiceCall < ActiveRecord::Base
     self.save
   end
 
-  def update_pattern
-    input_parameters.each do |input_parameter|
-      ac = pattern.attribute_constraints.where(value: input_parameter.name).first
-      ac.rdf_type = input_parameter.rdf_type
-      ac.node.rdf_type = repository.ontology.attribute_domain(input_parameter.rdf_type)
+  def update_pattern_and_parameters
+    input_parameters.each do |ip|
+      unless ip.rdf_type.blank?
+        ac = pattern.attribute_constraints.where(value: ip.name).first
+        ac.rdf_type = ip.rdf_type
+        ac.node.rdf_type = repository.ontology.attribute_domain(ip.rdf_type).url
+      end
+    end
+
+    output_parameters.each do |op|
+      unless op.rdf_type.blank? || op.rdf_type.match(URI.regexp(%w(http https)))
+        op.update_attributes(rdf_type: repository.ontology.custom_attribute_url(op.rdf_type))
+      end
     end
   end
 
@@ -45,24 +55,35 @@ class ServiceCall < ActiveRecord::Base
   end
 
   def invoke
-    results = repository.results_for_query(attribute_query()).collect do |values|
-      next if values.values.any?{|val| val.blank?}
-      {values => JSON.parse(RestClient.post(service.url, values))}
+    results = repository.results_for_query(attribute_query()).collect do |query_res|
+      next if query_res.values.any?{|val| val.blank?}
+      service_res = JSON.parse(RestClient.post(service.url, query_res))
+      next if service_res.blank?
+      [rdf_values(query_res), service_res]
     end.compact
 
-    results.each_pair do |parameters, result|
-      real_params = {}
-      parameters.each_pair{|param_name, value| real_params[input_parameter(param_name)] = value}
-      repository.query_creator_class.new.insert_query(real_params, result)
+    output_parameters.each{|op| repository.ontology.add_custom_attribute(op.rdf_type, op.datatype, nil)}
+    results.each_with_index do |result, i|
+      real_result = Hash[result[1].collect{|param_name, value| [output_rdf_type(param_name), value]}]
+      query = repository.query_creator_class.new.update_query(result[0], real_result, repository.ontology)
+      repository.results_for_query(query)
     end
+  end
+
+  def rdf_values(values)
+    Hash[values.collect{|param_name, value| [input_rdf_type(param_name), value]}]
   end
 
   def attribute_query()
     repository.query_creator_class.new(pattern, aggregations).query_string
   end
 
-  def input_parameter(name)
-    input_parameters.find{|ip| ip.name == name}
+  def input_rdf_type(name)
+    service_call_parameters.find_by_service_parameter_id(service.input_parameters.find_by_name(name)).rdf_type
+  end
+
+  def output_rdf_type(name)
+    service_call_parameters.find_by_service_parameter_id(service.output_parameters.find_by_name(name)).rdf_type
   end
 
   def input_parameters

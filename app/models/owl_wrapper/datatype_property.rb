@@ -28,10 +28,11 @@ class DatatypeProperty
   def rdf_statements
     stmts = [
       [resource, RDF.type, RDF::OWL.DatatypeProperty],
-      [resource, RDF::RDFS.domain, domain.resource],
       [resource, RDF::RDFS.range, range],
       [resource, RDF::RDFS.label, RDF::Literal.new(name)]
     ]
+    stmts << [resource, RDF::RDFS.domain, domain.resource] unless domain.nil?
+    return stmts
   end
 
   def ==(other_object)

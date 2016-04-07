@@ -26,6 +26,11 @@ class AgraphConnection
     remove_duplicates!
   end
 
+  def insert_statements!(stmts)
+    repository.insert(*stmts)
+    remove_duplicates!
+  end
+
   def remove_duplicates!()
     RestClient.delete(self.repository_url + "/statements/duplicates?mode=spog")
   end
@@ -55,7 +60,7 @@ class AgraphConnection
   end
 
   def attribute_domain(attrib)
-    thing_for_thing(attrib, RDF::RDFS.domain)
+    OwlClass.new(nil, nil, thing_for_thing(attrib, RDF::RDFS.domain))
   end
 
   def thing_for_thing(thing_in, thing_out)

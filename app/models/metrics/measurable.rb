@@ -20,11 +20,11 @@ class Measurable < ActiveRecord::Base
     raise "implement 'queries(monitoring_task)' in #{self.class.name}"
   end
 
-  def self.grouped(excluded_instances = [])
+  def self.grouped(excluded_ids = [])
     measurable_groups = {}
 
     where(type: self.name).each do |measurable|
-      next if excluded_instances.include?(measurable)
+      next if excluded_ids.include?(measurable.id)
       tag_list = measurable.tag_list.empty? ? ["Uncategorized"] : measurable.tag_list
       tag_list.each do |tag|
         measurable_groups[tag] ||= []

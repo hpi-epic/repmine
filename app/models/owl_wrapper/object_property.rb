@@ -21,7 +21,7 @@ class ObjectProperty
   end
 
   def rdf_statements
-    stmts = [
+    [
       [resource, RDF.type, RDF::OWL.ObjectProperty],
       [resource, RDF::RDFS.domain, domain.resource],
       [resource, RDF::RDFS.range, range.resource],

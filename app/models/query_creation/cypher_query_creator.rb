@@ -98,7 +98,7 @@ class CypherQueryCreator < QueryCreator
     if ac.refers_to_variable?
       return attribute_reference(ac.referenced_element)
     elsif ac.value_type == RDF::XSD.string
-      return "'#{clean_value(ac)}'"
+      return "'#{escape_str(clean_value(ac))}'"
     else
       return ac.value
     end
@@ -112,9 +112,13 @@ class CypherQueryCreator < QueryCreator
     end
   end
 
+  def escape_str(str)
+    str.is_a?(String) ? str.gsub("'", %q(\\\')) : str
+  end
+
   def update_query(filters, target_values, ontology)
-    query = "MATCH (n {" + filters.collect{|key,val| "#{ontology.label_for_resource(key)}:'#{val}'"}.join(", ")  + "}) "
-    query += "SET " + target_values.collect{|key, val| "n.#{ontology.label_for_resource(key)} = '#{val}'"}.join(", ") + " "
-    query + "RETURN n"
+    query = "MATCH (n {" + filters.collect{|key,val| "#{ontology.label_for_resource(key)}:'#{escape_str(val)}'"}.join(", ")  + "}) "
+    query += "SET " + target_values.collect{|key, val| "n.#{ontology.label_for_resource(key)} = '#{escape_str(val)}'"}.join(", ") + " "
+    query + "RETURN id(n)"
   end
 end

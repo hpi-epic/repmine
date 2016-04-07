@@ -1,8 +1,11 @@
+<p>Configure <strong><%= @service_call.service.name%></strong> Service for Repository '<%= @service_call.repository.name%>'</p>
+<hr />
+
 <%= form_for(@service_call) do |f| %>
 
   <%= f.fields_for(:service_call_parameters) do |ff| %>
     <% if ff.object.service_parameter.is_a?(InputParameter)%>
-      <p>Use <%= ff.select(:rdf_type, @service_call.input_values) %> as input for
+      <p>Use <%= ff.select(:rdf_type, @service_call.input_values, {},{class: "search-this"}) %> as input for
         <strong><%= ff.object.service_parameter.name %></strong>
       </p>
     <% else %>

@@ -2,7 +2,7 @@
   <div class="btn-group">
     <%= hidden_field_tag("measurables[]", [@pattern.id])%>
     <%= button_tag("Run on:", :class => "btn btn-info", :name => "monitor") %>
-    <%= select_tag(:repository_id, options_from_collection_for_select(@repositories, "id", "name")) %>
+    <%= select_tag(:repository_id, options_from_collection_for_select(@repositories, "id", "name"),{class: "needs_no_space"}) %>
   </div>
 <% end %>
 

@@ -1,0 +1,2 @@
+excludeInFolderSearch = "{$excludeInFolderSearch,$extraExcludes,log,doc,externals,app/assets/javascript/*.min.js}" 
+

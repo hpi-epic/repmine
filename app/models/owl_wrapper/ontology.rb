@@ -71,6 +71,15 @@ class Ontology < ActiveRecord::Base
     return id.nil? ? self.short_name : "ontology_#{self.id}"
   end
 
+  def custom_attribute_url(attrib_name)
+    url + "/custom_attributes/#{attrib_name.gsub(/\s/, "_")}"
+  end
+
+  def add_custom_attribute(url, range, domain)
+    dp = DatatypeProperty.from_url(url, range, domain)
+    ag_connection.insert_statements!(dp.rdf_statements)
+  end
+
   # expose the agraph_connection interface to ontology users
   def method_missing(sym, *args, &block)
     return ag_connection.send(sym, *args, &block) if ag_connection.respond_to?(sym)
