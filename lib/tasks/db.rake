@@ -49,9 +49,7 @@ namespace :db do
     TranslationPattern.destroy_all
     Correspondence.destroy_all
     clear_ontologies(false)
-    Repository.all.each{|repo|
-      repo.ontology.update_attributes(:does_exist => false) if repo.ontology.is_a?(ExtractedOntology)
-    }
+    Repository.all.each{|repo| repo.ontology.update_attributes(:does_exist => false) if repo.ontology.is_a?(ExtractedOntology)}
     MonitoringTask.destroy_all
     Metric.destroy_all
   end
