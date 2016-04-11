@@ -23,6 +23,7 @@ class AttributeConstraintsController < ApplicationController
       if @ac.update_attributes(params[:attribute_constraint])
         format.json { render json: {}, status => :ok }
       else
+        flash[:error] = "Could not save node! #{@ac.errors.full_messages.join("! ")}"
         format.json { render json: @ac.errors, status: :unprocessable_entity }
       end
     end

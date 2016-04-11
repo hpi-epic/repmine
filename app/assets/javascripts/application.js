@@ -24,7 +24,7 @@
 //= require_self
 
 // takes a jqXHR object and if it has the X-Message header set, displays a growl message
-var showGrowlNotification = function(request){
+function showGrowlNotification(request){
   var msg = request.getResponseHeader('X-Message');
   var msg_type = request.getResponseHeader('X-Message-Type');
   if(msg){

@@ -16,7 +16,7 @@ class PatternElement < ActiveRecord::Base
   has_one :type_expression, :dependent => :destroy
   before_destroy :invalidate_translations, prepend: true
 
-  after_save :set_name
+  after_create :set_name
   validates :name, :uniqueness => {scope: :pattern_id}, length: {minimum: 3}, unless: :new_record?
 
   include RdfSerialization

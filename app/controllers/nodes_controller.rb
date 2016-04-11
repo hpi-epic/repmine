@@ -20,10 +20,11 @@ class NodesController < ApplicationController
     respond_to do |format|
       rdf_type = params[:node].delete(:rdf_type)
       @node.rdf_type = rdf_type
-      if @node.update_attributes(params[:node])
+      if @node.update_attributes(params[:node].merge({name: "#{@node.short_rdf_type} #{@node.id}"}))
         @node.type_expression.save
         format.json { render json: {}, status => :ok }
       else
+        flash[:error] = "Could not save node! #{@node.errors.full_messages.join("! ")}"
         format.json { render json: @node.errors, status: :unprocessable_entity }
       end
     end

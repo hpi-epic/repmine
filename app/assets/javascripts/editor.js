@@ -111,6 +111,7 @@ var submitAndHighlight = function(form){
       showGrowlNotification(jqXHR);
     },
     error: function(jqXHR, textStatus, errorThrown){
+      form.parent().effect("highlight", {color: '#CC3412'}, 2000);
       showGrowlNotification(jqXHR);
     }
   });
