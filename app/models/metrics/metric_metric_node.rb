@@ -32,9 +32,8 @@ class MetricMetricNode < MetricNode
 
   def group_results(results)
     grouped_results = {}
-
     # basically just stores either the value (group criteria) or an array of values
-    results.each do |res_hash|
+    results.each.with_index do |res_hash, i|
       g_hash = group_headers.collect{|gh| res_hash[gh].to_s}.join("_")
       if grouped_results[g_hash].nil?
         grouped_results[g_hash] = {}
@@ -54,5 +53,9 @@ class MetricMetricNode < MetricNode
 
   def group_headers()
     @group_headers ||= aggregations.grouping.collect{|agg| agg.column_name}
+  end
+
+  def parameters(mt)
+    {}
   end
 end

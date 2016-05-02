@@ -93,19 +93,10 @@ class Neo4jRepository < Repository
   end
 
   def results_for_query(query)
-    data = []
-    columns = []
-    round = 0
-
-    loop do
-      round_data, round_columns = query_result(query + " SKIP #{round*1000} LIMIT 1000", true)
-      data += round_data
-      columns = round_columns
-      log_msg("Results so far: #{data.size}")
-      round += 1
-      break if round_data.size != 1000
-    end
-
+    start = Time.now
+    log_msg("Starting Query: #{query}")
+    data, columns = query_result(query, true)
+    log_msg("Received #{data.size} results in #{(Time.now - start).round(3)}s")
     return hash_data(data, columns)
   end
 

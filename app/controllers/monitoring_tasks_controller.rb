@@ -9,7 +9,13 @@ class MonitoringTasksController < ApplicationController
     else
       @query_jobs = {}
       @repos_with_tasks.collect{|repo| repo.query_jobs}.flatten.each do |qj|
-        mt = MonitoringTask.includes(:measurable).find(qj.payload_object.monitoring_task_id)
+        mt = begin
+          MonitoringTask.includes(:measurable).find(qj.payload_object.monitoring_task_id)
+        rescue
+          qj.destroy
+          nil
+        end
+        next if mt.nil?
         @query_jobs[qj.id] = mt.measurable.name
       end
       @new_tasks = params[:task_ids] || []

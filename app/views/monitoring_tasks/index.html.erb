@@ -31,6 +31,14 @@
           <% end %>
         <% end %>
         <%= link_to("Delete", monitoring_task_path(mt), method: :delete, class: "btn btn-danger") %>
+        <br />
+        <% mt.parameters.each_pair do |pattern, nodes| %>
+          <% nodes.each_pair do |node, acs| %>
+            <% acs.each do |ac| %>
+              <strong><%= node.name%></strong>: <%= ac.pretty_string %><br />
+            <% end %>
+          <% end%>
+        <% end%>
 
       <% if i == 0 %>
       </td>

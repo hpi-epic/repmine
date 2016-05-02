@@ -9,7 +9,7 @@ Neo4jRepository.where(
 puts "Creating SEON Repository"
 RdfRepository.where(
   name: "SWT2 Seon Data",
-  host: "172.16.30.252",
+  host: "127.0.0.1",
   ontology_url: "https://dl.dropboxusercontent.com/u/1622986/ontologies/seon/seon.owl",
   port: 10035,
   db_name: "repositories/seon_data",
@@ -21,5 +21,6 @@ Neo4jRepository.where(
   name: "Dev Data",
   host: "192.168.30.233",
   port: 7486,
-  description: "Git data from a large company repo"
+  description: "Git data from a large company repo",
+  db_username: "neo4j"
 ).first_or_create

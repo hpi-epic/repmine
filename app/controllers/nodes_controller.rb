@@ -20,7 +20,7 @@ class NodesController < ApplicationController
     respond_to do |format|
       rdf_type = params[:node].delete(:rdf_type)
       @node.rdf_type = rdf_type
-      if @node.update_attributes(params[:node].merge({name: "#{@node.short_rdf_type} #{@node.id}"}))
+      if @node.update_attributes(params[:node])
         @node.type_expression.save
         format.json { render json: {}, status => :ok }
       else

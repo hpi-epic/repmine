@@ -32,7 +32,13 @@ class Metric < Measurable
 
   # basically finds identical entries in multiple arrays of hashes contained as values in a hash
   def overlapping_result_headers(results)
-    results.values.collect{|res| res.collect{|val| val.keys}.flatten.uniq}.inject(:&)
+    if results.size == 1
+      return []
+    else
+      return results.values.collect do |res|
+        res.collect{|val| val.keys}.flatten.uniq
+      end.inject(:&)
+    end
   end
 
   # calculates metrics for all operator nodes
