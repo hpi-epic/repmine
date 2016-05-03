@@ -1,8 +1,8 @@
 <% unless @matching_groups.blank? %>
   <ul class="correspondence-list">
   <% @matching_groups.each_pair do |source_elements, target_elements| %>
-    <li class="correspondence-details">
-      <%= render :partial => "show", :locals => {sources: source_elements, targets: target_elements, pattern: @pattern} %>
+    <li class="correspondence-details <%= target_elements[:user_provided] ? 'user_provided' : 'automatically_matched' %>">
+      <%= render :partial => "show", :locals => {sources: source_elements, targets: target_elements[:matching_elements], pattern: @pattern} %>
     </li>
   <% end %>
   </ul>

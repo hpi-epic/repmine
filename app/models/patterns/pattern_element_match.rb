@@ -10,8 +10,10 @@ class PatternElementMatch < ActiveRecord::Base
     groups = {}
     matches.group_by{|el| el.matching_element}.each_pair do |matching, matches|
       matched_elements = matches.map(&:matched_element)
-      groups[matched_elements] ||= []
-      groups[matched_elements] << matching
+      user_provided = matches.collect{|pem| pem.correspondence.user_provided}.all?
+      groups[matched_elements] ||= {matching_elements: [], user_provided: user_provided}
+      groups[matched_elements][:matching_elements] << matching
+      groups[matched_elements][:user_provided] ||= user_provided
     end
     return groups
   end

@@ -46,7 +46,7 @@ class TranslationPattern < Pattern
   end
 
   def matching_groups
-    PatternElementMatch.matching_groups(pattern_elements.map(& :id))
+    PatternElementMatch.matching_groups(pattern_elements.map(&:id))
   end
 
   def match!()
