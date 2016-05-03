@@ -45,4 +45,7 @@ class ExtractedOntology < Ontology
     return ["ontologies", "extracted", short_name.squish.downcase.tr(" ","_") + ".#{file_format}"].join("/")
   end
 
+  def query_creator_class
+    repository.query_creator_class
+  end
 end

@@ -6,7 +6,5 @@
   </div>
 <% end %>
 
-<% @queries.each_pair do |language, query| %>
-  <legend><%= language %></legend>
-  <%= text_area_tag(:query_string, query, :class => "form-control full_page", :rows => 10)%>
-<% end %>
+<legend><%= @language %></legend>
+<%= text_area_tag(:query_string, @query, :class => "form-control full_page", :rows => 10)%>

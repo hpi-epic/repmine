@@ -14,23 +14,24 @@
   <%= javascript_include_tag "pattern_translator.js" %>
 <% end %>
 
-  <%= form_tag(pattern_nodes_path(@target_pattern), :remote => true, :id => "new_pattern_node") do %>
   <div class="translation_controls" style="left: <%= @controls_offset %>px" />
     <div class="btn-group">
-      <%= button_tag 'Create Node', :class => "btn p-control" %>
-      <% if @target_pattern.ontologies.size != 1 %>
-        <%= ontology_select(@target_pattern.ontologies)%>
-      <% else %>
-        <%= hidden_field_tag(:ontology_id, @target_pattern.ontologies.first.id) %>
+      <%= form_tag(pattern_nodes_path(@target_pattern), remote: true, id: "new_pattern_node", class: "needs_no_space") do %>
+        <%= button_tag 'Create Node', :class => "btn p-control" %>
+        <% if @target_pattern.ontologies.size != 1 %>
+          <%= ontology_select(@target_pattern.ontologies)%>
+        <% else %>
+          <%= hidden_field_tag(:ontology_id, @target_pattern.ontologies.first.id) %>
+        <% end %>
       <% end %>
     </div>
-  <% end %>
   <%= link_to 'Save Pattern', "#", :onclick => "savePattern();",  :class => "btn btn-success p-control" %>
   <%= link_to 'Save Mapping', "#", :onclick => "saveCorrespondence();", :class => "btn hide btn-info om-control" %>
   <%= link_to 'Back to Edit', "#", :onclick => "stopOmMode();", :class => "btn hide btn-warning om-control" %>
   <%= link_to 'Correspondences', pattern_correspondences_path(@target_pattern), remote: true, id: "toggle_correspondences" , class: "btn btn-danger" %>
   <%= link_to 'Query', pattern_query_path(@target_pattern), remote: true, id: "show_query", class: "btn btn-inverse"%>
   </div>
+
 
 
 

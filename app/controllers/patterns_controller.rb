@@ -14,6 +14,7 @@ class PatternsController < ApplicationController
 
   def show
     @pattern = Pattern.find(params[:id])
+    redirect_to pattern_translate_path(@pattern) and return if @pattern.is_a?(TranslationPattern)
     @attributes, @relations = load_attributes_and_constraints!(@pattern)
     @title = "'#{@pattern.name}' Pattern"
   end
@@ -108,12 +109,7 @@ class PatternsController < ApplicationController
   def query
     @pattern = Pattern.find(params[:pattern_id])
     @repositories = Repository.where(ontology_id: @pattern.ontologies.map(&:id))
-    @queries = if @repositories.any?{|repo| repo.is_a?(Neo4jRepository)}
-      {"Neo4j" => CypherQueryCreator.new(@pattern).query_string}
-    else
-      {"Sparql" => SparqlQueryCreator.new(@pattern).query_string}
-    end
-    @title = "Queries for '#{@pattern.name}'"
+    @language, @query = @pattern.query
     render layout: false
   end
 

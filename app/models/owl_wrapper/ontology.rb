@@ -142,6 +142,10 @@ class Ontology < ActiveRecord::Base
     end
     groups.reject{|group| group[1].empty?}
   end
+
+  def query_creator_class
+    SparqlQueryCreator
+  end
 end
 
 require_dependency 'agraph_connection'

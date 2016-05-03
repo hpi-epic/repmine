@@ -190,4 +190,9 @@ class Pattern < Measurable
   def parameters(mt)
     {self => nodes.collect{|node| {node => node.attribute_constraints.where(:monitoring_task_id => mt.id)}}.reduce({}, :merge)}
   end
+
+  def query
+    qcc = ontologies.first.query_creator_class
+    return qcc.language, qcc.new(self).query_string
+  end
 end

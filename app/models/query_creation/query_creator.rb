@@ -22,4 +22,8 @@ class QueryCreator < Struct.new(:pattern, :aggregations, :monitoring_task_id)
   def update_query(filters, values, ontology)
     raise "implement an update query with simple attribute value filters and target values to write"
   end
+
+  def self.language
+    return name.gsub("QueryCreator", "")
+  end
 end

@@ -16,6 +16,7 @@ var addNodeToGraph = function(node){
   node.find("#node_rdf_type").change(function(event){
     updateConnectionsAndAttributes($(this).closest("div"));
   });
+
   $(".inplace").editable();
 };
 
@@ -88,16 +89,6 @@ var saveForm = function(form_finder){
     requests.push(submitAndHighlight($(this)));
   });
   return requests;
-};
-
-var openComplexDialog = function(url, modal_tree, modal){
-  $.ajax({
-    url: url,
-    success: function(data, textStatus, jqXHR){
-      modal_tree.html(data);
-      modal.modal('show');
-    }
-  });
 };
 
 // submits the form and highlights possible errors
