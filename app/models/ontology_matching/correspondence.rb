@@ -3,7 +3,7 @@ class Correspondence < ActiveRecord::Base
   class UnsupportedCorrespondence < Exception;end
 
   attr_accessor :node, :entity1, :entity2, :pattern_elements, :ontology_matcher
-  attr_accessible :measure, :relation
+  attr_accessible :measure, :relation, :user_provided
   belongs_to :onto1, :class_name => "Ontology"
   belongs_to :onto2, :class_name => "Ontology"
   has_many :pattern_element_matches, dependent: :destroy
@@ -55,6 +55,7 @@ class Correspondence < ActiveRecord::Base
   def self.from_elements(input_elements, output_elements)
     corr = where(source_key: key_for_entity(input_elements), target_key: key_for_entity(output_elements)).first
     corr ||= construct_from_elements(input_elements, output_elements)
+    corr.update_attributes(user_provided: true)
 
     input_elements.each do |ie|
       output_elements.each do |oe|

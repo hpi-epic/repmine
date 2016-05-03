@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
     t.integer "onto2_id"
     t.text    "source_key"
     t.text    "target_key"
+    t.boolean "user_provided", :default => false
     t.string  "type"
   end
 
