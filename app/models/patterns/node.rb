@@ -9,7 +9,7 @@ class Node < PatternElement
   validates :ontology, :presence => true
 
   def pretty_string
-    "#{type_expression.fancy_string(true)}"
+    short_rdf_type
   end
 
   def rdf_mappings

@@ -110,9 +110,9 @@ RSpec.describe Pattern, :type => :model do
     p = Pattern.create(name: name, description: "Generic")
     p.ontologies << ontology
     source_node = p.create_node!(p.ontologies.first)
-    source_node.rdf_type = source_class
+    source_node.update_attributes(rdf_type: source_class)
     target_node = p.create_node!(p.ontologies.first)
-    target_node.rdf_type = target_class
+    target_node.update_attributes(rdf_type: target_class)
     relation = RelationConstraint.create(:source_id => source_node.id, :target_id => target_node.id)
     relation.rdf_type = relation_type
     return p
@@ -122,9 +122,9 @@ RSpec.describe Pattern, :type => :model do
     p = Pattern.create(name: name, description: "Generic")
     p.ontologies << ontology
     source_node = p.create_node!(p.ontologies.first)
-    source_node.rdf_type = source_class
+    source_node.update_attributes(rdf_type: source_class)
     ac = source_node.attribute_constraints.create
-    ac.rdf_type = attribute_type
+    ac.update_attributes(rdf_type: attribute_type)
     return p
   end
 

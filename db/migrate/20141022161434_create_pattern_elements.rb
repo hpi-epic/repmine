@@ -7,6 +7,7 @@ class CreatePatternElements < ActiveRecord::Migration
       t.references :ontology
       t.references :pattern
       t.string :name
+      t.string :rdf_type
       # attribute constraint
       t.references :node
       t.string :value

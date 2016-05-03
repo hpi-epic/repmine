@@ -58,12 +58,12 @@ class TranslationPattern < Pattern
   end
 
   # return correspondences for a given pattern
-  def prepare!(selected_correspondences = [])
+  def prepare!(selected_correspondences = {})
     match!
     mappings = all_mappings()
     resolve_ambiguities(mappings, selected_correspondences)
     ambiguities = check_for_ambiguous_mappings(mappings)
-    raise AmbiguousTranslation.new unless ambiguities.empty?
+    raise AmbiguousTranslation.new() unless ambiguities.empty?
     flatten_mappings(mappings)
     add_pattern_elements!(mappings)
     connect_pattern_elements!(mappings)
@@ -110,9 +110,10 @@ class TranslationPattern < Pattern
       # and the elements defined by the correspondence
       correspondence.pattern_elements.each do |te|
         # we first store the element in the translation pattern
-        self.pattern_elements << te
-        # save it (without validation)
+        pattern_elements << te unless pattern_elements.include?(te)
+        # save it (without validation since we connect later...)
         te.save!(validate: false)
+        # create a new pattern element match
         input_elements.each do |ie_id|
           correspondence.pattern_element_matches.where(:matched_element_id => ie_id, :matching_element_id => te.id).first_or_create!
         end
@@ -136,30 +137,25 @@ class TranslationPattern < Pattern
   end
 
   def resolve_ambiguities(mappings, selected_correspondences)
-    if selected_correspondences.empty?
-      return mappings
-    else
-      selected_correspondences.each_pair do |element_ids, correspondence_id|
-        real_target = mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?}
-        real_target = real_target.nil? ? element_ids : real_target.first.collect{|el| el.id}
-        mappings.each do |elements, correspondences|
-          if !(elements.collect{|el| el.id} & real_target).empty?
-            mappings[elements] = mappings[elements].select{|corr| corr.id == correspondence_id}
-            mappings.delete(elements) if mappings[elements].empty?
-          end
+    selected_correspondences.each_pair do |element_ids, correspondence_id|
+      real_target = mappings.find{|k,v| !v.find{|corr| corr.id == correspondence_id}.nil?}
+      real_target = real_target.nil? ? element_ids : real_target.first.collect{|el| el.id}
+      mappings.each do |elements, correspondences|
+        if !(elements.collect{|el| el.id} & real_target).empty?
+          mappings[elements] = mappings[elements].select{|corr| corr.id == correspondence_id}
+          mappings.delete(elements) if mappings[elements].empty?
         end
       end
     end
+    return mappings
   end
 
-  # we check whether we find unmatched doppelgaengers of all the elements
   def unmatched_subgraph(elements)
+    # check whether we have unmatched elements in the translation (i.e., ones created by users)
     candidates = unmatched_elements(source_pattern.ontologies)
+    # now try to find similar elements in the ones returned by the ontology matcher
     doppelgaengers = elements.collect{|el| candidates.find{|cand| cand.equal_to?(el)}}.compact
-    if doppelgaengers.uniq.size == elements.size
-      return doppelgaengers
-    else
-      return elements
-    end
+    # if we found a doppelgaenger for each target element, we simple use them instead of creating new elements
+    doppelgaengers.uniq.size == elements.size ? doppelgaengers : elements
   end
 end

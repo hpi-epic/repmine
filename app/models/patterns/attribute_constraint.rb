@@ -63,7 +63,7 @@ class AttributeConstraint < PatternElement
   end
 
   def pretty_string
-    "#{type_expression.fancy_string(true)} #{operator} #{value}"
+    "#{short_rdf_type} #{operator} #{value}"
   end
 
   def graph_strings(elements = [])

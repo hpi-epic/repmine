@@ -6,11 +6,6 @@
   <%= f.select(:rdf_type, type_select(node.type_hierarchy, node), :class => "classSelector") %>
   <%= f.hidden_field(:is_group) %><%= link_to(fa_icon("group"), "#", onclick: "toggleNodeGroup($(this), '#{div_id(node)}')") %>
   &nbsp;|&nbsp;
-  <%= link_to(fa_icon("sitemap"), "#",
-  :onclick => "openComplexDialog('#{node_type_expression_path(node, node.type_expression)}',$('#node_#{ node.id}_modal_tree'), $('#node_#{node.id}_modal'))") %>
-  &nbsp;|&nbsp;
   <%= link_to(fa_icon("times-circle"), "#", :onclick => "deleteNode($('#node_#{node.id}'))") %>
 <% end %>
 </div>
-
-<%= render :partial => "nodes/modal", :locals => {:node => node} %>

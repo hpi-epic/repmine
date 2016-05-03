@@ -40,7 +40,9 @@ RSpec.describe Node, :type => :model do
   it "should figure out differing attribute constraints" do
     n1 = FactoryGirl.create(:pattern).nodes.first
     n2 = FactoryGirl.create(:pattern).nodes.first
-    n2.attribute_constraints.first.rdf_type = n1.attribute_constraints.first.rdf_type + "stuff"
+    ac2 = n2.attribute_constraints.first
+    ac1 = n1.attribute_constraints.first
+    ac2.update_attributes(rdf_type: ac1.rdf_type + "stuff")
     assert !n1.equal_to?(n2)
   end
 
@@ -49,7 +51,7 @@ RSpec.describe Node, :type => :model do
     n2 = FactoryGirl.create(:pattern).nodes.first
     ac1 = FactoryGirl.create(:attribute_constraint, :node => n1)
     ac2 = FactoryGirl.create(:attribute_constraint, :node => n2)
-    ac2.rdf_type = ac1.rdf_type + "stuff"
+    ac2.update_attributes(rdf_type: ac1.rdf_type + "stuff")
     assert !n1.equal_to?(n2)
   end
 

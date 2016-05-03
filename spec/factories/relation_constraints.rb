@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :relation_constraint do
-    association :type_expression, :factory => :type_expression, :rdf_override => "http://example.org/relation"
+    rdf_type "http://example.org/relation"
     ontology
   end
 end

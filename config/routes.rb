@@ -29,12 +29,7 @@ RepMine::Application.routes.draw do
   end
 
   resources :nodes do
-    get :fancy_rdf_string
-    resources :type_expressions do
-      post :add_below
-      post :add_same_level
-      post :delete
-    end
+    get :static
   end
 
   resources :attribute_constraints do

@@ -48,9 +48,7 @@ class Pattern < Measurable
   end
 
   def create_node!(ontology, rdf_type = "")
-    node = self.nodes.create!(:ontology_id => ontology.id)
-    node.type_expression = TypeExpression.for_rdf_type(rdf_type)
-    return node.becomes(Node)
+    Node.create(:ontology_id => ontology.id, rdf_type: rdf_type, pattern_id: self.id)
   end
 
   def matched_elements(onts)

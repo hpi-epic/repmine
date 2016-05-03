@@ -27,11 +27,11 @@ class SparqlQueryCreator < QueryCreator
 
   def fill_where_clause
     pattern.nodes.each do |node|
-      where << [pe_variable(node), RDF.type, RDF::Resource.new(node.rdf_type)]
+      where << [pe_variable(node), RDF.type, node.type_resource]
     end
 
     pattern.relation_constraints.each do |rc|
-      where << [pe_variable(rc.source), rc.type_expression.resource, pe_variable(rc.target)]
+      where << [pe_variable(rc.source), rc.type_resource, pe_variable(rc.target)]
     end
 
     pattern.attribute_constraints(monitoring_task_id).each do |ac|
@@ -60,19 +60,19 @@ class SparqlQueryCreator < QueryCreator
 
   def pattern_for_ac_equals(node, ac)
     if ac.refers_to_variable?
-      where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
+      where << [pe_variable(node), ac.type_resource, pe_variable(ac)]
       filter << "?#{pe_variable(ac)} = ?#{pe_variable(ac.referenced_element)}"
     else
-      where << [pe_variable(node), ac.type_expression.resource, ac.value]
+      where << [pe_variable(node), ac.type_resource, ac.value]
     end
   end
 
   def pattern_for_ac_regex(node, ac)
     filter << "regex(?#{pe_variable(ac)}, \"#{ac.value.gsub("\/", "")}\")"
-    where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
+    where << [pe_variable(node), ac.type_resource, pe_variable(ac)]
   end
 
   def pattern_for_ac_var(node, ac)
-    where << [pe_variable(node), ac.type_expression.resource, pe_variable(ac)]
+    where << [pe_variable(node), ac.type_resource, pe_variable(ac)]
   end
 end

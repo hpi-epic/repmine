@@ -34,8 +34,8 @@ class ServiceCall < ActiveRecord::Base
     input_parameters.each do |ip|
       unless ip.rdf_type.blank?
         ac = pattern.attribute_constraints.where(value: ip.name).first
-        ac.rdf_type = ip.rdf_type
-        ac.node.rdf_type = repository.ontology.attribute_domain(ip.rdf_type).url
+        ac.update_attributes(rdf_type: ip.rdf_type)
+        ac.node.update_attributes(rdf_type: repository.ontology.attribute_domain(ip.rdf_type).url)
       end
     end
 

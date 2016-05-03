@@ -41,7 +41,7 @@ RSpec.describe CypherQueryCreator, :type => :model do
     pattern = FactoryGirl.create(:n_r_n_pattern)
     new_node = pattern.create_node!(pattern.ontologies.first)
     new_rc = FactoryGirl.create(:relation_constraint, :source_id => pattern.nodes.first.id, :target_id => new_node.id)
-    new_rc.rdf_type = "fancy_new_connection"
+    new_rc.update_attributes(rdf_type: "fancy_new_connection")
     pattern.pattern_elements.reload
     qc = CypherQueryCreator.new(pattern)
     qv = query_variables(pattern, qc)

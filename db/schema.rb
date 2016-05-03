@@ -139,6 +139,7 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
     t.integer  "ontology_id"
     t.integer  "pattern_id"
     t.string   "name"
+    t.string   "rdf_type"
     t.integer  "node_id"
     t.string   "value"
     t.string   "operator"
@@ -236,17 +237,5 @@ ActiveRecord::Schema.define(:version => 20151028164332) do
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
-
-  create_table "type_expressions", :force => true do |t|
-    t.string   "operator"
-    t.string   "rdf_type"
-    t.integer  "pattern_element_id"
-    t.string   "ancestry"
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
-  end
-
-  add_index "type_expressions", ["ancestry"], :name => "index_type_expressions_on_ancestry"
-  add_index "type_expressions", ["pattern_element_id"], :name => "index_type_expressions_on_pattern_element_id"
 
 end

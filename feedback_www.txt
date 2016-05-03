@@ -1,0 +1,6 @@
+Probleme/Anregungen:
+- Speichern bei jeder aktion, sonst knallt es bei den Korrespondenzen
+- Refresh Correspondence overview
+- Github -> SEON != SEON -> Github
+- Welche Korrespondenzen wurden automatisch erzeugt, welche von Nutzern
+- How to measure that this is better?

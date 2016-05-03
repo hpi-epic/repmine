@@ -295,55 +295,6 @@ var rdfTypeForHTMLNode = function(node_html_id){
   return $("#" + node_html_id).find("select").val();
 };
 
-// highlights a type selector upon click
-var highlightSelector = function(element) {
-  $("li.type_expression").each(function(i, ts){
-    $(ts).removeClass("highlighted");
-  });
-  element.addClass("highlighted");
-};
-
-// adds a type expression above, below, or on the same level as the selected_element (determined by url)
-// for simplicity, we simply redraw the entire tree instead of fiddling with the DOM
-var addTypeExpression = function(url,selected_element, list, operator){
-  var requests = [];
-  if(selected_element.length == 1){
-    var target_url = url.replace("XXX", selected_element.attr("data-id"));
-    // save each type expression in this list
-    $.when.apply($, saveAllTypeExpressions(list)).done(function(){
-      $.ajax({url: target_url, data: {operator: operator}, type: "POST", success: function(data){
-        $(list).html(data);}
-      });
-    });
-  } else {
-    alert("You have to select an element before altering the tree!");
-  }
-};
-
-var saveAllTypeExpressions = function(list){
-  var requests = []
-  list.find(".edit_type_expression").each(function(i,form){
-    requests.push(submitAndHighlight($(form)));
-  });
-  return requests;
-};
-
-var saveTypeExpressions = function(list, fancy_string_url, node_rdf_type_selector, modal){
-  $.when.apply($, saveAllTypeExpressions(list)).done(function(){
-    $.ajax({url: fancy_string_url, success: function(data){
-      var new_option = $(data);
-      var old_option = node_rdf_type_selector.find("option[id=" + new_option.attr("id") + "]");
-      if(old_option.length == 0){
-        node_rdf_type_selector.append(data);
-      } else {
-        old_option.html(new_option);
-      }
-      modal.modal("hide");
-      }
-    })
-  });
-};
-
 var freeRelationEndpointOn = function(node_html_id){
   var endpoints = jsPlumb.getEndpoints(node_html_id);
   var free_endpoint;

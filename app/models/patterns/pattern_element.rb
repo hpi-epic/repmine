@@ -1,6 +1,6 @@
 class PatternElement < ActiveRecord::Base
   # explicitly allows setting the rdf type of an element and the ontology
-  attr_accessible :rdf_type, :ontology_id, :name
+  attr_accessible :rdf_type, :ontology_id, :name, :pattern_id
 
   # allows to access the rdf node, in case this pattern stems from an rdf graph
   attr_accessor :rdf_node
@@ -13,8 +13,8 @@ class PatternElement < ActiveRecord::Base
   has_many :matched_elements, :through => :matchings
   has_many :matching_elements, :through => :matches
 
-  has_one :type_expression, :dependent => :destroy
   before_destroy :invalidate_translations, prepend: true
+  after_save :invalidate_translations_if_dirty
 
   after_create :set_name
   validates :name, :uniqueness => {scope: :pattern_id}, length: {minimum: 3}, unless: :new_record?
@@ -31,6 +31,10 @@ class PatternElement < ActiveRecord::Base
     matchings.each{|match| match.destroy}
   end
 
+  def invalidate_translations_if_dirty
+    invalidate_translations if !changes["rdf_type"].nil? && !changes["rdf_type"][0].nil?
+  end
+
   def set_name
     update_attributes(name: "#{type || self.class.name} #{self.id}") if self.name.blank?
   end
@@ -39,35 +43,16 @@ class PatternElement < ActiveRecord::Base
     pattern.url + "/#{self.class.name.underscore.pluralize}/#{id}"
   end
 
-  def rdf_type
-    type_expression.nil? ? "" : type_expression.fancy_string
-  end
-
   def short_rdf_type
-    type_expression.nil? ? "" : type_expression.fancy_string(true)
+    rdf_type.split("/").last.split("#").last
   end
 
-  def qualified_type(short = true)
-    type_expression.nil? ? "" : (ontology.short_name + "#" + type_expression.fancy_string(short))
+  def qualified_type()
+    ontology.short_name + "#" + short_rdf_type
   end
 
-  # this method allows overwriting an existing type expression with a SIMPLE rdf type
-  def rdf_type=(str)
-    if type_expression.nil?
-      self.type_expression = TypeExpression.for_rdf_type(str)
-      invalidate_translations
-    else
-      # we only need to overwrite if the strings differ...
-      if type_expression.fancy_string != str
-        if type_expression.is_simple?
-          type_expression.children.first.update_attributes(:rdf_type => str)
-        else
-          type_expression.destroy
-          self.type_expression = TypeExpression.for_rdf_type(str)
-        end
-        invalidate_translations
-      end
-    end
+  def type_resource
+    RDF::Resource.new(rdf_type)
   end
 
   def equal_to?(other)
@@ -88,7 +73,7 @@ class PatternElement < ActiveRecord::Base
   def rdf_statements
     return [
       [resource, Vocabularies::GraphPattern.belongsTo, pattern.resource],
-      [resource, Vocabularies::GraphPattern.elementType, type_expression.resource]
+      [resource, Vocabularies::GraphPattern.elementType, RDF::Resource.new(rdf_type)]
     ]
   end
 
@@ -113,8 +98,6 @@ class PatternElement < ActiveRecord::Base
     rebuild_element_properties!(queryable, self.rdf_node)
   end
 
-  # TODO: also become able to rebuild complex expressions (universal, someOf, and stuff like that)
-  # P.S.: that is also why this is currently a separate method...
   def rebuild_element_type!(queryable, node)
     queryable.query(:subject => node, :predicate => Vocabularies::GraphPattern.elementType) do |res|
       self.rdf_type = res.object.to_s

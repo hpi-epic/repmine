@@ -22,7 +22,7 @@ RSpec.describe TranslationPattern, :type => :model do
     correspondence = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence])
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}
-    @pattern.nodes.first.rdf_type = correspondence.entity1
+    @pattern.nodes.first.update_attributes(rdf_type: correspondence.entity1)
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
 
@@ -34,7 +34,7 @@ RSpec.describe TranslationPattern, :type => :model do
     correspondence = FactoryGirl.create(:complex_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence])
     assert @pattern.pattern_elements.none?{|pe| pe.rdf_type == correspondence.entity1}
-    @pattern.nodes.first.rdf_type = correspondence.entity1
+    @pattern.nodes.first.update_attributes(rdf_type: correspondence.entity1)
     @tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     @tp.prepare!
     assert @tp.pattern_elements.all?{|pe| correspondence.entity2.any?{|ce| ce.equal_to?(pe)}}
@@ -75,7 +75,7 @@ RSpec.describe TranslationPattern, :type => :model do
     correspondence2 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1, correspondence2])
     new_node = @pattern.create_node!(@pattern.ontologies.first)
-    new_node.rdf_type = correspondence1.entity1
+    new_node.update_attributes(rdf_type: correspondence1.entity1)
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
     # there should be one node comming from the simple correspondence and one from the hardway
@@ -102,7 +102,7 @@ RSpec.describe TranslationPattern, :type => :model do
     correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
     new_node = @pattern.create_node!(@source_ontology)
-    new_node.rdf_type = "unmatchable"
+    new_node.update_attributes(rdf_type: "unmatchable")
 
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
@@ -115,7 +115,7 @@ RSpec.describe TranslationPattern, :type => :model do
     # adding a new correspondence
     corr2 = FactoryGirl.create(:simple_correspondence, :onto1 => @source_ontology, :onto2 => @target_ontology)
     # now we change the rdf type on one node
-    @pattern.nodes.last.rdf_type = corr2.entity1
+    @pattern.nodes.last.update_attributes(rdf_type: corr2.entity1)
     tp.prepare!
 
     assert_empty @pattern.unmatched_elements([@target_ontology])
@@ -125,18 +125,23 @@ RSpec.describe TranslationPattern, :type => :model do
   it "should throw away elements of translation patterns if the original one was changed" do
     correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
     om = ontology_matcher([correspondence1])
+
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
+
     assert_equal 1, tp.pattern_elements.size
-    @pattern.nodes.first.rdf_type = @pattern.nodes.first.rdf_type + "_new"
-    assert_empty TranslationPattern.first.pattern_elements
+    expect(PatternElementMatch.count).to eq(3)
+    @pattern.nodes.first.update_attributes(rdf_type: @pattern.nodes.first.rdf_type + "_new")
+    expect(TranslationPattern.first.pattern_elements).to be_empty
   end
 
   it "should throw away a translation if an existing element was remvoved" do
     correspondence1 = FactoryGirl.create(:hardway_complex, :onto1 => @source_ontology, :onto2 => @target_ontology)
+
     om = ontology_matcher([correspondence1])
     tp = TranslationPattern.for_pattern_and_ontologies(@pattern, [@target_ontology])
     tp.prepare!
+
     assert_equal 1, tp.pattern_elements.size
     @pattern.nodes.first.destroy
     assert_empty TranslationPattern.first.pattern_elements
@@ -208,14 +213,20 @@ RSpec.describe TranslationPattern, :type => :model do
     n1 = p.create_node!(@source_ontology, corr.entity1)
     n2 = p.create_node!(@source_ontology, corr.entity1)
 
+    # create one node that refers to one of the input nodes
     tp = FactoryGirl.create(:translation_pattern, :pattern_id => p.id, :ontologies => [@target_ontology])
     tn1 = tp.create_node!(@target_ontology, corr.entity2)
     corr.pattern_element_matches.create(:matched_element => n1, :matching_element => tn1)
 
+    # create a second node that does not refer to anything (i.e., user created one but didn't mark the match)
     tn2 = tp.create_node!(@target_ontology, corr.entity2)
+    assert_equal 2, tp.nodes.size
+
+    # now prepare the pattern
     tp.prepare!
 
-    assert_equal 2, tp.nodes.size
+    # and there should not be an additional node but only a new match ...
+    assert_equal 2, tp.pattern_elements.size
     assert_equal 2, PatternElementMatch.count
   end
 
@@ -293,7 +304,7 @@ RSpec.describe TranslationPattern, :type => :model do
     tp.prepare!
 
     assert_equal 3, PatternElementMatch.count
-    tp.nodes.first.rdf_type = tp.nodes.first.rdf_type + "_new"
+    tp.nodes.first.update_attributes(rdf_type: tp.nodes.first.rdf_type + "_new")
     assert_equal 0, PatternElementMatch.count
     assert_equal 3, Pattern.first.pattern_elements.size
   end

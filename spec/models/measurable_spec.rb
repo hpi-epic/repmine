@@ -16,6 +16,6 @@ RSpec.describe Measurable, :type => :model do
     expect(group.size).to eq(5)
     expect(group.keys.to_set).to eq(["Uncategorized", "awesome", "cool", "manly", "womanly"].to_set)
     expect(group["Uncategorized"]).to eq([m3])
-    expect(Pattern.grouped([m3])["Uncategorized"]).to be_nil
+    expect(Pattern.grouped([m3.id])["Uncategorized"]).to be_nil
   end
 end

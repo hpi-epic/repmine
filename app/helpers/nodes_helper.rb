@@ -2,12 +2,6 @@ module NodesHelper
 
   def type_select(type_hierarchy, node)
     options = select_list_options(type_hierarchy)
-    unless node.is_a?(TypeExpression)
-      fstring = node.type_expression.fancy_string
-      if !fstring.blank? && options.find{|o| o.last == fstring}.nil?
-        options << [node.type_expression.fancy_string(true), node.type_expression.fancy_string]
-      end
-    end
     return options_for_select(options, node.rdf_type)
   end
 

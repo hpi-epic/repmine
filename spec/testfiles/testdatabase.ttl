@@ -38,13 +38,6 @@
       rdfs:isDefinedBy : ;
       rdfs:label "services" .
 
-:type_expressions_operator
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_operator" ;
-      rdfs:range xsd:string .
-
 :repositories_description
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
@@ -557,11 +550,6 @@
       rdfs:label "metric_nodes_metric_id" ;
       rdfs:range xsd:integer .
 
-:type_expressions
-      a       owl:Class , rdfs:Class ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions" .
-
 :service_calls_service_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :service_calls ;
@@ -642,20 +630,6 @@
       rdfs:domain :services ;
       rdfs:isDefinedBy : ;
       rdfs:label "services_updated_at" ;
-      rdfs:range xsd:string .
-
-:type_expressions_pattern_element_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_pattern_element_id" ;
-      rdfs:range xsd:integer .
-
-:type_expressions_updated_at
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_updated_at" ;
       rdfs:range xsd:string .
 
 :aggregations_metric_node_id
@@ -801,13 +775,6 @@
       rdfs:label "ontologies_patterns_id" ;
       rdfs:range xsd:integer .
 
-:type_expressions_created_at
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_created_at" ;
-      rdfs:range xsd:string .
-
 :repositories_ontology_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :repositories ;
@@ -821,6 +788,13 @@
       rdfs:isDefinedBy : ;
       rdfs:label "correspondences_target_key" ;
       rdfs:range xsd:string .
+
+:service_calls_pattern_id
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :service_calls ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "service_calls_pattern_id" ;
+      rdfs:range xsd:integer .
 
 :repositories_db_password
       a       owl:DatatypeProperty , rdf:Property ;
@@ -942,6 +916,13 @@
       rdfs:domain :delayed_jobs ;
       rdfs:isDefinedBy : ;
       rdfs:label "delayed_jobs_updated_at" ;
+      rdfs:range xsd:string .
+
+:pattern_elements_rdf_type
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :pattern_elements ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "pattern_elements_rdf_type" ;
       rdfs:range xsd:string .
 
 :services_url
@@ -1118,13 +1099,6 @@
       rdfs:label "service_parameters_service_id" ;
       rdfs:range xsd:integer .
 
-:type_expressions_rdf_type
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_rdf_type" ;
-      rdfs:range xsd:string .
-
 :service_calls_repository_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :service_calls ;
@@ -1172,26 +1146,12 @@
       rdfs:label "taggings_context" ;
       rdfs:range xsd:string .
 
-:type_expressions_id
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_id" ;
-      rdfs:range xsd:integer .
-
 :service_parameters_id
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :service_parameters ;
       rdfs:isDefinedBy : ;
       rdfs:label "service_parameters_id" ;
       rdfs:range xsd:integer .
-
-:type_expressions_ancestry
-      a       owl:DatatypeProperty , rdf:Property ;
-      rdfs:domain :type_expressions ;
-      rdfs:isDefinedBy : ;
-      rdfs:label "type_expressions_ancestry" ;
-      rdfs:range xsd:string .
 
 :measurables
       a       owl:Class , rdfs:Class ;

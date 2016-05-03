@@ -52,7 +52,7 @@ class RelationConstraint < PatternElement
   end
 
   def pretty_string
-    str = " #{type_expression.fancy_string(true)}"
+    str = " #{short_rdf_type}"
     str += " (#{min_cardinality.blank? ? 0 : min_cardinality},#{max_cardinality.blank? ? '*' : max_cardinality})"
     str += "[#{min_path_length.blank? ? 1 : min_path_length},#{max_path_length.blank? ? 1 : max_path_length}] "
   end
