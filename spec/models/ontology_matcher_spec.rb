@@ -86,7 +86,7 @@ RSpec.describe OntologyMatcher, :type => :model do
   it "should find an existing correspondence within the graph" do
     correspondence = FactoryGirl.create(:simple_correspondence)
     assert_not_empty @om.alignment_graph
-    assert @om.has_correspondence_node?(correspondence)
+    assert @om.alignment_graph.has_statement?(RDF::Statement.new(correspondence.resource, RDF.type, Vocabularies::Alignment.Cell))
   end
 
   it "should remove an existing correspondence from the graph" do

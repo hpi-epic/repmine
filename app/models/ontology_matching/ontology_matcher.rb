@@ -95,13 +95,17 @@ class OntologyMatcher
 
     alignment_graph.query(query) do |result|
       if result[:entity2].anonymous?
-        return Pattern.from_graph(alignment_graph, result[:entity2], target_ontology).pattern_elements
+        return Pattern.from_graph(alignment_graph, result[:entity2], real_target_ontology).pattern_elements
       else
-        element = target_ontology.element_class_for_rdf_type(result[:entity2].to_s).new(:ontology_id => target_ontology.id)
+        element = real_target_ontology.element_class_for_rdf_type(result[:entity2].to_s).new(:ontology_id => real_target_ontology.id)
         element.rdf_type = result[:entity2].to_s
         return [element]
       end
     end
+  end
+
+  def real_target_ontology
+    inverted ? source_ontology : target_ontology
   end
 
   def all_correspondence_query
@@ -176,9 +180,5 @@ class OntologyMatcher
       subnodes << res[:sn]
     end
     return subnodes
-  end
-
-  def has_correspondence_node?(correspondence)
-    alignment_graph.has_statement?(RDF::Statement.new(correspondence.resource, RDF.type, Vocabularies::Alignment.Cell))
   end
 end
