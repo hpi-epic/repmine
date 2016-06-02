@@ -1,5 +1,5 @@
 // makes a node draggable and creates the onclick and
-var addNodeToGraph = function(node){
+function addNodeToGraph(node){
   var node_id = node.attr("data-id");
   var node_html_id = node.attr("id");
 
@@ -13,10 +13,6 @@ var addNodeToGraph = function(node){
   });
 
   // insert an onchange handler for the node's type selector
-  node.find("#node_rdf_type").change(function(event){
-    updateConnectionsAndAttributes($(this).closest("div"));
-  });
-
   $(".inplace").editable();
 };
 
@@ -34,7 +30,7 @@ $("#show_query").on("ajax:success", function(e, data, status, xhr){
   modal.modal('show');
 });
 
-var loadNodesAndConnections = function(){
+function loadNodesAndConnections(){
 	$(".node").not(".static").each(function(index,node_div){
 	  addNodeToGraph($(node_div));
 	});
@@ -50,8 +46,13 @@ var loadNodesAndConnections = function(){
   $(".inplace").editable();
 }
 
+/*   node.find("#node_rdf_type").change(function(event){
+    updateConnectionsAndAttributes($(this).closest("div"));
+}); */
+
+
 // adds only the endpoints to a given node without making it draggable or registering callbacks
-var addNodeEndpoints = function(node_html_id){
+function addNodeEndpoints(node_html_id){
   var endpoints = []
   endpoints.push(jsPlumb.addEndpoint(node_html_id, connectionEndpoint()));
   endpoints.push(jsPlumb.addEndpoint(node_html_id, attributeEndpoint()));
@@ -59,7 +60,7 @@ var addNodeEndpoints = function(node_html_id){
 };
 
 // creates the relations and attribute constraint thingies
-var loadExistingConnections = function(connect_them, load_attributes, make_static){
+function loadExistingConnections(connect_them, load_attributes, make_static){
   requests = []
   $(connect_them).each(function(index, el){
 	  requests.push(createConnection(el.source, el.target, true, el.url));
@@ -74,16 +75,24 @@ var loadExistingConnections = function(connect_them, load_attributes, make_stati
   return requests;
 };
 
+// make every edit form report back to mommy
+$(document).on("change", "form[class*='edit_']", function(e){
+  var form = $(this);
+  $.when(submitAndHighlight(form)).then(function(data, textStatus, jqXHR){
+    updateConnectionsAndAttributes(form.closest("div"));
+  });
+});
+
 // handler for the 'save' button. basically submits all forms
-var savePattern = function(){
-  var requests = saveForm("form.edit_node").concat(saveForm("form[class*=edit_][class*=_constraint]"));
+function savePattern(){
+  var requests = submitForm("form.edit_node").concat(submitForm("form[class*=edit_][class*=_constraint]"));
   $.when.apply($, requests).done(function(){
     submitAndHighlight($("form.edit_pattern"));
   });
 };
 
 // takes a form, submits it, and stores all the requests so we can wait for ... it
-var saveForm = function(form_finder){
+function submitForm(form_finder){
   var requests = [];
   $(form_finder).not(".static").each(function(index){
     requests.push(submitAndHighlight($(this)));
@@ -92,7 +101,7 @@ var saveForm = function(form_finder){
 };
 
 // submits the form and highlights possible errors
-var submitAndHighlight = function(form){
+function submitAndHighlight(form){
   updatePositionInformation(form);
   return $.ajax({
     url : form.attr("action"),
@@ -108,7 +117,7 @@ var submitAndHighlight = function(form){
   });
 };
 
-var updatePositionInformation = function(form){
+function updatePositionInformation(form){
   var position = $(form).parent().position();
 	if($(form).find("input[id$=_x]").length > 0){
 	  $(form).find("input[id$=_x]").val(position.left);
@@ -117,26 +126,35 @@ var updatePositionInformation = function(form){
 };
 
 // updates all connections of a node upon change of the node class
-var updateConnectionsAndAttributes = function(node){
-  var node_id = node.attr("id")
-  $(jsPlumb.getConnections("relations")).each(function(index, connection){
+function updateConnectionsAndAttributes(node){
+  var node_id = node.attr("id");
+  // update the relations. cannot use jsplumb querying, as we need incoming and outgoing
+  $(jsPlumb.getConnections({scope: "relations"})).each(function(index, connection){
     if(connection.sourceId == node_id || connection.targetId == node_id){
       var overlay = $(connection.getOverlay("customOverlay").getElement());
-      var update_url = overlay.find("form").attr("action");
-      var params = { source_type: rdfTypeForHTMLNode(connection.sourceId), target_type: rdfTypeForHTMLNode(connection.targetId)};
-      $.get(update_url, params, function(data) {overlay.html(data);});
+      reloadElement(overlay);
     }
-  })
+  });
+  // and the attributes using jsplumb querying
+  $(jsPlumb.getConnections({scope: "attributes", source: node_id})).each(function(index, connection){
+    reloadElement($(connection.target));
+  });
 };
 
-var toggleNodeGroup = function(button, node_id){
+function reloadElement(element, params){
+  var update_url = element.find("form").attr("action");
+  $.get(update_url, params, function(data) {element.html(data)});
+};
+
+
+function toggleNodeGroup(button, node_id){
   button.toggleClass("wicked");
   $("#" + node_id).toggleClass("double-border");
   var field = $("form[id='edit_" + node_id + "'] input[id='node_is_group']");
   field.val(field.val() === "true" ? "false" : "true");
 };
 
-var buildDraggedConnection = function(connection, rebuild_endpoints){
+function buildDraggedConnection(connection, rebuild_endpoints){
   var source_id = $(connection.source).attr("data-id");
   var target_id = $(connection.target).attr("data-id");
   jsPlumb.detach(connection, {fireEvent:false});
@@ -144,7 +162,7 @@ var buildDraggedConnection = function(connection, rebuild_endpoints){
 };
 
 // creates a connection between two endpoints
-var createConnection = function(source_id, target_id, reinstall_endpoints, url) {
+function createConnection(source_id, target_id, reinstall_endpoints, url) {
   // get the available relations from the server oder simply load the existing one
   if(url){
     return $.ajax({url: url, success: function(data){
@@ -154,12 +172,7 @@ var createConnection = function(source_id, target_id, reinstall_endpoints, url) 
     return $.ajax({
       url: new_relation_constraint_path,
       type: "POST",
-      data: {
-        source_id: source_id,
-        target_id: target_id,
-        source_type: rdfTypeForHTMLNode("node_" + source_id),
-        target_type: rdfTypeForHTMLNode("node_" + target_id)
-      },
+      data: {source_id: source_id, target_id: target_id},
       success: function(data) {
         buildConnection(source_id, target_id, reinstall_endpoints, $(data));
       }
@@ -167,7 +180,7 @@ var createConnection = function(source_id, target_id, reinstall_endpoints, url) 
   }
 };
 
-var buildConnection = function(source_id, target_id, reinstall_endpoints, overlay){
+function buildConnection(source_id, target_id, reinstall_endpoints, overlay){
   var free_source = freeRelationEndpointOn("node_" + source_id);
   var free_target = freeRelationEndpointOn("node_" + target_id);
   var connection = jsPlumb.connect({
@@ -202,20 +215,26 @@ jsPlumb.bind("connectionDetached", function(info, originalEvent){
   }
 });
 
-var insertAttributeConstraint = function(node_id, data){
-  var ac = $(data)
+function insertAttributeConstraint(node_id, data){
+  var ac = $(data);
+  var ac_div = $("<div class='ac_wrapper'></div>");
+
   if(0 === ac.attr("style").length){
     var node_position = $("#node_" + node_id).position()
-    ac.css({left: node_position.left - 100, top: node_position.top - 150})
+    ac.css({left: node_position.left - 100, top: node_position.top - 150});
   }
-  $("#drawing_canvas").append(ac);
-  jsPlumb.draggable(ac);
-  var ae = jsPlumb.addEndpoint(ac, { anchor:[ "BottomCenter"], deleteEndpointsOnDetach:true }, attributeEndpoint());
+  ac_div.css({left: ac.css("left"), right: ac.css("right")});
+  ac.removeAttr("style");
+  ac_div.append(ac);
+
+  $("#drawing_canvas").append(ac_div);
+  jsPlumb.draggable(ac_div);
+  var ae = jsPlumb.addEndpoint(ac_div, { anchor:[ "BottomCenter"], deleteEndpointsOnDetach:true }, attributeEndpoint());
   jsPlumb.connect({source: jsPlumb.getEndpoints("node_" + node_id)[1], target: ae});
 };
 
 // call the backend and retrieve the next attribute filter line
-var addAttributeFilter = function(node_id, url) {
+function addAttributeFilter(node_id, url) {
   if(url){
     return $.ajax({
       url: url,
@@ -228,7 +247,7 @@ var addAttributeFilter = function(node_id, url) {
     return $.ajax({
       url: new_attribute_constraint_path,
       type: "POST",
-      data: {node_id: node_id, rdf_type: rdfTypeForNode(node_id)},
+      data: {node_id: node_id},
       success: function(data) {
         insertAttributeConstraint(node_id, data);
         $(".inplace").editable();
@@ -238,7 +257,7 @@ var addAttributeFilter = function(node_id, url) {
 };
 
 // removes a node from the graph
-var deleteNode = function(node){
+function deleteNode(node){
   if(confirm("Really delete the node and all of its connections?") == false) return;
 
   var delete_url = node.find("form").attr("action");
@@ -266,13 +285,8 @@ var deleteNode = function(node){
   }});
 };
 
-// returns the rdf type value for a node
-var rdfTypeForNode = function(node_id) {
-  return $("#node_" + node_id).find("select").val();
-};
-
 // removes all unconnected Endpoints so users cannot somehow create new connections
-var removeExcessEndpoints = function(){
+function removeExcessEndpoints(){
   $("div.node.static").each(function(i,node){
     $(jsPlumb.getEndpoints($(node).attr("id"))).each(function(ii,endpoint){
       if(endpoint.connections.length == 0){
@@ -282,11 +296,7 @@ var removeExcessEndpoints = function(){
   });
 };
 
-var rdfTypeForHTMLNode = function(node_html_id){
-  return $("#" + node_html_id).find("select").val();
-};
-
-var freeRelationEndpointOn = function(node_html_id){
+function freeRelationEndpointOn(node_html_id){
   var endpoints = jsPlumb.getEndpoints(node_html_id);
   var free_endpoint;
   $(endpoints).each(function(i,e){
@@ -296,7 +306,7 @@ var freeRelationEndpointOn = function(node_html_id){
 };
 
 // encapsulates the enpoint options for the orange connection thingies
-var connectionEndpoint = function() {
+function connectionEndpoint() {
   return {
 		endpoint:["Dot", {radius:4} ],
 		paintStyle:{ fillStyle:"#ffa500", opacity:0.5 },
@@ -316,7 +326,7 @@ var connectionEndpoint = function() {
 };
 
 // same for the attribute endpoints
-var attributeEndpoint = function() {
+function attributeEndpoint() {
   return {
 		endpoint:["Rectangle", {width:5, height:5} ],
 		anchor: ["Top"],
