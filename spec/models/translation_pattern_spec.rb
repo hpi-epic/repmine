@@ -324,8 +324,8 @@ RSpec.describe TranslationPattern, :type => :model do
     expect(PatternElementMatch.count).to eq(18)
     matching_groups = tp.matching_groups
     expect(matching_groups.size).to eq(2)
-    expect(matching_groups[pattern.pattern_elements[0..2]]).to eq(tp.pattern_elements[0..2])
-    expect(matching_groups[pattern.pattern_elements[3..-1]]).to eq(tp.pattern_elements[3..-1])
+    expect(matching_groups[pattern.pattern_elements[0..2]][:matching_elements]).to eq(tp.pattern_elements[0..2])
+    expect(matching_groups[pattern.pattern_elements[3..-1]][:matching_elements]).to eq(tp.pattern_elements[3..-1])
   end
 
   def ontology_matcher(correspondences)

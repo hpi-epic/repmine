@@ -115,6 +115,13 @@
       rdfs:label "service_call_parameters_created_at" ;
       rdfs:range xsd:string .
 
+:correspondences_user_provided
+      a       owl:DatatypeProperty , rdf:Property ;
+      rdfs:domain :correspondences ;
+      rdfs:isDefinedBy : ;
+      rdfs:label "correspondences_user_provided" ;
+      rdfs:range xsd:integer .
+
 :service_parameters_datatype_cd
       a       owl:DatatypeProperty , rdf:Property ;
       rdfs:domain :service_parameters ;

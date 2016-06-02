@@ -13,7 +13,7 @@ class ServiceCall < ActiveRecord::Base
   after_save :update_pattern_and_parameters
 
   def copy_parameters
-    service.input_parameters.each{|ip| service_call_parameters.where(service_parameter_id: ip.id).first_or_create}
+    service.input_parameters.each{|ip| service_call_parameters.where(service_parameter_id: ip.id, rdf_type: ip.name).first_or_create!}
     service.output_parameters.each{|op| service_call_parameters.where(service_parameter_id: op.id, rdf_type: op.name).first_or_create}
   end
 
@@ -35,7 +35,8 @@ class ServiceCall < ActiveRecord::Base
       unless ip.rdf_type.blank?
         ac = pattern.attribute_constraints.where(value: ip.name).first
         ac.update_attributes(rdf_type: ip.rdf_type)
-        ac.node.update_attributes(rdf_type: repository.ontology.attribute_domain(ip.rdf_type).url)
+        attrib_domain = repository.ontology.attribute_domain(ip.rdf_type)
+        ac.node.update_attributes(rdf_type: attrib_domain.nil? ? ip.rdf_type : attrib_domain.url)
       end
     end
 
