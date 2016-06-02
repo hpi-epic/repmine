@@ -44,11 +44,7 @@ function loadNodesAndConnections(){
 	});
 
   $(".inplace").editable();
-}
-
-/*   node.find("#node_rdf_type").change(function(event){
-    updateConnectionsAndAttributes($(this).closest("div"));
-}); */
+};
 
 
 // adds only the endpoints to a given node without making it draggable or registering callbacks
@@ -145,7 +141,6 @@ function reloadElement(element, params){
   var update_url = element.find("form").attr("action");
   $.get(update_url, params, function(data) {element.html(data)});
 };
-
 
 function toggleNodeGroup(button, node_id){
   button.toggleClass("wicked");

@@ -43,7 +43,7 @@ class AttributeConstraint < PatternElement
   end
 
   def possible_attributes()
-    return node.possible_attribute_constraints
+    check_rdf_type(node.possible_attribute_constraints)
   end
 
   def refers_to_variable?

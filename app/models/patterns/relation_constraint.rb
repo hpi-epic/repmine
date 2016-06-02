@@ -47,8 +47,8 @@ class RelationConstraint < PatternElement
     str += elements.include?(target) ? "->#{target.rdf_type}" : ""
   end
 
-  def possible_relations(source_type = nil, target_type = nil)
-    return ontology.relations_with(source_type || source.rdf_type, target_type || target.rdf_type)
+  def possible_relations()
+    check_rdf_type(ontology.relations_with(source.rdf_type, target.rdf_type))
   end
 
   def pretty_string

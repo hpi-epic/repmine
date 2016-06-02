@@ -15,6 +15,7 @@ class CorrespondencesController < ApplicationController
       begin
         @oc = Correspondence.from_elements(input_elements, output_elements)
         output_elements.first.pattern.prepare!
+        @oc.update_attributes(user_provided: true)
         flash[:notice] = "Correspondence saved!"
       rescue Correspondence::UnsupportedCorrespondence => e
         flash[:error] = "Could not save correspondence! #{e.message}"

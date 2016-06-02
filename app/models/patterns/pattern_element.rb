@@ -93,6 +93,15 @@ class PatternElement < ActiveRecord::Base
     ontology.label_for_resource(rdf_type)
   end
 
+  def check_rdf_type(possible_values)
+    if possible_values.empty?
+      update_attributes(rdf_type: "")
+    else
+      update_attributes(rdf_type: possible_values.first.url) unless possible_values.any?{|el| el.url == rdf_type}
+    end
+    return possible_values
+  end
+
   def rebuild!(queryable)
     rebuild_element_type!(queryable, self.rdf_node)
     rebuild_element_properties!(queryable, self.rdf_node)

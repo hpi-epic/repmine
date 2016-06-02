@@ -4,13 +4,13 @@ class RelationConstraintsController < ApplicationController
 
   def create
     @rc = RelationConstraint.create(:source_id => params[:source_id], :target_id => params[:target_id])
-    @possible_relations = @rc.possible_relations(params[:source_type], params[:target_type])
+    @possible_relations = @rc.possible_relations()
     render :show
   end
 
   def show
     @rc = RelationConstraint.find(params[:id])
-    @possible_relations ||= @rc.possible_relations(params[:source_type], params[:target_type])
+    @possible_relations ||= @rc.possible_relations()
   end
 
   def update

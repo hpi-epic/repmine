@@ -55,7 +55,6 @@ class Correspondence < ActiveRecord::Base
   def self.from_elements(input_elements, output_elements)
     corr = where(source_key: key_for_entity(input_elements), target_key: key_for_entity(output_elements)).first
     corr ||= construct_from_elements(input_elements, output_elements)
-    corr.update_attributes(user_provided: true)
 
     input_elements.each do |ie|
       output_elements.each do |oe|

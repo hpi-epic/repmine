@@ -60,7 +60,8 @@ class AgraphConnection
   end
 
   def attribute_domain(attrib)
-    OwlClass.new(nil, nil, thing_for_thing(attrib, RDF::RDFS.domain))
+    domain_url = thing_for_thing(attrib, RDF::RDFS.domain)
+    domain_url.nil? ? nil : OwlClass.new(nil, nil, domain_url)
   end
 
   def thing_for_thing(thing_in, thing_out)
